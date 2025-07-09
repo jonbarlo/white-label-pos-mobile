@@ -1,0 +1,687 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'pos_provider.dart';
+
+// **************************************************************************
+// RiverpodGenerator
+// **************************************************************************
+
+String _$posRepositoryHash() => r'b58d1446678fe79e8a54c36c631d0befa42ca8cd';
+
+/// See also [posRepository].
+@ProviderFor(posRepository)
+final posRepositoryProvider = AutoDisposeProvider<PosRepository>.internal(
+  posRepository,
+  name: r'posRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$posRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef PosRepositoryRef = AutoDisposeProviderRef<PosRepository>;
+String _$cartTotalHash() => r'3095ca29bd6cd95ea9e059b336f4e2dd6821b139';
+
+/// See also [cartTotal].
+@ProviderFor(cartTotal)
+final cartTotalProvider = AutoDisposeProvider<double>.internal(
+  cartTotal,
+  name: r'cartTotalProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$cartTotalHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef CartTotalRef = AutoDisposeProviderRef<double>;
+String _$createSaleHash() => r'472e47adfb42cbec5faf693f3b4db1347db16691';
+
+/// Copied from Dart SDK
+class _SystemHash {
+  _SystemHash._();
+
+  static int combine(int hash, int value) {
+    // ignore: parameter_assignments
+    hash = 0x1fffffff & (hash + value);
+    // ignore: parameter_assignments
+    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
+    return hash ^ (hash >> 6);
+  }
+
+  static int finish(int hash) {
+    // ignore: parameter_assignments
+    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
+    // ignore: parameter_assignments
+    hash = hash ^ (hash >> 11);
+    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
+  }
+}
+
+/// See also [createSale].
+@ProviderFor(createSale)
+const createSaleProvider = CreateSaleFamily();
+
+/// See also [createSale].
+class CreateSaleFamily extends Family<AsyncValue<Sale>> {
+  /// See also [createSale].
+  const CreateSaleFamily();
+
+  /// See also [createSale].
+  CreateSaleProvider call(
+    PaymentMethod paymentMethod, {
+    String? customerName,
+    String? customerEmail,
+  }) {
+    return CreateSaleProvider(
+      paymentMethod,
+      customerName: customerName,
+      customerEmail: customerEmail,
+    );
+  }
+
+  @override
+  CreateSaleProvider getProviderOverride(
+    covariant CreateSaleProvider provider,
+  ) {
+    return call(
+      provider.paymentMethod,
+      customerName: provider.customerName,
+      customerEmail: provider.customerEmail,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'createSaleProvider';
+}
+
+/// See also [createSale].
+class CreateSaleProvider extends AutoDisposeFutureProvider<Sale> {
+  /// See also [createSale].
+  CreateSaleProvider(
+    PaymentMethod paymentMethod, {
+    String? customerName,
+    String? customerEmail,
+  }) : this._internal(
+          (ref) => createSale(
+            ref as CreateSaleRef,
+            paymentMethod,
+            customerName: customerName,
+            customerEmail: customerEmail,
+          ),
+          from: createSaleProvider,
+          name: r'createSaleProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$createSaleHash,
+          dependencies: CreateSaleFamily._dependencies,
+          allTransitiveDependencies:
+              CreateSaleFamily._allTransitiveDependencies,
+          paymentMethod: paymentMethod,
+          customerName: customerName,
+          customerEmail: customerEmail,
+        );
+
+  CreateSaleProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.paymentMethod,
+    required this.customerName,
+    required this.customerEmail,
+  }) : super.internal();
+
+  final PaymentMethod paymentMethod;
+  final String? customerName;
+  final String? customerEmail;
+
+  @override
+  Override overrideWith(
+    FutureOr<Sale> Function(CreateSaleRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: CreateSaleProvider._internal(
+        (ref) => create(ref as CreateSaleRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        paymentMethod: paymentMethod,
+        customerName: customerName,
+        customerEmail: customerEmail,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<Sale> createElement() {
+    return _CreateSaleProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is CreateSaleProvider &&
+        other.paymentMethod == paymentMethod &&
+        other.customerName == customerName &&
+        other.customerEmail == customerEmail;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, paymentMethod.hashCode);
+    hash = _SystemHash.combine(hash, customerName.hashCode);
+    hash = _SystemHash.combine(hash, customerEmail.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin CreateSaleRef on AutoDisposeFutureProviderRef<Sale> {
+  /// The parameter `paymentMethod` of this provider.
+  PaymentMethod get paymentMethod;
+
+  /// The parameter `customerName` of this provider.
+  String? get customerName;
+
+  /// The parameter `customerEmail` of this provider.
+  String? get customerEmail;
+}
+
+class _CreateSaleProviderElement extends AutoDisposeFutureProviderElement<Sale>
+    with CreateSaleRef {
+  _CreateSaleProviderElement(super.provider);
+
+  @override
+  PaymentMethod get paymentMethod =>
+      (origin as CreateSaleProvider).paymentMethod;
+  @override
+  String? get customerName => (origin as CreateSaleProvider).customerName;
+  @override
+  String? get customerEmail => (origin as CreateSaleProvider).customerEmail;
+}
+
+String _$scanBarcodeHash() => r'7f7aa3230b28e490112f2d9882c00b49c1bdd4cc';
+
+/// See also [scanBarcode].
+@ProviderFor(scanBarcode)
+const scanBarcodeProvider = ScanBarcodeFamily();
+
+/// See also [scanBarcode].
+class ScanBarcodeFamily extends Family<AsyncValue<CartItem?>> {
+  /// See also [scanBarcode].
+  const ScanBarcodeFamily();
+
+  /// See also [scanBarcode].
+  ScanBarcodeProvider call(
+    String barcode,
+  ) {
+    return ScanBarcodeProvider(
+      barcode,
+    );
+  }
+
+  @override
+  ScanBarcodeProvider getProviderOverride(
+    covariant ScanBarcodeProvider provider,
+  ) {
+    return call(
+      provider.barcode,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'scanBarcodeProvider';
+}
+
+/// See also [scanBarcode].
+class ScanBarcodeProvider extends AutoDisposeFutureProvider<CartItem?> {
+  /// See also [scanBarcode].
+  ScanBarcodeProvider(
+    String barcode,
+  ) : this._internal(
+          (ref) => scanBarcode(
+            ref as ScanBarcodeRef,
+            barcode,
+          ),
+          from: scanBarcodeProvider,
+          name: r'scanBarcodeProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$scanBarcodeHash,
+          dependencies: ScanBarcodeFamily._dependencies,
+          allTransitiveDependencies:
+              ScanBarcodeFamily._allTransitiveDependencies,
+          barcode: barcode,
+        );
+
+  ScanBarcodeProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.barcode,
+  }) : super.internal();
+
+  final String barcode;
+
+  @override
+  Override overrideWith(
+    FutureOr<CartItem?> Function(ScanBarcodeRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: ScanBarcodeProvider._internal(
+        (ref) => create(ref as ScanBarcodeRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        barcode: barcode,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<CartItem?> createElement() {
+    return _ScanBarcodeProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is ScanBarcodeProvider && other.barcode == barcode;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, barcode.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin ScanBarcodeRef on AutoDisposeFutureProviderRef<CartItem?> {
+  /// The parameter `barcode` of this provider.
+  String get barcode;
+}
+
+class _ScanBarcodeProviderElement
+    extends AutoDisposeFutureProviderElement<CartItem?> with ScanBarcodeRef {
+  _ScanBarcodeProviderElement(super.provider);
+
+  @override
+  String get barcode => (origin as ScanBarcodeProvider).barcode;
+}
+
+String _$salesSummaryHash() => r'8633c57dc3393e1b24f5910b5810cd6835b9ac52';
+
+/// See also [salesSummary].
+@ProviderFor(salesSummary)
+const salesSummaryProvider = SalesSummaryFamily();
+
+/// See also [salesSummary].
+class SalesSummaryFamily extends Family<AsyncValue<Map<String, dynamic>>> {
+  /// See also [salesSummary].
+  const SalesSummaryFamily();
+
+  /// See also [salesSummary].
+  SalesSummaryProvider call(
+    DateTime startDate,
+    DateTime endDate,
+  ) {
+    return SalesSummaryProvider(
+      startDate,
+      endDate,
+    );
+  }
+
+  @override
+  SalesSummaryProvider getProviderOverride(
+    covariant SalesSummaryProvider provider,
+  ) {
+    return call(
+      provider.startDate,
+      provider.endDate,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'salesSummaryProvider';
+}
+
+/// See also [salesSummary].
+class SalesSummaryProvider
+    extends AutoDisposeFutureProvider<Map<String, dynamic>> {
+  /// See also [salesSummary].
+  SalesSummaryProvider(
+    DateTime startDate,
+    DateTime endDate,
+  ) : this._internal(
+          (ref) => salesSummary(
+            ref as SalesSummaryRef,
+            startDate,
+            endDate,
+          ),
+          from: salesSummaryProvider,
+          name: r'salesSummaryProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$salesSummaryHash,
+          dependencies: SalesSummaryFamily._dependencies,
+          allTransitiveDependencies:
+              SalesSummaryFamily._allTransitiveDependencies,
+          startDate: startDate,
+          endDate: endDate,
+        );
+
+  SalesSummaryProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.startDate,
+    required this.endDate,
+  }) : super.internal();
+
+  final DateTime startDate;
+  final DateTime endDate;
+
+  @override
+  Override overrideWith(
+    FutureOr<Map<String, dynamic>> Function(SalesSummaryRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: SalesSummaryProvider._internal(
+        (ref) => create(ref as SalesSummaryRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        startDate: startDate,
+        endDate: endDate,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<Map<String, dynamic>> createElement() {
+    return _SalesSummaryProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is SalesSummaryProvider &&
+        other.startDate == startDate &&
+        other.endDate == endDate;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, startDate.hashCode);
+    hash = _SystemHash.combine(hash, endDate.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin SalesSummaryRef on AutoDisposeFutureProviderRef<Map<String, dynamic>> {
+  /// The parameter `startDate` of this provider.
+  DateTime get startDate;
+
+  /// The parameter `endDate` of this provider.
+  DateTime get endDate;
+}
+
+class _SalesSummaryProviderElement
+    extends AutoDisposeFutureProviderElement<Map<String, dynamic>>
+    with SalesSummaryRef {
+  _SalesSummaryProviderElement(super.provider);
+
+  @override
+  DateTime get startDate => (origin as SalesSummaryProvider).startDate;
+  @override
+  DateTime get endDate => (origin as SalesSummaryProvider).endDate;
+}
+
+String _$topSellingItemsHash() => r'cb20556939a31e436ef2171334c66b949f26b6f2';
+
+/// See also [topSellingItems].
+@ProviderFor(topSellingItems)
+const topSellingItemsProvider = TopSellingItemsFamily();
+
+/// See also [topSellingItems].
+class TopSellingItemsFamily extends Family<AsyncValue<List<CartItem>>> {
+  /// See also [topSellingItems].
+  const TopSellingItemsFamily();
+
+  /// See also [topSellingItems].
+  TopSellingItemsProvider call({
+    int limit = 10,
+  }) {
+    return TopSellingItemsProvider(
+      limit: limit,
+    );
+  }
+
+  @override
+  TopSellingItemsProvider getProviderOverride(
+    covariant TopSellingItemsProvider provider,
+  ) {
+    return call(
+      limit: provider.limit,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'topSellingItemsProvider';
+}
+
+/// See also [topSellingItems].
+class TopSellingItemsProvider
+    extends AutoDisposeFutureProvider<List<CartItem>> {
+  /// See also [topSellingItems].
+  TopSellingItemsProvider({
+    int limit = 10,
+  }) : this._internal(
+          (ref) => topSellingItems(
+            ref as TopSellingItemsRef,
+            limit: limit,
+          ),
+          from: topSellingItemsProvider,
+          name: r'topSellingItemsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$topSellingItemsHash,
+          dependencies: TopSellingItemsFamily._dependencies,
+          allTransitiveDependencies:
+              TopSellingItemsFamily._allTransitiveDependencies,
+          limit: limit,
+        );
+
+  TopSellingItemsProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.limit,
+  }) : super.internal();
+
+  final int limit;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<CartItem>> Function(TopSellingItemsRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: TopSellingItemsProvider._internal(
+        (ref) => create(ref as TopSellingItemsRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        limit: limit,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<CartItem>> createElement() {
+    return _TopSellingItemsProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is TopSellingItemsProvider && other.limit == limit;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, limit.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin TopSellingItemsRef on AutoDisposeFutureProviderRef<List<CartItem>> {
+  /// The parameter `limit` of this provider.
+  int get limit;
+}
+
+class _TopSellingItemsProviderElement
+    extends AutoDisposeFutureProviderElement<List<CartItem>>
+    with TopSellingItemsRef {
+  _TopSellingItemsProviderElement(super.provider);
+
+  @override
+  int get limit => (origin as TopSellingItemsProvider).limit;
+}
+
+String _$cartNotifierHash() => r'3c7b3606d59f8a0be1ed390808870100bf6e87c1';
+
+/// See also [CartNotifier].
+@ProviderFor(CartNotifier)
+final cartNotifierProvider =
+    AutoDisposeNotifierProvider<CartNotifier, List<CartItem>>.internal(
+  CartNotifier.new,
+  name: r'cartNotifierProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$cartNotifierHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$CartNotifier = AutoDisposeNotifier<List<CartItem>>;
+String _$searchNotifierHash() => r'6ccf2aa9b849f267982a13b9a127b793a4c5d98d';
+
+/// See also [SearchNotifier].
+@ProviderFor(SearchNotifier)
+final searchNotifierProvider =
+    AutoDisposeNotifierProvider<SearchNotifier, List<CartItem>>.internal(
+  SearchNotifier.new,
+  name: r'searchNotifierProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$searchNotifierHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$SearchNotifier = AutoDisposeNotifier<List<CartItem>>;
+String _$recentSalesNotifierHash() =>
+    r'e9da448b43b90f3f9258bfb55ecb8f11b9b57d9c';
+
+/// See also [RecentSalesNotifier].
+@ProviderFor(RecentSalesNotifier)
+final recentSalesNotifierProvider =
+    AutoDisposeNotifierProvider<RecentSalesNotifier, List<Sale>>.internal(
+  RecentSalesNotifier.new,
+  name: r'recentSalesNotifierProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$recentSalesNotifierHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$RecentSalesNotifier = AutoDisposeNotifier<List<Sale>>;
+// ignore_for_file: type=lint
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
