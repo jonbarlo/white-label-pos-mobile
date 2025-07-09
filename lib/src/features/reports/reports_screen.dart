@@ -4,6 +4,9 @@ import 'package:intl/intl.dart';
 import 'package:white_label_pos_mobile/src/features/reports/reports_provider.dart';
 import 'package:white_label_pos_mobile/src/features/reports/models/sales_report.dart';
 import 'package:white_label_pos_mobile/src/features/reports/models/revenue_report.dart';
+import 'package:white_label_pos_mobile/src/shared/widgets/app_button.dart';
+import 'package:white_label_pos_mobile/src/shared/widgets/error_widget.dart';
+import 'package:white_label_pos_mobile/src/shared/widgets/loading_widget.dart';
 
 class ReportsScreen extends ConsumerStatefulWidget {
   const ReportsScreen({super.key});
@@ -17,17 +20,40 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
   late TabController _tabController;
   DateTime _startDate = DateTime.now().subtract(const Duration(days: 30));
   DateTime _endDate = DateTime.now();
+  String _selectedPeriod = '30d';
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 5, vsync: this);
   }
 
   @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
+  }
+
+  void _setDateRange(String period) {
+    setState(() {
+      _selectedPeriod = period;
+      final now = DateTime.now();
+      switch (period) {
+        case '7d':
+          _startDate = now.subtract(const Duration(days: 7));
+          break;
+        case '30d':
+          _startDate = now.subtract(const Duration(days: 30));
+          break;
+        case '90d':
+          _startDate = now.subtract(const Duration(days: 90));
+          break;
+        case '1y':
+          _startDate = now.subtract(const Duration(days: 365));
+          break;
+      }
+      _endDate = now;
+    });
   }
 
   Future<void> _selectDateRange() async {
@@ -45,6 +71,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
       setState(() {
         _startDate = picked.start;
         _endDate = picked.end;
+        _selectedPeriod = 'custom';
       });
     }
   }
@@ -60,13 +87,19 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Report exported: $downloadUrl')),
+          SnackBar(
+            content: Text('Report exported successfully!'),
+            backgroundColor: Colors.green,
+          ),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Export failed: $e')),
+          SnackBar(
+            content: Text('Export failed: $e'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     }
@@ -74,40 +107,109 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Reports'),
+        title: const Text('Analytics & Reports'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.calendar_today),
-            onPressed: _selectDateRange,
-          ),
           IconButton(
             icon: const Icon(Icons.download),
             onPressed: _exportReport,
+            tooltip: 'Export Report',
           ),
         ],
         bottom: TabBar(
           controller: _tabController,
+          isScrollable: true,
           tabs: const [
+            Tab(text: 'Overview'),
             Tab(text: 'Sales'),
             Tab(text: 'Revenue'),
+            Tab(text: 'Customers'),
             Tab(text: 'Inventory'),
           ],
         ),
       ),
       body: Column(
         children: [
-          // Date range display
+          // Date range selector
           Container(
             padding: const EdgeInsets.all(16),
-            child: Row(
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface,
+              border: Border(
+                bottom: BorderSide(
+                  color: theme.dividerColor,
+                  width: 1,
+                ),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.date_range, size: 16),
-                const SizedBox(width: 8),
-                Text(
-                  '${DateFormat('MMM dd').format(_startDate)} - ${DateFormat('MMM dd, yyyy').format(_endDate)}',
-                  style: Theme.of(context).textTheme.bodyMedium,
+                Row(
+                  children: [
+                    const Icon(Icons.date_range, size: 16),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Date Range',
+                      style: theme.textTheme.titleSmall,
+                    ),
+                    const Spacer(),
+                    Text(
+                      '${DateFormat('MMM dd').format(_startDate)} - ${DateFormat('MMM dd, yyyy').format(_endDate)}',
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            _PeriodChip(
+                              label: '7D',
+                              value: '7d',
+                              selected: _selectedPeriod == '7d',
+                              onTap: () => _setDateRange('7d'),
+                            ),
+                            const SizedBox(width: 8),
+                            _PeriodChip(
+                              label: '30D',
+                              value: '30d',
+                              selected: _selectedPeriod == '30d',
+                              onTap: () => _setDateRange('30d'),
+                            ),
+                            const SizedBox(width: 8),
+                            _PeriodChip(
+                              label: '90D',
+                              value: '90d',
+                              selected: _selectedPeriod == '90d',
+                              onTap: () => _setDateRange('90d'),
+                            ),
+                            const SizedBox(width: 8),
+                            _PeriodChip(
+                              label: '1Y',
+                              value: '1y',
+                              selected: _selectedPeriod == '1y',
+                              onTap: () => _setDateRange('1y'),
+                            ),
+                            const SizedBox(width: 8),
+                            _PeriodChip(
+                              label: 'Custom',
+                              value: 'custom',
+                              selected: _selectedPeriod == 'custom',
+                              onTap: _selectDateRange,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -117,14 +219,257 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
             child: TabBarView(
               controller: _tabController,
               children: [
+                _OverviewTab(startDate: _startDate, endDate: _endDate),
                 _SalesTab(startDate: _startDate, endDate: _endDate),
                 _RevenueTab(startDate: _startDate, endDate: _endDate),
+                _CustomersTab(startDate: _startDate, endDate: _endDate),
                 _InventoryTab(),
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _PeriodChip extends StatelessWidget {
+  final String label;
+  final String value;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _PeriodChip({
+    required this.label,
+    required this.value,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: selected ? theme.colorScheme.primary : theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: selected ? theme.colorScheme.primary : theme.dividerColor,
+          ),
+        ),
+        child: Text(
+          label,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: selected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
+            fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _OverviewTab extends ConsumerWidget {
+  final DateTime startDate;
+  final DateTime endDate;
+
+  const _OverviewTab({
+    required this.startDate,
+    required this.endDate,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final salesReportAsync = ref.watch(salesReportProvider(
+      startDate: startDate,
+      endDate: endDate,
+    ));
+    final revenueReportAsync = ref.watch(revenueReportProvider(
+      startDate: startDate,
+      endDate: endDate,
+    ));
+
+    return salesReportAsync.when(
+      data: (salesReport) => revenueReportAsync.when(
+        data: (revenueReport) => _buildOverviewContent(context, salesReport, revenueReport),
+        loading: () => const LoadingWidget(),
+        error: (error, stack) => AppErrorWidget(message: error.toString()),
+      ),
+      loading: () => const LoadingWidget(),
+      error: (error, stack) => AppErrorWidget(message: error.toString()),
+    );
+  }
+
+  Widget _buildOverviewContent(BuildContext context, SalesReport salesReport, RevenueReport revenueReport) {
+    final theme = Theme.of(context);
+    final currencyFormat = NumberFormat.currency(symbol: '\$');
+    
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Key Metrics
+          Text(
+            'Key Metrics',
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _MetricCard(
+                  title: 'Total Sales',
+                  value: currencyFormat.format(salesReport.totalSales),
+                  icon: Icons.attach_money,
+                  color: Colors.green,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _MetricCard(
+                  title: 'Transactions',
+                  value: salesReport.totalTransactions.toString(),
+                  icon: Icons.receipt,
+                  color: Colors.blue,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _MetricCard(
+                  title: 'Avg. Transaction',
+                  value: currencyFormat.format(salesReport.averageTransactionValue),
+                  icon: Icons.trending_up,
+                  color: Colors.orange,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _MetricCard(
+                  title: 'Profit Margin',
+                  value: '${revenueReport.profitMargin.toStringAsFixed(1)}%',
+                  icon: Icons.percent,
+                  color: Colors.purple,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          
+          // Top Selling Items
+          Text(
+            'Top Selling Items',
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: theme.dividerColor),
+            ),
+            child: Column(
+              children: salesReport.topSellingItems.take(5).map((item) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Row(
+                    children: [
+                      Icon(Icons.restaurant, size: 16, color: theme.colorScheme.primary),
+                      const SizedBox(width: 8),
+                      Expanded(child: Text(item)),
+                      Text(
+                        'Popular',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: Colors.green,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          const SizedBox(height: 24),
+          
+          // Sales by Hour
+          Text(
+            'Sales by Hour',
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Container(
+            height: 200,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: theme.dividerColor),
+            ),
+            child: _buildSalesChart(salesReport.salesByHour, theme),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSalesChart(Map<String, double> salesByHour, ThemeData theme) {
+    if (salesByHour.isEmpty) {
+      return Center(
+        child: Text(
+          'No sales data available',
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.textTheme.bodySmall?.color,
+          ),
+        ),
+      );
+    }
+
+    final maxSales = salesByHour.values.reduce((a, b) => a > b ? a : b);
+    final sortedHours = salesByHour.keys.toList()..sort();
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: sortedHours.map((hour) {
+        final sales = salesByHour[hour] ?? 0;
+        final height = maxSales > 0 ? (sales / maxSales) : 0;
+        
+        return Expanded(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Container(
+                width: 20,
+                height: (120 * height).toDouble(),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                hour,
+                style: theme.textTheme.bodySmall,
+              ),
+            ],
+          ),
+        );
+      }).toList(),
     );
   }
 }
@@ -147,127 +492,140 @@ class _SalesTab extends ConsumerWidget {
 
     return salesReportAsync.when(
       data: (salesReport) => _buildSalesContent(context, salesReport),
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => _buildErrorWidget(context, error.toString()),
+      loading: () => const LoadingWidget(),
+      error: (error, stack) => AppErrorWidget(message: error.toString()),
     );
   }
 
   Widget _buildSalesContent(BuildContext context, SalesReport report) {
+    final theme = Theme.of(context);
+    final currencyFormat = NumberFormat.currency(symbol: '\$');
+    
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Key metrics cards
-          Row(
-            children: [
-              Expanded(
-                child: _MetricCard(
-                  title: 'Total Sales',
-                  value: '\$${NumberFormat('#,##0.00').format(report.totalSales)}',
-                  icon: Icons.attach_money,
-                  color: Colors.green,
-                ),
+          // Sales Summary
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [theme.colorScheme.primary, theme.colorScheme.primaryContainer],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _MetricCard(
-                  title: 'Transactions',
-                  value: '${report.totalTransactions}',
-                  icon: Icons.receipt,
-                  color: Colors.blue,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Sales Summary',
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    color: theme.colorScheme.onPrimary,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _MetricCard(
-                  title: 'Avg Transaction',
-                  value: '\$${NumberFormat('#,##0.00').format(report.averageTransactionValue)}',
-                  icon: Icons.analytics,
-                  color: Colors.orange,
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Total Sales',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onPrimary.withOpacity(0.8),
+                            ),
+                          ),
+                          Text(
+                            currencyFormat.format(report.totalSales),
+                            style: theme.textTheme.headlineMedium?.copyWith(
+                              color: theme.colorScheme.onPrimary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Transactions',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onPrimary.withOpacity(0.8),
+                            ),
+                          ),
+                          Text(
+                            report.totalTransactions.toString(),
+                            style: theme.textTheme.headlineMedium?.copyWith(
+                              color: theme.colorScheme.onPrimary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _MetricCard(
-                  title: 'Top Items',
-                  value: '${report.topSellingItems.length}',
-                  icon: Icons.star,
-                  color: Colors.purple,
+                const SizedBox(height: 12),
+                Text(
+                  'Average Transaction: ${currencyFormat.format(report.averageTransactionValue)}',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onPrimary.withOpacity(0.9),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           const SizedBox(height: 24),
           
-          // Top selling items
+          // Top Selling Items
           Text(
             'Top Selling Items',
-            style: Theme.of(context).textTheme.titleLarge,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          const SizedBox(height: 8),
-          ...report.topSellingItems.take(5).map((item) => ListTile(
-            leading: const Icon(Icons.inventory),
-            title: Text(item),
-            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-          )),
-          
-          const SizedBox(height: 24),
-          
-          // Sales by hour chart placeholder
-          Text(
-            'Sales by Hour',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           Container(
-            height: 200,
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey.shade300),
-              borderRadius: BorderRadius.circular(8),
+              color: theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: theme.dividerColor),
             ),
-            child: Center(
-              child: Text(
-                'Chart placeholder\n${report.salesByHour.length} data points',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.grey.shade600,
-                ),
-              ),
+            child: ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: report.topSellingItems.length,
+              separatorBuilder: (context, index) => Divider(height: 1),
+              itemBuilder: (context, index) {
+                final item = report.topSellingItems[index];
+                return ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: theme.colorScheme.primary.withOpacity(0.1),
+                    child: Text(
+                      '${index + 1}',
+                      style: TextStyle(
+                        color: theme.colorScheme.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  title: Text(item),
+                  subtitle: Text('Top seller'),
+                  trailing: Icon(
+                    Icons.trending_up,
+                    color: Colors.green,
+                    size: 20,
+                  ),
+                );
+              },
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildErrorWidget(BuildContext context, String error) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.error_outline, size: 64, color: Colors.red),
-          const SizedBox(height: 16),
-          Text(
-            'Error',
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            error,
-            style: Theme.of(context).textTheme.bodyMedium,
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () {
-              // Refresh the data
-            },
-            child: const Text('Retry'),
           ),
         ],
       ),
@@ -293,114 +651,364 @@ class _RevenueTab extends ConsumerWidget {
 
     return revenueReportAsync.when(
       data: (revenueReport) => _buildRevenueContent(context, revenueReport),
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => _buildErrorWidget(context, error.toString()),
+      loading: () => const LoadingWidget(),
+      error: (error, stack) => AppErrorWidget(message: error.toString()),
     );
   }
 
   Widget _buildRevenueContent(BuildContext context, RevenueReport report) {
+    final theme = Theme.of(context);
+    final currencyFormat = NumberFormat.currency(symbol: '\$');
+    
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Key metrics cards
-          Row(
-            children: [
-              Expanded(
-                child: _MetricCard(
-                  title: 'Total Revenue',
-                  value: '\$${NumberFormat('#,##0.00').format(report.totalRevenue)}',
-                  icon: Icons.trending_up,
-                  color: Colors.green,
-                ),
+          // Revenue Summary
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.green, Colors.green.shade300],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _MetricCard(
-                  title: 'Total Cost',
-                  value: '\$${NumberFormat('#,##0.00').format(report.totalCost)}',
-                  icon: Icons.trending_down,
-                  color: Colors.red,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Revenue Summary',
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Total Revenue',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: Colors.white.withOpacity(0.8),
+                            ),
+                          ),
+                          Text(
+                            currencyFormat.format(report.totalRevenue),
+                            style: theme.textTheme.headlineMedium?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Gross Profit',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: Colors.white.withOpacity(0.8),
+                            ),
+                          ),
+                          Text(
+                            currencyFormat.format(report.grossProfit),
+                            style: theme.textTheme.headlineMedium?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Profit Margin: ${report.profitMargin.toStringAsFixed(1)}%',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: Colors.white.withOpacity(0.9),
+                  ),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _MetricCard(
-                  title: 'Gross Profit',
-                  value: '\$${NumberFormat('#,##0.00').format(report.grossProfit)}',
-                  icon: Icons.account_balance_wallet,
-                  color: Colors.blue,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _MetricCard(
-                  title: 'Profit Margin',
-                  value: '${report.profitMargin.toStringAsFixed(1)}%',
-                  icon: Icons.percent,
-                  color: Colors.orange,
-                ),
-              ),
-            ],
-          ),
-          
           const SizedBox(height: 24),
           
-          // Revenue by day chart placeholder
+          // Revenue by Day
           Text(
             'Revenue by Day',
-            style: Theme.of(context).textTheme.titleLarge,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           Container(
             height: 200,
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey.shade300),
-              borderRadius: BorderRadius.circular(8),
+              color: theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: theme.dividerColor),
             ),
-            child: Center(
-              child: Text(
-                'Chart placeholder\n${report.revenueByDay.length} data points',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).textTheme.bodySmall?.color,
-                ),
-              ),
-            ),
+            child: _buildRevenueChart(report.revenueByDay, theme),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildErrorWidget(BuildContext context, String error) {
-    return Center(
+  Widget _buildRevenueChart(Map<String, double> revenueByDay, ThemeData theme) {
+    if (revenueByDay.isEmpty) {
+      return Center(
+        child: Text(
+          'No revenue data available',
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.textTheme.bodySmall?.color,
+          ),
+        ),
+      );
+    }
+
+    final maxRevenue = revenueByDay.values.reduce((a, b) => a > b ? a : b);
+    final sortedDays = revenueByDay.keys.toList()..sort();
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: sortedDays.take(7).map((day) {
+        final revenue = revenueByDay[day] ?? 0;
+        final height = maxRevenue > 0 ? (revenue / maxRevenue) : 0;
+        
+        return Expanded(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Container(
+                width: 20,
+                height: (120 * height).toDouble(),
+                decoration: BoxDecoration(
+                  color: Colors.green,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                day,
+                style: theme.textTheme.bodySmall,
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+}
+
+class _CustomersTab extends ConsumerWidget {
+  final DateTime startDate;
+  final DateTime endDate;
+
+  const _CustomersTab({
+    required this.startDate,
+    required this.endDate,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final customerAnalyticsAsync = ref.watch(customerAnalyticsProvider(
+      startDate: startDate,
+      endDate: endDate,
+    ));
+
+    return customerAnalyticsAsync.when(
+      data: (analytics) => _buildCustomersContent(context, analytics),
+      loading: () => const LoadingWidget(),
+      error: (error, stack) => AppErrorWidget(message: error.toString()),
+    );
+  }
+
+  Widget _buildCustomersContent(BuildContext context, Map<String, dynamic> analytics) {
+    final theme = Theme.of(context);
+    
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.error_outline, size: 64, color: Theme.of(context).colorScheme.error),
-          const SizedBox(height: 16),
-          Text(
-            'Error',
-            style: Theme.of(context).textTheme.headlineSmall,
+          // Customer Analytics Summary
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.purple, Colors.purple.shade300],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Customer Analytics',
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Total Customers',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: Colors.white.withOpacity(0.8),
+                            ),
+                          ),
+                          Text(
+                            '${analytics['totalCustomers'] ?? 0}',
+                            style: theme.textTheme.headlineMedium?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'New Customers',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: Colors.white.withOpacity(0.8),
+                            ),
+                          ),
+                          Text(
+                            '${analytics['newCustomers'] ?? 0}',
+                            style: theme.textTheme.headlineMedium?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Avg. Order Value: \$${analytics['averageOrderValue']?.toStringAsFixed(2) ?? '0.00'}',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: Colors.white.withOpacity(0.9),
+                  ),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 24),
+          
+          // Customer Segments
           Text(
-            error,
-            style: Theme.of(context).textTheme.bodyMedium,
-            textAlign: TextAlign.center,
+            'Customer Segments',
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () {
-              // Refresh the data
-            },
-            child: Text('Retry', style: Theme.of(context).textTheme.labelLarge),
+          const SizedBox(height: 12),
+          Container(
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: theme.dividerColor),
+            ),
+            child: ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: 3,
+              separatorBuilder: (context, index) => Divider(height: 1),
+              itemBuilder: (context, index) {
+                final segments = ['VIP Customers', 'Regular Customers', 'New Customers'];
+                final counts = [analytics['vipCustomers'] ?? 0, analytics['regularCustomers'] ?? 0, analytics['newCustomers'] ?? 0];
+                final colors = [Colors.amber, Colors.blue, Colors.green];
+                
+                return ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: colors[index].withOpacity(0.1),
+                    child: Icon(
+                      Icons.person,
+                      color: colors[index],
+                      size: 20,
+                    ),
+                  ),
+                  title: Text(segments[index]),
+                  subtitle: Text('${counts[index]} customers'),
+                  trailing: Text(
+                    '${((counts[index] / (analytics['totalCustomers'] ?? 1)) * 100).toStringAsFixed(1)}%',
+                    style: TextStyle(
+                      color: colors[index],
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 24),
+          
+          // Customer Retention
+          Text(
+            'Customer Retention',
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: theme.dividerColor),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: _MetricCard(
+                        title: 'Retention Rate',
+                        value: '${analytics['retentionRate']?.toStringAsFixed(1) ?? '0.0'}%',
+                        icon: Icons.trending_up,
+                        color: Colors.green,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _MetricCard(
+                        title: 'Churn Rate',
+                        value: '${analytics['churnRate']?.toStringAsFixed(1) ?? '0.0'}%',
+                        icon: Icons.trending_down,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -409,95 +1017,139 @@ class _RevenueTab extends ConsumerWidget {
 }
 
 class _InventoryTab extends ConsumerWidget {
+  const _InventoryTab();
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final inventoryReportAsync = ref.watch(inventoryReportProvider);
 
     return inventoryReportAsync.when(
       data: (report) => _buildInventoryContent(context, report),
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => _buildErrorWidget(context, error.toString()),
+      loading: () => const LoadingWidget(),
+      error: (error, stack) => AppErrorWidget(message: error.toString()),
     );
   }
 
   Widget _buildInventoryContent(BuildContext context, Map<String, dynamic> report) {
+    final theme = Theme.of(context);
+    
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Key metrics cards
-          Row(
-            children: [
-              Expanded(
-                child: _MetricCard(
-                  title: 'Total Items',
-                  value: '${report['totalItems'] ?? 0}',
-                  icon: Icons.inventory,
-                  color: Colors.blue,
-                ),
+          // Inventory Summary
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.orange, Colors.orange.shade300],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _MetricCard(
-                  title: 'Low Stock',
-                  value: '${report['lowStockItems'] ?? 0}',
-                  icon: Icons.warning,
-                  color: Colors.orange,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Inventory Summary',
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Total Items',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: Colors.white.withOpacity(0.8),
+                            ),
+                          ),
+                          Text(
+                            '${report['totalItems'] ?? 0}',
+                            style: theme.textTheme.headlineMedium?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Low Stock',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: Colors.white.withOpacity(0.8),
+                            ),
+                          ),
+                          Text(
+                            '${report['lowStockItems'] ?? 0}',
+                            style: theme.textTheme.headlineMedium?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _MetricCard(
-                  title: 'Out of Stock',
-                  value: '${report['outOfStockItems'] ?? 0}',
-                  icon: Icons.cancel,
-                  color: Colors.red,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _MetricCard(
-                  title: 'Total Value',
-                  value: '\$${NumberFormat('#,##0.00').format(report['totalValue'] ?? 0.0)}',
-                  icon: Icons.attach_money,
-                  color: Colors.green,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildErrorWidget(BuildContext context, String error) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.error_outline, size: 64, color: Colors.red),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
+          
+          // Low Stock Alerts
           Text(
-            'Error',
-            style: Theme.of(context).textTheme.headlineSmall,
+            'Low Stock Alerts',
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            error,
-            style: Theme.of(context).textTheme.bodyMedium,
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () {
-              // Refresh the data
-            },
-            child: const Text('Retry'),
+          const SizedBox(height: 12),
+          Container(
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: theme.dividerColor),
+            ),
+            child: ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: 5,
+              separatorBuilder: (context, index) => Divider(height: 1),
+              itemBuilder: (context, index) {
+                return ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: Colors.red.withOpacity(0.1),
+                    child: Icon(
+                      Icons.warning,
+                      color: Colors.red,
+                      size: 20,
+                    ),
+                  ),
+                  title: Text('Item ${index + 1}'),
+                  subtitle: Text('Stock: ${5 - index} units'),
+                  trailing: Text(
+                    'Low',
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -521,42 +1173,40 @@ class _MetricCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
+    
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: theme.dividerColor),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            CircleAvatar(
-              backgroundColor: color.withOpacity(0.1),
-              child: Icon(icon, color: color),
-            ),
-            const SizedBox(width: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: color, size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
                   title,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.primary,
-                    fontWeight: FontWeight.w600,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.textTheme.bodySmall?.color,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  value,
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    color: color,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: color,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -2,103 +2,143 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 import 'package:dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:white_label_pos_mobile/src/features/auth/auth_repository_impl.dart';
+import 'package:white_label_pos_mobile/src/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:white_label_pos_mobile/src/features/auth/data/repositories/auth_repository.dart';
+import 'package:white_label_pos_mobile/src/features/auth/models/user.dart';
+import 'package:white_label_pos_mobile/src/shared/models/result.dart';
 
 import 'auth_repository_impl_test.mocks.dart';
 
-@GenerateMocks([Dio, SharedPreferences])
+@GenerateMocks([Dio])
 void main() {
-  late MockDio mockDio;
-  late MockSharedPreferences mockPrefs;
-  late AuthRepositoryImpl authRepository;
-
-  setUp(() {
-    mockDio = MockDio();
-    mockPrefs = MockSharedPreferences();
-    authRepository = AuthRepositoryImpl(mockDio, mockPrefs);
-  });
-
   group('AuthRepositoryImpl', () {
+    late MockDio mockDio;
+    late AuthRepositoryImpl repository;
+
+    setUp(() {
+      mockDio = MockDio();
+      repository = AuthRepositoryImpl(mockDio);
+    });
+
     group('login', () {
-      test('returns token and saves to preferences on success', () async {
-        when(mockDio.post('/auth/login', data: {
-          'email': 'test@example.com',
-          'password': 'password',
-          'businessSlug': 'biz1',
-        })).thenAnswer((_) async => Response(
-          data: {'token': 'test_token'},
-          statusCode: 200,
-          requestOptions: RequestOptions(path: '/auth/login'),
-        ));
-
-        when(mockPrefs.setString('auth_token', 'test_token')).thenAnswer((_) async => true);
-        when(mockPrefs.setString('business_slug', 'biz1')).thenAnswer((_) async => true);
-
-        final token = await authRepository.login(
+      test('should return success result when login is successful', () async {
+        // Arrange
+        final user = User(
+          id: 1,
+          businessId: 1,
+          name: 'Test User',
           email: 'test@example.com',
-          password: 'password',
-          businessSlug: 'biz1',
+          role: UserRole.cashier,
+          isActive: true,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
         );
 
-        expect(token, 'test_token');
-        verify(mockPrefs.setString('auth_token', 'test_token')).called(1);
-        verify(mockPrefs.setString('business_slug', 'biz1')).called(1);
+        final responseData = {
+          'success': true,
+          'data': {
+            'id': user.id,
+            'businessId': user.businessId,
+            'name': user.name,
+            'email': user.email,
+            'role': 'cashier',
+            'isActive': user.isActive,
+            'createdAt': user.createdAt.toIso8601String(),
+            'updatedAt': user.updatedAt.toIso8601String(),
+          },
+        };
+
+        when(mockDio.post('/auth/login', data: anyNamed('data')))
+            .thenAnswer((_) async => Response(
+                  data: responseData,
+                  statusCode: 200,
+                  requestOptions: RequestOptions(path: '/auth/login'),
+                ));
+
+        // Act
+        final result = await repository.login('test@example.com', 'password');
+
+        // Assert
+        expect(result.isSuccess, true);
+        expect(result.data.id, user.id);
+        expect(result.data.email, user.email);
+        expect(result.data.role, user.role);
       });
 
-      test('throws exception on network error', () async {
+      test('should return failure result when login fails', () async {
+        // Arrange
+        final responseData = {
+          'success': false,
+          'message': 'Invalid credentials',
+        };
+
+        when(mockDio.post('/auth/login', data: anyNamed('data')))
+            .thenAnswer((_) async => Response(
+                  data: responseData,
+                  statusCode: 401,
+                  requestOptions: RequestOptions(path: '/auth/login'),
+                ));
+
+        // Act
+        final result = await repository.login('test@example.com', 'wrongpassword');
+
+        // Assert
+        expect(result.isFailure, true);
+        expect(result.errorMessage, 'Invalid credentials');
+      });
+
+      test('should return failure result when network error occurs', () async {
+        // Arrange
         when(mockDio.post('/auth/login', data: anyNamed('data')))
             .thenThrow(DioException(
               requestOptions: RequestOptions(path: '/auth/login'),
-              message: 'Network error',
+              type: DioExceptionType.connectionError,
             ));
 
-        expect(
-          () async => await authRepository.login(
-            email: 'test@example.com',
-            password: 'password',
-            businessSlug: 'biz1',
-          ),
-          throwsA(isA<Exception>()),
-        );
+        // Act
+        final result = await repository.login('test@example.com', 'password');
+
+        // Assert
+        expect(result.isFailure, true);
+        expect(result.errorMessage, contains('internet connection'));
       });
     });
 
     group('logout', () {
-      test('removes token and business slug from preferences', () async {
-        when(mockPrefs.remove('auth_token')).thenAnswer((_) async => true);
-        when(mockPrefs.remove('business_slug')).thenAnswer((_) async => true);
+      test('should return success result when logout is successful', () async {
+        // Arrange
+        when(mockDio.post('/auth/logout'))
+            .thenAnswer((_) async => Response(
+                  data: {'success': true},
+                  statusCode: 200,
+                  requestOptions: RequestOptions(path: '/auth/logout'),
+                ));
 
-        await authRepository.logout();
+        // Act
+        final result = await repository.logout();
 
-        verify(mockPrefs.remove('auth_token')).called(1);
-        verify(mockPrefs.remove('business_slug')).called(1);
-      });
-    });
-
-    group('isLoggedIn', () {
-      test('returns true when token exists', () async {
-        when(mockPrefs.getString('auth_token')).thenReturn('valid_token');
-
-        final isLoggedIn = await authRepository.isLoggedIn();
-
-        expect(isLoggedIn, true);
+        // Assert
+        expect(result.isSuccess, true);
       });
 
-      test('returns false when token is null', () async {
-        when(mockPrefs.getString('auth_token')).thenReturn(null);
+      test('should return failure result when logout fails', () async {
+        // Arrange
+        when(mockDio.post('/auth/logout'))
+            .thenThrow(DioException(
+              requestOptions: RequestOptions(path: '/auth/logout'),
+              type: DioExceptionType.badResponse,
+              response: Response(
+                statusCode: 500,
+                requestOptions: RequestOptions(path: '/auth/logout'),
+              ),
+            ));
 
-        final isLoggedIn = await authRepository.isLoggedIn();
+        // Act
+        final result = await repository.logout();
 
-        expect(isLoggedIn, false);
-      });
-
-      test('returns false when token is empty', () async {
-        when(mockPrefs.getString('auth_token')).thenReturn('');
-
-        final isLoggedIn = await authRepository.isLoggedIn();
-
-        expect(isLoggedIn, false);
+        // Assert
+        expect(result.isFailure, true);
+        expect(result.errorMessage, contains('Server error'));
       });
     });
   });

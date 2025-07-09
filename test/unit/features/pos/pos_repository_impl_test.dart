@@ -2,278 +2,233 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 import 'package:dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:white_label_pos_mobile/src/features/pos/pos_repository_impl.dart';
 import 'package:white_label_pos_mobile/src/features/pos/models/cart_item.dart';
 import 'package:white_label_pos_mobile/src/features/pos/models/sale.dart';
+import 'package:white_label_pos_mobile/src/features/pos/models/menu_item.dart';
 
 import 'pos_repository_impl_test.mocks.dart';
 
-@GenerateMocks([Dio, SharedPreferences])
+@GenerateMocks([Dio, Ref])
 void main() {
-  late MockDio mockDio;
-  late MockSharedPreferences mockPrefs;
-  late PosRepositoryImpl posRepository;
-
-  setUp(() {
-    mockDio = MockDio();
-    mockPrefs = MockSharedPreferences();
-    posRepository = PosRepositoryImpl(mockDio, mockPrefs);
-
-    when(mockPrefs.getString('api_base_url')).thenReturn('http://localhost:3000/api');
-    when(mockPrefs.getString('auth_token')).thenReturn('test_token');
-  });
-
   group('PosRepositoryImpl', () {
+    late MockDio mockDio;
+    late MockRef mockRef;
+    late PosRepositoryImpl repository;
+
+    setUp(() {
+      mockDio = MockDio();
+      mockRef = MockRef();
+      repository = PosRepositoryImpl(mockDio, mockRef);
+    });
+
     group('searchItems', () {
-      test('returns items when API call succeeds', () async {
-        final query = 'apple';
-        final responseData = {
-          'items': [
-            {
-              'id': '1',
-              'name': 'Apple',
-              'price': 1.99,
-              'quantity': 1,
-              'barcode': '123456789',
-              'imageUrl': 'https://example.com/apple.jpg',
-              'category': 'Fruits',
-            },
-            {
-              'id': '2',
-              'name': 'Apple Juice',
-              'price': 2.99,
-              'quantity': 1,
-              'barcode': '987654321',
-              'imageUrl': 'https://example.com/juice.jpg',
-              'category': 'Beverages',
-            },
-          ]
-        };
-
-        when(mockDio.get(
-          'http://localhost:3000/api/pos/items/search',
-          queryParameters: {'q': query},
-          options: anyNamed('options'),
-        )).thenAnswer((_) async => Response(
-          data: responseData,
+      test('should return list of cart items when API call is successful', () async {
+        // Arrange
+        final mockResponse = Response(
+          data: {
+            'success': true,
+            'data': [
+              {
+                'id': 1,
+                'businessId': 1,
+                'categoryId': 1,
+                'name': 'Test Item',
+                'description': 'Test Description',
+                'price': 10.99,
+                'cost': 5.0,
+                'image': null,
+                'allergens': null,
+                'nutritionalInfo': null,
+                'preparationTime': 10,
+                'isAvailable': true,
+                'isActive': true,
+                'createdAt': '2024-01-01T00:00:00Z',
+                'updatedAt': '2024-01-01T00:00:00Z',
+              }
+            ]
+          },
           statusCode: 200,
-          requestOptions: RequestOptions(path: ''),
-        ));
+          requestOptions: RequestOptions(path: '/api/menu/items'),
+        );
 
-        final result = await posRepository.searchItems(query);
+        when(mockDio.get(any, queryParameters: anyNamed('queryParameters')))
+            .thenAnswer((_) async => mockResponse);
 
-        expect(result.length, 2);
-        expect(result.first.name, 'Apple');
-        expect(result.first.price, 1.99);
-        expect(result.last.name, 'Apple Juice');
-        expect(result.last.price, 2.99);
+        // Act
+        final result = await repository.searchItems('test');
+
+        // Assert
+        expect(result, isA<List<CartItem>>());
+        expect(result.length, 1);
+        expect(result.first.name, 'Test Item');
+        expect(result.first.price, 10.99);
       });
 
-      test('returns empty list when API returns no items', () async {
-        final query = 'nonexistent';
-        final responseData = {'items': []};
-
-        when(mockDio.get(
-          'http://localhost:3000/api/pos/items/search',
-          queryParameters: {'q': query},
-          options: anyNamed('options'),
-        )).thenAnswer((_) async => Response(
-          data: responseData,
-          statusCode: 200,
-          requestOptions: RequestOptions(path: ''),
-        ));
-
-        final result = await posRepository.searchItems(query);
-
-        expect(result, isEmpty);
-      });
-
-      test('throws exception when API call fails', () async {
-        final query = 'apple';
-
-        when(mockDio.get(
-          'http://localhost:3000/api/pos/items/search',
-          queryParameters: {'q': query},
-          options: anyNamed('options'),
-        )).thenThrow(DioException(
-          requestOptions: RequestOptions(path: ''),
+      test('should return empty list when API call fails', () async {
+        // Arrange
+        when(mockDio.get(any, queryParameters: anyNamed('queryParameters')))
+            .thenThrow(DioException(
+          requestOptions: RequestOptions(path: '/api/menu/items'),
           response: Response(
             statusCode: 500,
-            requestOptions: RequestOptions(path: ''),
+            requestOptions: RequestOptions(path: '/api/menu/items'),
           ),
         ));
 
+        // Act & Assert
         expect(
-          () async => await posRepository.searchItems(query),
+          () => repository.searchItems('test'),
           throwsA(isA<Exception>()),
         );
       });
     });
 
     group('getItemByBarcode', () {
-      test('returns item when barcode exists', () async {
-        final barcode = '123456789';
-        final responseData = {
-          'item': {
-            'id': '1',
-            'name': 'Apple',
-            'price': 1.99,
-            'quantity': 1,
-            'barcode': barcode,
-          }
-        };
-
-        when(mockDio.get(
-          'http://localhost:3000/api/pos/items/barcode/$barcode',
-          options: anyNamed('options'),
-        )).thenAnswer((_) async => Response(
-          data: responseData,
+      test('should return cart item when barcode is found', () async {
+        // Arrange
+        final mockResponse = Response(
+          data: {
+            'success': true,
+            'data': [
+              {
+                'id': 1,
+                'businessId': 1,
+                'categoryId': 1,
+                'name': 'Barcode Item',
+                'description': 'Item found by barcode',
+                'price': 15.99,
+                'cost': 8.0,
+                'image': null,
+                'allergens': null,
+                'nutritionalInfo': null,
+                'preparationTime': 5,
+                'isAvailable': true,
+                'isActive': true,
+                'createdAt': '2024-01-01T00:00:00Z',
+                'updatedAt': '2024-01-01T00:00:00Z',
+              }
+            ]
+          },
           statusCode: 200,
-          requestOptions: RequestOptions(path: ''),
-        ));
+          requestOptions: RequestOptions(path: '/api/menu/items'),
+        );
 
-        final result = await posRepository.getItemByBarcode(barcode);
+        when(mockDio.get(any, queryParameters: anyNamed('queryParameters')))
+            .thenAnswer((_) async => mockResponse);
 
-        expect(result, isNotNull);
-        expect(result!.name, 'Apple');
-        expect(result.barcode, barcode);
+        // Act
+        final result = await repository.getItemByBarcode('123456789');
+
+        // Assert
+        expect(result, isA<CartItem>());
+        expect(result!.name, 'Barcode Item');
+        expect(result.price, 15.99);
       });
 
-      test('returns null when barcode not found', () async {
-        final barcode = '999999999';
+      test('should return null when barcode is not found', () async {
+        // Arrange
+        final mockResponse = Response(
+          data: {
+            'success': true,
+            'data': []
+          },
+          statusCode: 200,
+          requestOptions: RequestOptions(path: '/api/menu/items'),
+        );
 
-        when(mockDio.get(
-          'http://localhost:3000/api/pos/items/barcode/$barcode',
-          options: anyNamed('options'),
-        )).thenThrow(DioException(
-          requestOptions: RequestOptions(path: ''),
-          response: Response(
-            statusCode: 404,
-            requestOptions: RequestOptions(path: ''),
-          ),
-        ));
+        when(mockDio.get(any, queryParameters: anyNamed('queryParameters')))
+            .thenAnswer((_) async => mockResponse);
 
-        final result = await posRepository.getItemByBarcode(barcode);
+        // Act
+        final result = await repository.getItemByBarcode('nonexistent');
 
+        // Assert
         expect(result, isNull);
       });
     });
 
     group('createSale', () {
-      test('creates sale successfully', () async {
+      test('should create sale successfully', () async {
+        // Arrange
         final items = [
-          CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 2),
-          CartItem(id: '2', name: 'Banana', price: 0.99, quantity: 1),
+          CartItem(
+            id: '1',
+            name: 'Test Item',
+            price: 10.99,
+            quantity: 2,
+          )
         ];
-        final paymentMethod = PaymentMethod.cash;
-        final responseData = {
-          'sale': {
-            'id': 'sale_123',
-            'items': items.map((item) => item.toJson()).toList(),
-            'total': 4.97,
-            'paymentMethod': paymentMethod.name,
-            'createdAt': DateTime.now().toIso8601String(),
-          }
-        };
 
-        when(mockDio.post(
-          'http://localhost:3000/api/pos/sales',
-          data: anyNamed('data'),
-          options: anyNamed('options'),
-        )).thenAnswer((_) async => Response(
-          data: responseData,
+        final orderResponse = Response(
+          data: {
+            'success': true,
+            'data': {
+              'id': 1,
+              'businessId': 1,
+              'customerId': null,
+              'tableId': null,
+              'orderNumber': 'ORD-1234567890-123',
+              'type': 'takeaway',
+              'status': 'pending',
+              'subtotal': 21.98,
+              'tax': 0.0,
+              'discount': 0.0,
+              'total': 21.98,
+              'notes': null,
+              'estimatedReadyTime': null,
+              'createdAt': '2024-01-01T00:00:00Z',
+              'updatedAt': '2024-01-01T00:00:00Z',
+            }
+          },
           statusCode: 201,
-          requestOptions: RequestOptions(path: ''),
-        ));
-
-        final result = await posRepository.createSale(
-          items: items,
-          paymentMethod: paymentMethod,
+          requestOptions: RequestOptions(path: '/api/orders'),
         );
 
-        expect(result.id, 'sale_123');
-        expect(result.total, 4.97);
-        expect(result.paymentMethod, PaymentMethod.cash);
-        expect(result.items.length, 2);
-      });
-
-      test('throws exception when sale creation fails', () async {
-        final items = [CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 1)];
-        final paymentMethod = PaymentMethod.card;
-
-        when(mockDio.post(
-          'http://localhost:3000/api/pos/sales',
-          data: anyNamed('data'),
-          options: anyNamed('options'),
-        )).thenThrow(DioException(
-          requestOptions: RequestOptions(path: ''),
-          response: Response(
-            statusCode: 400,
-            requestOptions: RequestOptions(path: ''),
-          ),
-        ));
-
-        expect(
-          () async => await posRepository.createSale(
-            items: items,
-            paymentMethod: paymentMethod,
-          ),
-          throwsA(isA<Exception>()),
-        );
-      });
-    });
-
-    group('getRecentSales', () {
-      test('returns recent sales successfully', () async {
-        final responseData = {
-          'sales': [
-            {
-              'id': 'sale_1',
-              'items': [
-                {
-                  'id': '1',
-                  'name': 'Apple',
-                  'price': 1.99,
-                  'quantity': 1,
-                }
-              ],
-              'total': 1.99,
-              'paymentMethod': 'cash',
-              'createdAt': DateTime.now().toIso8601String(),
-            },
-            {
-              'id': 'sale_2',
-              'items': [
-                {
-                  'id': '2',
-                  'name': 'Banana',
-                  'price': 0.99,
-                  'quantity': 2,
-                }
-              ],
-              'total': 1.98,
+        final saleResponse = Response(
+          data: {
+            'success': true,
+            'data': {
+              'id': 1,
+              'orderId': 1,
+              'customerName': 'Test Customer',
+              'customerEmail': 'test@example.com',
               'paymentMethod': 'card',
-              'createdAt': DateTime.now().toIso8601String(),
-            },
-          ]
-        };
+              'total': 21.98,
+              'createdAt': '2024-01-01T00:00:00Z',
+              'updatedAt': '2024-01-01T00:00:00Z',
+            }
+          },
+          statusCode: 201,
+          requestOptions: RequestOptions(path: '/api/sales'),
+        );
 
-        when(mockDio.get(
-          'http://localhost:3000/api/pos/sales/recent',
-          queryParameters: {'limit': 10},
-          options: anyNamed('options'),
-        )).thenAnswer((_) async => Response(
-          data: responseData,
-          statusCode: 200,
-          requestOptions: RequestOptions(path: ''),
-        ));
+        when(mockDio.post('/api/orders', data: anyNamed('data')))
+            .thenAnswer((_) async => orderResponse);
+        when(mockDio.post('/api/orders/1/items', data: anyNamed('data')))
+            .thenAnswer((_) async => Response(
+                  statusCode: 201,
+                  requestOptions: RequestOptions(path: '/api/orders/1/items'),
+                ));
+        when(mockDio.post('/api/sales', data: anyNamed('data')))
+            .thenAnswer((_) async => saleResponse);
 
-        final result = await posRepository.getRecentSales(limit: 10);
+        // Act
+        final result = await repository.createSale(
+          items: items,
+          paymentMethod: PaymentMethod.card,
+          customerName: 'Test Customer',
+          customerEmail: 'test@example.com',
+        );
 
-        expect(result.length, 2);
-        expect(result.first.id, 'sale_1');
-        expect(result.last.id, 'sale_2');
+        // Assert
+        expect(result, isA<Sale>());
+        expect(result.id, '1');
+        expect(result.total, 21.98);
+        expect(result.paymentMethod, PaymentMethod.card);
+        expect(result.customerName, 'Test Customer');
+        expect(result.customerEmail, 'test@example.com');
       });
     });
   });

@@ -6,11 +6,11 @@ part of 'pos_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$posRepositoryHash() => r'b58d1446678fe79e8a54c36c631d0befa42ca8cd';
+String _$posRepositoryHash() => r'9fc654035f06821df10d3252fee627b15eb98fa5';
 
 /// See also [posRepository].
 @ProviderFor(posRepository)
-final posRepositoryProvider = AutoDisposeProvider<PosRepository>.internal(
+final posRepositoryProvider = AutoDisposeFutureProvider<PosRepository>.internal(
   posRepository,
   name: r'posRepositoryProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -22,7 +22,7 @@ final posRepositoryProvider = AutoDisposeProvider<PosRepository>.internal(
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef PosRepositoryRef = AutoDisposeProviderRef<PosRepository>;
+typedef PosRepositoryRef = AutoDisposeFutureProviderRef<PosRepository>;
 String _$cartTotalHash() => r'3095ca29bd6cd95ea9e059b336f4e2dd6821b139';
 
 /// See also [cartTotal].
@@ -39,7 +39,7 @@ final cartTotalProvider = AutoDisposeProvider<double>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CartTotalRef = AutoDisposeProviderRef<double>;
-String _$createSaleHash() => r'472e47adfb42cbec5faf693f3b4db1347db16691';
+String _$createSaleHash() => r'33e5458414f3d3f32fe2d10ab71f1c5cea80ecd1';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -224,7 +224,7 @@ class _CreateSaleProviderElement extends AutoDisposeFutureProviderElement<Sale>
   String? get customerEmail => (origin as CreateSaleProvider).customerEmail;
 }
 
-String _$scanBarcodeHash() => r'7f7aa3230b28e490112f2d9882c00b49c1bdd4cc';
+String _$scanBarcodeHash() => r'6e6bfbe7e3c9885b917d66472796d3a6d382ee87';
 
 /// See also [scanBarcode].
 @ProviderFor(scanBarcode)
@@ -354,7 +354,7 @@ class _ScanBarcodeProviderElement
   String get barcode => (origin as ScanBarcodeProvider).barcode;
 }
 
-String _$salesSummaryHash() => r'8633c57dc3393e1b24f5910b5810cd6835b9ac52';
+String _$salesSummaryHash() => r'2c7a6bf253af04d5b883282bde83d11cbd64bb4b';
 
 /// See also [salesSummary].
 @ProviderFor(salesSummary)
@@ -503,7 +503,7 @@ class _SalesSummaryProviderElement
   DateTime get endDate => (origin as SalesSummaryProvider).endDate;
 }
 
-String _$topSellingItemsHash() => r'cb20556939a31e436ef2171334c66b949f26b6f2';
+String _$topSellingItemsHash() => r'31799e0b8bacbb1b6a032350f7acd65aec4fcfa8';
 
 /// See also [topSellingItems].
 @ProviderFor(topSellingItems)
@@ -650,12 +650,12 @@ final cartNotifierProvider =
 );
 
 typedef _$CartNotifier = AutoDisposeNotifier<List<CartItem>>;
-String _$searchNotifierHash() => r'6ccf2aa9b849f267982a13b9a127b793a4c5d98d';
+String _$searchNotifierHash() => r'c9339d2ba7bb6a22d959578a22ae58dca4829959';
 
 /// See also [SearchNotifier].
 @ProviderFor(SearchNotifier)
 final searchNotifierProvider =
-    AutoDisposeNotifierProvider<SearchNotifier, List<CartItem>>.internal(
+    AutoDisposeNotifierProvider<SearchNotifier, List<MenuItem>>.internal(
   SearchNotifier.new,
   name: r'searchNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -665,9 +665,9 @@ final searchNotifierProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$SearchNotifier = AutoDisposeNotifier<List<CartItem>>;
+typedef _$SearchNotifier = AutoDisposeNotifier<List<MenuItem>>;
 String _$recentSalesNotifierHash() =>
-    r'e9da448b43b90f3f9258bfb55ecb8f11b9b57d9c';
+    r'77db73cc5b4e3ea79aa34a9d380d534248b2bb2f';
 
 /// See also [RecentSalesNotifier].
 @ProviderFor(RecentSalesNotifier)

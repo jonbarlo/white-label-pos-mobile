@@ -6,24 +6,6 @@ part of 'reports_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$reportsRepositoryHash() => r'ec62ec5c22c0e0efdf4d762ebfd6da9ff6c72275';
-
-/// See also [reportsRepository].
-@ProviderFor(reportsRepository)
-final reportsRepositoryProvider =
-    AutoDisposeProvider<ReportsRepository>.internal(
-  reportsRepository,
-  name: r'reportsRepositoryProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$reportsRepositoryHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef ReportsRepositoryRef = AutoDisposeProviderRef<ReportsRepository>;
 String _$salesReportHash() => r'1f029ffcf41398694a7a45d871f097c819dbbe7d';
 
 /// Copied from Dart SDK

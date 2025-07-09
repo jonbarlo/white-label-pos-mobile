@@ -1,0 +1,94 @@
+import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../network/dio_client.dart';
+import '../../features/auth/data/repositories/auth_repository.dart';
+import '../../features/auth/data/repositories/auth_repository_impl.dart';
+import '../../features/business/data/repositories/business_repository.dart';
+import '../../features/business/data/repositories/business_repository_impl.dart';
+import '../../features/inventory/inventory_repository.dart';
+import '../../features/inventory/inventory_repository_impl.dart';
+import '../../features/inventory/inventory_provider.dart';
+
+/// Global providers for dependency injection
+class DependencyInjection {
+  static late ProviderContainer _container;
+  static late SharedPreferences _prefs;
+  static late Dio _dio;
+
+  /// Initialize all dependencies
+  static Future<void> initialize() async {
+    // Initialize SharedPreferences
+    _prefs = await SharedPreferences.getInstance();
+    
+    // Initialize Dio client
+    _dio = Dio(BaseOptions(
+      baseUrl: 'http://localhost:3000/api', // Default API URL
+      connectTimeout: const Duration(seconds: 30),
+      receiveTimeout: const Duration(seconds: 30),
+      sendTimeout: const Duration(seconds: 30),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    ));
+    
+    // Create provider container with overrides
+    _container = ProviderContainer(
+      overrides: [
+        // Override Dio client to use our configured instance
+        dioClientProvider.overrideWith((ref) => _dio),
+        
+        // Auth repository (uses Dio from provider)
+        authRepositoryProvider.overrideWith(
+          (ref) => AuthRepositoryImpl(ref.watch(dioClientProvider)),
+        ),
+        
+        // Business repository (uses Dio from provider)
+        businessRepositoryProvider.overrideWith(
+          (ref) => BusinessRepositoryImpl(ref.watch(dioClientProvider)),
+        ),
+        
+        // Inventory repository (uses Dio from provider)
+        inventoryRepositoryProvider.overrideWith(
+          (ref) => InventoryRepositoryImpl(ref.watch(dioClientProvider)),
+        ),
+      ],
+    );
+  }
+
+  /// Get the provider container
+  static ProviderContainer get container => _container;
+
+  /// Get SharedPreferences instance
+  static SharedPreferences get prefs => _prefs;
+
+  /// Get Dio client instance
+  static Dio get dio => _dio;
+
+  /// Dispose all dependencies
+  static void dispose() {
+    _container.dispose();
+  }
+}
+
+/// Provider overrides for testing
+final testOverrides = [
+  // Override Dio client to use our configured instance
+  dioClientProvider.overrideWith((ref) => DependencyInjection.dio),
+  
+  // Auth repository (uses Dio from provider)
+  authRepositoryProvider.overrideWith(
+    (ref) => AuthRepositoryImpl(ref.watch(dioClientProvider)),
+  ),
+  
+  // Business repository (uses Dio from provider)
+  businessRepositoryProvider.overrideWith(
+    (ref) => BusinessRepositoryImpl(ref.watch(dioClientProvider)),
+  ),
+  
+  // Inventory repository (uses Dio from provider)
+  inventoryRepositoryProvider.overrideWith(
+    (ref) => InventoryRepositoryImpl(ref.watch(dioClientProvider)),
+  ),
+]; 

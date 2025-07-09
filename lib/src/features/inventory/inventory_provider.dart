@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:white_label_pos_mobile/src/features/inventory/inventory_repository.dart';
 import 'package:white_label_pos_mobile/src/features/inventory/models/inventory_item.dart';
+import 'package:white_label_pos_mobile/src/shared/models/result.dart';
 
 part 'inventory_provider.g.dart';
 
@@ -13,19 +14,34 @@ InventoryRepository inventoryRepository(InventoryRepositoryRef ref) {
 @riverpod
 Future<List<InventoryItem>> inventoryItems(InventoryItemsRef ref) async {
   final repository = ref.watch(inventoryRepositoryProvider);
-  return await repository.getInventoryItems();
+  final result = await repository.getInventoryItems();
+  if (result.isSuccess) {
+    return result.data;
+  } else {
+    throw Exception(result.errorMessage);
+  }
 }
 
 @riverpod
 Future<List<InventoryItem>> lowStockItems(LowStockItemsRef ref) async {
   final repository = ref.watch(inventoryRepositoryProvider);
-  return await repository.getLowStockItems();
+  final result = await repository.getLowStockItems();
+  if (result.isSuccess) {
+    return result.data;
+  } else {
+    throw Exception(result.errorMessage);
+  }
 }
 
 @riverpod
 Future<List<String>> categories(CategoriesRef ref) async {
   final repository = ref.watch(inventoryRepositoryProvider);
-  return await repository.getCategories();
+  final result = await repository.getCategories();
+  if (result.isSuccess) {
+    return result.data;
+  } else {
+    throw Exception(result.errorMessage);
+  }
 }
 
 @riverpod
@@ -40,12 +56,20 @@ class Inventory extends _$Inventory {
     
     try {
       final repository = ref.read(inventoryRepositoryProvider);
-      final items = await repository.getInventoryItems();
-      state = state.copyWith(
-        items: items,
-        isLoading: false,
-        error: null,
-      );
+      final result = await repository.getInventoryItems();
+      
+      if (result.isSuccess) {
+        state = state.copyWith(
+          items: result.data,
+          isLoading: false,
+          error: null,
+        );
+      } else {
+        state = state.copyWith(
+          isLoading: false,
+          error: result.errorMessage,
+        );
+      }
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
@@ -59,8 +83,17 @@ class Inventory extends _$Inventory {
     
     try {
       final repository = ref.read(inventoryRepositoryProvider);
-      await repository.createInventoryItem(item);
-      await loadInventoryItems(); // Reload the list
+      final result = await repository.createInventoryItem(item);
+      
+      if (result.isSuccess) {
+        // Reload the list after successful creation
+        loadInventoryItems();
+      } else {
+        state = state.copyWith(
+          isLoading: false,
+          error: result.errorMessage,
+        );
+      }
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
@@ -74,8 +107,17 @@ class Inventory extends _$Inventory {
     
     try {
       final repository = ref.read(inventoryRepositoryProvider);
-      await repository.updateInventoryItem(item);
-      await loadInventoryItems(); // Reload the list
+      final result = await repository.updateInventoryItem(item);
+      
+      if (result.isSuccess) {
+        // Reload the list after successful update
+        loadInventoryItems();
+      } else {
+        state = state.copyWith(
+          isLoading: false,
+          error: result.errorMessage,
+        );
+      }
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
@@ -89,8 +131,24 @@ class Inventory extends _$Inventory {
     
     try {
       final repository = ref.read(inventoryRepositoryProvider);
-      await repository.deleteInventoryItem(id);
-      await loadInventoryItems(); // Reload the list
+      final result = await repository.deleteInventoryItem(id);
+      
+      if (result.isSuccess) {
+        if (result.data) {
+          // Reload the list after successful deletion
+          loadInventoryItems();
+        } else {
+          state = state.copyWith(
+            isLoading: false,
+            error: 'Item not found',
+          );
+        }
+      } else {
+        state = state.copyWith(
+          isLoading: false,
+          error: result.errorMessage,
+        );
+      }
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
@@ -104,8 +162,17 @@ class Inventory extends _$Inventory {
     
     try {
       final repository = ref.read(inventoryRepositoryProvider);
-      await repository.updateStockLevel(id, newQuantity);
-      await loadInventoryItems(); // Reload the list
+      final result = await repository.updateStockLevel(id, newQuantity);
+      
+      if (result.isSuccess) {
+        // Reload the list after successful update
+        loadInventoryItems();
+      } else {
+        state = state.copyWith(
+          isLoading: false,
+          error: result.errorMessage,
+        );
+      }
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
@@ -127,13 +194,21 @@ class Inventory extends _$Inventory {
     
     try {
       final repository = ref.read(inventoryRepositoryProvider);
-      final results = await repository.searchItems(query);
-      state = state.copyWith(
-        searchResults: results,
-        searchQuery: query,
-        isLoading: false,
-        error: null,
-      );
+      final result = await repository.searchItems(query);
+      
+      if (result.isSuccess) {
+        state = state.copyWith(
+          searchResults: result.data,
+          searchQuery: query,
+          isLoading: false,
+          error: null,
+        );
+      } else {
+        state = state.copyWith(
+          isLoading: false,
+          error: result.errorMessage,
+        );
+      }
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
@@ -162,13 +237,21 @@ class Inventory extends _$Inventory {
     
     try {
       final repository = ref.read(inventoryRepositoryProvider);
-      final items = await repository.getItemsByCategory(category);
-      state = state.copyWith(
-        filteredItems: items,
-        selectedCategory: category,
-        isLoading: false,
-        error: null,
-      );
+      final result = await repository.getItemsByCategory(category);
+      
+      if (result.isSuccess) {
+        state = state.copyWith(
+          filteredItems: result.data,
+          selectedCategory: category,
+          isLoading: false,
+          error: null,
+        );
+      } else {
+        state = state.copyWith(
+          isLoading: false,
+          error: result.errorMessage,
+        );
+      }
     } catch (e) {
       state = state.copyWith(
         isLoading: false,

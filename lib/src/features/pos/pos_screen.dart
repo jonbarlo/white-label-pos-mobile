@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'pos_provider.dart';
 import 'models/cart_item.dart';
 import 'models/sale.dart';
+import 'models/menu_item.dart';
 
 class PosScreen extends ConsumerStatefulWidget {
   const PosScreen({super.key});
@@ -158,7 +159,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
 class _SalesTab extends StatelessWidget {
   final List<CartItem> cart;
   final double cartTotal;
-  final List<CartItem> searchResults;
+  final List<MenuItem> searchResults;
   final TextEditingController searchController;
   final Function(String) onSearchChanged;
   final Function(CartItem) onAddToCart;
@@ -242,7 +243,7 @@ class _SalesTab extends StatelessWidget {
 }
 
 class _SearchResultItem extends StatelessWidget {
-  final CartItem item;
+  final MenuItem item;
   final Function(CartItem) onAddToCart;
 
   const _SearchResultItem({
@@ -266,7 +267,14 @@ class _SearchResultItem extends StatelessWidget {
         ),
         trailing: IconButton(
           icon: Icon(Icons.add_shopping_cart, color: theme.colorScheme.primary),
-          onPressed: () => onAddToCart(item),
+          onPressed: () => onAddToCart(CartItem(
+            id: item.id.toString(),
+            name: item.name,
+            price: item.price,
+            quantity: 1,
+            imageUrl: item.image,
+            category: item.categoryId.toString(),
+          )),
         ),
       ),
     );

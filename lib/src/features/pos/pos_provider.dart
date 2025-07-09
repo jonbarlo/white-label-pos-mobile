@@ -1,14 +1,17 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:dio/dio.dart';
 import 'pos_repository.dart';
+import 'pos_repository_impl.dart';
 import 'models/cart_item.dart';
 import 'models/sale.dart';
+import 'models/menu_item.dart';
 
 part 'pos_provider.g.dart';
 
 @riverpod
-PosRepository posRepository(PosRepositoryRef ref) {
-  // This will be provided by dependency injection
-  throw UnimplementedError('PosRepository should be provided via dependency injection');
+Future<PosRepository> posRepository(PosRepositoryRef ref) async {
+  final dio = Dio();
+  return PosRepositoryImpl(dio, ref);
 }
 
 // Cart management
@@ -73,7 +76,7 @@ double cartTotal(CartTotalRef ref) {
 @riverpod
 class SearchNotifier extends _$SearchNotifier {
   @override
-  List<CartItem> build() {
+  List<MenuItem> build() {
     return [];
   }
 
@@ -84,9 +87,26 @@ class SearchNotifier extends _$SearchNotifier {
     }
 
     try {
-      final repository = ref.read(posRepositoryProvider);
+      final repository = await ref.read(posRepositoryProvider.future);
       final results = await repository.searchItems(query);
-      state = results;
+      // Convert CartItem results to MenuItem for display
+      state = results.map((item) => MenuItem(
+        id: int.parse(item.id),
+        businessId: 1, // This should come from auth state
+        categoryId: int.tryParse(item.category ?? '1') ?? 1,
+        name: item.name,
+        description: '',
+        price: item.price,
+        cost: 0.0,
+        image: item.imageUrl,
+        allergens: null,
+        nutritionalInfo: null,
+        preparationTime: 0,
+        isAvailable: true,
+        isActive: true,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      )).toList();
     } catch (e) {
       // Handle error silently for now, could add error state later
       state = [];
@@ -108,7 +128,7 @@ class RecentSalesNotifier extends _$RecentSalesNotifier {
 
   Future<void> loadRecentSales({int limit = 10}) async {
     try {
-      final repository = ref.read(posRepositoryProvider);
+      final repository = await ref.read(posRepositoryProvider.future);
       final sales = await repository.getRecentSales(limit: limit);
       state = sales;
     } catch (e) {
@@ -136,7 +156,7 @@ Future<Sale> createSale(
     throw Exception('Cannot create sale with empty cart');
   }
 
-  final repository = ref.read(posRepositoryProvider);
+  final repository = await ref.read(posRepositoryProvider.future);
   final sale = await repository.createSale(
     items: cart,
     paymentMethod: paymentMethod,
@@ -157,7 +177,7 @@ Future<Sale> createSale(
 @riverpod
 Future<CartItem?> scanBarcode(ScanBarcodeRef ref, String barcode) async {
   try {
-    final repository = ref.read(posRepositoryProvider);
+    final repository = await ref.read(posRepositoryProvider.future);
     return await repository.getItemByBarcode(barcode);
   } catch (e) {
     return null;
@@ -171,7 +191,7 @@ Future<Map<String, dynamic>> salesSummary(
   DateTime startDate,
   DateTime endDate,
 ) async {
-  final repository = ref.read(posRepositoryProvider);
+  final repository = await ref.read(posRepositoryProvider.future);
   return await repository.getSalesSummary(
     startDate: startDate,
     endDate: endDate,
@@ -182,7 +202,7 @@ Future<Map<String, dynamic>> salesSummary(
 @riverpod
 Future<List<CartItem>> topSellingItems(TopSellingItemsRef ref, {int limit = 10}) async {
   try {
-    final repository = ref.read(posRepositoryProvider);
+    final repository = await ref.read(posRepositoryProvider.future);
     return await repository.getTopSellingItems(limit: limit);
   } catch (e) {
     return [];

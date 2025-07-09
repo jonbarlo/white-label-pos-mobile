@@ -25,7 +25,7 @@ final inventoryRepositoryProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef InventoryRepositoryRef = AutoDisposeProviderRef<InventoryRepository>;
-String _$inventoryItemsHash() => r'31428c5ef6bb46f7051953dc9d58479a69812bc6';
+String _$inventoryItemsHash() => r'19f04ff2fb8893b084414ef464716765c8e62760';
 
 /// See also [inventoryItems].
 @ProviderFor(inventoryItems)
@@ -43,7 +43,7 @@ final inventoryItemsProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef InventoryItemsRef = AutoDisposeFutureProviderRef<List<InventoryItem>>;
-String _$lowStockItemsHash() => r'7f5d9f1d020a1cbb7fbc9e2c398113f8305eadfa';
+String _$lowStockItemsHash() => r'7a8dd1bcfe05bab7de96f1ba3266b9378239dda4';
 
 /// See also [lowStockItems].
 @ProviderFor(lowStockItems)
@@ -61,7 +61,7 @@ final lowStockItemsProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef LowStockItemsRef = AutoDisposeFutureProviderRef<List<InventoryItem>>;
-String _$categoriesHash() => r'9e058b1834749b30a0db69c73ee944c8e311da29';
+String _$categoriesHash() => r'd2fd8efe3f9de5098ee160847b330f2bcbe806af';
 
 /// See also [categories].
 @ProviderFor(categories)
@@ -77,7 +77,7 @@ final categoriesProvider = AutoDisposeFutureProvider<List<String>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CategoriesRef = AutoDisposeFutureProviderRef<List<String>>;
-String _$inventoryHash() => r'96db431064a2ea7509ed563151675b6e07f696f8';
+String _$inventoryHash() => r'59607b4bd6ff544d447055028ec1ed903c224488';
 
 /// See also [Inventory].
 @ProviderFor(Inventory)

@@ -1,8 +1,10 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:white_label_pos_mobile/src/features/reports/reports_repository.dart';
 import 'package:white_label_pos_mobile/src/features/reports/models/sales_report.dart';
 import 'package:white_label_pos_mobile/src/features/reports/models/revenue_report.dart';
+import 'package:white_label_pos_mobile/src/core/network/dio_client.dart';
 
 class ReportsRepositoryImpl implements ReportsRepository {
   final Dio _dio;
@@ -197,3 +199,21 @@ class ReportsRepositoryImpl implements ReportsRepository {
     }
   }
 } 
+
+// Provider for dependency injection
+final reportsRepositoryProvider = Provider<ReportsRepository>((ref) {
+  final dio = ref.watch(dioClientProvider);
+  final prefsAsync = ref.watch(sharedPreferencesProvider);
+  
+  // Handle the async nature of SharedPreferences
+  if (prefsAsync.hasValue) {
+    return ReportsRepositoryImpl(dio, prefsAsync.value!);
+  } else {
+    // Return a default implementation or throw an error
+    throw Exception('SharedPreferences not initialized');
+  }
+});
+
+final sharedPreferencesProvider = FutureProvider<SharedPreferences>((ref) async {
+  return await SharedPreferences.getInstance();
+}); 

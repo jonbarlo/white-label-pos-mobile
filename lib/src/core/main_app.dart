@@ -7,7 +7,7 @@ import '../features/onboarding/onboarding_screen.dart';
 import '../features/dashboard/dashboard_screen.dart';
 import '../features/pos/pos_screen.dart';
 import '../features/inventory/inventory_screen.dart';
-import '../features/sales/reports_screen.dart';
+import '../features/reports/reports_screen.dart';
 import '../features/users/profile_screen.dart';
 import '../features/business/business_list_screen.dart';
 

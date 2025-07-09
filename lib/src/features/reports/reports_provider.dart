@@ -2,14 +2,11 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:white_label_pos_mobile/src/features/reports/reports_repository.dart';
 import 'package:white_label_pos_mobile/src/features/reports/models/sales_report.dart';
 import 'package:white_label_pos_mobile/src/features/reports/models/revenue_report.dart';
+import 'package:white_label_pos_mobile/src/features/reports/reports_repository_impl.dart';
 
 part 'reports_provider.g.dart';
 
-@riverpod
-ReportsRepository reportsRepository(ReportsRepositoryRef ref) {
-  // This will be overridden in tests and dependency injection
-  throw UnimplementedError('reportsRepository must be overridden');
-}
+// Use the direct provider from the implementation file instead of creating a circular dependency
 
 @riverpod
 Future<SalesReport> salesReport(

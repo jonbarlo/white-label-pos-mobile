@@ -9,7 +9,8 @@ import 'package:mockito/mockito.dart' as _i1;
 import 'package:white_label_pos_mobile/src/features/inventory/inventory_repository.dart'
     as _i3;
 import 'package:white_label_pos_mobile/src/features/inventory/models/inventory_item.dart'
-    as _i2;
+    as _i5;
+import 'package:white_label_pos_mobile/src/shared/models/result.dart' as _i2;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -25,8 +26,8 @@ import 'package:white_label_pos_mobile/src/features/inventory/models/inventory_i
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
 
-class _FakeInventoryItem_0 extends _i1.SmartFake implements _i2.InventoryItem {
-  _FakeInventoryItem_0(
+class _FakeResult_0<T> extends _i1.SmartFake implements _i2.Result<T> {
+  _FakeResult_0(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -45,75 +46,93 @@ class MockInventoryRepository extends _i1.Mock
   }
 
   @override
-  _i4.Future<List<_i2.InventoryItem>> getInventoryItems() =>
+  _i4.Future<_i2.Result<List<_i5.InventoryItem>>> getInventoryItems() =>
       (super.noSuchMethod(
         Invocation.method(
           #getInventoryItems,
           [],
         ),
-        returnValue:
-            _i4.Future<List<_i2.InventoryItem>>.value(<_i2.InventoryItem>[]),
-      ) as _i4.Future<List<_i2.InventoryItem>>);
+        returnValue: _i4.Future<_i2.Result<List<_i5.InventoryItem>>>.value(
+            _FakeResult_0<List<_i5.InventoryItem>>(
+          this,
+          Invocation.method(
+            #getInventoryItems,
+            [],
+          ),
+        )),
+      ) as _i4.Future<_i2.Result<List<_i5.InventoryItem>>>);
 
   @override
-  _i4.Future<_i2.InventoryItem> getInventoryItem(String? id) =>
+  _i4.Future<_i2.Result<_i5.InventoryItem>> getInventoryItem(String? id) =>
       (super.noSuchMethod(
         Invocation.method(
           #getInventoryItem,
           [id],
         ),
-        returnValue: _i4.Future<_i2.InventoryItem>.value(_FakeInventoryItem_0(
+        returnValue: _i4.Future<_i2.Result<_i5.InventoryItem>>.value(
+            _FakeResult_0<_i5.InventoryItem>(
           this,
           Invocation.method(
             #getInventoryItem,
             [id],
           ),
         )),
-      ) as _i4.Future<_i2.InventoryItem>);
+      ) as _i4.Future<_i2.Result<_i5.InventoryItem>>);
 
   @override
-  _i4.Future<_i2.InventoryItem> createInventoryItem(_i2.InventoryItem? item) =>
+  _i4.Future<_i2.Result<_i5.InventoryItem>> createInventoryItem(
+          _i5.InventoryItem? item) =>
       (super.noSuchMethod(
         Invocation.method(
           #createInventoryItem,
           [item],
         ),
-        returnValue: _i4.Future<_i2.InventoryItem>.value(_FakeInventoryItem_0(
+        returnValue: _i4.Future<_i2.Result<_i5.InventoryItem>>.value(
+            _FakeResult_0<_i5.InventoryItem>(
           this,
           Invocation.method(
             #createInventoryItem,
             [item],
           ),
         )),
-      ) as _i4.Future<_i2.InventoryItem>);
+      ) as _i4.Future<_i2.Result<_i5.InventoryItem>>);
 
   @override
-  _i4.Future<_i2.InventoryItem> updateInventoryItem(_i2.InventoryItem? item) =>
+  _i4.Future<_i2.Result<_i5.InventoryItem>> updateInventoryItem(
+          _i5.InventoryItem? item) =>
       (super.noSuchMethod(
         Invocation.method(
           #updateInventoryItem,
           [item],
         ),
-        returnValue: _i4.Future<_i2.InventoryItem>.value(_FakeInventoryItem_0(
+        returnValue: _i4.Future<_i2.Result<_i5.InventoryItem>>.value(
+            _FakeResult_0<_i5.InventoryItem>(
           this,
           Invocation.method(
             #updateInventoryItem,
             [item],
           ),
         )),
-      ) as _i4.Future<_i2.InventoryItem>);
+      ) as _i4.Future<_i2.Result<_i5.InventoryItem>>);
 
   @override
-  _i4.Future<bool> deleteInventoryItem(String? id) => (super.noSuchMethod(
+  _i4.Future<_i2.Result<bool>> deleteInventoryItem(String? id) =>
+      (super.noSuchMethod(
         Invocation.method(
           #deleteInventoryItem,
           [id],
         ),
-        returnValue: _i4.Future<bool>.value(false),
-      ) as _i4.Future<bool>);
+        returnValue: _i4.Future<_i2.Result<bool>>.value(_FakeResult_0<bool>(
+          this,
+          Invocation.method(
+            #deleteInventoryItem,
+            [id],
+          ),
+        )),
+      ) as _i4.Future<_i2.Result<bool>>);
 
   @override
-  _i4.Future<_i2.InventoryItem> updateStockLevel(
+  _i4.Future<_i2.Result<_i5.InventoryItem>> updateStockLevel(
     String? id,
     int? newQuantity,
   ) =>
@@ -125,7 +144,8 @@ class MockInventoryRepository extends _i1.Mock
             newQuantity,
           ],
         ),
-        returnValue: _i4.Future<_i2.InventoryItem>.value(_FakeInventoryItem_0(
+        returnValue: _i4.Future<_i2.Result<_i5.InventoryItem>>.value(
+            _FakeResult_0<_i5.InventoryItem>(
           this,
           Invocation.method(
             #updateStockLevel,
@@ -135,46 +155,73 @@ class MockInventoryRepository extends _i1.Mock
             ],
           ),
         )),
-      ) as _i4.Future<_i2.InventoryItem>);
+      ) as _i4.Future<_i2.Result<_i5.InventoryItem>>);
 
   @override
-  _i4.Future<List<_i2.InventoryItem>> getLowStockItems() => (super.noSuchMethod(
+  _i4.Future<_i2.Result<List<_i5.InventoryItem>>> getLowStockItems() =>
+      (super.noSuchMethod(
         Invocation.method(
           #getLowStockItems,
           [],
         ),
-        returnValue:
-            _i4.Future<List<_i2.InventoryItem>>.value(<_i2.InventoryItem>[]),
-      ) as _i4.Future<List<_i2.InventoryItem>>);
+        returnValue: _i4.Future<_i2.Result<List<_i5.InventoryItem>>>.value(
+            _FakeResult_0<List<_i5.InventoryItem>>(
+          this,
+          Invocation.method(
+            #getLowStockItems,
+            [],
+          ),
+        )),
+      ) as _i4.Future<_i2.Result<List<_i5.InventoryItem>>>);
 
   @override
-  _i4.Future<List<String>> getCategories() => (super.noSuchMethod(
+  _i4.Future<_i2.Result<List<String>>> getCategories() => (super.noSuchMethod(
         Invocation.method(
           #getCategories,
           [],
         ),
-        returnValue: _i4.Future<List<String>>.value(<String>[]),
-      ) as _i4.Future<List<String>>);
+        returnValue: _i4.Future<_i2.Result<List<String>>>.value(
+            _FakeResult_0<List<String>>(
+          this,
+          Invocation.method(
+            #getCategories,
+            [],
+          ),
+        )),
+      ) as _i4.Future<_i2.Result<List<String>>>);
 
   @override
-  _i4.Future<List<_i2.InventoryItem>> searchItems(String? query) =>
+  _i4.Future<_i2.Result<List<_i5.InventoryItem>>> searchItems(String? query) =>
       (super.noSuchMethod(
         Invocation.method(
           #searchItems,
           [query],
         ),
-        returnValue:
-            _i4.Future<List<_i2.InventoryItem>>.value(<_i2.InventoryItem>[]),
-      ) as _i4.Future<List<_i2.InventoryItem>>);
+        returnValue: _i4.Future<_i2.Result<List<_i5.InventoryItem>>>.value(
+            _FakeResult_0<List<_i5.InventoryItem>>(
+          this,
+          Invocation.method(
+            #searchItems,
+            [query],
+          ),
+        )),
+      ) as _i4.Future<_i2.Result<List<_i5.InventoryItem>>>);
 
   @override
-  _i4.Future<List<_i2.InventoryItem>> getItemsByCategory(String? category) =>
+  _i4.Future<_i2.Result<List<_i5.InventoryItem>>> getItemsByCategory(
+          String? category) =>
       (super.noSuchMethod(
         Invocation.method(
           #getItemsByCategory,
           [category],
         ),
-        returnValue:
-            _i4.Future<List<_i2.InventoryItem>>.value(<_i2.InventoryItem>[]),
-      ) as _i4.Future<List<_i2.InventoryItem>>);
+        returnValue: _i4.Future<_i2.Result<List<_i5.InventoryItem>>>.value(
+            _FakeResult_0<List<_i5.InventoryItem>>(
+          this,
+          Invocation.method(
+            #getItemsByCategory,
+            [category],
+          ),
+        )),
+      ) as _i4.Future<_i2.Result<List<_i5.InventoryItem>>>);
 }

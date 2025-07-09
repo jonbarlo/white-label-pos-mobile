@@ -109,8 +109,15 @@ class AuthNotifier extends _$AuthNotifier {
 
   Future<void> checkAuthStatus() async {
     try {
+      state = state.copyWith(status: AuthStatus.loading);
+      
       final repository = await ref.read(authRepositoryProvider.future);
-      final isLoggedIn = await repository.isLoggedIn();
+      final isLoggedIn = await repository.isLoggedIn().timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          throw Exception('Connection timeout. Please check your internet connection.');
+        },
+      );
       
       if (isLoggedIn) {
         state = state.copyWith(status: AuthStatus.authenticated);
