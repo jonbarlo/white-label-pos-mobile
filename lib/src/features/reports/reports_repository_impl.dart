@@ -20,17 +20,51 @@ class ReportsRepositoryImpl implements ReportsRepository {
     required DateTime endDate,
   }) async {
     try {
-      final response = await _dio.get('/reports/sales', queryParameters: {
-        'startDate': startDate.toIso8601String(),
-        'endDate': endDate.toIso8601String(),
+      final response = await _dio.get('/sales', queryParameters: {
+        'page': 1,
+        'limit': 100,
+        'status': 'completed',
       });
 
-      final salesReport = SalesReport.fromJson(response.data);
+      // Backend returns a list of sales, not a sales report object
+      // We need to calculate the report from the sales data
+      final salesData = response.data as List<dynamic>;
+      
+      // Calculate totals from sales data
+      double totalSales = 0.0;
+      int totalTransactions = salesData.length;
+      List<String> topSellingItems = [];
+      
+      for (final sale in salesData) {
+        final saleMap = sale as Map<String, dynamic>;
+        totalSales += (saleMap['total'] as num?)?.toDouble() ?? 0.0;
+        
+        // Extract items if available
+        final items = saleMap['items'] as List<dynamic>?;
+        if (items != null) {
+          for (final item in items) {
+            final itemMap = item as Map<String, dynamic>;
+            final itemName = itemMap['name']?.toString() ?? 'Unknown Item';
+            topSellingItems.add(itemName);
+          }
+        }
+      }
+      
+      // Create sales report from calculated data
+      final salesReport = SalesReport(
+        totalSales: totalSales,
+        totalTransactions: totalTransactions,
+        averageTransactionValue: totalTransactions > 0 ? totalSales / totalTransactions : 0.0,
+        topSellingItems: topSellingItems.take(10).toList(), // Top 10 items
+        salesByHour: {}, // TODO: Calculate by hour if needed
+        startDate: startDate,
+        endDate: endDate,
+      );
       
       // Cache the report
       await _prefs.setString(
         '$_salesReportCacheKey${startDate.toIso8601String()}_${endDate.toIso8601String()}',
-        response.data.toString(),
+        salesReport.toJson().toString(),
       );
 
       return salesReport;
@@ -63,12 +97,17 @@ class ReportsRepositoryImpl implements ReportsRepository {
     required DateTime endDate,
   }) async {
     try {
-      final response = await _dio.get('/reports/revenue', queryParameters: {
+      final response = await _dio.get('/sales/stats', queryParameters: {
         'startDate': startDate.toIso8601String(),
         'endDate': endDate.toIso8601String(),
       });
 
-      final revenueReport = RevenueReport.fromJson(response.data);
+      // Handle both response.data and response.data['data'] formats
+      final data = response.data is Map<String, dynamic> && response.data['data'] != null 
+          ? response.data['data'] as Map<String, dynamic>
+          : response.data as Map<String, dynamic>;
+
+      final revenueReport = RevenueReport.fromJson(data);
       
       // Cache the report
       await _prefs.setString(
@@ -101,10 +140,60 @@ class ReportsRepositoryImpl implements ReportsRepository {
   }
 
   @override
+  Future<List<Map<String, dynamic>>> getDetailedTransactions({
+    required DateTime startDate,
+    required DateTime endDate,
+    int page = 1,
+    int limit = 50,
+    String? status,
+    String? paymentMethod,
+  }) async {
+    try {
+      final queryParams = <String, dynamic>{
+        'page': page,
+        'limit': limit,
+        'sort': 'createdAt',
+        'order': 'desc',
+      };
+      
+      if (status != null) {
+        queryParams['status'] = status;
+      }
+      if (paymentMethod != null) {
+        queryParams['paymentMethod'] = paymentMethod;
+      }
+
+      final response = await _dio.get('/sales', queryParameters: queryParams);
+      
+      // Backend returns a list of sales
+      final salesData = response.data as List<dynamic>;
+      return List<Map<String, dynamic>>.from(salesData);
+    } on DioException catch (e) {
+      throw Exception('Failed to get detailed transactions: ${e.message}');
+    }
+  }
+
+  @override
   Future<Map<String, dynamic>> getInventoryReport() async {
     try {
-      final response = await _dio.get('/reports/inventory');
-      return Map<String, dynamic>.from(response.data);
+      final response = await _dio.get('/items');
+      
+      // Handle both array and object responses
+      if (response.data is List) {
+        final items = response.data as List<dynamic>;
+        return {
+          'totalItems': items.length,
+          'items': items,
+          'lowStockItems': items.where((item) {
+            final itemMap = item as Map<String, dynamic>;
+            final stockQuantity = (itemMap['stockQuantity'] as num?)?.toInt() ?? 0;
+            final minStockLevel = (itemMap['minStockLevel'] as num?)?.toInt() ?? 0;
+            return stockQuantity <= minStockLevel;
+          }).length,
+        };
+      } else {
+        return Map<String, dynamic>.from(response.data);
+      }
     } on DioException catch (e) {
       throw Exception('Failed to get inventory report: ${e.message}');
     }
@@ -128,9 +217,16 @@ class ReportsRepositoryImpl implements ReportsRepository {
         queryParams['endDate'] = endDate.toIso8601String();
       }
 
-      final response = await _dio.get('/reports/top-selling-items', queryParameters: queryParams);
+      final response = await _dio.get('/sales/top-items', queryParameters: queryParams);
       
-      return List<Map<String, dynamic>>.from(response.data);
+      // Handle both array and object responses
+      if (response.data is List) {
+        return List<Map<String, dynamic>>.from(response.data);
+      } else if (response.data is Map<String, dynamic> && response.data['data'] is List) {
+        return List<Map<String, dynamic>>.from(response.data['data']);
+      } else {
+        return [];
+      }
     } on DioException catch (e) {
       throw Exception('Failed to get top selling items: ${e.message}');
     }
@@ -143,13 +239,18 @@ class ReportsRepositoryImpl implements ReportsRepository {
     required DateTime endDate,
   }) async {
     try {
-      final response = await _dio.get('/reports/sales-trends', queryParameters: {
+      final response = await _dio.get('/sales/trends', queryParameters: {
         'period': period,
         'startDate': startDate.toIso8601String(),
         'endDate': endDate.toIso8601String(),
       });
 
-      return Map<String, double>.from(response.data);
+      // Handle both direct map and nested data
+      final data = response.data is Map<String, dynamic> && response.data['data'] != null 
+          ? response.data['data'] as Map<String, dynamic>
+          : response.data as Map<String, dynamic>;
+
+      return Map<String, double>.from(data);
     } on DioException catch (e) {
       throw Exception('Failed to get sales trends: ${e.message}');
     }
@@ -170,9 +271,14 @@ class ReportsRepositoryImpl implements ReportsRepository {
         queryParams['endDate'] = endDate.toIso8601String();
       }
 
-      final response = await _dio.get('/reports/customer-analytics', queryParameters: queryParams);
+      final response = await _dio.get('/sales/customer-analytics', queryParameters: queryParams);
       
-      return Map<String, dynamic>.from(response.data);
+      // Handle both direct map and nested data
+      final data = response.data is Map<String, dynamic> && response.data['data'] != null 
+          ? response.data['data'] as Map<String, dynamic>
+          : response.data as Map<String, dynamic>;
+
+      return Map<String, dynamic>.from(data);
     } on DioException catch (e) {
       throw Exception('Failed to get customer analytics: ${e.message}');
     }
@@ -186,7 +292,7 @@ class ReportsRepositoryImpl implements ReportsRepository {
     String format = 'csv',
   }) async {
     try {
-      final response = await _dio.get('/reports/export', queryParameters: {
+      final response = await _dio.get('/sales/export', queryParameters: {
         'reportType': reportType,
         'startDate': startDate.toIso8601String(),
         'endDate': endDate.toIso8601String(),
@@ -198,7 +304,7 @@ class ReportsRepositoryImpl implements ReportsRepository {
       throw Exception('Failed to export report: ${e.message}');
     }
   }
-} 
+}
 
 // Provider for dependency injection
 final reportsRepositoryProvider = Provider<ReportsRepository>((ref) {

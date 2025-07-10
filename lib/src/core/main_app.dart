@@ -65,13 +65,21 @@ class _MainAppState extends ConsumerState<MainApp> {
         const ReportsScreen(),
         const ProfileScreen(),
       ];
-    } else {
-      // Non-admin screens - includes POS, no business management
+    } else if (authState.canAccessReports) {
+      // Manager screens - includes POS and reports, no business management
       return [
         const DashboardScreen(),
         const PosScreen(),
         const InventoryScreen(),
         const ReportsScreen(),
+        const ProfileScreen(),
+      ];
+    } else {
+      // Cashier/Kitchen screens - includes POS, no reports or business management
+      return [
+        const DashboardScreen(),
+        const PosScreen(),
+        const InventoryScreen(),
         const ProfileScreen(),
       ];
     }
@@ -101,7 +109,7 @@ class _MainAppState extends ConsumerState<MainApp> {
           label: 'Profile',
         ),
       ];
-    } else {
+    } else if (authState.canAccessReports) {
       return const [
         BottomNavigationBarItem(
           icon: Icon(Icons.dashboard),
@@ -118,6 +126,25 @@ class _MainAppState extends ConsumerState<MainApp> {
         BottomNavigationBarItem(
           icon: Icon(Icons.analytics),
           label: 'Reports',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.person),
+          label: 'Profile',
+        ),
+      ];
+    } else {
+      return const [
+        BottomNavigationBarItem(
+          icon: Icon(Icons.dashboard),
+          label: 'Dashboard',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.point_of_sale),
+          label: 'POS',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.inventory),
+          label: 'Inventory',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.person),

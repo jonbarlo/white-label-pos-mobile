@@ -3,6 +3,7 @@ import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 import 'package:white_label_pos_mobile/src/features/inventory/inventory_repository.dart';
 import 'package:white_label_pos_mobile/src/features/inventory/models/inventory_item.dart';
+import 'package:white_label_pos_mobile/src/shared/models/result.dart';
 
 import 'inventory_repository_test.mocks.dart';
 
@@ -16,7 +17,7 @@ void main() {
 
   group('InventoryRepository', () {
     group('getInventoryItems', () {
-      test('returns list of inventory items', () async {
+      test('returns success with list of inventory items', () async {
         final expectedItems = [
           InventoryItem(
             id: '1',
@@ -49,38 +50,40 @@ void main() {
         ];
 
         when(mockInventoryRepository.getInventoryItems())
-            .thenAnswer((_) async => expectedItems);
+            .thenAnswer((_) async => Result.success(expectedItems));
 
         final result = await mockInventoryRepository.getInventoryItems();
 
-        expect(result, expectedItems);
-        expect(result.length, 2);
-        expect(result.first.name, 'Apple');
-        expect(result.last.name, 'Banana');
+        expect(result.isSuccess, isTrue);
+        expect(result.data, expectedItems);
+        expect(result.data!.length, 2);
+        expect(result.data!.first.name, 'Apple');
+        expect(result.data!.last.name, 'Banana');
       });
 
-      test('returns empty list when no items exist', () async {
+      test('returns success with empty list when no items exist', () async {
         when(mockInventoryRepository.getInventoryItems())
-            .thenAnswer((_) async => []);
+            .thenAnswer((_) async => Result.success([]));
 
         final result = await mockInventoryRepository.getInventoryItems();
 
-        expect(result, isEmpty);
+        expect(result.isSuccess, isTrue);
+        expect(result.data, isEmpty);
       });
 
-      test('throws exception on network error', () async {
+      test('returns failure on network error', () async {
         when(mockInventoryRepository.getInventoryItems())
-            .thenThrow(Exception('Network error'));
+            .thenAnswer((_) async => Result.failure('Network error'));
 
-        expect(
-          () async => await mockInventoryRepository.getInventoryItems(),
-          throwsA(isA<Exception>()),
-        );
+        final result = await mockInventoryRepository.getInventoryItems();
+
+        expect(result.isFailure, isTrue);
+        expect(result.errorMessage, 'Network error');
       });
     });
 
     group('getInventoryItem', () {
-      test('returns item when id exists', () async {
+      test('returns success with item when id exists', () async {
         final expectedItem = InventoryItem(
           id: '1',
           name: 'Apple',
@@ -97,28 +100,29 @@ void main() {
         );
 
         when(mockInventoryRepository.getInventoryItem('1'))
-            .thenAnswer((_) async => expectedItem);
+            .thenAnswer((_) async => Result.success(expectedItem));
 
         final result = await mockInventoryRepository.getInventoryItem('1');
 
-        expect(result, expectedItem);
-        expect(result.name, 'Apple');
-        expect(result.sku, 'APP001');
+        expect(result.isSuccess, isTrue);
+        expect(result.data, expectedItem);
+        expect(result.data!.name, 'Apple');
+        expect(result.data!.sku, 'APP001');
       });
 
-      test('throws exception when item not found', () async {
+      test('returns failure when item not found', () async {
         when(mockInventoryRepository.getInventoryItem('999'))
-            .thenThrow(Exception('Item not found'));
+            .thenAnswer((_) async => Result.failure('Item not found'));
 
-        expect(
-          () async => await mockInventoryRepository.getInventoryItem('999'),
-          throwsA(isA<Exception>()),
-        );
+        final result = await mockInventoryRepository.getInventoryItem('999');
+
+        expect(result.isFailure, isTrue);
+        expect(result.errorMessage, 'Item not found');
       });
     });
 
     group('createInventoryItem', () {
-      test('creates item successfully', () async {
+      test('returns success with created item', () async {
         final newItem = InventoryItem(
           id: '',
           name: 'Orange',
@@ -137,16 +141,17 @@ void main() {
         final createdItem = newItem.copyWith(id: '3');
 
         when(mockInventoryRepository.createInventoryItem(newItem))
-            .thenAnswer((_) async => createdItem);
+            .thenAnswer((_) async => Result.success(createdItem));
 
         final result = await mockInventoryRepository.createInventoryItem(newItem);
 
-        expect(result, createdItem);
-        expect(result.id, '3');
-        expect(result.name, 'Orange');
+        expect(result.isSuccess, isTrue);
+        expect(result.data, createdItem);
+        expect(result.data!.id, '3');
+        expect(result.data!.name, 'Orange');
       });
 
-      test('throws exception when creation fails', () async {
+      test('returns failure when creation fails', () async {
         final newItem = InventoryItem(
           id: '',
           name: 'Orange',
@@ -163,17 +168,17 @@ void main() {
         );
 
         when(mockInventoryRepository.createInventoryItem(newItem))
-            .thenThrow(Exception('Creation failed'));
+            .thenAnswer((_) async => Result.failure('Creation failed'));
 
-        expect(
-          () async => await mockInventoryRepository.createInventoryItem(newItem),
-          throwsA(isA<Exception>()),
-        );
+        final result = await mockInventoryRepository.createInventoryItem(newItem);
+
+        expect(result.isFailure, isTrue);
+        expect(result.errorMessage, 'Creation failed');
       });
     });
 
     group('updateInventoryItem', () {
-      test('updates item successfully', () async {
+      test('returns success with updated item', () async {
         final updatedItem = InventoryItem(
           id: '1',
           name: 'Apple Updated',
@@ -190,70 +195,73 @@ void main() {
         );
 
         when(mockInventoryRepository.updateInventoryItem(updatedItem))
-            .thenAnswer((_) async => updatedItem);
+            .thenAnswer((_) async => Result.success(updatedItem));
 
         final result = await mockInventoryRepository.updateInventoryItem(updatedItem);
 
-        expect(result, updatedItem);
-        expect(result.name, 'Apple Updated');
-        expect(result.price, 2.49);
+        expect(result.isSuccess, isTrue);
+        expect(result.data, updatedItem);
+        expect(result.data!.name, 'Apple Updated');
+        expect(result.data!.price, 2.49);
       });
 
-      test('throws exception when update fails', () async {
+      test('returns failure when update fails', () async {
         final updatedItem = InventoryItem(
-          id: '999',
-          name: 'Non-existent Item',
-          sku: 'NON001',
-          price: 1.00,
-          cost: 0.80,
-          stockQuantity: 10,
-          category: 'Test',
-          barcode: '000000000',
-          imageUrl: 'https://example.com/test.jpg',
-          description: 'Test item',
-          minStockLevel: 1,
-          maxStockLevel: 20,
+          id: '1',
+          name: 'Apple Updated',
+          sku: 'APP001',
+          price: 2.49,
+          cost: 1.80,
+          stockQuantity: 80,
+          category: 'Fruits',
+          barcode: '123456789',
+          imageUrl: 'https://example.com/apple.jpg',
+          description: 'Updated description',
+          minStockLevel: 15,
+          maxStockLevel: 250,
         );
 
         when(mockInventoryRepository.updateInventoryItem(updatedItem))
-            .thenThrow(Exception('Update failed'));
+            .thenAnswer((_) async => Result.failure('Update failed'));
 
-        expect(
-          () async => await mockInventoryRepository.updateInventoryItem(updatedItem),
-          throwsA(isA<Exception>()),
-        );
+        final result = await mockInventoryRepository.updateInventoryItem(updatedItem);
+
+        expect(result.isFailure, isTrue);
+        expect(result.errorMessage, 'Update failed');
       });
     });
 
     group('deleteInventoryItem', () {
-      test('deletes item successfully', () async {
+      test('returns success when item is deleted', () async {
         when(mockInventoryRepository.deleteInventoryItem('1'))
-            .thenAnswer((_) async => true);
+            .thenAnswer((_) async => Result.success(true));
 
         final result = await mockInventoryRepository.deleteInventoryItem('1');
 
-        expect(result, isTrue);
+        expect(result.isSuccess, isTrue);
+        expect(result.data, isTrue);
       });
 
-      test('returns false when item not found', () async {
+      test('returns failure when deletion fails', () async {
         when(mockInventoryRepository.deleteInventoryItem('999'))
-            .thenAnswer((_) async => false);
+            .thenAnswer((_) async => Result.failure('Item not found'));
 
         final result = await mockInventoryRepository.deleteInventoryItem('999');
 
-        expect(result, isFalse);
+        expect(result.isFailure, isTrue);
+        expect(result.errorMessage, 'Item not found');
       });
     });
 
     group('updateStockLevel', () {
-      test('updates stock level successfully', () async {
+      test('returns success with updated item', () async {
         final updatedItem = InventoryItem(
           id: '1',
           name: 'Apple',
           sku: 'APP001',
           price: 1.99,
           cost: 1.50,
-          stockQuantity: 90, // Updated from 100
+          stockQuantity: 90,
           category: 'Fruits',
           barcode: '123456789',
           imageUrl: 'https://example.com/apple.jpg',
@@ -263,27 +271,28 @@ void main() {
         );
 
         when(mockInventoryRepository.updateStockLevel('1', 90))
-            .thenAnswer((_) async => updatedItem);
+            .thenAnswer((_) async => Result.success(updatedItem));
 
         final result = await mockInventoryRepository.updateStockLevel('1', 90);
 
-        expect(result, updatedItem);
-        expect(result.stockQuantity, 90);
+        expect(result.isSuccess, isTrue);
+        expect(result.data, updatedItem);
+        expect(result.data!.stockQuantity, 90);
       });
 
-      test('throws exception when item not found', () async {
-        when(mockInventoryRepository.updateStockLevel('999', 50))
-            .thenThrow(Exception('Item not found'));
+      test('returns failure when stock update fails', () async {
+        when(mockInventoryRepository.updateStockLevel('999', 90))
+            .thenAnswer((_) async => Result.failure('Item not found'));
 
-        expect(
-          () async => await mockInventoryRepository.updateStockLevel('999', 50),
-          throwsA(isA<Exception>()),
-        );
+        final result = await mockInventoryRepository.updateStockLevel('999', 90);
+
+        expect(result.isFailure, isTrue);
+        expect(result.errorMessage, 'Item not found');
       });
     });
 
     group('getLowStockItems', () {
-      test('returns items with low stock', () async {
+      test('returns success with low stock items', () async {
         final lowStockItems = [
           InventoryItem(
             id: '1',
@@ -291,7 +300,7 @@ void main() {
             sku: 'APP001',
             price: 1.99,
             cost: 1.50,
-            stockQuantity: 5, // Below min stock level
+            stockQuantity: 5,
             category: 'Fruits',
             barcode: '123456789',
             imageUrl: 'https://example.com/apple.jpg',
@@ -302,46 +311,132 @@ void main() {
         ];
 
         when(mockInventoryRepository.getLowStockItems())
-            .thenAnswer((_) async => lowStockItems);
+            .thenAnswer((_) async => Result.success(lowStockItems));
 
         final result = await mockInventoryRepository.getLowStockItems();
 
-        expect(result, lowStockItems);
-        expect(result.length, 1);
-        expect(result.first.stockQuantity, 5);
+        expect(result.isSuccess, isTrue);
+        expect(result.data, lowStockItems);
+        expect(result.data!.length, 1);
+        expect(result.data!.first.stockQuantity, 5);
       });
 
-      test('returns empty list when no low stock items', () async {
+      test('returns success with empty list when no low stock items', () async {
         when(mockInventoryRepository.getLowStockItems())
-            .thenAnswer((_) async => []);
+            .thenAnswer((_) async => Result.success([]));
 
         final result = await mockInventoryRepository.getLowStockItems();
 
-        expect(result, isEmpty);
+        expect(result.isSuccess, isTrue);
+        expect(result.data, isEmpty);
       });
     });
 
     group('getCategories', () {
-      test('returns list of categories', () async {
-        final categories = ['Fruits', 'Vegetables', 'Dairy', 'Beverages'];
+      test('returns success with categories', () async {
+        final categories = ['Fruits', 'Vegetables', 'Dairy', 'Meat'];
 
         when(mockInventoryRepository.getCategories())
-            .thenAnswer((_) async => categories);
+            .thenAnswer((_) async => Result.success(categories));
 
         final result = await mockInventoryRepository.getCategories();
 
-        expect(result, categories);
-        expect(result.length, 4);
-        expect(result.contains('Fruits'), isTrue);
+        expect(result.isSuccess, isTrue);
+        expect(result.data, categories);
+        expect(result.data!.length, 4);
+        expect(result.data!.contains('Fruits'), isTrue);
       });
 
-      test('returns empty list when no categories exist', () async {
+      test('returns failure when categories cannot be loaded', () async {
         when(mockInventoryRepository.getCategories())
-            .thenAnswer((_) async => []);
+            .thenAnswer((_) async => Result.failure('Failed to load categories'));
 
         final result = await mockInventoryRepository.getCategories();
 
-        expect(result, isEmpty);
+        expect(result.isFailure, isTrue);
+        expect(result.errorMessage, 'Failed to load categories');
+      });
+    });
+
+    group('searchItems', () {
+      test('returns success with search results', () async {
+        final searchResults = [
+          InventoryItem(
+            id: '1',
+            name: 'Apple',
+            sku: 'APP001',
+            price: 1.99,
+            cost: 1.50,
+            stockQuantity: 100,
+            category: 'Fruits',
+            barcode: '123456789',
+            imageUrl: 'https://example.com/apple.jpg',
+            description: 'Fresh red apples',
+            minStockLevel: 10,
+            maxStockLevel: 200,
+          ),
+        ];
+
+        when(mockInventoryRepository.searchItems('apple'))
+            .thenAnswer((_) async => Result.success(searchResults));
+
+        final result = await mockInventoryRepository.searchItems('apple');
+
+        expect(result.isSuccess, isTrue);
+        expect(result.data, searchResults);
+        expect(result.data!.length, 1);
+        expect(result.data!.first.name, 'Apple');
+      });
+
+      test('returns success with empty list when no search results', () async {
+        when(mockInventoryRepository.searchItems('nonexistent'))
+            .thenAnswer((_) async => Result.success([]));
+
+        final result = await mockInventoryRepository.searchItems('nonexistent');
+
+        expect(result.isSuccess, isTrue);
+        expect(result.data, isEmpty);
+      });
+    });
+
+    group('getItemsByCategory', () {
+      test('returns success with items in category', () async {
+        final categoryItems = [
+          InventoryItem(
+            id: '1',
+            name: 'Apple',
+            sku: 'APP001',
+            price: 1.99,
+            cost: 1.50,
+            stockQuantity: 100,
+            category: 'Fruits',
+            barcode: '123456789',
+            imageUrl: 'https://example.com/apple.jpg',
+            description: 'Fresh red apples',
+            minStockLevel: 10,
+            maxStockLevel: 200,
+          ),
+        ];
+
+        when(mockInventoryRepository.getItemsByCategory('Fruits'))
+            .thenAnswer((_) async => Result.success(categoryItems));
+
+        final result = await mockInventoryRepository.getItemsByCategory('Fruits');
+
+        expect(result.isSuccess, isTrue);
+        expect(result.data, categoryItems);
+        expect(result.data!.length, 1);
+        expect(result.data!.first.category, 'Fruits');
+      });
+
+      test('returns success with empty list when no items in category', () async {
+        when(mockInventoryRepository.getItemsByCategory('Nonexistent'))
+            .thenAnswer((_) async => Result.success([]));
+
+        final result = await mockInventoryRepository.getItemsByCategory('Nonexistent');
+
+        expect(result.isSuccess, isTrue);
+        expect(result.data, isEmpty);
       });
     });
   });

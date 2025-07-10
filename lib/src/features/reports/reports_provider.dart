@@ -35,6 +35,27 @@ Future<RevenueReport> revenueReport(
 }
 
 @riverpod
+Future<List<Map<String, dynamic>>> detailedTransactions(
+  DetailedTransactionsRef ref, {
+  required DateTime startDate,
+  required DateTime endDate,
+  int page = 1,
+  int limit = 50,
+  String? status,
+  String? paymentMethod,
+}) async {
+  final repository = ref.watch(reportsRepositoryProvider);
+  return await repository.getDetailedTransactions(
+    startDate: startDate,
+    endDate: endDate,
+    page: page,
+    limit: limit,
+    status: status,
+    paymentMethod: paymentMethod,
+  );
+}
+
+@riverpod
 Future<Map<String, dynamic>> inventoryReport(InventoryReportRef ref) async {
   final repository = ref.watch(reportsRepositoryProvider);
   return await repository.getInventoryReport();

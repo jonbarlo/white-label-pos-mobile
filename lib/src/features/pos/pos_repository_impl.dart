@@ -113,27 +113,28 @@ class PosRepositoryImpl implements PosRepository {
     String? customerEmail,
   }) async {
     try {
+      final authState = _ref.read(authNotifierProvider);
+      final businessId = authState.business?.id;
+      if (businessId == null) {
+        throw Exception('No businessId found in auth state');
+      }
       // Create order
       final orderData = {
-        'orderType': 'takeaway', // Default to takeaway for mobile POS
-        'status': 'pending',
-        'subtotal': items.fold(0.0, (sum, item) => sum + item.total),
-        'tax': 0.0, // Calculate based on business tax rate
-        'discount': 0.0,
-        'total': items.fold(0.0, (sum, item) => sum + item.total),
-        'notes': null,
+        'businessId': businessId,
+        'orderType': 'takeaway', // Must match backend: dine_in, takeaway, delivery
+        if (customerName != null) 'customerName': customerName,
         'items': items.map((item) => {
-          'menuItemId': int.parse(item.id),
+          'itemId': int.parse(item.id),
           'quantity': item.quantity,
-          'unitPrice': item.price,
-          'totalPrice': item.total,
+          'price': item.price,
         }).toList(),
       };
 
       final orderResponse = await _dio.post('/orders', data: orderData);
-      
-      if (orderResponse.statusCode != 201 || orderResponse.data['success'] != true) {
-        throw Exception('Failed to create order');
+      final orderSuccess = (orderResponse.statusCode == 201 || orderResponse.statusCode == 200) &&
+                          (orderResponse.data['success'] == true || orderResponse.data['success'] == 'true');
+      if (!orderSuccess) {
+        throw Exception(orderResponse.data['message'] ?? 'Failed to create order');
       }
 
       final order = Order.fromJson(orderResponse.data['data']);
@@ -156,16 +157,20 @@ class PosRepositoryImpl implements PosRepository {
       // Create sale record
       final saleData = {
         'orderId': order.id,
-        'customerName': customerName,
-        'customerEmail': customerEmail,
-        'paymentMethod': paymentMethod.name,
+        if (customerName != null) 'customerName': customerName,
+        if (customerEmail != null) 'customerEmail': customerEmail,
+        'subtotal': order.subtotal,
+        'tax': order.tax,
         'total': order.total,
+        'paymentMethod': paymentMethod.name,
+        'status': 'completed',
       };
 
       final saleResponse = await _dio.post('/sales', data: saleData);
-      
-      if (saleResponse.statusCode != 201 || saleResponse.data['success'] != true) {
-        throw Exception('Failed to create sale');
+      final saleSuccess = (saleResponse.statusCode == 201 || saleResponse.statusCode == 200) &&
+                         (saleResponse.data['success'] == true || saleResponse.data['success'] == 'true');
+      if (!saleSuccess) {
+        throw Exception(saleResponse.data['message'] ?? 'Failed to create sale');
       }
 
       // Convert to Sale model

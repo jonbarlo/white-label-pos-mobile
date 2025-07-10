@@ -22,8 +22,7 @@ class SalesReport {
     required this.endDate,
   });
 
-  factory SalesReport.fromJson(Map<String, dynamic> json) =>
-      _$SalesReportFromJson(json);
+  factory SalesReport.fromJson(Map<String, dynamic> json) => _$SalesReportFromJson(json);
 
   Map<String, dynamic> toJson() => _$SalesReportToJson(this);
 

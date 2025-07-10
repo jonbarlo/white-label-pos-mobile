@@ -10,8 +10,12 @@ import 'package:white_label_pos_mobile/src/features/pos/models/menu_item.dart';
 
 import 'pos_repository_impl_test.mocks.dart';
 
+import 'package:white_label_pos_mobile/src/features/auth/auth_provider.dart';
+import 'package:white_label_pos_mobile/src/features/business/models/business.dart';
+
 @GenerateMocks([Dio, Ref])
 void main() {
+  provideDummy<AuthState>(const AuthState());
   group('PosRepositoryImpl', () {
     late MockDio mockDio;
     late MockRef mockRef;
@@ -20,6 +24,8 @@ void main() {
     setUp(() {
       mockDio = MockDio();
       mockRef = MockRef();
+      when(mockDio.options).thenReturn(BaseOptions());
+      when(mockDio.interceptors).thenReturn(Interceptors());
       repository = PosRepositoryImpl(mockDio, mockRef);
     });
 
@@ -35,12 +41,17 @@ void main() {
             'data': [
               {
                 'id': 1,
+                'businessId': 1,
+                'categoryId': 1,
                 'name': 'Test Item',
                 'description': 'Test Description',
                 'price': 10.99,
-                'categoryId': 1,
+                'cost': 5.00,
+                'preparationTime': 10,
                 'isAvailable': true,
                 'isActive': true,
+                'createdAt': '2025-07-10T01:00:00.000Z',
+                'updatedAt': '2025-07-10T01:00:00.000Z',
               }
             ]
           },
@@ -114,12 +125,17 @@ void main() {
             'data': [
               {
                 'id': 1,
+                'businessId': 1,
+                'categoryId': 1,
                 'name': 'Barcode Item',
                 'description': 'Item with barcode',
                 'price': 15.99,
-                'categoryId': 1,
+                'cost': 7.00,
+                'preparationTime': 5,
                 'isAvailable': true,
                 'isActive': true,
+                'createdAt': '2025-07-10T01:00:00.000Z',
+                'updatedAt': '2025-07-10T01:00:00.000Z',
               }
             ]
           },
@@ -180,9 +196,16 @@ void main() {
                     'success': true,
                     'data': {
                       'id': 1,
+                      'businessId': 1,
                       'orderNumber': 'ORD-123',
+                      'orderType': 'takeaway',
+                      'status': 'pending',
+                      'subtotal': 21.98,
+                      'tax': 0.0,
+                      'discount': 0.0,
                       'total': 21.98,
                       'createdAt': '2025-07-10T01:00:00.000Z',
+                      'updatedAt': '2025-07-10T01:00:00.000Z',
                     }
                   },
                   statusCode: 201,
@@ -211,6 +234,20 @@ void main() {
                   requestOptions: RequestOptions(path: '/sales'),
                 ));
 
+        // Mock auth state
+        when(mockRef.read(any)).thenReturn(const AuthState(
+          business: Business(
+            id: 1,
+            name: 'Demo',
+            slug: 'demo',
+            type: BusinessType.restaurant,
+            taxRate: 0.0,
+            currency: 'USD',
+            timezone: 'UTC',
+            isActive: true,
+          ),
+        ));
+
         final result = await repository.createSale(
           items: items,
           paymentMethod: PaymentMethod.cash,
@@ -224,6 +261,86 @@ void main() {
         verify(mockDio.post('/orders', data: anyNamed('data'))).called(1);
         verify(mockDio.post('/orders/1/items', data: anyNamed('data'))).called(1);
         verify(mockDio.post('/sales', data: anyNamed('data'))).called(1);
+      });
+
+      test('should create sale with orderType in response', () async {
+        final items = [
+          CartItem(
+            id: '1',
+            name: 'Test Item',
+            price: 10.99,
+            quantity: 2,
+          ),
+        ];
+
+        // Mock order creation with 'orderType' only
+        when(mockDio.post('/orders', data: anyNamed('data')))
+            .thenAnswer((_) async => Response(
+                  data: {
+                    'success': true,
+                    'data': {
+                      'id': 1,
+                      'businessId': 1,
+                      'orderNumber': 'ORD-123',
+                      'orderType': 'takeaway',
+                      'status': 'pending',
+                      'subtotal': 21.98,
+                      'tax': 0.0,
+                      'discount': 0.0,
+                      'total': 21.98,
+                      'createdAt': '2025-07-10T01:00:00.000Z',
+                      'updatedAt': '2025-07-10T01:00:00.000Z',
+                    }
+                  },
+                  statusCode: 201,
+                  requestOptions: RequestOptions(path: '/orders'),
+                ));
+
+        // Mock order items creation
+        when(mockDio.post('/orders/1/items', data: anyNamed('data')))
+            .thenAnswer((_) async => Response(
+                  data: {'success': true},
+                  statusCode: 201,
+                  requestOptions: RequestOptions(path: '/orders/1/items'),
+                ));
+
+        // Mock sale creation
+        when(mockDio.post('/sales', data: anyNamed('data')))
+            .thenAnswer((_) async => Response(
+                  data: {
+                    'success': true,
+                    'data': {
+                      'id': 1,
+                      'total': 21.98,
+                    }
+                  },
+                  statusCode: 201,
+                  requestOptions: RequestOptions(path: '/sales'),
+                ));
+
+        // Mock auth state
+        when(mockRef.read(any)).thenReturn(const AuthState(
+          business: Business(
+            id: 1,
+            name: 'Demo',
+            slug: 'demo',
+            type: BusinessType.restaurant,
+            taxRate: 0.0,
+            currency: 'USD',
+            timezone: 'UTC',
+            isActive: true,
+          ),
+        ));
+
+        final result = await repository.createSale(
+          items: items,
+          paymentMethod: PaymentMethod.cash,
+          customerName: 'John Doe',
+        );
+
+        expect(result.id, '1');
+        expect(result.total, 21.98);
+        expect(result.customerName, 'John Doe');
       });
     });
 

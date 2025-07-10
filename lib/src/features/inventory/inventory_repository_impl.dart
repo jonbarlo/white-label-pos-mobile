@@ -13,20 +13,14 @@ class InventoryRepositoryImpl implements InventoryRepository {
   @override
   Future<Result<List<InventoryItem>>> getInventoryItems() async {
     try {
-      final response = await _dio.get('/inventory/items');
-      final apiResponse = ApiResponse<List<dynamic>>.fromJson(
-        response.data,
-        (json) => json as List<dynamic>,
-      );
-      
-      if (apiResponse.data == null) {
+      final response = await _dio.get('/items');
+      final data = response.data as List<dynamic>?;
+      if (data == null) {
         return Result.failure('No data received from server');
       }
-      
-      final items = apiResponse.data!
+      final items = data
           .map((json) => InventoryItem.fromJson(json as Map<String, dynamic>))
           .toList();
-      
       return Result.success(items);
     } on DioException catch (e) {
       return Result.failure(AppException.fromDioException(e).message);
@@ -38,7 +32,7 @@ class InventoryRepositoryImpl implements InventoryRepository {
   @override
   Future<Result<InventoryItem>> getInventoryItem(String id) async {
     try {
-      final response = await _dio.get('/inventory/items/$id');
+      final response = await _dio.get('/items/$id');
       final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
         response.data,
         (json) => json as Map<String, dynamic>,
@@ -61,7 +55,7 @@ class InventoryRepositoryImpl implements InventoryRepository {
   Future<Result<InventoryItem>> createInventoryItem(InventoryItem item) async {
     try {
       final response = await _dio.post(
-        '/inventory/items',
+        '/items',
         data: item.toJson(),
       );
       final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
@@ -86,7 +80,7 @@ class InventoryRepositoryImpl implements InventoryRepository {
   Future<Result<InventoryItem>> updateInventoryItem(InventoryItem item) async {
     try {
       final response = await _dio.put(
-        '/inventory/items/${item.id}',
+        '/items/${item.id}',
         data: item.toJson(),
       );
       final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
@@ -110,7 +104,7 @@ class InventoryRepositoryImpl implements InventoryRepository {
   @override
   Future<Result<bool>> deleteInventoryItem(String id) async {
     try {
-      await _dio.delete('/inventory/items/$id');
+      await _dio.delete('/items/$id');
       return Result.success(true);
     } on DioException catch (e) {
       return Result.failure(AppException.fromDioException(e).message);
@@ -123,7 +117,7 @@ class InventoryRepositoryImpl implements InventoryRepository {
   Future<Result<InventoryItem>> updateStockLevel(String id, int newQuantity) async {
     try {
       final response = await _dio.patch(
-        '/inventory/items/$id/stock',
+        '/items/$id/stock',
         data: {'quantity': newQuantity},
       );
       final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
@@ -147,19 +141,14 @@ class InventoryRepositoryImpl implements InventoryRepository {
   @override
   Future<Result<List<InventoryItem>>> searchItems(String query) async {
     try {
-      final response = await _dio.get('/inventory/items/search', queryParameters: {
+      final response = await _dio.get('/items/search', queryParameters: {
         'q': query,
       });
-      final apiResponse = ApiResponse<List<dynamic>>.fromJson(
-        response.data,
-        (json) => json as List<dynamic>,
-      );
-      
-      if (apiResponse.data == null) {
+      final data = response.data as List<dynamic>?;
+      if (data == null) {
         return Result.failure('No search results found');
       }
-      
-      final items = apiResponse.data!
+      final items = data
           .map((json) => InventoryItem.fromJson(json as Map<String, dynamic>))
           .toList();
       
@@ -174,7 +163,7 @@ class InventoryRepositoryImpl implements InventoryRepository {
   @override
   Future<Result<List<String>>> getCategories() async {
     try {
-      final response = await _dio.get('/inventory/categories');
+      final response = await _dio.get('/menu/categories');
       final apiResponse = ApiResponse<List<dynamic>>.fromJson(
         response.data,
         (json) => json as List<dynamic>,
@@ -196,17 +185,12 @@ class InventoryRepositoryImpl implements InventoryRepository {
   @override
   Future<Result<List<InventoryItem>>> getItemsByCategory(String category) async {
     try {
-      final response = await _dio.get('/inventory/items/category/$category');
-      final apiResponse = ApiResponse<List<dynamic>>.fromJson(
-        response.data,
-        (json) => json as List<dynamic>,
-      );
-      
-      if (apiResponse.data == null) {
+      final response = await _dio.get('/items/category/$category');
+      final data = response.data as List<dynamic>?;
+      if (data == null) {
         return Result.failure('No items found in category');
       }
-      
-      final items = apiResponse.data!
+      final items = data
           .map((json) => InventoryItem.fromJson(json as Map<String, dynamic>))
           .toList();
       
@@ -221,17 +205,12 @@ class InventoryRepositoryImpl implements InventoryRepository {
   @override
   Future<Result<List<InventoryItem>>> getLowStockItems() async {
     try {
-      final response = await _dio.get('/inventory/items/low-stock');
-      final apiResponse = ApiResponse<List<dynamic>>.fromJson(
-        response.data,
-        (json) => json as List<dynamic>,
-      );
-      
-      if (apiResponse.data == null) {
+      final response = await _dio.get('/items/low-stock');
+      final data = response.data as List<dynamic>?;
+      if (data == null) {
         return Result.failure('No low stock items found');
       }
-      
-      final items = apiResponse.data!
+      final items = data
           .map((json) => InventoryItem.fromJson(json as Map<String, dynamic>))
           .toList();
       

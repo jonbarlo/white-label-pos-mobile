@@ -322,6 +322,225 @@ class _RevenueReportProviderElement
   DateTime get endDate => (origin as RevenueReportProvider).endDate;
 }
 
+String _$detailedTransactionsHash() =>
+    r'4d52880bc02357746ff6f8610e2cbfd52148ca54';
+
+/// See also [detailedTransactions].
+@ProviderFor(detailedTransactions)
+const detailedTransactionsProvider = DetailedTransactionsFamily();
+
+/// See also [detailedTransactions].
+class DetailedTransactionsFamily
+    extends Family<AsyncValue<List<Map<String, dynamic>>>> {
+  /// See also [detailedTransactions].
+  const DetailedTransactionsFamily();
+
+  /// See also [detailedTransactions].
+  DetailedTransactionsProvider call({
+    required DateTime startDate,
+    required DateTime endDate,
+    int page = 1,
+    int limit = 50,
+    String? status,
+    String? paymentMethod,
+  }) {
+    return DetailedTransactionsProvider(
+      startDate: startDate,
+      endDate: endDate,
+      page: page,
+      limit: limit,
+      status: status,
+      paymentMethod: paymentMethod,
+    );
+  }
+
+  @override
+  DetailedTransactionsProvider getProviderOverride(
+    covariant DetailedTransactionsProvider provider,
+  ) {
+    return call(
+      startDate: provider.startDate,
+      endDate: provider.endDate,
+      page: provider.page,
+      limit: provider.limit,
+      status: provider.status,
+      paymentMethod: provider.paymentMethod,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'detailedTransactionsProvider';
+}
+
+/// See also [detailedTransactions].
+class DetailedTransactionsProvider
+    extends AutoDisposeFutureProvider<List<Map<String, dynamic>>> {
+  /// See also [detailedTransactions].
+  DetailedTransactionsProvider({
+    required DateTime startDate,
+    required DateTime endDate,
+    int page = 1,
+    int limit = 50,
+    String? status,
+    String? paymentMethod,
+  }) : this._internal(
+          (ref) => detailedTransactions(
+            ref as DetailedTransactionsRef,
+            startDate: startDate,
+            endDate: endDate,
+            page: page,
+            limit: limit,
+            status: status,
+            paymentMethod: paymentMethod,
+          ),
+          from: detailedTransactionsProvider,
+          name: r'detailedTransactionsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$detailedTransactionsHash,
+          dependencies: DetailedTransactionsFamily._dependencies,
+          allTransitiveDependencies:
+              DetailedTransactionsFamily._allTransitiveDependencies,
+          startDate: startDate,
+          endDate: endDate,
+          page: page,
+          limit: limit,
+          status: status,
+          paymentMethod: paymentMethod,
+        );
+
+  DetailedTransactionsProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.startDate,
+    required this.endDate,
+    required this.page,
+    required this.limit,
+    required this.status,
+    required this.paymentMethod,
+  }) : super.internal();
+
+  final DateTime startDate;
+  final DateTime endDate;
+  final int page;
+  final int limit;
+  final String? status;
+  final String? paymentMethod;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<Map<String, dynamic>>> Function(
+            DetailedTransactionsRef provider)
+        create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: DetailedTransactionsProvider._internal(
+        (ref) => create(ref as DetailedTransactionsRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        startDate: startDate,
+        endDate: endDate,
+        page: page,
+        limit: limit,
+        status: status,
+        paymentMethod: paymentMethod,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<Map<String, dynamic>>> createElement() {
+    return _DetailedTransactionsProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is DetailedTransactionsProvider &&
+        other.startDate == startDate &&
+        other.endDate == endDate &&
+        other.page == page &&
+        other.limit == limit &&
+        other.status == status &&
+        other.paymentMethod == paymentMethod;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, startDate.hashCode);
+    hash = _SystemHash.combine(hash, endDate.hashCode);
+    hash = _SystemHash.combine(hash, page.hashCode);
+    hash = _SystemHash.combine(hash, limit.hashCode);
+    hash = _SystemHash.combine(hash, status.hashCode);
+    hash = _SystemHash.combine(hash, paymentMethod.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin DetailedTransactionsRef
+    on AutoDisposeFutureProviderRef<List<Map<String, dynamic>>> {
+  /// The parameter `startDate` of this provider.
+  DateTime get startDate;
+
+  /// The parameter `endDate` of this provider.
+  DateTime get endDate;
+
+  /// The parameter `page` of this provider.
+  int get page;
+
+  /// The parameter `limit` of this provider.
+  int get limit;
+
+  /// The parameter `status` of this provider.
+  String? get status;
+
+  /// The parameter `paymentMethod` of this provider.
+  String? get paymentMethod;
+}
+
+class _DetailedTransactionsProviderElement
+    extends AutoDisposeFutureProviderElement<List<Map<String, dynamic>>>
+    with DetailedTransactionsRef {
+  _DetailedTransactionsProviderElement(super.provider);
+
+  @override
+  DateTime get startDate => (origin as DetailedTransactionsProvider).startDate;
+  @override
+  DateTime get endDate => (origin as DetailedTransactionsProvider).endDate;
+  @override
+  int get page => (origin as DetailedTransactionsProvider).page;
+  @override
+  int get limit => (origin as DetailedTransactionsProvider).limit;
+  @override
+  String? get status => (origin as DetailedTransactionsProvider).status;
+  @override
+  String? get paymentMethod =>
+      (origin as DetailedTransactionsProvider).paymentMethod;
+}
+
 String _$inventoryReportHash() => r'55af2ca19c08561a692ba1e69c049909da56b9a0';
 
 /// See also [inventoryReport].

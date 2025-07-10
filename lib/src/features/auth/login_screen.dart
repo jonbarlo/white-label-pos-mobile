@@ -24,9 +24,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.initState();
     // Set default values in debug mode for easier testing
     if (EnvConfig.isDebugMode) {
-      _emailController = TextEditingController(text: 'user@demo.com');
-      _passwordController = TextEditingController(text: 'user123');
-      _businessSlugController = TextEditingController(text: 'demo-restaurant');
+      _emailController = TextEditingController(text: 'maria@bellavista.com');
+      _passwordController = TextEditingController(text: 'cashier123');
+      _businessSlugController = TextEditingController(text: 'bella-vista-italian');
     } else {
       _emailController = TextEditingController();
       _passwordController = TextEditingController();

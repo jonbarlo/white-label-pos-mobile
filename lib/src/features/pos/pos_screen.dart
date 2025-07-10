@@ -4,6 +4,7 @@ import 'pos_provider.dart';
 import 'models/cart_item.dart';
 import 'models/sale.dart';
 import 'models/menu_item.dart';
+import '../auth/auth_provider.dart';
 
 class PosScreen extends ConsumerStatefulWidget {
   const PosScreen({super.key});
@@ -87,11 +88,17 @@ class _PosScreenState extends ConsumerState<PosScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-    // Load recent sales after the widget is built
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadRecentSales();
-    });
+    // Check if user can access reports to determine tab count
+    final authState = ref.read(authNotifierProvider);
+    final canAccessReports = authState.canAccessReports;
+    _tabController = TabController(length: canAccessReports ? 2 : 1, vsync: this);
+    
+    // Load recent sales after the widget is built (only if user can access reports)
+    if (canAccessReports) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _loadRecentSales();
+      });
+    }
   }
 
   @override
@@ -182,23 +189,30 @@ class _PosScreenState extends ConsumerState<PosScreen>
   Future<void> _completeSale() async {
     try {
       await ref.read(createSaleProvider(_selectedPaymentMethod).future);
-      
-      if (mounted) {
-        Navigator.of(context).pop(); // Close dialog
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Row(
-              children: [
-                Icon(Icons.check_circle, color: Colors.white),
-                SizedBox(width: 8),
-                Text('Sale completed successfully!'),
-              ],
-            ),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 3),
-          ),
-        );
+      // Refresh sales summary/report
+      ref.refresh(salesSummaryProvider(DateTime.now().subtract(const Duration(days: 7)), DateTime.now()));
+      // Switch to Recent Sales tab if user can access reports
+      final authState = ref.read(authNotifierProvider);
+      if (mounted && authState.canAccessReports) {
+        _tabController.animateTo(1);
       }
+      setState(() {
+        _selectedPaymentMethod = PaymentMethod.cash;
+      });
+      Navigator.of(context).pop(); // Close dialog
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.white),
+              SizedBox(width: 8),
+              Text('Sale completed successfully!'),
+            ],
+          ),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 3),
+        ),
+      );
     } catch (e) {
       if (mounted) {
         Navigator.of(context).pop(); // Close dialog
@@ -225,6 +239,8 @@ class _PosScreenState extends ConsumerState<PosScreen>
     final cartTotal = ref.watch(cartTotalProvider);
     final searchResults = ref.watch(searchNotifierProvider);
     final recentSales = ref.watch(recentSalesNotifierProvider);
+    final authState = ref.watch(authNotifierProvider);
+    final canAccessReports = authState.canAccessReports;
 
     return Scaffold(
       appBar: AppBar(
@@ -234,15 +250,16 @@ class _PosScreenState extends ConsumerState<PosScreen>
         elevation: 2,
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
-            Tab(
+          tabs: [
+            const Tab(
               icon: Icon(Icons.point_of_sale),
               text: 'Sales',
             ),
-            Tab(
-              icon: Icon(Icons.history),
-              text: 'Recent Sales',
-            ),
+            if (canAccessReports)
+              const Tab(
+                icon: Icon(Icons.history),
+                text: 'Recent Sales',
+              ),
           ],
           indicatorColor: Theme.of(context).colorScheme.onPrimary,
         ),
@@ -324,7 +341,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
                     );
             },
           ),
-          _RecentSalesTab(sales: recentSales),
+          if (canAccessReports) _RecentSalesTab(sales: recentSales),
         ],
       ),
     );
@@ -1105,7 +1122,7 @@ class _RecentSalesTab extends StatelessWidget {
                   ),
                 ],
                 Text(
-                  '${sale.items.length} items • ${sale.paymentMethod.name}',
+                  '${sale.items?.length ?? 0} items • ${sale.paymentMethod.name}',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),

@@ -111,6 +111,32 @@ class MockReportsRepository extends _i1.Mock implements _i4.ReportsRepository {
       ) as _i5.Future<_i3.RevenueReport>);
 
   @override
+  _i5.Future<List<Map<String, dynamic>>> getDetailedTransactions({
+    required DateTime? startDate,
+    required DateTime? endDate,
+    int? page = 1,
+    int? limit = 50,
+    String? status,
+    String? paymentMethod,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getDetailedTransactions,
+          [],
+          {
+            #startDate: startDate,
+            #endDate: endDate,
+            #page: page,
+            #limit: limit,
+            #status: status,
+            #paymentMethod: paymentMethod,
+          },
+        ),
+        returnValue: _i5.Future<List<Map<String, dynamic>>>.value(
+            <Map<String, dynamic>>[]),
+      ) as _i5.Future<List<Map<String, dynamic>>>);
+
+  @override
   _i5.Future<Map<String, dynamic>> getInventoryReport() => (super.noSuchMethod(
         Invocation.method(
           #getInventoryReport,

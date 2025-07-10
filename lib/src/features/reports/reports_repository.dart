@@ -14,6 +14,16 @@ abstract class ReportsRepository {
     required DateTime endDate,
   });
 
+  /// Get detailed transactions for a given date range
+  Future<List<Map<String, dynamic>>> getDetailedTransactions({
+    required DateTime startDate,
+    required DateTime endDate,
+    int page = 1,
+    int limit = 50,
+    String? status,
+    String? paymentMethod,
+  });
+
   /// Get inventory summary report
   Future<Map<String, dynamic>> getInventoryReport();
 
