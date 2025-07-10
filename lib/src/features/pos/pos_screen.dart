@@ -6,6 +6,7 @@ import 'package:white_label_pos_mobile/src/features/pos/models/menu_item.dart';
 import 'package:white_label_pos_mobile/src/features/pos/pos_provider.dart';
 import 'package:white_label_pos_mobile/src/features/pos/customer_selection_dialog.dart';
 import 'package:white_label_pos_mobile/src/features/auth/auth_provider.dart';
+import 'package:white_label_pos_mobile/src/features/auth/models/user.dart';
 
 class PosScreen extends ConsumerStatefulWidget {
   const PosScreen({super.key});
@@ -91,11 +92,12 @@ class _PosScreenState extends ConsumerState<PosScreen>
     super.initState();
     // Check if user can access reports to determine tab count
     final authState = ref.read(authNotifierProvider);
-    final canAccessReports = authState.canAccessReports;
-    _tabController = TabController(length: canAccessReports ? 2 : 1, vsync: this);
+    final userRole = authState.user?.role;
+    final canSeeReportsTab = userRole == UserRole.admin || userRole == UserRole.manager;
+    _tabController = TabController(length: canSeeReportsTab ? 2 : 1, vsync: this);
     
     // Load recent sales after the widget is built (only if user can access reports)
-    if (canAccessReports) {
+    if (canSeeReportsTab) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _loadRecentSales();
       });
@@ -194,7 +196,9 @@ class _PosScreenState extends ConsumerState<PosScreen>
       ref.refresh(salesSummaryProvider(DateTime.now().subtract(const Duration(days: 7)), DateTime.now()));
       // Switch to Recent Sales tab if user can access reports
       final authState = ref.read(authNotifierProvider);
-      if (mounted && authState.canAccessReports) {
+      final userRole = authState.user?.role;
+      final canSeeReportsTab = userRole == UserRole.admin || userRole == UserRole.manager;
+      if (mounted && canSeeReportsTab) {
         _tabController.animateTo(1);
       }
       setState(() {
@@ -241,7 +245,8 @@ class _PosScreenState extends ConsumerState<PosScreen>
     final searchResults = ref.watch(searchNotifierProvider);
     final recentSales = ref.watch(recentSalesNotifierProvider);
     final authState = ref.watch(authNotifierProvider);
-    final canAccessReports = authState.canAccessReports;
+    final userRole = authState.user?.role;
+    final canSeeReportsTab = userRole == UserRole.admin || userRole == UserRole.manager;
 
     return Scaffold(
       appBar: AppBar(
@@ -256,7 +261,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
               icon: Icon(Icons.point_of_sale),
               text: 'Sales',
             ),
-            if (canAccessReports)
+            if (canSeeReportsTab)
               const Tab(
                 icon: Icon(Icons.history),
                 text: 'Recent Sales',
@@ -342,7 +347,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
                     );
             },
           ),
-          if (canAccessReports) _RecentSalesTab(sales: recentSales),
+          if (canSeeReportsTab) _RecentSalesTab(sales: recentSales),
         ],
       ),
     );
