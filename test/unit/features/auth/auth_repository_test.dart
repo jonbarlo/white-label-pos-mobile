@@ -1,7 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
-import 'package:white_label_pos_mobile/src/features/auth/auth_repository.dart';
+import 'package:white_label_pos_mobile/src/features/auth/data/repositories/auth_repository.dart';
+import 'package:white_label_pos_mobile/src/shared/models/result.dart';
+import 'package:white_label_pos_mobile/src/features/auth/models/user.dart';
+import 'package:white_label_pos_mobile/src/features/business/models/business.dart';
 
 import 'auth_repository_test.mocks.dart';
 
@@ -15,46 +18,88 @@ void main() {
 
   group('AuthRepository', () {
     group('login', () {
-      test('returns token on success', () async {
-        when(mockAuthRepository.login(email: 'test@example.com', password: 'password', businessSlug: 'biz1'))
-            .thenAnswer((_) async => 'mock_token');
+      test('returns LoginResponse on success', () async {
+        final mockUser = User(
+          id: 1,
+          businessId: 1,
+          name: 'Test User',
+          email: 'test@example.com',
+          role: UserRole.cashier,
+          isActive: true,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+        
+        final mockBusiness = Business(
+          id: 1,
+          name: 'Test Business',
+          slug: 'test-business',
+          taxRate: 0.08,
+          currency: 'USD',
+          timezone: 'UTC',
+        );
+        
+        final mockLoginResponse = LoginResponse(
+          user: mockUser,
+          token: 'mock_token',
+          business: mockBusiness,
+        );
 
-        final token = await mockAuthRepository.login(email: 'test@example.com', password: 'password', businessSlug: 'biz1');
-        expect(token, 'mock_token');
+        when(mockAuthRepository.login('test@example.com', 'password', 'biz1'))
+            .thenAnswer((_) async => Result.success(mockLoginResponse));
+
+        final result = await mockAuthRepository.login('test@example.com', 'password', 'biz1');
+        expect(result.isSuccess, true);
+        expect(result.data?.token, 'mock_token');
+        expect(result.data?.user.email, 'test@example.com');
+        expect(result.data?.business.slug, 'test-business');
       });
 
-      test('throws on failure', () async {
-        when(mockAuthRepository.login(email: 'fail@example.com', password: 'wrong', businessSlug: 'biz1'))
-            .thenThrow(Exception('Login failed'));
+      test('returns failure on error', () async {
+        when(mockAuthRepository.login('fail@example.com', 'wrong', 'biz1'))
+            .thenAnswer((_) async => Result.failure('Login failed'));
 
-        expect(
-          () async => await mockAuthRepository.login(email: 'fail@example.com', password: 'wrong', businessSlug: 'biz1'),
-          throwsA(isA<Exception>()),
-        );
+        final result = await mockAuthRepository.login('fail@example.com', 'wrong', 'biz1');
+        expect(result.isSuccess, false);
+        expect(result.errorMessage, 'Login failed');
       });
     });
 
     group('logout', () {
       test('completes successfully', () async {
-        when(mockAuthRepository.logout()).thenAnswer((_) async {});
+        when(mockAuthRepository.logout()).thenAnswer((_) async => Result.success(null));
 
-        expect(() async => await mockAuthRepository.logout(), returnsNormally);
+        final result = await mockAuthRepository.logout();
+        expect(result.isSuccess, true);
       });
     });
 
-    group('isLoggedIn', () {
-      test('returns true when user is logged in', () async {
-        when(mockAuthRepository.isLoggedIn()).thenAnswer((_) async => true);
+    group('getCurrentUser', () {
+      test('returns user when authenticated', () async {
+        final mockUser = User(
+          id: 1,
+          businessId: 1,
+          name: 'Test User',
+          email: 'test@example.com',
+          role: UserRole.cashier,
+          isActive: true,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
 
-        final isLoggedIn = await mockAuthRepository.isLoggedIn();
-        expect(isLoggedIn, true);
+        when(mockAuthRepository.getCurrentUser()).thenAnswer((_) async => Result.success(mockUser));
+
+        final result = await mockAuthRepository.getCurrentUser();
+        expect(result.isSuccess, true);
+        expect(result.data?.email, 'test@example.com');
       });
 
-      test('returns false when user is not logged in', () async {
-        when(mockAuthRepository.isLoggedIn()).thenAnswer((_) async => false);
+      test('returns failure when not authenticated', () async {
+        when(mockAuthRepository.getCurrentUser()).thenAnswer((_) async => Result.failure('Not authenticated'));
 
-        final isLoggedIn = await mockAuthRepository.isLoggedIn();
-        expect(isLoggedIn, false);
+        final result = await mockAuthRepository.getCurrentUser();
+        expect(result.isSuccess, false);
+        expect(result.errorMessage, 'Not authenticated');
       });
     });
   });

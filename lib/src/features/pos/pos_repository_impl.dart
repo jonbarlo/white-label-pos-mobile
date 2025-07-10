@@ -115,13 +115,19 @@ class PosRepositoryImpl implements PosRepository {
     try {
       // Create order
       final orderData = {
-        'type': 'takeaway', // Default to takeaway for mobile POS
+        'orderType': 'takeaway', // Default to takeaway for mobile POS
         'status': 'pending',
         'subtotal': items.fold(0.0, (sum, item) => sum + item.total),
         'tax': 0.0, // Calculate based on business tax rate
         'discount': 0.0,
         'total': items.fold(0.0, (sum, item) => sum + item.total),
         'notes': null,
+        'items': items.map((item) => {
+          'menuItemId': int.parse(item.id),
+          'quantity': item.quantity,
+          'unitPrice': item.price,
+          'totalPrice': item.total,
+        }).toList(),
       };
 
       final orderResponse = await _dio.post('/orders', data: orderData);

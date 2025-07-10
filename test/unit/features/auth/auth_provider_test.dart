@@ -34,7 +34,7 @@ void main() {
 
     test('🔴 PROOF: Login fails when API is unreachable - NO CACHE FALLBACK', () async {
       // Arrange: Mock API failure (network error)
-      when(mockAuthRepository.login(any, any))
+      when(mockAuthRepository.login(any, any, any))
           .thenAnswer((_) async => Result<LoginResponse>.failure(
                 'No internet connection. Please check your network settings.',
                 Exception('Network error'),

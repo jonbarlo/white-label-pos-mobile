@@ -4,7 +4,7 @@ import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:white_label_pos_mobile/src/features/auth/auth_provider.dart';
-import 'package:white_label_pos_mobile/src/features/auth/auth_repository.dart';
+import 'package:white_label_pos_mobile/src/features/auth/data/repositories/auth_repository.dart';
 import 'package:white_label_pos_mobile/src/features/auth/login_screen.dart';
 import 'package:white_label_pos_mobile/src/core/main_app.dart';
 

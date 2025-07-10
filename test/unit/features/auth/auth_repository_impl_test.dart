@@ -56,13 +56,13 @@ void main() {
                 ));
 
         // Act
-        final result = await repository.login('test@example.com', 'password');
+        final result = await repository.login('test@example.com', 'password', 'test-business');
 
         // Assert
         expect(result.isSuccess, true);
-        expect(result.data.id, user.id);
-        expect(result.data.email, user.email);
-        expect(result.data.role, user.role);
+        expect(result.data.user.id, user.id);
+        expect(result.data.user.email, user.email);
+        expect(result.data.user.role, user.role);
       });
 
       test('should return failure result when login fails', () async {
@@ -80,7 +80,7 @@ void main() {
                 ));
 
         // Act
-        final result = await repository.login('test@example.com', 'wrongpassword');
+        final result = await repository.login('test@example.com', 'wrongpassword', 'test-business');
 
         // Assert
         expect(result.isFailure, true);
@@ -96,7 +96,7 @@ void main() {
             ));
 
         // Act
-        final result = await repository.login('test@example.com', 'password');
+        final result = await repository.login('test@example.com', 'password', 'test-business');
 
         // Assert
         expect(result.isFailure, true);

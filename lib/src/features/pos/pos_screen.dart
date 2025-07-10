@@ -1132,7 +1132,7 @@ class _RecentSalesTab extends StatelessWidget {
   }
 }
 
-class _CheckoutDialog extends StatelessWidget {
+class _CheckoutDialog extends StatefulWidget {
   final List<CartItem> cart;
   final double total;
   final PaymentMethod selectedPaymentMethod;
@@ -1146,6 +1146,26 @@ class _CheckoutDialog extends StatelessWidget {
     required this.onPaymentMethodChanged,
     required this.onCompleteSale,
   });
+
+  @override
+  State<_CheckoutDialog> createState() => _CheckoutDialogState();
+}
+
+class _CheckoutDialogState extends State<_CheckoutDialog> {
+  late PaymentMethod _selectedMethod;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedMethod = widget.selectedPaymentMethod;
+  }
+
+  void _onMethodChanged(PaymentMethod method) {
+    setState(() {
+      _selectedMethod = method;
+    });
+    widget.onPaymentMethodChanged(method);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1173,15 +1193,14 @@ class _CheckoutDialog extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            
             // Items list
             Container(
               constraints: const BoxConstraints(maxHeight: 200),
               child: ListView.builder(
                 shrinkWrap: true,
-                itemCount: cart.length,
+                itemCount: widget.cart.length,
                 itemBuilder: (context, index) {
-                  final item = cart[index];
+                  final item = widget.cart[index];
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 8),
                     child: Row(
@@ -1205,9 +1224,7 @@ class _CheckoutDialog extends StatelessWidget {
                 },
               ),
             ),
-            
             const Divider(),
-            
             // Total
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1219,7 +1236,7 @@ class _CheckoutDialog extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '\$${total.toStringAsFixed(2)}',
+                  '\$${widget.total.toStringAsFixed(2)}',
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: theme.colorScheme.primary,
@@ -1227,9 +1244,7 @@ class _CheckoutDialog extends StatelessWidget {
                 ),
               ],
             ),
-            
             const SizedBox(height: 20),
-            
             // Payment method
             Text(
               'Payment Method',
@@ -1238,17 +1253,16 @@ class _CheckoutDialog extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            
             Wrap(
               spacing: 8,
               children: PaymentMethod.values.map((method) {
-                final isSelected = selectedPaymentMethod == method;
+                final isSelected = _selectedMethod == method;
                 return ChoiceChip(
                   label: Text(method.name.toUpperCase()),
                   selected: isSelected,
                   onSelected: (selected) {
                     if (selected) {
-                      onPaymentMethodChanged(method);
+                      _onMethodChanged(method);
                     }
                   },
                 );
@@ -1263,7 +1277,7 @@ class _CheckoutDialog extends StatelessWidget {
           child: const Text('Cancel'),
         ),
         ElevatedButton(
-          onPressed: onCompleteSale,
+          onPressed: widget.onCompleteSale,
           style: ElevatedButton.styleFrom(
             backgroundColor: theme.colorScheme.primary,
             foregroundColor: theme.colorScheme.onPrimary,
