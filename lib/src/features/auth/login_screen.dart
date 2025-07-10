@@ -22,16 +22,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    // Set default values in debug mode for easier testing
-    if (EnvConfig.isDebugMode) {
-      _emailController = TextEditingController(text: 'maria@bellavista.com');
-      _passwordController = TextEditingController(text: 'cashier123');
-      _businessSlugController = TextEditingController(text: 'bella-vista-italian');
-    } else {
-      _emailController = TextEditingController();
-      _passwordController = TextEditingController();
-      _businessSlugController = TextEditingController();
-    }
+    // Remove default values; all fields start empty
+    _emailController = TextEditingController();
+    _passwordController = TextEditingController();
+    _businessSlugController = TextEditingController();
   }
 
   @override
@@ -51,6 +45,41 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       );
     }
   }
+
+  // Add this to the _LoginScreenState class:
+  final List<Map<String, String>> _testUsers = [
+    {
+      'label': 'Marco Rossi (admin)',
+      'email': 'marco@bellavista.com',
+      'password': 'admin123',
+      'role': 'admin',
+    },
+    {
+      'label': 'Sofia Bianchi (manager)',
+      'email': 'sofia@bellavista.com',
+      'password': 'manager123',
+      'role': 'manager',
+    },
+    {
+      'label': 'Giuseppe Romano (cashier)',
+      'email': 'giuseppe@bellavista.com',
+      'password': 'cashier123',
+      'role': 'cashier',
+    },
+    {
+      'label': 'Maria Esposito (cashier)',
+      'email': 'maria@bellavista.com',
+      'password': 'cashier123',
+      'role': 'cashier',
+    },
+    {
+      'label': 'Antonio Marino (viewer)',
+      'email': 'antonio@bellavista.com',
+      'password': 'viewer123',
+      'role': 'viewer',
+    },
+  ];
+  String? _selectedTestUserLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -122,6 +151,32 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
+
+                // Test User Dropdown (for prototype, only in debug mode)
+                if (EnvConfig.isDebugMode) ...[
+                  DropdownButtonFormField<String>(
+                    value: _selectedTestUserLabel,
+                    decoration: const InputDecoration(
+                      labelText: 'Quick Login (Test User)',
+                      prefixIcon: Icon(Icons.person),
+                    ),
+                    items: _testUsers.map((user) => DropdownMenuItem<String>(
+                      value: user['label'],
+                      child: Text(user['label']!),
+                    )).toList(),
+                    onChanged: (label) {
+                      setState(() {
+                        _selectedTestUserLabel = label;
+                        final user = _testUsers.firstWhere((u) => u['label'] == label);
+                        _emailController.text = user['email']!;
+                        _passwordController.text = user['password']!;
+                        _businessSlugController.text = 'bella-vista-italian';
+                      });
+                    },
+                    isExpanded: true,
+                  ),
+                  const SizedBox(height: 16),
+                ],
 
                 // Email Field
                 Semantics(
