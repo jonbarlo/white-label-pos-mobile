@@ -3,11 +3,14 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i3;
+import 'dart:async' as _i4;
 
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:white_label_pos_mobile/src/features/auth/auth_repository.dart'
-    as _i2;
+import 'package:white_label_pos_mobile/src/features/auth/data/repositories/auth_repository.dart'
+    as _i3;
+import 'package:white_label_pos_mobile/src/features/auth/models/user.dart'
+    as _i5;
+import 'package:white_label_pos_mobile/src/shared/models/result.dart' as _i2;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -23,8 +26,8 @@ import 'package:white_label_pos_mobile/src/features/auth/auth_repository.dart'
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
 
-class _FakeLoginResponse_0 extends _i1.SmartFake implements _i2.LoginResponse {
-  _FakeLoginResponse_0(
+class _FakeResult_0<T> extends _i1.SmartFake implements _i2.Result<T> {
+  _FakeResult_0(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -36,57 +39,234 @@ class _FakeLoginResponse_0 extends _i1.SmartFake implements _i2.LoginResponse {
 /// A class which mocks [AuthRepository].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockAuthRepository extends _i1.Mock implements _i2.AuthRepository {
+class MockAuthRepository extends _i1.Mock implements _i3.AuthRepository {
   MockAuthRepository() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i3.Future<_i2.LoginResponse> login({
-    required String? email,
-    required String? password,
-    required String? businessSlug,
-  }) =>
+  _i4.Future<_i2.Result<_i3.LoginResponse>> login(
+    String? email,
+    String? password,
+    String? businessSlug,
+  ) =>
       (super.noSuchMethod(
         Invocation.method(
           #login,
+          [
+            email,
+            password,
+            businessSlug,
+          ],
+        ),
+        returnValue: _i4.Future<_i2.Result<_i3.LoginResponse>>.value(
+            _FakeResult_0<_i3.LoginResponse>(
+          this,
+          Invocation.method(
+            #login,
+            [
+              email,
+              password,
+              businessSlug,
+            ],
+          ),
+        )),
+      ) as _i4.Future<_i2.Result<_i3.LoginResponse>>);
+
+  @override
+  _i4.Future<_i2.Result<_i5.User>> register({
+    required String? email,
+    required String? password,
+    required String? firstName,
+    required String? lastName,
+    String? phone,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #register,
           [],
           {
             #email: email,
             #password: password,
-            #businessSlug: businessSlug,
+            #firstName: firstName,
+            #lastName: lastName,
+            #phone: phone,
           },
         ),
-        returnValue: _i3.Future<_i2.LoginResponse>.value(_FakeLoginResponse_0(
+        returnValue:
+            _i4.Future<_i2.Result<_i5.User>>.value(_FakeResult_0<_i5.User>(
           this,
           Invocation.method(
-            #login,
+            #register,
             [],
             {
               #email: email,
               #password: password,
-              #businessSlug: businessSlug,
+              #firstName: firstName,
+              #lastName: lastName,
+              #phone: phone,
             },
           ),
         )),
-      ) as _i3.Future<_i2.LoginResponse>);
+      ) as _i4.Future<_i2.Result<_i5.User>>);
 
   @override
-  _i3.Future<void> logout() => (super.noSuchMethod(
+  _i4.Future<_i2.Result<void>> logout() => (super.noSuchMethod(
         Invocation.method(
           #logout,
           [],
         ),
-        returnValue: _i3.Future<void>.value(),
-        returnValueForMissingStub: _i3.Future<void>.value(),
-      ) as _i3.Future<void>);
+        returnValue: _i4.Future<_i2.Result<void>>.value(_FakeResult_0<void>(
+          this,
+          Invocation.method(
+            #logout,
+            [],
+          ),
+        )),
+      ) as _i4.Future<_i2.Result<void>>);
 
   @override
-  _i3.Future<bool> isLoggedIn() => (super.noSuchMethod(
+  _i4.Future<_i2.Result<_i5.User>> getCurrentUser() => (super.noSuchMethod(
         Invocation.method(
-          #isLoggedIn,
+          #getCurrentUser,
           [],
         ),
-        returnValue: _i3.Future<bool>.value(false),
-      ) as _i3.Future<bool>);
+        returnValue:
+            _i4.Future<_i2.Result<_i5.User>>.value(_FakeResult_0<_i5.User>(
+          this,
+          Invocation.method(
+            #getCurrentUser,
+            [],
+          ),
+        )),
+      ) as _i4.Future<_i2.Result<_i5.User>>);
+
+  @override
+  _i4.Future<_i2.Result<void>> refreshToken() => (super.noSuchMethod(
+        Invocation.method(
+          #refreshToken,
+          [],
+        ),
+        returnValue: _i4.Future<_i2.Result<void>>.value(_FakeResult_0<void>(
+          this,
+          Invocation.method(
+            #refreshToken,
+            [],
+          ),
+        )),
+      ) as _i4.Future<_i2.Result<void>>);
+
+  @override
+  _i4.Future<_i2.Result<void>> forgotPassword(String? email) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #forgotPassword,
+          [email],
+        ),
+        returnValue: _i4.Future<_i2.Result<void>>.value(_FakeResult_0<void>(
+          this,
+          Invocation.method(
+            #forgotPassword,
+            [email],
+          ),
+        )),
+      ) as _i4.Future<_i2.Result<void>>);
+
+  @override
+  _i4.Future<_i2.Result<void>> resetPassword({
+    required String? token,
+    required String? newPassword,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #resetPassword,
+          [],
+          {
+            #token: token,
+            #newPassword: newPassword,
+          },
+        ),
+        returnValue: _i4.Future<_i2.Result<void>>.value(_FakeResult_0<void>(
+          this,
+          Invocation.method(
+            #resetPassword,
+            [],
+            {
+              #token: token,
+              #newPassword: newPassword,
+            },
+          ),
+        )),
+      ) as _i4.Future<_i2.Result<void>>);
+
+  @override
+  _i4.Future<_i2.Result<_i5.User>> updateProfile({
+    String? firstName,
+    String? lastName,
+    String? phone,
+    String? avatar,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #updateProfile,
+          [],
+          {
+            #firstName: firstName,
+            #lastName: lastName,
+            #phone: phone,
+            #avatar: avatar,
+          },
+        ),
+        returnValue:
+            _i4.Future<_i2.Result<_i5.User>>.value(_FakeResult_0<_i5.User>(
+          this,
+          Invocation.method(
+            #updateProfile,
+            [],
+            {
+              #firstName: firstName,
+              #lastName: lastName,
+              #phone: phone,
+              #avatar: avatar,
+            },
+          ),
+        )),
+      ) as _i4.Future<_i2.Result<_i5.User>>);
+
+  @override
+  _i4.Future<_i2.Result<void>> changePassword({
+    required String? currentPassword,
+    required String? newPassword,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #changePassword,
+          [],
+          {
+            #currentPassword: currentPassword,
+            #newPassword: newPassword,
+          },
+        ),
+        returnValue: _i4.Future<_i2.Result<void>>.value(_FakeResult_0<void>(
+          this,
+          Invocation.method(
+            #changePassword,
+            [],
+            {
+              #currentPassword: currentPassword,
+              #newPassword: newPassword,
+            },
+          ),
+        )),
+      ) as _i4.Future<_i2.Result<void>>);
+
+  @override
+  _i4.Future<void> clearStoredAuth() => (super.noSuchMethod(
+        Invocation.method(
+          #clearStoredAuth,
+          [],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
 }

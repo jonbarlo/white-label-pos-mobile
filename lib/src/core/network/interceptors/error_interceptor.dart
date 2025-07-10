@@ -5,65 +5,18 @@ import '../../errors/app_exception.dart';
 class ErrorInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    // Convert DioException to AppException
+    // Convert DioException to AppException for logging/debugging
     final appException = _convertToAppException(err);
     
     // You could add logging here
     // Logger().e('Network Error: ${appException.message}', appException.originalError);
     
+    // For now, just pass the error through
     handler.next(err);
   }
 
   AppException _convertToAppException(DioException err) {
-    final statusCode = err.response?.statusCode;
-    final message = err.response?.data?['message'] ?? err.message ?? 'Network error occurred';
-    final endpoint = err.requestOptions.path;
-
-    switch (statusCode) {
-      case 400:
-        return ValidationException(
-          message,
-          statusCode: statusCode,
-          endpoint: endpoint,
-          originalError: err,
-        );
-      case 401:
-        return AuthenticationException(
-          message,
-          statusCode: statusCode,
-          endpoint: endpoint,
-          originalError: err,
-        );
-      case 403:
-        return BusinessException(
-          'Access denied',
-          statusCode: statusCode,
-          endpoint: endpoint,
-          originalError: err,
-        );
-      case 404:
-        return NetworkException(
-          'Resource not found',
-          statusCode: statusCode,
-          endpoint: endpoint,
-          originalError: err,
-        );
-      case 500:
-      case 502:
-      case 503:
-        return NetworkException(
-          'Server error occurred',
-          statusCode: statusCode,
-          endpoint: endpoint,
-          originalError: err,
-        );
-      default:
-        return NetworkException(
-          message,
-          statusCode: statusCode,
-          endpoint: endpoint,
-          originalError: err,
-        );
-    }
+    // Use the factory constructor from AppException
+    return AppException.fromDioException(err);
   }
 } 

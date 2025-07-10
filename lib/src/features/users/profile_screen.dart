@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:white_label_pos_mobile/src/features/auth/auth_provider.dart';
-import 'package:white_label_pos_mobile/src/features/auth/data/repositories/auth_repository_impl.dart' as auth_repo_impl;
+import 'package:white_label_pos_mobile/src/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:white_label_pos_mobile/src/features/auth/models/user.dart';
 import 'package:white_label_pos_mobile/src/shared/widgets/loading_widget.dart';
 import 'package:white_label_pos_mobile/src/shared/widgets/error_widget.dart';
+import 'package:white_label_pos_mobile/src/core/config/env_config.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -36,7 +37,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     setState(() { _loading = true; _error = null; });
     
     try {
-      final result = await ref.read(auth_repo_impl.authRepositoryProvider).updateProfile(
+      final result = await ref.read(authRepositoryProvider).updateProfile(
         firstName: _name,
       ).timeout(
         const Duration(seconds: 10),
@@ -213,6 +214,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   ),
                   onPressed: _logout,
                 ),
+                if (EnvConfig.isDebugMode) ...[
+                  const SizedBox(height: 16),
+                  OutlinedButton.icon(
+                    icon: const Icon(Icons.clear_all),
+                    label: const Text('Clear Stored Data (Debug)'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: theme.colorScheme.error,
+                    ),
+                    onPressed: () async {
+                      final repository = ref.read(authRepositoryProvider);
+                      await repository.clearStoredAuth();
+                      await _logout();
+                    },
+                  ),
+                ],
               ],
             ),
           ),

@@ -2,13 +2,11 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../network/dio_client.dart';
-import '../../features/auth/data/repositories/auth_repository.dart';
 import '../../features/auth/data/repositories/auth_repository_impl.dart';
-import '../../features/business/data/repositories/business_repository.dart';
 import '../../features/business/data/repositories/business_repository_impl.dart';
-import '../../features/inventory/inventory_repository.dart';
 import '../../features/inventory/inventory_repository_impl.dart';
 import '../../features/inventory/inventory_provider.dart';
+import '../../core/config/env_config.dart';
 
 /// Global providers for dependency injection
 class DependencyInjection {
@@ -23,7 +21,7 @@ class DependencyInjection {
     
     // Initialize Dio client
     _dio = Dio(BaseOptions(
-      baseUrl: 'http://localhost:3000/api', // Default API URL
+      baseUrl: EnvConfig.apiBaseUrl, // Use API URL from .env
       connectTimeout: const Duration(seconds: 30),
       receiveTimeout: const Duration(seconds: 30),
       sendTimeout: const Duration(seconds: 30),
@@ -36,9 +34,6 @@ class DependencyInjection {
     // Create provider container with overrides
     _container = ProviderContainer(
       overrides: [
-        // Override Dio client to use our configured instance
-        dioClientProvider.overrideWith((ref) => _dio),
-        
         // Auth repository (uses Dio from provider)
         authRepositoryProvider.overrideWith(
           (ref) => AuthRepositoryImpl(ref.watch(dioClientProvider)),

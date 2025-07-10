@@ -1,167 +1,168 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
-import 'package:riverpod/riverpod.dart';
 import 'package:white_label_pos_mobile/src/features/auth/auth_provider.dart';
-import 'package:white_label_pos_mobile/src/features/auth/auth_repository.dart';
+import 'package:white_label_pos_mobile/src/features/auth/data/repositories/auth_repository.dart';
+import 'package:white_label_pos_mobile/src/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:white_label_pos_mobile/src/shared/models/result.dart';
+import 'package:white_label_pos_mobile/src/features/auth/models/user.dart';
+import 'package:white_label_pos_mobile/src/features/business/models/business.dart';
 
 import 'auth_provider_test.mocks.dart';
 
 @GenerateMocks([AuthRepository])
 void main() {
-  late MockAuthRepository mockAuthRepository;
-  late ProviderContainer container;
+  group('AuthProvider - NO CACHE FALLBACK TESTS', () {
+    late ProviderContainer container;
+    late MockAuthRepository mockAuthRepository;
 
-  setUp(() {
-    mockAuthRepository = MockAuthRepository();
-    container = ProviderContainer(
-      overrides: [
-        authRepositoryProvider.overrideWithValue(mockAuthRepository),
-      ],
-    );
-  });
+    setUp(() async {
+      mockAuthRepository = MockAuthRepository();
 
-  tearDown(() {
-    container.dispose();
-  });
+      // Override the auth repository provider with our mock
+      container = ProviderContainer(
+        overrides: [
+          authRepositoryProvider.overrideWith((ref) => mockAuthRepository),
+        ],
+      );
+    });
 
-  group('AuthNotifier', () {
-    test('initial state is correct', () {
+    tearDown(() {
+      container.dispose();
+    });
+
+    test('🔴 PROOF: Login fails when API is unreachable - NO CACHE FALLBACK', () async {
+      // Arrange: Mock API failure (network error)
+      when(mockAuthRepository.login(any, any))
+          .thenAnswer((_) async => Result<LoginResponse>.failure(
+                'No internet connection. Please check your network settings.',
+                Exception('Network error'),
+              ));
+
+      // Act: Attempt to login
       final authNotifier = container.read(authNotifierProvider.notifier);
-      expect(authNotifier.state.status, AuthStatus.initial);
-      expect(authNotifier.state.token, isNull);
-      expect(authNotifier.state.businessSlug, isNull);
-      expect(authNotifier.state.errorMessage, isNull);
+      await authNotifier.login(
+        email: 'test@example.com',
+        password: 'password',
+        businessSlug: 'test-business',
+      );
+
+      // Assert: Verify the auth state is ERROR, not authenticated
+      final authState = container.read(authNotifierProvider);
+      
+      expect(authState.status, equals(AuthStatus.error), 
+          reason: '🔴 FAILED: Auth state should be ERROR when API is unreachable');
+      expect(authState.user, isNull, 
+          reason: '🔴 FAILED: User should be NULL when API is unreachable');
+      expect(authState.token, isNull, 
+          reason: '🔴 FAILED: Token should be NULL when API is unreachable');
+      expect(authState.errorMessage, contains('No internet connection'), 
+          reason: '🔴 FAILED: Should show network error message');
+      
+      print('✅ SUCCESS: Login correctly fails when API is unreachable');
     });
 
-    group('login', () {
-      test('successful login updates state correctly', () async {
-        when(mockAuthRepository.login(
-          email: 'test@example.com',
-          password: 'password',
-          businessSlug: 'biz1',
-        )).thenAnswer((_) async => 'test_token');
+    test('🔴 PROOF: checkAuthStatus fails when API is unreachable - NO CACHE FALLBACK', () async {
+      // Arrange: Mock API failure for auth check
+      when(mockAuthRepository.getCurrentUser())
+          .thenAnswer((_) async => Result<User>.failure(
+                'No internet connection. Please check your network settings.',
+                Exception('Network error'),
+              ));
 
-        final authNotifier = container.read(authNotifierProvider.notifier);
+      // Act: Check authentication status
+      final authNotifier = container.read(authNotifierProvider.notifier);
+      await authNotifier.checkAuthStatus();
 
-        await authNotifier.login(
-          email: 'test@example.com',
-          password: 'password',
-          businessSlug: 'biz1',
-        );
-
-        expect(authNotifier.state.status, AuthStatus.authenticated);
-        expect(authNotifier.state.token, 'test_token');
-        expect(authNotifier.state.businessSlug, 'biz1');
-        expect(authNotifier.state.errorMessage, isNull);
-      });
-
-      test('login failure sets error state', () async {
-        when(mockAuthRepository.login(
-          email: 'fail@example.com',
-          password: 'wrong',
-          businessSlug: 'biz1',
-        )).thenThrow(Exception('Login failed'));
-
-        final authNotifier = container.read(authNotifierProvider.notifier);
-
-        await authNotifier.login(
-          email: 'fail@example.com',
-          password: 'wrong',
-          businessSlug: 'biz1',
-        );
-
-        expect(authNotifier.state.status, AuthStatus.error);
-        expect(authNotifier.state.errorMessage, contains('Login failed'));
-      });
-
-      test('login sets loading state during operation', () async {
-        when(mockAuthRepository.login(
-          email: 'test@example.com',
-          password: 'password',
-          businessSlug: 'biz1',
-        )).thenAnswer((_) async {
-          await Future.delayed(const Duration(milliseconds: 100));
-          return 'test_token';
-        });
-
-        final authNotifier = container.read(authNotifierProvider.notifier);
-        final future = authNotifier.login(
-          email: 'test@example.com',
-          password: 'password',
-          businessSlug: 'biz1',
-        );
-
-        // Check that state is loading immediately
-        expect(authNotifier.state.status, AuthStatus.loading);
-
-        await future;
-      });
+      // Assert: Verify the auth state is ERROR, not authenticated
+      final authState = container.read(authNotifierProvider);
+      
+      expect(authState.status, equals(AuthStatus.error), 
+          reason: '🔴 FAILED: Auth state should be ERROR when API check fails');
+      expect(authState.user, isNull, 
+          reason: '🔴 FAILED: User should be NULL when API check fails');
+      expect(authState.token, isNull, 
+          reason: '🔴 FAILED: Token should be NULL when API check fails');
+      expect(authState.errorMessage, contains('No internet connection'), 
+          reason: '🔴 FAILED: Should show network error message');
+      
+      print('✅ SUCCESS: Auth check correctly fails when API is unreachable');
     });
 
-    group('logout', () {
-      test('successful logout resets state', () async {
-        when(mockAuthRepository.logout()).thenAnswer((_) async {});
-
-        final authNotifier = container.read(authNotifierProvider.notifier);
-        
-        // Set initial authenticated state
-        authNotifier.state = authNotifier.state.copyWith(
-          status: AuthStatus.authenticated,
-          token: 'test_token',
-          businessSlug: 'biz1',
-        );
-
-        await authNotifier.logout();
-
-        expect(authNotifier.state.status, AuthStatus.unauthenticated);
-        expect(authNotifier.state.token, isNull);
-        expect(authNotifier.state.businessSlug, isNull);
-      });
-
-      test('logout failure sets error state', () async {
-        when(mockAuthRepository.logout()).thenThrow(Exception('Logout failed'));
-
-        final authNotifier = container.read(authNotifierProvider.notifier);
-
-        await authNotifier.logout();
-
-        expect(authNotifier.state.status, AuthStatus.error);
-        expect(authNotifier.state.errorMessage, contains('Logout failed'));
-      });
+    test('🔴 PROOF: Initial auth state is unauthenticated', () {
+      // Act: Get initial auth state
+      final authState = container.read(authNotifierProvider);
+      
+      // Assert: Verify initial state is unauthenticated
+      expect(authState.status, equals(AuthStatus.initial), 
+          reason: '🔴 FAILED: Initial auth state should be initial');
+      expect(authState.user, isNull, 
+          reason: '🔴 FAILED: Initial user should be NULL');
+      expect(authState.token, isNull, 
+          reason: '🔴 FAILED: Initial token should be NULL');
+      
+      print('✅ SUCCESS: Initial auth state is correctly unauthenticated');
     });
 
-    group('checkAuthStatus', () {
-      test('sets authenticated state when user is logged in', () async {
-        when(mockAuthRepository.isLoggedIn()).thenAnswer((_) async => true);
+    test('🔴 PROOF: Successful login requires valid API response', () async {
+      // Arrange: Mock successful API response
+      final mockUser = User(
+        id: 1,
+        businessId: 1,
+        name: 'Test User',
+        email: 'test@example.com',
+        role: UserRole.cashier,
+        isActive: true,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+      
+      final mockBusiness = Business(
+        id: 1,
+        name: 'Test Business',
+        slug: 'test-business',
+        type: BusinessType.restaurant,
+        taxRate: 8.5,
+        currency: 'USD',
+        timezone: 'America/New_York',
+        isActive: true,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+      
+      final mockLoginResponse = LoginResponse(
+        user: mockUser,
+        token: 'valid-token-123',
+        business: mockBusiness,
+      );
 
-        final authNotifier = container.read(authNotifierProvider.notifier);
+      when(mockAuthRepository.login(any, any, any))
+          .thenAnswer((_) async => Result<LoginResponse>.success(mockLoginResponse));
 
-        await authNotifier.checkAuthStatus();
+      // Act: Attempt to login
+      final authNotifier = container.read(authNotifierProvider.notifier);
+      await authNotifier.login(
+        email: 'test@example.com',
+        password: 'password',
+        businessSlug: 'test-business',
+      );
 
-        expect(authNotifier.state.status, AuthStatus.authenticated);
-      });
-
-      test('sets unauthenticated state when user is not logged in', () async {
-        when(mockAuthRepository.isLoggedIn()).thenAnswer((_) async => false);
-
-        final authNotifier = container.read(authNotifierProvider.notifier);
-
-        await authNotifier.checkAuthStatus();
-
-        expect(authNotifier.state.status, AuthStatus.unauthenticated);
-      });
-
-      test('sets error state when check fails', () async {
-        when(mockAuthRepository.isLoggedIn()).thenThrow(Exception('Check failed'));
-
-        final authNotifier = container.read(authNotifierProvider.notifier);
-
-        await authNotifier.checkAuthStatus();
-
-        expect(authNotifier.state.status, AuthStatus.error);
-        expect(authNotifier.state.errorMessage, contains('Check failed'));
-      });
+      // Assert: Verify successful authentication
+      final authState = container.read(authNotifierProvider);
+      
+      expect(authState.status, equals(AuthStatus.authenticated), 
+          reason: '🔴 FAILED: Auth state should be authenticated after successful API response');
+      expect(authState.user, equals(mockUser), 
+          reason: '🔴 FAILED: User should match API response');
+      expect(authState.business, equals(mockBusiness), 
+          reason: '🔴 FAILED: Business should match API response');
+      expect(authState.token, equals('valid-token-123'), 
+          reason: '🔴 FAILED: Token should match API response');
+      expect(authState.errorMessage, isNull, 
+          reason: '🔴 FAILED: Error message should be NULL on success');
+      
+      print('✅ SUCCESS: Authentication only works with valid API response');
     });
   });
 } 

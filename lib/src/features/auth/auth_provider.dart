@@ -2,10 +2,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'auth_repository.dart';
-import 'auth_repository_impl.dart';
+import 'data/repositories/auth_repository.dart';
+import 'data/repositories/auth_repository_impl.dart';
 import 'models/user.dart';
 import '../business/models/business.dart';
+import '../../core/config/env_config.dart';
 
 part 'auth_provider.g.dart';
 
@@ -60,6 +61,9 @@ class AuthState {
 class AuthNotifier extends _$AuthNotifier {
   @override
   AuthState build() {
+    if (EnvConfig.isDebugMode) {
+      print('🔐 AUTH PROVIDER: Building initial state - status: ${const AuthState().status}');
+    }
     return const AuthState();
   }
 
@@ -68,74 +72,167 @@ class AuthNotifier extends _$AuthNotifier {
     required String password,
     required String businessSlug,
   }) async {
+    if (EnvConfig.isDebugMode) {
+      print('🔐 AUTH PROVIDER: Starting login process');
+      print('🔐 AUTH PROVIDER: Business Slug: $businessSlug');
+      print('🔐 AUTH PROVIDER: Email: $email');
+      print('🔐 AUTH PROVIDER: Current state before login: ${state.status}');
+    }
+    
     state = state.copyWith(status: AuthStatus.loading);
 
     try {
-      final repository = await ref.read(authRepositoryProvider.future);
-      final loginResponse = await repository.login(
-        email: email,
-        password: password,
-        businessSlug: businessSlug,
-      );
+      final repository = ref.read(authRepositoryProvider);
+      if (EnvConfig.isDebugMode) {
+        print('🔐 AUTH PROVIDER: Calling repository.login()');
+      }
+      final result = await repository.login(email, password, businessSlug);
 
-      state = state.copyWith(
-        status: AuthStatus.authenticated,
-        token: loginResponse.token,
-        user: loginResponse.user,
-        business: loginResponse.business,
-        errorMessage: null,
-      );
+      if (EnvConfig.isDebugMode) {
+        print('🔐 AUTH PROVIDER: Repository result - isSuccess: ${result.isSuccess}');
+        print('🔐 AUTH PROVIDER: Repository result - errorMessage: ${result.errorMessage}');
+        print('🔐 AUTH PROVIDER: Repository result - data: ${result.data}');
+      }
+
+      if (result.isSuccess && result.data != null) {
+        if (EnvConfig.isDebugMode) {
+          print('🔐 AUTH PROVIDER: Login successful');
+          print('🔐 AUTH PROVIDER: User: ${result.data!.user.name}');
+          print('🔐 AUTH PROVIDER: Business: ${result.data!.business.name}');
+          print('🔐 AUTH PROVIDER: Token received');
+          print('🔐 AUTH PROVIDER: Setting state to authenticated');
+        }
+
+        state = state.copyWith(
+          status: AuthStatus.authenticated,
+          user: result.data!.user,
+          business: result.data!.business,
+          token: result.data!.token,
+          errorMessage: null,
+        );
+        
+        if (EnvConfig.isDebugMode) {
+          print('🔐 AUTH PROVIDER: State after successful login: ${state.status}');
+        }
+      } else {
+        if (EnvConfig.isDebugMode) {
+          print('🔐 AUTH PROVIDER: Login failed - ${result.errorMessage}');
+          print('🔐 AUTH PROVIDER: Setting state to error');
+        }
+        
+        state = state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: result.errorMessage,
+        );
+        
+        if (EnvConfig.isDebugMode) {
+          print('🔐 AUTH PROVIDER: State after failed login: ${state.status}');
+        }
+      }
     } catch (e) {
+      if (EnvConfig.isDebugMode) {
+        print('🔐 AUTH PROVIDER: Login failed - Error: ${e.toString()}');
+        print('🔐 AUTH PROVIDER: Setting state to error with message');
+      }
+      
+      // When API is unreachable, show error message to user
       state = state.copyWith(
         status: AuthStatus.error,
         errorMessage: e.toString(),
       );
+      
+      if (EnvConfig.isDebugMode) {
+        print('🔐 AUTH PROVIDER: State after error: ${state.status}');
+        print('🔐 AUTH PROVIDER: Error message: ${state.errorMessage}');
+      }
     }
   }
 
   Future<void> logout() async {
+    if (EnvConfig.isDebugMode) {
+      print('🔐 AUTH PROVIDER: Logging out');
+    }
+    
     try {
-      final repository = await ref.read(authRepositoryProvider.future);
-      await repository.logout();
+      final repository = ref.read(authRepositoryProvider);
+      final result = await repository.logout();
       
-      state = const AuthState(status: AuthStatus.unauthenticated);
+      if (result.isSuccess) {
+        if (EnvConfig.isDebugMode) {
+          print('🔐 AUTH PROVIDER: Logout successful');
+        }
+        state = const AuthState(status: AuthStatus.unauthenticated);
+      } else {
+        if (EnvConfig.isDebugMode) {
+          print('🔐 AUTH PROVIDER: Logout failed - ${result.errorMessage}');
+        }
+        state = state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: result.errorMessage,
+        );
+      }
     } catch (e) {
-      state = state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: e.toString(),
-      );
+      if (EnvConfig.isDebugMode) {
+        print('🔐 AUTH PROVIDER: Logout failed - Error: ${e.toString()}');
+      }
+      
+      // Even if logout fails, clear the auth state
+      state = const AuthState(status: AuthStatus.unauthenticated);
     }
   }
 
   Future<void> checkAuthStatus() async {
+    if (EnvConfig.isDebugMode) {
+      print('🔐 AUTH PROVIDER: Checking authentication status');
+    }
+    
     try {
       state = state.copyWith(status: AuthStatus.loading);
       
-      final repository = await ref.read(authRepositoryProvider.future);
-      final isLoggedIn = await repository.isLoggedIn().timeout(
+      final repository = ref.read(authRepositoryProvider);
+      final result = await repository.getCurrentUser().timeout(
         const Duration(seconds: 10),
         onTimeout: () {
+          if (EnvConfig.isDebugMode) {
+            print('🔐 AUTH PROVIDER: Authentication check timed out');
+          }
           throw Exception('Connection timeout. Please check your internet connection.');
         },
       );
       
-      if (isLoggedIn) {
-        state = state.copyWith(status: AuthStatus.authenticated);
+      if (result.isSuccess && result.data != null) {
+        if (EnvConfig.isDebugMode) {
+          print('🔐 AUTH PROVIDER: User is authenticated');
+          print('🔐 AUTH PROVIDER: Current user: ${result.data!.name}');
+        }
+        state = state.copyWith(
+          status: AuthStatus.authenticated,
+          user: result.data,
+        );
       } else {
+        if (EnvConfig.isDebugMode) {
+          print('🔐 AUTH PROVIDER: User is not authenticated - ${result.errorMessage}');
+        }
         state = const AuthState(status: AuthStatus.unauthenticated);
       }
     } catch (e) {
-      state = state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: e.toString(),
-      );
+      if (EnvConfig.isDebugMode) {
+        print('🔐 AUTH PROVIDER: Authentication check failed - Error: ${e.toString()}');
+      }
+      
+      // When API is unreachable, treat user as unauthenticated (not error)
+      // This ensures they are redirected to login screen
+      state = const AuthState(status: AuthStatus.unauthenticated);
     }
+  }
+
+  /// Clear any error state and reset to unauthenticated
+  void clearError() {
+    if (EnvConfig.isDebugMode) {
+      print('🔐 AUTH PROVIDER: Clearing error state');
+    }
+    state = const AuthState(status: AuthStatus.unauthenticated);
   }
 }
 
-@riverpod
-Future<AuthRepository> authRepository(AuthRepositoryRef ref) async {
-  final dio = Dio();
-  final prefs = await SharedPreferences.getInstance();
-  return AuthRepositoryImpl(dio, prefs);
-} 
+ 

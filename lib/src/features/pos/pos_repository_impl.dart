@@ -5,7 +5,7 @@ import 'models/cart_item.dart';
 import 'models/sale.dart';
 import 'models/menu_item.dart';
 import 'models/order.dart';
-import 'models/order_item.dart';
+
 import '../../core/config/env_config.dart';
 import '../auth/auth_provider.dart';
 
@@ -44,19 +44,41 @@ class PosRepositoryImpl implements PosRepository {
   @override
   Future<List<CartItem>> searchItems(String query) async {
     try {
-      final response = await _dio.get('/api/menu/items', queryParameters: {
+      if (EnvConfig.isDebugMode) {
+        print('🔍 POS SEARCH: Searching for items with query: "$query"');
+        print('🔍 POS SEARCH: Making request to /menu/items');
+      }
+
+      final response = await _dio.get('/menu/items', queryParameters: {
         'search': query,
         'isAvailable': true,
         'isActive': true,
       });
 
+      if (EnvConfig.isDebugMode) {
+        print('🔍 POS SEARCH: Response status: ${response.statusCode}');
+        print('🔍 POS SEARCH: Response data: ${response.data}');
+      }
+
       if (response.statusCode == 200 && response.data['success'] == true) {
         final List<dynamic> items = response.data['data'] ?? [];
+        if (EnvConfig.isDebugMode) {
+          print('🔍 POS SEARCH: Found ${items.length} items');
+        }
         return items.map((item) => _convertMenuItemToCartItem(MenuItem.fromJson(item))).toList();
+      } else {
+        if (EnvConfig.isDebugMode) {
+          print('🔍 POS SEARCH: Response not successful or wrong format');
+          print('🔍 POS SEARCH: success field: ${response.data['success']}');
+          print('🔍 POS SEARCH: data field: ${response.data['data']}');
+        }
       }
       
       return [];
     } catch (e) {
+      if (EnvConfig.isDebugMode) {
+        print('🔍 POS SEARCH: Error occurred: $e');
+      }
       throw Exception('Failed to search items: $e');
     }
   }
@@ -64,7 +86,7 @@ class PosRepositoryImpl implements PosRepository {
   @override
   Future<CartItem?> getItemByBarcode(String barcode) async {
     try {
-      final response = await _dio.get('/api/menu/items', queryParameters: {
+      final response = await _dio.get('/menu/items', queryParameters: {
         'barcode': barcode,
         'isAvailable': true,
         'isActive': true,
@@ -102,7 +124,7 @@ class PosRepositoryImpl implements PosRepository {
         'notes': null,
       };
 
-      final orderResponse = await _dio.post('/api/orders', data: orderData);
+      final orderResponse = await _dio.post('/orders', data: orderData);
       
       if (orderResponse.statusCode != 201 || orderResponse.data['success'] != true) {
         throw Exception('Failed to create order');
@@ -122,7 +144,7 @@ class PosRepositoryImpl implements PosRepository {
           'status': 'pending',
         };
 
-        await _dio.post('/api/orders/${order.id}/items', data: orderItemData);
+        await _dio.post('/orders/${order.id}/items', data: orderItemData);
       }
 
       // Create sale record
@@ -134,7 +156,7 @@ class PosRepositoryImpl implements PosRepository {
         'total': order.total,
       };
 
-      final saleResponse = await _dio.post('/api/sales', data: saleData);
+      final saleResponse = await _dio.post('/sales', data: saleData);
       
       if (saleResponse.statusCode != 201 || saleResponse.data['success'] != true) {
         throw Exception('Failed to create sale');
@@ -159,7 +181,7 @@ class PosRepositoryImpl implements PosRepository {
   @override
   Future<List<Sale>> getRecentSales({int limit = 50}) async {
     try {
-      final response = await _dio.get('/api/sales', queryParameters: {
+      final response = await _dio.get('/sales', queryParameters: {
         'limit': limit,
         'sort': 'createdAt',
         'order': 'desc',
@@ -182,7 +204,7 @@ class PosRepositoryImpl implements PosRepository {
     required DateTime endDate,
   }) async {
     try {
-      final response = await _dio.get('/api/sales/summary', queryParameters: {
+      final response = await _dio.get('/sales/summary', queryParameters: {
         'startDate': startDate.toIso8601String(),
         'endDate': endDate.toIso8601String(),
       });
@@ -200,7 +222,7 @@ class PosRepositoryImpl implements PosRepository {
   @override
   Future<List<CartItem>> getTopSellingItems({int limit = 10}) async {
     try {
-      final response = await _dio.get('/api/sales/top-items', queryParameters: {
+      final response = await _dio.get('/sales/top-items', queryParameters: {
         'limit': limit,
       });
 
@@ -220,7 +242,7 @@ class PosRepositoryImpl implements PosRepository {
     try {
       for (final item in items) {
         // Update stock for each item
-        await _dio.patch('/api/menu/items/${item.id}/stock', data: {
+        await _dio.patch('/menu/items/${item.id}/stock', data: {
           'quantity': -item.quantity, // Decrease stock
         });
       }

@@ -86,13 +86,16 @@ class BusinessListScreen extends ConsumerWidget {
       itemCount: businesses.length,
       itemBuilder: (context, index) {
         final business = businesses[index];
+        final isActive = business.isActive ?? true; // Default to active if null
+        final businessType = business.type ?? BusinessType.restaurant; // Default to restaurant if null
+        
         return Card(
           margin: const EdgeInsets.only(bottom: 12),
           child: ListTile(
             leading: CircleAvatar(
               backgroundColor: Theme.of(context).colorScheme.primaryContainer,
               child: Text(
-                business.type.icon,
+                businessType.icon,
                 style: const TextStyle(fontSize: 20),
               ),
             ),
@@ -104,7 +107,7 @@ class BusinessListScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  business.type.displayName,
+                  businessType.displayName,
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
                 if (business.description != null)
@@ -122,15 +125,15 @@ class BusinessListScreen extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: business.isActive 
+                    color: isActive 
                         ? Colors.green.withOpacity(0.1)
                         : Colors.red.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    business.isActive ? 'Active' : 'Inactive',
+                    isActive ? 'Active' : 'Inactive',
                     style: TextStyle(
-                      color: business.isActive ? Colors.green : Colors.red,
+                      color: isActive ? Colors.green : Colors.red,
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                     ),

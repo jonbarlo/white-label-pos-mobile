@@ -3,6 +3,8 @@ import 'package:flutter/semantics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'auth_provider.dart';
 import 'auth_validators.dart';
+import '../../shared/widgets/message_dialog.dart';
+import '../../core/config/env_config.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -13,9 +15,24 @@ class LoginScreen extends ConsumerStatefulWidget {
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _businessSlugController = TextEditingController();
+  late final TextEditingController _emailController;
+  late final TextEditingController _passwordController;
+  late final TextEditingController _businessSlugController;
+
+  @override
+  void initState() {
+    super.initState();
+    // Set default values in debug mode for easier testing
+    if (EnvConfig.isDebugMode) {
+      _emailController = TextEditingController(text: 'user@demo.com');
+      _passwordController = TextEditingController(text: 'user123');
+      _businessSlugController = TextEditingController(text: 'demo-restaurant');
+    } else {
+      _emailController = TextEditingController();
+      _passwordController = TextEditingController();
+      _businessSlugController = TextEditingController();
+    }
+  }
 
   @override
   void dispose() {
@@ -38,6 +55,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
+
+    // Show error dialog when login fails
+    if (authState.status == AuthStatus.error && authState.errorMessage != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        MessageDialogExtension.showError(
+          context,
+          title: 'Login Failed',
+          message: authState.errorMessage!,
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                // Clear the error state after showing dialog
+                ref.read(authNotifierProvider.notifier).clearError();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      });
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -125,29 +163,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-
-                // Error Message
-                if (authState.errorMessage != null)
-                  Semantics(
-                    label: 'Error message: ${authState.errorMessage}',
-                    child: Container(
-                      padding: const EdgeInsets.all(12),
-                      margin: const EdgeInsets.only(bottom: 16),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.error.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Theme.of(context).colorScheme.error.withOpacity(0.3)),
-                      ),
-                      child: Text(
-                        authState.errorMessage!,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.error,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
 
                 // Login Button
                 Semantics(

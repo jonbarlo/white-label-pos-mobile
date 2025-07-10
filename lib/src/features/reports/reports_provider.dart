@@ -1,5 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:white_label_pos_mobile/src/features/reports/reports_repository.dart';
+
 import 'package:white_label_pos_mobile/src/features/reports/models/sales_report.dart';
 import 'package:white_label_pos_mobile/src/features/reports/models/revenue_report.dart';
 import 'package:white_label_pos_mobile/src/features/reports/reports_repository_impl.dart';

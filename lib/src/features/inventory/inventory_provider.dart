@@ -1,7 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:white_label_pos_mobile/src/features/inventory/inventory_repository.dart';
 import 'package:white_label_pos_mobile/src/features/inventory/models/inventory_item.dart';
-import 'package:white_label_pos_mobile/src/shared/models/result.dart';
+
 
 part 'inventory_provider.g.dart';
 

@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../features/auth/auth_provider.dart';
+import '../../../features/auth/auth_provider.dart';
 
 /// Interceptor to add authentication headers
 class AuthInterceptor extends Interceptor {

@@ -9,7 +9,7 @@ import 'src/features/auth/data/repositories/auth_repository_impl.dart';
 import 'src/features/business/data/repositories/business_repository_impl.dart';
 import 'src/features/inventory/inventory_repository_impl.dart';
 import 'src/features/inventory/inventory_provider.dart';
-import 'src/core/mock/mock_inventory_repository.dart';
+
 
 void main() async {
   // Ensure Flutter is initialized
@@ -24,9 +24,6 @@ void main() async {
   runApp(
     ProviderScope(
       overrides: [
-        // Override Dio client to use our configured instance
-        dioClientProvider.overrideWith((ref) => DependencyInjection.dio),
-        
         // Auth repository (uses Dio from provider)
         authRepositoryProvider.overrideWith(
           (ref) => AuthRepositoryImpl(ref.watch(dioClientProvider)),

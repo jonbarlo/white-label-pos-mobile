@@ -27,8 +27,19 @@ class EnvConfig {
   /// Get the API base URL
   static String get apiBaseUrl {
     try {
-      return dotenv.env['API_BASE_URL'] ?? _defaultApiUrl;
+      final url = dotenv.env['API_BASE_URL'] ?? _defaultApiUrl;
+      if (isDebugMode) {
+        print('🔧 ENV CONFIG: API_BASE_URL from env: ${dotenv.env['API_BASE_URL']}');
+        print('🔧 ENV CONFIG: Default API URL: $_defaultApiUrl');
+        print('🔧 ENV CONFIG: Final API URL: $url');
+        print('🔧 ENV CONFIG: All env variables: ${dotenv.env}');
+      }
+      return url;
     } catch (e) {
+      if (isDebugMode) {
+        print('🔧 ENV CONFIG: Error getting API_BASE_URL: $e');
+        print('🔧 ENV CONFIG: Using default URL: $_defaultApiUrl');
+      }
       return _defaultApiUrl;
     }
   }
@@ -88,16 +99,6 @@ class EnvConfig {
       return enabled != null ? enabled.toLowerCase() == 'true' : true;
     } catch (e) {
       return true;
-    }
-  }
-
-  /// Check if offline mode is enabled
-  static bool get isOfflineModeEnabled {
-    try {
-      final enabled = dotenv.env['ENABLE_OFFLINE_MODE'];
-      return enabled != null ? enabled.toLowerCase() == 'true' : false;
-    } catch (e) {
-      return false;
     }
   }
 

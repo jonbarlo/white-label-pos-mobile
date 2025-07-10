@@ -16,7 +16,7 @@ class Business {
   final int id;
   final String name;
   final String slug;
-  final BusinessType type;
+  final BusinessType? type;
   final String? description;
   final String? logo;
   final String? primaryColor;
@@ -28,15 +28,15 @@ class Business {
   final double taxRate;
   final String currency;
   final String timezone;
-  final bool isActive;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final bool? isActive;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   const Business({
     required this.id,
     required this.name,
     required this.slug,
-    required this.type,
+    this.type,
     this.description,
     this.logo,
     this.primaryColor,
@@ -48,9 +48,9 @@ class Business {
     required this.taxRate,
     required this.currency,
     required this.timezone,
-    required this.isActive,
-    required this.createdAt,
-    required this.updatedAt,
+    this.isActive,
+    this.createdAt,
+    this.updatedAt,
   });
 
   Business copyWith({

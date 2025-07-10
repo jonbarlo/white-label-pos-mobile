@@ -6,9 +6,8 @@ import 'package:white_label_pos_mobile/src/shared/models/result.dart';
 
 class InventoryRepositoryImplSimple implements InventoryRepository {
   final Dio _dio;
-  final SharedPreferences _prefs;
 
-  InventoryRepositoryImplSimple(this._dio, this._prefs);
+  InventoryRepositoryImplSimple(this._dio);
 
   @override
   Future<Result<List<InventoryItem>>> getInventoryItems() async {

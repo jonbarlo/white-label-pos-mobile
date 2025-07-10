@@ -1,10 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../shared/models/api_response.dart';
 import '../../../../shared/models/result.dart';
 import '../../../../core/errors/app_exception.dart';
 import '../../../../core/network/dio_client.dart';
+import '../../../../core/config/env_config.dart';
 import '../../models/user.dart';
+import '../../../business/models/business.dart';
 import 'auth_repository.dart';
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
@@ -18,24 +21,34 @@ class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl(this._dio);
 
   @override
-  Future<Result<User>> login(String email, String password) async {
+  Future<Result<LoginResponse>> login(String email, String password, String businessSlug) async {
     try {
       final response = await _dio.post('/auth/login', data: {
         'email': email,
         'password': password,
+        'businessSlug': businessSlug,
       });
 
-      final apiResponse = ApiResponse<User>.fromJson(
-        response.data,
-        (json) => User.fromJson(json as Map<String, dynamic>),
-      );
-
-      if (apiResponse.isSuccess && apiResponse.data != null) {
-        return Result.success(apiResponse.data!);
+      // Backend returns direct response, not wrapped in ApiResponse
+      final responseData = response.data as Map<String, dynamic>;
+      
+      if (responseData['message'] == 'Login successful' && 
+          responseData['user'] != null && 
+          responseData['token'] != null &&
+          responseData['business'] != null) {
+        
+        // Create LoginResponse with business from the response
+        final loginResponse = LoginResponse(
+          user: User.fromJson(responseData['user'] as Map<String, dynamic>),
+          token: responseData['token'] as String,
+          business: Business.fromJson(responseData['business'] as Map<String, dynamic>),
+        );
+        
+        return Result.success(loginResponse);
       } else {
         return Result.failure(
-          apiResponse.message ?? 'Login failed',
-          apiResponse.errors,
+          responseData['message'] ?? 'Login failed',
+          responseData['errors'],
         );
       }
     } on DioException catch (e) {
@@ -268,6 +281,23 @@ class AuthRepositoryImpl implements AuthRepository {
         'An unexpected error occurred while changing password',
         e,
       );
+    }
+  }
+
+  @override
+  Future<void> clearStoredAuth() async {
+    if (EnvConfig.isDebugMode) {
+      print('🔐 AUTH: Clearing all stored authentication data');
+    }
+    
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('auth_token');
+    await prefs.remove('business_slug');
+    await prefs.remove('user_id');
+    await prefs.remove('business_id');
+    
+    if (EnvConfig.isDebugMode) {
+      print('🔐 AUTH: All stored authentication data cleared');
     }
   }
 } 

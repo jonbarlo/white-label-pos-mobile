@@ -26,7 +26,6 @@ class EnvironmentConfig extends _$EnvironmentConfig {
       'appVersion': EnvConfig.appVersion,
       'isDebugMode': EnvConfig.isDebugMode,
       'isBarcodeScanningEnabled': EnvConfig.isBarcodeScanningEnabled,
-      'isOfflineModeEnabled': EnvConfig.isOfflineModeEnabled,
       'isPushNotificationsEnabled': EnvConfig.isPushNotificationsEnabled,
       'isAnalyticsEnabled': EnvConfig.isAnalyticsEnabled,
       'isCrashReportingEnabled': EnvConfig.isCrashReportingEnabled,

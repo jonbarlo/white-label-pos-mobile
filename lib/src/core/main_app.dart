@@ -10,6 +10,7 @@ import '../features/inventory/inventory_screen.dart';
 import '../features/reports/reports_screen.dart';
 import '../features/users/profile_screen.dart';
 import '../features/business/business_list_screen.dart';
+import '../core/config/env_config.dart';
 
 class MainApp extends ConsumerStatefulWidget {
   const MainApp({super.key});
@@ -130,8 +131,18 @@ class _MainAppState extends ConsumerState<MainApp> {
   Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
 
+    if (EnvConfig.isDebugMode) {
+      print('🔐 MAIN APP: Building with auth state: ${authState.status}');
+      print('🔐 MAIN APP: Onboarding checked: $_onboardingChecked');
+      print('🔐 MAIN APP: Auth checked: $_authChecked');
+      print('🔐 MAIN APP: Onboarding completed: $_onboardingCompleted');
+    }
+
     // Show loading screen while checking onboarding and auth status
     if (!_onboardingChecked || !_authChecked || authState.status == AuthStatus.initial) {
+      if (EnvConfig.isDebugMode) {
+        print('🔐 MAIN APP: Showing loading screen');
+      }
       return const Scaffold(
         body: Center(
           child: CircularProgressIndicator(),
@@ -141,17 +152,34 @@ class _MainAppState extends ConsumerState<MainApp> {
 
     // Show onboarding screen if not completed
     if (!_onboardingCompleted) {
+      if (EnvConfig.isDebugMode) {
+        print('🔐 MAIN APP: Showing onboarding screen');
+      }
       return OnboardingScreen(
         onOnboardingComplete: _onOnboardingComplete,
       );
     }
 
     // Show login screen if not authenticated
-    if (authState.status == AuthStatus.unauthenticated) {
+    if (authState.status == AuthStatus.unauthenticated || 
+        authState.status == AuthStatus.error ||
+        authState.status == AuthStatus.loading ||
+        authState.user == null) {
+      if (EnvConfig.isDebugMode) {
+        print('🔐 MAIN APP: Showing login screen - user not authenticated');
+        print('🔐 MAIN APP: Status: ${authState.status}');
+        print('🔐 MAIN APP: User: ${authState.user}');
+      }
       return const LoginScreen();
     }
 
     // Show main app with role-based navigation if authenticated
+    if (EnvConfig.isDebugMode) {
+      print('🔐 MAIN APP: Showing main app - user is authenticated');
+      print('🔐 MAIN APP: User role: ${authState.userRole}');
+      print('🔐 MAIN APP: User name: ${authState.user?.name}');
+    }
+    
     final screens = _getScreensForRole(authState);
     final navigationItems = _getNavigationItemsForRole(authState);
 

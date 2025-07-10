@@ -5,12 +5,13 @@ import 'pos_repository_impl.dart';
 import 'models/cart_item.dart';
 import 'models/sale.dart';
 import 'models/menu_item.dart';
+import '../../core/network/dio_client.dart';
 
 part 'pos_provider.g.dart';
 
 @riverpod
 Future<PosRepository> posRepository(PosRepositoryRef ref) async {
-  final dio = Dio();
+  final dio = ref.watch(dioClientProvider);
   return PosRepositoryImpl(dio, ref);
 }
 

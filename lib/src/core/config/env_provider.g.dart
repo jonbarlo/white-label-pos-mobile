@@ -117,7 +117,7 @@ final isBarcodeScanningEnabledProvider = AutoDisposeProvider<bool>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef IsBarcodeScanningEnabledRef = AutoDisposeProviderRef<bool>;
-String _$environmentConfigHash() => r'a82fa8b7e76f3c944ff3950cc5d2498054a846de';
+String _$environmentConfigHash() => r'f79163b4049c59c73925057d94e0859a425765e0';
 
 /// Provider for environment configuration
 ///

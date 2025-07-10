@@ -10,7 +10,7 @@ Business _$BusinessFromJson(Map<String, dynamic> json) => Business(
       id: (json['id'] as num).toInt(),
       name: json['name'] as String,
       slug: json['slug'] as String,
-      type: $enumDecode(_$BusinessTypeEnumMap, json['type']),
+      type: $enumDecodeNullable(_$BusinessTypeEnumMap, json['type']),
       description: json['description'] as String?,
       logo: json['logo'] as String?,
       primaryColor: json['primaryColor'] as String?,
@@ -22,16 +22,20 @@ Business _$BusinessFromJson(Map<String, dynamic> json) => Business(
       taxRate: (json['taxRate'] as num).toDouble(),
       currency: json['currency'] as String,
       timezone: json['timezone'] as String,
-      isActive: json['isActive'] as bool,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
+      isActive: json['isActive'] as bool?,
+      createdAt: json['createdAt'] == null
+          ? null
+          : DateTime.parse(json['createdAt'] as String),
+      updatedAt: json['updatedAt'] == null
+          ? null
+          : DateTime.parse(json['updatedAt'] as String),
     );
 
 Map<String, dynamic> _$BusinessToJson(Business instance) => <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
       'slug': instance.slug,
-      'type': _$BusinessTypeEnumMap[instance.type]!,
+      'type': _$BusinessTypeEnumMap[instance.type],
       'description': instance.description,
       'logo': instance.logo,
       'primaryColor': instance.primaryColor,
@@ -44,8 +48,8 @@ Map<String, dynamic> _$BusinessToJson(Business instance) => <String, dynamic>{
       'currency': instance.currency,
       'timezone': instance.timezone,
       'isActive': instance.isActive,
-      'createdAt': instance.createdAt.toIso8601String(),
-      'updatedAt': instance.updatedAt.toIso8601String(),
+      'createdAt': instance.createdAt?.toIso8601String(),
+      'updatedAt': instance.updatedAt?.toIso8601String(),
     };
 
 const _$BusinessTypeEnumMap = {
