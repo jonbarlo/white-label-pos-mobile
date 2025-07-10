@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'pos_provider.dart';
-import 'models/cart_item.dart';
-import 'models/sale.dart';
-import 'models/menu_item.dart';
-import '../auth/auth_provider.dart';
+import 'package:white_label_pos_mobile/src/features/pos/models/cart_item.dart';
+import 'package:white_label_pos_mobile/src/features/pos/models/sale.dart';
+import 'package:white_label_pos_mobile/src/features/pos/models/menu_item.dart';
+import 'package:white_label_pos_mobile/src/features/pos/pos_provider.dart';
+import 'package:white_label_pos_mobile/src/features/pos/customer_selection_dialog.dart';
+import 'package:white_label_pos_mobile/src/features/auth/auth_provider.dart';
 
 class PosScreen extends ConsumerStatefulWidget {
   const PosScreen({super.key});
@@ -186,9 +187,9 @@ class _PosScreenState extends ConsumerState<PosScreen>
     );
   }
 
-  Future<void> _completeSale() async {
+  Future<void> _completeSale(String customerName, String customerEmail) async {
     try {
-      await ref.read(createSaleProvider(_selectedPaymentMethod).future);
+      await ref.read(createSaleProvider(_selectedPaymentMethod, customerName: customerName, customerEmail: customerEmail).future);
       // Refresh sales summary/report
       ref.refresh(salesSummaryProvider(DateTime.now().subtract(const Duration(days: 7)), DateTime.now()));
       // Switch to Recent Sales tab if user can access reports
@@ -1154,7 +1155,7 @@ class _CheckoutDialog extends StatefulWidget {
   final double total;
   final PaymentMethod selectedPaymentMethod;
   final Function(PaymentMethod) onPaymentMethodChanged;
-  final VoidCallback onCompleteSale;
+  final Function(String customerName, String customerEmail) onCompleteSale;
 
   const _CheckoutDialog({
     required this.cart,
@@ -1170,6 +1171,10 @@ class _CheckoutDialog extends StatefulWidget {
 
 class _CheckoutDialogState extends State<_CheckoutDialog> {
   late PaymentMethod _selectedMethod;
+  String? _selectedCustomerName;
+  String? _selectedCustomerEmail;
+  int? _selectedCustomerId;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -1177,11 +1182,52 @@ class _CheckoutDialogState extends State<_CheckoutDialog> {
     _selectedMethod = widget.selectedPaymentMethod;
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   void _onMethodChanged(PaymentMethod method) {
     setState(() {
       _selectedMethod = method;
     });
     widget.onPaymentMethodChanged(method);
+  }
+
+  Future<void> _selectCustomer() async {
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (context) => CustomerSelectionDialog(
+        initialCustomerName: _selectedCustomerName,
+        initialCustomerEmail: _selectedCustomerEmail,
+      ),
+    );
+
+    if (result != null) {
+      setState(() {
+        _selectedCustomerId = result['customerId'];
+        _selectedCustomerName = result['customerName'];
+        _selectedCustomerEmail = result['customerEmail'];
+      });
+    }
+  }
+
+  void _completeSale() {
+    if (_selectedCustomerName == null || _selectedCustomerName!.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select a customer or enter customer information'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    widget.onCompleteSale(_selectedCustomerName!, _selectedCustomerEmail ?? '');
   }
 
   @override
@@ -1262,6 +1308,57 @@ class _CheckoutDialogState extends State<_CheckoutDialog> {
               ],
             ),
             const SizedBox(height: 20),
+            // Customer Information
+            Text(
+              'Customer Information',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 12),
+            // Customer Selection Button
+            OutlinedButton.icon(
+              onPressed: _selectCustomer,
+              icon: const Icon(Icons.person),
+              label: Text(_selectedCustomerName != null 
+                ? 'Customer: $_selectedCustomerName' 
+                : 'Select Customer'),
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 48),
+              ),
+            ),
+            if (_selectedCustomerName != null) ...[
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Name: $_selectedCustomerName',
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                    if (_selectedCustomerEmail != null && _selectedCustomerEmail!.isNotEmpty)
+                      Text(
+                        'Email: $_selectedCustomerEmail',
+                        style: theme.textTheme.bodyMedium,
+                      ),
+                    if (_selectedCustomerId != null)
+                      Text(
+                        'Customer ID: $_selectedCustomerId',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+            const SizedBox(height: 20),
             // Payment method
             Text(
               'Payment Method',
@@ -1294,12 +1391,18 @@ class _CheckoutDialogState extends State<_CheckoutDialog> {
           child: const Text('Cancel'),
         ),
         ElevatedButton(
-          onPressed: widget.onCompleteSale,
+          onPressed: _isLoading ? null : _completeSale,
           style: ElevatedButton.styleFrom(
             backgroundColor: theme.colorScheme.primary,
             foregroundColor: theme.colorScheme.onPrimary,
           ),
-          child: const Text('Complete Sale'),
+          child: _isLoading 
+            ? const SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+              )
+            : const Text('Complete Sale'),
         ),
       ],
     );

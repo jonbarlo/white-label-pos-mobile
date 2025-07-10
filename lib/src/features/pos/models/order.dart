@@ -42,24 +42,24 @@ class Order {
   });
 
   factory Order.fromJson(Map<String, dynamic> json) => Order(
-    id: (json['id'] as num).toInt(),
-    businessId: (json['businessId'] as num).toInt(),
-    customerId: (json['customerId'] as num?)?.toInt(),
-    tableId: (json['tableId'] as num?)?.toInt(),
-    orderNumber: json['orderNumber'] as String,
-    type: $enumDecode(_$OrderTypeEnumMap, json['orderType']),
-    status: $enumDecode(_$OrderStatusEnumMap, json['status']),
-    subtotal: (json['subtotal'] as num).toDouble(),
-    tax: (json['tax'] as num).toDouble(),
-    discount: (json['discount'] as num).toDouble(),
-    total: (json['total'] as num).toDouble(),
-    notes: json['notes'] as String?,
-    estimatedReadyTime: json['estimatedReadyTime'] == null
-        ? null
-        : DateTime.parse(json['estimatedReadyTime'] as String),
-    createdAt: DateTime.parse(json['createdAt'] as String),
-    updatedAt: DateTime.parse(json['updatedAt'] as String),
-  );
+        id: (json['id'] as num).toInt(),
+        businessId: (json['businessId'] as num).toInt(),
+        customerId: (json['customerId'] as num?)?.toInt(),
+        tableId: (json['tableId'] as num?)?.toInt(),
+        orderNumber: json['orderNumber'] as String,
+        type: $enumDecode(_$OrderTypeEnumMap, json['orderType']),
+        status: $enumDecode(_$OrderStatusEnumMap, json['status']),
+        subtotal: (json['subtotal'] as num).toDouble(),
+        tax: (json['taxAmount'] as num).toDouble(),
+        discount: (json['discountAmount'] as num).toDouble(),
+        total: (json['totalAmount'] as num).toDouble(),
+        notes: json['notes'] as String?,
+        estimatedReadyTime: json['estimatedReadyTime'] == null
+            ? null
+            : DateTime.parse(json['estimatedReadyTime'] as String),
+        createdAt: DateTime.parse(json['createdAt'] as String),
+        updatedAt: DateTime.parse(json['updatedAt'] as String),
+      );
   Map<String, dynamic> toJson() => _$OrderToJson(this);
 
   @override

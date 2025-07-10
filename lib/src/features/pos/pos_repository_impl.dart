@@ -118,73 +118,58 @@ class PosRepositoryImpl implements PosRepository {
       if (businessId == null) {
         throw Exception('No businessId found in auth state');
       }
-      // Create order
-      final orderData = {
-        'businessId': businessId,
-        'orderType': 'takeaway', // Must match backend: dine_in, takeaway, delivery
-        if (customerName != null) 'customerName': customerName,
-        'items': items.map((item) => {
-          'itemId': int.parse(item.id),
-          'quantity': item.quantity,
-          'price': item.price,
-        }).toList(),
-      };
 
-      final orderResponse = await _dio.post('/orders', data: orderData);
-      final orderSuccess = (orderResponse.statusCode == 201 || orderResponse.statusCode == 200) &&
-                          (orderResponse.data['success'] == true || orderResponse.data['success'] == 'true');
-      if (!orderSuccess) {
-        throw Exception(orderResponse.data['message'] ?? 'Failed to create order');
-      }
+      // Calculate total
+      final total = items.fold<double>(0.0, (sum, item) => sum + (item.price * (item.quantity ?? 1)));
 
-      final order = Order.fromJson(orderResponse.data['data']);
-
-      // Create order items
-      for (final item in items) {
-        final orderItemData = {
-          'orderId': order.id,
-          'menuItemId': int.parse(item.id), // Assuming item.id is the menuItemId
-          'quantity': item.quantity,
-          'unitPrice': item.price,
-          'totalPrice': item.total,
-          'notes': null,
-          'status': 'pending',
-        };
-
-        await _dio.post('/orders/${order.id}/items', data: orderItemData);
-      }
-
-      // Create sale record
+      // Create sale with the fields the backend actually expects
       final saleData = {
-        'orderId': order.id,
-        if (customerName != null) 'customerName': customerName,
-        if (customerEmail != null) 'customerEmail': customerEmail,
-        'subtotal': order.subtotal,
-        'tax': order.tax,
-        'total': order.total,
+        'userId': authState.user?.id ?? businessId, // Backend expects userId
+        'businessId': businessId, // Database requires businessId
+        'totalAmount': total, // Backend expects totalAmount
         'paymentMethod': paymentMethod.name,
         'status': 'completed',
+        'notes': 'Customer: ${customerName ?? 'Guest'} (${customerEmail ?? 'guest@pos.com'})',
       };
 
+      if (EnvConfig.isDebugMode) {
+        print('🛒 SALE CREATION: Sending sale data: $saleData');
+      }
+
       final saleResponse = await _dio.post('/sales', data: saleData);
-      final saleSuccess = (saleResponse.statusCode == 201 || saleResponse.statusCode == 200) &&
-                         (saleResponse.data['success'] == true || saleResponse.data['success'] == 'true');
-      if (!saleSuccess) {
+      
+      if (EnvConfig.isDebugMode) {
+        print('🛒 SALE CREATION: Response status:  [32m${saleResponse.statusCode} [0m');
+        print('🛒 SALE CREATION: Response data:  [36m${saleResponse.data} [0m');
+      }
+
+      // Accept as success if:
+      // - status code is 200/201
+      // - OR response contains a message with 'Sale created successfully'
+      final isSuccess = (saleResponse.statusCode == 201 || saleResponse.statusCode == 200)
+        || (saleResponse.data is Map && (saleResponse.data['message']?.toString().toLowerCase().contains('sale created successfully') ?? false));
+
+      if (!isSuccess) {
         throw Exception(saleResponse.data['message'] ?? 'Failed to create sale');
       }
 
-      // Convert to Sale model
+      // Use 'sale' field if present, otherwise 'data'
+      final saleObj = saleResponse.data['sale'] ?? saleResponse.data['data'] ?? {};
+
       return Sale(
-        id: order.id.toString(),
+        id: saleObj['id']?.toString() ?? 'unknown',
         items: items,
-        total: order.total,
+        total: total,
         paymentMethod: paymentMethod,
-        createdAt: order.createdAt,
+        createdAt: DateTime.now(),
         customerName: customerName,
         customerEmail: customerEmail,
-        receiptNumber: order.orderNumber,
+        receiptNumber: saleObj['orderNumber'] ?? 'SALE-${DateTime.now().millisecondsSinceEpoch}',
       );
     } catch (e) {
+      if (EnvConfig.isDebugMode) {
+        print('🛒 SALE CREATION: Error occurred: $e');
+      }
       throw Exception('Failed to create sale: $e');
     }
   }

@@ -12,7 +12,7 @@ Order _$OrderFromJson(Map<String, dynamic> json) => Order(
       customerId: (json['customerId'] as num?)?.toInt(),
       tableId: (json['tableId'] as num?)?.toInt(),
       orderNumber: json['orderNumber'] as String,
-      type: $enumDecode(_$OrderTypeEnumMap, json['orderType']),
+      type: $enumDecode(_$OrderTypeEnumMap, json['type']),
       status: $enumDecode(_$OrderStatusEnumMap, json['status']),
       subtotal: (json['subtotal'] as num).toDouble(),
       tax: (json['tax'] as num).toDouble(),
