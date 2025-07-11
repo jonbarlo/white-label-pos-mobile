@@ -11,6 +11,8 @@ import '../features/reports/reports_screen.dart';
 import '../features/users/profile_screen.dart';
 import '../features/business/business_list_screen.dart';
 import '../core/config/env_config.dart';
+import '../features/viewer/bar_screen.dart';
+import '../features/viewer/kitchen_screen.dart';
 
 class MainApp extends ConsumerStatefulWidget {
   const MainApp({super.key});
@@ -203,10 +205,21 @@ class _MainAppState extends ConsumerState<MainApp> {
     // Show main app with role-based navigation if authenticated
     if (EnvConfig.isDebugMode) {
       print('🔐 MAIN APP: Showing main app - user is authenticated');
-      print('🔐 MAIN APP: User role: ${authState.userRole}');
+      print('🔐 MAIN APP: User role:  [32m${authState.userRole} [0m');
       print('🔐 MAIN APP: User name: ${authState.user?.name}');
+      print('🔐 MAIN APP: User assignment: ${authState.user?.assignment}');
     }
-    
+
+    // Route viewer users to BarScreen or KitchenScreen based on assignment
+    if (authState.user?.role.toString() == 'UserRole.viewer') {
+      final assignment = authState.user?.assignment;
+      if (assignment == 'bar') {
+        return const BarScreen();
+      } else if (assignment == 'kitchen') {
+        return const KitchenScreen();
+      }
+    }
+
     final screens = _getScreensForRole(authState);
     final navigationItems = _getNavigationItemsForRole(authState);
 

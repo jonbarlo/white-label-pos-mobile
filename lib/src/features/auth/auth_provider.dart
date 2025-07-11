@@ -48,7 +48,7 @@ class AuthState {
   bool get isAdmin => userRole == UserRole.admin;
   bool get isManager => userRole == UserRole.manager;
   bool get isCashier => userRole == UserRole.cashier;
-  bool get isKitchen => userRole == UserRole.kitchen;
+  bool get isKitchen => userRole == UserRole.viewer && user?.assignment == 'kitchen';
   
   bool get canAccessBusinessManagement => userRole?.canAccessBusinessManagement ?? false;
   bool get canAccessPOS => userRole?.canAccessPOS ?? false;

@@ -15,6 +15,7 @@ _$UserImpl _$$UserImplFromJson(Map<String, dynamic> json) => _$UserImpl(
       isActive: json['isActive'] as bool,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
+      assignment: json['assignment'] as String?,
     );
 
 Map<String, dynamic> _$$UserImplToJson(_$UserImpl instance) =>
@@ -27,11 +28,12 @@ Map<String, dynamic> _$$UserImplToJson(_$UserImpl instance) =>
       'isActive': instance.isActive,
       'createdAt': instance.createdAt.toIso8601String(),
       'updatedAt': instance.updatedAt.toIso8601String(),
+      'assignment': instance.assignment,
     };
 
 const _$UserRoleEnumMap = {
   UserRole.admin: 'admin',
   UserRole.manager: 'manager',
   UserRole.cashier: 'cashier',
-  UserRole.kitchen: 'kitchen',
+  UserRole.viewer: 'viewer',
 };

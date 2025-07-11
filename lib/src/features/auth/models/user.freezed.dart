@@ -28,6 +28,7 @@ mixin _$User {
   bool get isActive => throw _privateConstructorUsedError;
   DateTime get createdAt => throw _privateConstructorUsedError;
   DateTime get updatedAt => throw _privateConstructorUsedError;
+  String? get assignment => throw _privateConstructorUsedError;
 
   /// Serializes this User to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -51,7 +52,8 @@ abstract class $UserCopyWith<$Res> {
       UserRole role,
       bool isActive,
       DateTime createdAt,
-      DateTime updatedAt});
+      DateTime updatedAt,
+      String? assignment});
 }
 
 /// @nodoc
@@ -77,6 +79,7 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
     Object? isActive = null,
     Object? createdAt = null,
     Object? updatedAt = null,
+    Object? assignment = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -111,6 +114,10 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      assignment: freezed == assignment
+          ? _value.assignment
+          : assignment // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -130,7 +137,8 @@ abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
       UserRole role,
       bool isActive,
       DateTime createdAt,
-      DateTime updatedAt});
+      DateTime updatedAt,
+      String? assignment});
 }
 
 /// @nodoc
@@ -153,6 +161,7 @@ class __$$UserImplCopyWithImpl<$Res>
     Object? isActive = null,
     Object? createdAt = null,
     Object? updatedAt = null,
+    Object? assignment = freezed,
   }) {
     return _then(_$UserImpl(
       id: null == id
@@ -187,6 +196,10 @@ class __$$UserImplCopyWithImpl<$Res>
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      assignment: freezed == assignment
+          ? _value.assignment
+          : assignment // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -202,7 +215,8 @@ class _$UserImpl implements _User {
       required this.role,
       required this.isActive,
       required this.createdAt,
-      required this.updatedAt});
+      required this.updatedAt,
+      this.assignment});
 
   factory _$UserImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserImplFromJson(json);
@@ -223,10 +237,12 @@ class _$UserImpl implements _User {
   final DateTime createdAt;
   @override
   final DateTime updatedAt;
+  @override
+  final String? assignment;
 
   @override
   String toString() {
-    return 'User(id: $id, businessId: $businessId, name: $name, email: $email, role: $role, isActive: $isActive, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'User(id: $id, businessId: $businessId, name: $name, email: $email, role: $role, isActive: $isActive, createdAt: $createdAt, updatedAt: $updatedAt, assignment: $assignment)';
   }
 
   @override
@@ -245,13 +261,15 @@ class _$UserImpl implements _User {
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
-                other.updatedAt == updatedAt));
+                other.updatedAt == updatedAt) &&
+            (identical(other.assignment, assignment) ||
+                other.assignment == assignment));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, id, businessId, name, email,
-      role, isActive, createdAt, updatedAt);
+      role, isActive, createdAt, updatedAt, assignment);
 
   /// Create a copy of User
   /// with the given fields replaced by the non-null parameter values.
@@ -278,7 +296,8 @@ abstract class _User implements User {
       required final UserRole role,
       required final bool isActive,
       required final DateTime createdAt,
-      required final DateTime updatedAt}) = _$UserImpl;
+      required final DateTime updatedAt,
+      final String? assignment}) = _$UserImpl;
 
   factory _User.fromJson(Map<String, dynamic> json) = _$UserImpl.fromJson;
 
@@ -298,6 +317,8 @@ abstract class _User implements User {
   DateTime get createdAt;
   @override
   DateTime get updatedAt;
+  @override
+  String? get assignment;
 
   /// Create a copy of User
   /// with the given fields replaced by the non-null parameter values.

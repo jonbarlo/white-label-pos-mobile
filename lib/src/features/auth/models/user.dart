@@ -10,8 +10,8 @@ enum UserRole {
   manager,
   @JsonValue('cashier')
   cashier,
-  @JsonValue('kitchen')
-  kitchen,
+  @JsonValue('viewer')
+  viewer,
 }
 
 @freezed
@@ -25,6 +25,7 @@ class User with _$User {
     required bool isActive,
     required DateTime createdAt,
     required DateTime updatedAt,
+    String? assignment,
   }) = _User;
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
@@ -39,14 +40,15 @@ extension UserRoleExtension on UserRole {
         return 'Manager';
       case UserRole.cashier:
         return 'Cashier';
-      case UserRole.kitchen:
-        return 'Kitchen Staff';
+      case UserRole.viewer:
+        return 'Viewer';
     }
   }
 
   bool get canAccessBusinessManagement => this == UserRole.admin;
-  bool get canAccessPOS => this != UserRole.admin;
-  bool get canAccessKitchen => this == UserRole.kitchen || this == UserRole.admin;
+  bool get canAccessPOS => this != UserRole.admin && this != UserRole.viewer;
+  bool get canAccessKitchen => this == UserRole.viewer;
   bool get canAccessReports => this == UserRole.admin || this == UserRole.manager;
   bool get canManageUsers => this == UserRole.admin;
+  bool get canViewOnly => this == UserRole.viewer;
 } 
