@@ -22,8 +22,24 @@ class RevenueReport {
     required this.endDate,
   });
 
-  factory RevenueReport.fromJson(Map<String, dynamic> json) =>
-      _$RevenueReportFromJson(json);
+  factory RevenueReport.fromJson(Map<String, dynamic> json) {
+    double parseNum(dynamic value) {
+      if (value == null) return 0.0;
+      if (value is num) return value.toDouble();
+      return double.tryParse(value.toString()) ?? 0.0;
+    }
+    return RevenueReport(
+      totalRevenue: parseNum(json['totalRevenue'] ?? json['totalSales']),
+      totalCost: parseNum(json['totalCost']),
+      grossProfit: parseNum(json['grossProfit']),
+      profitMargin: parseNum(json['profitMargin']),
+      revenueByDay: (json['revenueByDay'] is Map<String, dynamic>)
+          ? (json['revenueByDay'] as Map<String, dynamic>).map((k, e) => MapEntry(k, parseNum(e)))
+          : <String, double>{},
+      startDate: DateTime.tryParse(json['startDate']?.toString() ?? '') ?? DateTime.now(),
+      endDate: DateTime.tryParse(json['endDate']?.toString() ?? '') ?? DateTime.now(),
+    );
+  }
 
   Map<String, dynamic> toJson() => _$RevenueReportToJson(this);
 

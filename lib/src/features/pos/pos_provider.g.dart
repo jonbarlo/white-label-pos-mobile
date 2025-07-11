@@ -39,7 +39,7 @@ final cartTotalProvider = AutoDisposeProvider<double>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CartTotalRef = AutoDisposeProviderRef<double>;
-String _$createSaleHash() => r'33e5458414f3d3f32fe2d10ab71f1c5cea80ecd1';
+String _$createSaleHash() => r'f18c8dfcf0b5ba5d6e47a4aa907be4d64f3f584e';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -635,6 +635,455 @@ class _TopSellingItemsProviderElement
   int get limit => (origin as TopSellingItemsProvider).limit;
 }
 
+String _$createSplitSaleHash() => r'c3feeae84a705864e01358ae1f842773c6709c25';
+
+/// See also [createSplitSale].
+@ProviderFor(createSplitSale)
+const createSplitSaleProvider = CreateSplitSaleFamily();
+
+/// See also [createSplitSale].
+class CreateSplitSaleFamily extends Family<AsyncValue<SplitSaleResponse>> {
+  /// See also [createSplitSale].
+  const CreateSplitSaleFamily();
+
+  /// See also [createSplitSale].
+  CreateSplitSaleProvider call(
+    SplitSaleRequest request,
+  ) {
+    return CreateSplitSaleProvider(
+      request,
+    );
+  }
+
+  @override
+  CreateSplitSaleProvider getProviderOverride(
+    covariant CreateSplitSaleProvider provider,
+  ) {
+    return call(
+      provider.request,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'createSplitSaleProvider';
+}
+
+/// See also [createSplitSale].
+class CreateSplitSaleProvider
+    extends AutoDisposeFutureProvider<SplitSaleResponse> {
+  /// See also [createSplitSale].
+  CreateSplitSaleProvider(
+    SplitSaleRequest request,
+  ) : this._internal(
+          (ref) => createSplitSale(
+            ref as CreateSplitSaleRef,
+            request,
+          ),
+          from: createSplitSaleProvider,
+          name: r'createSplitSaleProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$createSplitSaleHash,
+          dependencies: CreateSplitSaleFamily._dependencies,
+          allTransitiveDependencies:
+              CreateSplitSaleFamily._allTransitiveDependencies,
+          request: request,
+        );
+
+  CreateSplitSaleProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.request,
+  }) : super.internal();
+
+  final SplitSaleRequest request;
+
+  @override
+  Override overrideWith(
+    FutureOr<SplitSaleResponse> Function(CreateSplitSaleRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: CreateSplitSaleProvider._internal(
+        (ref) => create(ref as CreateSplitSaleRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        request: request,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<SplitSaleResponse> createElement() {
+    return _CreateSplitSaleProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is CreateSplitSaleProvider && other.request == request;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, request.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin CreateSplitSaleRef on AutoDisposeFutureProviderRef<SplitSaleResponse> {
+  /// The parameter `request` of this provider.
+  SplitSaleRequest get request;
+}
+
+class _CreateSplitSaleProviderElement
+    extends AutoDisposeFutureProviderElement<SplitSaleResponse>
+    with CreateSplitSaleRef {
+  _CreateSplitSaleProviderElement(super.provider);
+
+  @override
+  SplitSaleRequest get request => (origin as CreateSplitSaleProvider).request;
+}
+
+String _$addPaymentToSaleHash() => r'201863ff865f0313c320098e35fd5ca7f05e79b9';
+
+/// See also [addPaymentToSale].
+@ProviderFor(addPaymentToSale)
+const addPaymentToSaleProvider = AddPaymentToSaleFamily();
+
+/// See also [addPaymentToSale].
+class AddPaymentToSaleFamily extends Family<AsyncValue<SplitSale>> {
+  /// See also [addPaymentToSale].
+  const AddPaymentToSaleFamily();
+
+  /// See also [addPaymentToSale].
+  AddPaymentToSaleProvider call(
+    int saleId,
+    AddPaymentRequest request,
+  ) {
+    return AddPaymentToSaleProvider(
+      saleId,
+      request,
+    );
+  }
+
+  @override
+  AddPaymentToSaleProvider getProviderOverride(
+    covariant AddPaymentToSaleProvider provider,
+  ) {
+    return call(
+      provider.saleId,
+      provider.request,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'addPaymentToSaleProvider';
+}
+
+/// See also [addPaymentToSale].
+class AddPaymentToSaleProvider extends AutoDisposeFutureProvider<SplitSale> {
+  /// See also [addPaymentToSale].
+  AddPaymentToSaleProvider(
+    int saleId,
+    AddPaymentRequest request,
+  ) : this._internal(
+          (ref) => addPaymentToSale(
+            ref as AddPaymentToSaleRef,
+            saleId,
+            request,
+          ),
+          from: addPaymentToSaleProvider,
+          name: r'addPaymentToSaleProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$addPaymentToSaleHash,
+          dependencies: AddPaymentToSaleFamily._dependencies,
+          allTransitiveDependencies:
+              AddPaymentToSaleFamily._allTransitiveDependencies,
+          saleId: saleId,
+          request: request,
+        );
+
+  AddPaymentToSaleProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.saleId,
+    required this.request,
+  }) : super.internal();
+
+  final int saleId;
+  final AddPaymentRequest request;
+
+  @override
+  Override overrideWith(
+    FutureOr<SplitSale> Function(AddPaymentToSaleRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: AddPaymentToSaleProvider._internal(
+        (ref) => create(ref as AddPaymentToSaleRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        saleId: saleId,
+        request: request,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<SplitSale> createElement() {
+    return _AddPaymentToSaleProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is AddPaymentToSaleProvider &&
+        other.saleId == saleId &&
+        other.request == request;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, saleId.hashCode);
+    hash = _SystemHash.combine(hash, request.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin AddPaymentToSaleRef on AutoDisposeFutureProviderRef<SplitSale> {
+  /// The parameter `saleId` of this provider.
+  int get saleId;
+
+  /// The parameter `request` of this provider.
+  AddPaymentRequest get request;
+}
+
+class _AddPaymentToSaleProviderElement
+    extends AutoDisposeFutureProviderElement<SplitSale>
+    with AddPaymentToSaleRef {
+  _AddPaymentToSaleProviderElement(super.provider);
+
+  @override
+  int get saleId => (origin as AddPaymentToSaleProvider).saleId;
+  @override
+  AddPaymentRequest get request => (origin as AddPaymentToSaleProvider).request;
+}
+
+String _$refundSplitPaymentHash() =>
+    r'01b7a3c0e000b135af4e8afe16509ac49407c1a6';
+
+/// See also [refundSplitPayment].
+@ProviderFor(refundSplitPayment)
+const refundSplitPaymentProvider = RefundSplitPaymentFamily();
+
+/// See also [refundSplitPayment].
+class RefundSplitPaymentFamily extends Family<AsyncValue<SplitSale>> {
+  /// See also [refundSplitPayment].
+  const RefundSplitPaymentFamily();
+
+  /// See also [refundSplitPayment].
+  RefundSplitPaymentProvider call(
+    int saleId,
+    RefundRequest request,
+  ) {
+    return RefundSplitPaymentProvider(
+      saleId,
+      request,
+    );
+  }
+
+  @override
+  RefundSplitPaymentProvider getProviderOverride(
+    covariant RefundSplitPaymentProvider provider,
+  ) {
+    return call(
+      provider.saleId,
+      provider.request,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'refundSplitPaymentProvider';
+}
+
+/// See also [refundSplitPayment].
+class RefundSplitPaymentProvider extends AutoDisposeFutureProvider<SplitSale> {
+  /// See also [refundSplitPayment].
+  RefundSplitPaymentProvider(
+    int saleId,
+    RefundRequest request,
+  ) : this._internal(
+          (ref) => refundSplitPayment(
+            ref as RefundSplitPaymentRef,
+            saleId,
+            request,
+          ),
+          from: refundSplitPaymentProvider,
+          name: r'refundSplitPaymentProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$refundSplitPaymentHash,
+          dependencies: RefundSplitPaymentFamily._dependencies,
+          allTransitiveDependencies:
+              RefundSplitPaymentFamily._allTransitiveDependencies,
+          saleId: saleId,
+          request: request,
+        );
+
+  RefundSplitPaymentProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.saleId,
+    required this.request,
+  }) : super.internal();
+
+  final int saleId;
+  final RefundRequest request;
+
+  @override
+  Override overrideWith(
+    FutureOr<SplitSale> Function(RefundSplitPaymentRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: RefundSplitPaymentProvider._internal(
+        (ref) => create(ref as RefundSplitPaymentRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        saleId: saleId,
+        request: request,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<SplitSale> createElement() {
+    return _RefundSplitPaymentProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is RefundSplitPaymentProvider &&
+        other.saleId == saleId &&
+        other.request == request;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, saleId.hashCode);
+    hash = _SystemHash.combine(hash, request.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin RefundSplitPaymentRef on AutoDisposeFutureProviderRef<SplitSale> {
+  /// The parameter `saleId` of this provider.
+  int get saleId;
+
+  /// The parameter `request` of this provider.
+  RefundRequest get request;
+}
+
+class _RefundSplitPaymentProviderElement
+    extends AutoDisposeFutureProviderElement<SplitSale>
+    with RefundSplitPaymentRef {
+  _RefundSplitPaymentProviderElement(super.provider);
+
+  @override
+  int get saleId => (origin as RefundSplitPaymentProvider).saleId;
+  @override
+  RefundRequest get request => (origin as RefundSplitPaymentProvider).request;
+}
+
+String _$getSplitBillingStatsHash() =>
+    r'03e6342ed99a49e32fb4b4ec588adb25fd3dee24';
+
+/// See also [getSplitBillingStats].
+@ProviderFor(getSplitBillingStats)
+final getSplitBillingStatsProvider =
+    AutoDisposeFutureProvider<SplitBillingStats>.internal(
+  getSplitBillingStats,
+  name: r'getSplitBillingStatsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$getSplitBillingStatsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef GetSplitBillingStatsRef
+    = AutoDisposeFutureProviderRef<SplitBillingStats>;
 String _$cartNotifierHash() => r'3c7b3606d59f8a0be1ed390808870100bf6e87c1';
 
 /// See also [CartNotifier].

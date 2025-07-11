@@ -5,6 +5,7 @@ import 'pos_repository_impl.dart';
 import 'models/cart_item.dart';
 import 'models/sale.dart';
 import 'models/menu_item.dart';
+import 'models/split_payment.dart';
 import '../../core/network/dio_client.dart';
 
 part 'pos_provider.g.dart';
@@ -151,27 +152,50 @@ Future<Sale> createSale(
   String? customerName,
   String? customerEmail,
 }) async {
+  print('🛒 PROVIDER: Starting createSale provider...');
+  print('🛒 PROVIDER: Payment method: ${paymentMethod.name}');
+  print('🛒 PROVIDER: Customer name: $customerName');
+  print('🛒 PROVIDER: Customer email: $customerEmail');
+  
   final cart = ref.read(cartNotifierProvider);
+  print('🛒 PROVIDER: Cart items count: ${cart.length}');
   
   if (cart.isEmpty) {
+    print('🛒 PROVIDER: ERROR - Cart is empty');
     throw Exception('Cannot create sale with empty cart');
   }
 
+  print('🛒 PROVIDER: Getting repository...');
   final repository = await ref.read(posRepositoryProvider.future);
-  final sale = await repository.createSale(
-    items: cart,
-    paymentMethod: paymentMethod,
-    customerName: customerName,
-    customerEmail: customerEmail,
-  );
-
-  // Clear cart after successful sale
-  ref.read(cartNotifierProvider.notifier).clearCart();
+  print('🛒 PROVIDER: Repository obtained, calling createSale...');
   
-  // Add to recent sales
-  ref.read(recentSalesNotifierProvider.notifier).addSale(sale);
+  try {
+    final sale = await repository.createSale(
+      items: cart,
+      paymentMethod: paymentMethod,
+      customerName: customerName,
+      customerEmail: customerEmail,
+    );
+    
+    print('🛒 PROVIDER: Sale created successfully!');
+    print('🛒 PROVIDER: Sale ID: ${sale.id}');
+    print('🛒 PROVIDER: Sale total: ${sale.total}');
 
-  return sale;
+    // Clear cart after successful sale
+    print('🛒 PROVIDER: Clearing cart...');
+    ref.read(cartNotifierProvider.notifier).clearCart();
+    
+    // Add to recent sales
+    print('🛒 PROVIDER: Adding to recent sales...');
+    ref.read(recentSalesNotifierProvider.notifier).addSale(sale);
+
+    print('🛒 PROVIDER: Returning sale object');
+    return sale;
+  } catch (e) {
+    print('🛒 PROVIDER: EXCEPTION in createSale: $e');
+    print('🛒 PROVIDER: Exception type: ${e.runtimeType}');
+    rethrow;
+  }
 }
 
 // Barcode scanning
@@ -208,4 +232,78 @@ Future<List<CartItem>> topSellingItems(TopSellingItemsRef ref, {int limit = 10})
   } catch (e) {
     return [];
   }
+}
+
+// Split payment functionality
+@riverpod
+Future<SplitSaleResponse> createSplitSale(
+  CreateSplitSaleRef ref,
+  SplitSaleRequest request,
+) async {
+  print('💳 PROVIDER: Starting createSplitSale provider...');
+  print('💳 PROVIDER: User ID: ${request.userId}');
+  print('💳 PROVIDER: Total amount: ${request.totalAmount}');
+  print('💳 PROVIDER: Payments count: ${request.payments.length}');
+  print('💳 PROVIDER: Customer name: ${request.customerName}');
+  print('💳 PROVIDER: Customer email: ${request.customerEmail}');
+  
+  try {
+    print('💳 PROVIDER: Getting repository...');
+    final repository = await ref.read(posRepositoryProvider.future);
+    print('💳 PROVIDER: Repository obtained, calling createSplitSale...');
+    
+    final response = await repository.createSplitSale(request);
+    print('💳 PROVIDER: Split sale created successfully!');
+    print('💳 PROVIDER: Response sale ID: ${response.sale.id}');
+
+    // Clear cart after successful sale
+    print('💳 PROVIDER: Clearing cart...');
+    ref.read(cartNotifierProvider.notifier).clearCart();
+    
+    // Add to recent sales (convert to regular sale for display)
+    print('💳 PROVIDER: Converting to regular sale for display...');
+    final sale = Sale(
+      id: response.sale.id.toString(),
+      customerName: response.sale.customerName ?? 'Split Payment',
+      total: response.sale.totalAmount,
+      status: response.sale.status,
+      createdAt: response.sale.createdAt,
+      paymentMethod: PaymentMethod.card, // Default for split payments
+    );
+    print('💳 PROVIDER: Adding to recent sales...');
+    ref.read(recentSalesNotifierProvider.notifier).addSale(sale);
+
+    print('💳 PROVIDER: Returning split sale response');
+    return response;
+  } catch (e) {
+    print('💳 PROVIDER: EXCEPTION in createSplitSale: $e');
+    print('💳 PROVIDER: Exception type: ${e.runtimeType}');
+    rethrow;
+  }
+}
+
+@riverpod
+Future<SplitSale> addPaymentToSale(
+  AddPaymentToSaleRef ref,
+  int saleId,
+  AddPaymentRequest request,
+) async {
+  final repository = await ref.read(posRepositoryProvider.future);
+  return await repository.addPaymentToSale(saleId, request);
+}
+
+@riverpod
+Future<SplitSale> refundSplitPayment(
+  RefundSplitPaymentRef ref,
+  int saleId,
+  RefundRequest request,
+) async {
+  final repository = await ref.read(posRepositoryProvider.future);
+  return await repository.refundSplitPayment(saleId, request);
+}
+
+@riverpod
+Future<SplitBillingStats> getSplitBillingStats(GetSplitBillingStatsRef ref) async {
+  final repository = await ref.read(posRepositoryProvider.future);
+  return await repository.getSplitBillingStats();
 } 

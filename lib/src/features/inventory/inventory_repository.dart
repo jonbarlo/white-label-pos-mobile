@@ -1,5 +1,6 @@
 import 'package:white_label_pos_mobile/src/features/inventory/models/inventory_item.dart';
 import 'package:white_label_pos_mobile/src/shared/models/result.dart';
+import 'models/category.dart';
 
 abstract class InventoryRepository {
   /// Get all inventory items
@@ -24,7 +25,7 @@ abstract class InventoryRepository {
   Future<Result<List<InventoryItem>>> getLowStockItems();
 
   /// Get all available categories
-  Future<Result<List<String>>> getCategories();
+  Future<Result<List<Category>>> getCategories({required int businessId});
 
   /// Search inventory items by name, SKU, or barcode
   Future<Result<List<InventoryItem>>> searchItems(String query);

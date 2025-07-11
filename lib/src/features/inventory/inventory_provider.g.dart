@@ -61,11 +61,11 @@ final lowStockItemsProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef LowStockItemsRef = AutoDisposeFutureProviderRef<List<InventoryItem>>;
-String _$categoriesHash() => r'd2fd8efe3f9de5098ee160847b330f2bcbe806af';
+String _$categoriesHash() => r'1fe8f22f0c3d5e4a4e46c33b04eba92f9ad96b41';
 
 /// See also [categories].
 @ProviderFor(categories)
-final categoriesProvider = AutoDisposeFutureProvider<List<String>>.internal(
+final categoriesProvider = AutoDisposeFutureProvider<List<Category>>.internal(
   categories,
   name: r'categoriesProvider',
   debugGetCreateSourceHash:
@@ -76,7 +76,7 @@ final categoriesProvider = AutoDisposeFutureProvider<List<String>>.internal(
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef CategoriesRef = AutoDisposeFutureProviderRef<List<String>>;
+typedef CategoriesRef = AutoDisposeFutureProviderRef<List<Category>>;
 String _$inventoryHash() => r'59607b4bd6ff544d447055028ec1ed903c224488';
 
 /// See also [Inventory].

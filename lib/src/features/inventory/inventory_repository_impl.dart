@@ -4,6 +4,7 @@ import 'package:white_label_pos_mobile/src/shared/models/result.dart';
 import 'package:white_label_pos_mobile/src/core/errors/app_exception.dart';
 import 'package:white_label_pos_mobile/src/features/inventory/models/inventory_item.dart';
 import 'package:white_label_pos_mobile/src/features/inventory/inventory_repository.dart';
+import 'models/category.dart';
 
 class InventoryRepositoryImpl implements InventoryRepository {
   final Dio _dio;
@@ -161,23 +162,36 @@ class InventoryRepositoryImpl implements InventoryRepository {
   }
 
   @override
-  Future<Result<List<String>>> getCategories() async {
+  Future<Result<List<Category>>> getCategories({required int businessId}) async {
     try {
-      final response = await _dio.get('/menu/categories');
+      print('🔍 REPOSITORY DEBUG: Making GET request to /menu/categories with businessId: $businessId');
+      print('🔍 REPOSITORY DEBUG: Query parameters: {"businessId": $businessId}');
+      
+      final response = await _dio.get('/menu/categories', queryParameters: {'businessId': businessId});
+      
+      print('🔍 REPOSITORY DEBUG: Response status:  [32m${response.statusCode} [0m');
+      print('🔍 REPOSITORY DEBUG: Response data: ${response.data}');
+      
       final apiResponse = ApiResponse<List<dynamic>>.fromJson(
         response.data,
-        (json) => json as List<dynamic>,
+        (json) => (json as List<dynamic>).map((e) => Category.fromJson(e as Map<String, dynamic>)).toList(),
       );
       
       if (apiResponse.data == null) {
+        print('❌ REPOSITORY DEBUG: No categories found in response');
         return Result.failure('No categories found');
       }
       
-      final categories = apiResponse.data!.cast<String>();
+      final categories = apiResponse.data! as List<Category>;
+      print('🔍 REPOSITORY DEBUG: Parsed categories: $categories');
       return Result.success(categories);
     } on DioException catch (e) {
+      print('❌ REPOSITORY DEBUG: DioException caught: ${e.message}');
+      print('❌ REPOSITORY DEBUG: DioException type: ${e.type}');
+      print('❌ REPOSITORY DEBUG: DioException response: ${e.response?.data}');
       return Result.failure(AppException.fromDioException(e).message);
     } catch (e) {
+      print('❌ REPOSITORY DEBUG: General exception caught: $e');
       return Result.failure(AppException.unknown(e.toString()).message);
     }
   }

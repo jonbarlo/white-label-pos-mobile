@@ -3,10 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:white_label_pos_mobile/src/features/pos/models/cart_item.dart';
 import 'package:white_label_pos_mobile/src/features/pos/models/sale.dart';
 import 'package:white_label_pos_mobile/src/features/pos/models/menu_item.dart';
+import 'package:white_label_pos_mobile/src/features/pos/models/split_payment.dart';
 import 'package:white_label_pos_mobile/src/features/pos/pos_provider.dart';
 import 'package:white_label_pos_mobile/src/features/pos/customer_selection_dialog.dart';
+import 'package:white_label_pos_mobile/src/features/pos/split_payment_dialog.dart';
 import 'package:white_label_pos_mobile/src/features/auth/auth_provider.dart';
 import 'package:white_label_pos_mobile/src/features/auth/models/user.dart';
+import 'package:white_label_pos_mobile/src/core/config/env_config.dart';
 
 class PosScreen extends ConsumerStatefulWidget {
   const PosScreen({super.key});
@@ -185,25 +188,40 @@ class _PosScreenState extends ConsumerState<PosScreen>
           });
         },
         onCompleteSale: _completeSale,
+        onCompleteSplitSale: _completeSplitSale,
+        userId: ref.read(authNotifierProvider).user?.id ?? 1,
       ),
     );
   }
 
   Future<void> _completeSale(String customerName, String customerEmail) async {
+    print('🛒 MAIN: _completeSale called');
+    print('🛒 MAIN: Customer name: $customerName');
+    print('🛒 MAIN: Customer email: $customerEmail');
+    print('🛒 MAIN: Payment method: ${_selectedPaymentMethod.name}');
+    
     try {
+      print('🛒 MAIN: Calling createSaleProvider...');
       await ref.read(createSaleProvider(_selectedPaymentMethod, customerName: customerName, customerEmail: customerEmail).future);
+      print('🛒 MAIN: Sale completed successfully!');
+      
       // Refresh sales summary/report
+      print('🛒 MAIN: Refreshing sales summary...');
       ref.refresh(salesSummaryProvider(DateTime.now().subtract(const Duration(days: 7)), DateTime.now()));
+      
       // Switch to Recent Sales tab if user can access reports
       final authState = ref.read(authNotifierProvider);
       final userRole = authState.user?.role;
       final canSeeReportsTab = userRole == UserRole.admin || userRole == UserRole.manager;
       if (mounted && canSeeReportsTab) {
+        print('🛒 MAIN: Switching to Recent Sales tab...');
         _tabController.animateTo(1);
       }
+      
       setState(() {
         _selectedPaymentMethod = PaymentMethod.cash;
       });
+      
       Navigator.of(context).pop(); // Close dialog
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -219,6 +237,70 @@ class _PosScreenState extends ConsumerState<PosScreen>
         ),
       );
     } catch (e) {
+      print('🛒 MAIN: EXCEPTION in _completeSale: $e');
+      print('🛒 MAIN: Exception type: ${e.runtimeType}');
+      if (mounted) {
+        Navigator.of(context).pop(); // Close dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.error, color: Colors.white),
+                const SizedBox(width: 8),
+                Expanded(child: Text('Error: ${e.toString()}')),
+              ],
+            ),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _completeSplitSale(SplitSaleRequest request) async {
+    print('💳 MAIN: _completeSplitSale called');
+    print('💳 MAIN: User ID: ${request.userId}');
+    print('💳 MAIN: Total amount: ${request.totalAmount}');
+    print('💳 MAIN: Payments count: ${request.payments.length}');
+    print('💳 MAIN: Customer name: ${request.customerName}');
+    print('💳 MAIN: Customer email: ${request.customerEmail}');
+    
+    try {
+      print('💳 MAIN: Calling createSplitSaleProvider...');
+      await ref.read(createSplitSaleProvider(request).future);
+      print('💳 MAIN: Split sale completed successfully!');
+      
+      // Refresh sales summary/report
+      print('💳 MAIN: Refreshing sales summary...');
+      ref.refresh(salesSummaryProvider(DateTime.now().subtract(const Duration(days: 7)), DateTime.now()));
+      
+      // Switch to Recent Sales tab if user can access reports
+      final authState = ref.read(authNotifierProvider);
+      final userRole = authState.user?.role;
+      final canSeeReportsTab = userRole == UserRole.admin || userRole == UserRole.manager;
+      if (mounted && canSeeReportsTab) {
+        print('💳 MAIN: Switching to Recent Sales tab...');
+        _tabController.animateTo(1);
+      }
+      
+      Navigator.of(context).pop(); // Close dialog
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.white),
+              SizedBox(width: 8),
+              Text('Split payment completed successfully!'),
+            ],
+          ),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 3),
+        ),
+      );
+    } catch (e) {
+      print('💳 MAIN: EXCEPTION in _completeSplitSale: $e');
+      print('💳 MAIN: Exception type: ${e.runtimeType}');
       if (mounted) {
         Navigator.of(context).pop(); // Close dialog
         ScaffoldMessenger.of(context).showSnackBar(
@@ -1161,6 +1243,8 @@ class _CheckoutDialog extends StatefulWidget {
   final PaymentMethod selectedPaymentMethod;
   final Function(PaymentMethod) onPaymentMethodChanged;
   final Function(String customerName, String customerEmail) onCompleteSale;
+  final Function(SplitSaleRequest) onCompleteSplitSale;
+  final int userId;
 
   const _CheckoutDialog({
     required this.cart,
@@ -1168,6 +1252,8 @@ class _CheckoutDialog extends StatefulWidget {
     required this.selectedPaymentMethod,
     required this.onPaymentMethodChanged,
     required this.onCompleteSale,
+    required this.onCompleteSplitSale,
+    required this.userId,
   });
 
   @override
@@ -1218,7 +1304,13 @@ class _CheckoutDialogState extends State<_CheckoutDialog> {
   }
 
   void _completeSale() {
+    print('🛒 UI: _completeSale called');
+    print('🛒 UI: Selected customer name: $_selectedCustomerName');
+    print('🛒 UI: Selected customer email: $_selectedCustomerEmail');
+    print('🛒 UI: Selected payment method: ${_selectedMethod?.name}');
+    
     if (_selectedCustomerName == null || _selectedCustomerName!.isEmpty) {
+      print('🛒 UI: ERROR - No customer selected');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please select a customer or enter customer information'),
@@ -1228,11 +1320,42 @@ class _CheckoutDialogState extends State<_CheckoutDialog> {
       return;
     }
 
+    print('🛒 UI: Setting loading state to true');
     setState(() {
       _isLoading = true;
     });
 
+    print('🛒 UI: Calling widget.onCompleteSale...');
     widget.onCompleteSale(_selectedCustomerName!, _selectedCustomerEmail ?? '');
+  }
+
+  void _showSplitPaymentDialog() {
+    if (EnvConfig.isDebugMode) {
+      print('💳 SPLIT PAYMENT: Opening split payment dialog');
+      print('💳 SPLIT PAYMENT: User ID: ${widget.userId}');
+      print('💳 SPLIT PAYMENT: Total amount: ${widget.total}');
+      print('💳 SPLIT PAYMENT: Cart items: ${widget.cart.length}');
+    }
+    
+    showDialog(
+      context: context,
+      builder: (context) => SplitPaymentDialog(
+        totalAmount: widget.total,
+        cartItems: widget.cart,
+        userId: widget.userId,
+      ),
+    ).then((result) {
+      if (result != null && result is SplitSaleRequest) {
+        if (EnvConfig.isDebugMode) {
+          print('💳 SPLIT PAYMENT: Split payment request received');
+        }
+        widget.onCompleteSplitSale(result);
+      } else {
+        if (EnvConfig.isDebugMode) {
+          print('💳 SPLIT PAYMENT: No valid result received: $result');
+        }
+      }
+    });
   }
 
   @override
@@ -1394,6 +1517,15 @@ class _CheckoutDialogState extends State<_CheckoutDialog> {
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
           child: const Text('Cancel'),
+        ),
+        ElevatedButton.icon(
+          onPressed: _isLoading ? null : _showSplitPaymentDialog,
+          icon: const Icon(Icons.account_balance_wallet),
+          label: const Text('Split Payment'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: theme.colorScheme.secondary,
+            foregroundColor: theme.colorScheme.onSecondary,
+          ),
         ),
         ElevatedButton(
           onPressed: _isLoading ? null : _completeSale,

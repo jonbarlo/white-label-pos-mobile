@@ -1,5 +1,6 @@
 import 'models/cart_item.dart';
 import 'models/sale.dart';
+import 'models/split_payment.dart';
 
 abstract class PosRepository {
   /// Search for items by name, SKU, or description
@@ -30,4 +31,17 @@ abstract class PosRepository {
 
   /// Update item stock levels after sale
   Future<void> updateStockLevels(List<CartItem> items);
+
+  // Split payment methods
+  /// Create a sale with split payments
+  Future<SplitSaleResponse> createSplitSale(SplitSaleRequest request);
+
+  /// Add payment to existing sale
+  Future<SplitSale> addPaymentToSale(int saleId, AddPaymentRequest request);
+
+  /// Refund a split payment
+  Future<SplitSale> refundSplitPayment(int saleId, RefundRequest request);
+
+  /// Get split billing statistics
+  Future<SplitBillingStats> getSplitBillingStats();
 } 

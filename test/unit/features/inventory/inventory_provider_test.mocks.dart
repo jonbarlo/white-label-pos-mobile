@@ -8,6 +8,8 @@ import 'dart:async' as _i4;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:white_label_pos_mobile/src/features/inventory/inventory_repository.dart'
     as _i3;
+import 'package:white_label_pos_mobile/src/features/inventory/models/category.dart'
+    as _i6;
 import 'package:white_label_pos_mobile/src/features/inventory/models/inventory_item.dart'
     as _i5;
 import 'package:white_label_pos_mobile/src/shared/models/result.dart' as _i2;
@@ -175,20 +177,24 @@ class MockInventoryRepository extends _i1.Mock
       ) as _i4.Future<_i2.Result<List<_i5.InventoryItem>>>);
 
   @override
-  _i4.Future<_i2.Result<List<String>>> getCategories() => (super.noSuchMethod(
+  _i4.Future<_i2.Result<List<_i6.Category>>> getCategories(
+          {required int? businessId}) =>
+      (super.noSuchMethod(
         Invocation.method(
           #getCategories,
           [],
+          {#businessId: businessId},
         ),
-        returnValue: _i4.Future<_i2.Result<List<String>>>.value(
-            _FakeResult_0<List<String>>(
+        returnValue: _i4.Future<_i2.Result<List<_i6.Category>>>.value(
+            _FakeResult_0<List<_i6.Category>>(
           this,
           Invocation.method(
             #getCategories,
             [],
+            {#businessId: businessId},
           ),
         )),
-      ) as _i4.Future<_i2.Result<List<String>>>);
+      ) as _i4.Future<_i2.Result<List<_i6.Category>>>);
 
   @override
   _i4.Future<_i2.Result<List<_i5.InventoryItem>>> searchItems(String? query) =>

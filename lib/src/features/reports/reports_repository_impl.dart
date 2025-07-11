@@ -37,7 +37,9 @@ class ReportsRepositoryImpl implements ReportsRepository {
       
       for (final sale in salesData) {
         final saleMap = sale as Map<String, dynamic>;
-        totalSales += (saleMap['total'] as num?)?.toDouble() ?? 0.0;
+        final totalValue = (saleMap['finalAmount'] ?? saleMap['totalAmount'] ?? saleMap['total'] ?? 0.0);
+        final total = (totalValue is num) ? totalValue.toDouble() : double.tryParse(totalValue.toString()) ?? 0.0;
+        totalSales += total;
         
         // Extract items if available
         final items = saleMap['items'] as List<dynamic>?;

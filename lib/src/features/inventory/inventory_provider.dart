@@ -1,6 +1,8 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:white_label_pos_mobile/src/features/inventory/inventory_repository.dart';
 import 'package:white_label_pos_mobile/src/features/inventory/models/inventory_item.dart';
+import 'package:white_label_pos_mobile/src/features/auth/auth_provider.dart';
+import 'package:white_label_pos_mobile/src/features/inventory/models/category.dart';
 
 
 part 'inventory_provider.g.dart';
@@ -34,9 +36,29 @@ Future<List<InventoryItem>> lowStockItems(LowStockItemsRef ref) async {
 }
 
 @riverpod
-Future<List<String>> categories(CategoriesRef ref) async {
+Future<List<Category>> categories(CategoriesRef ref) async {
   final repository = ref.watch(inventoryRepositoryProvider);
-  final result = await repository.getCategories();
+  final authState = ref.read(authNotifierProvider);
+  
+  print('🔍 CATEGORIES DEBUG: Auth state status:  [32m${authState.status} [0m');
+  print('🔍 CATEGORIES DEBUG: Auth state business: ${authState.business}');
+  print('🔍 CATEGORIES DEBUG: Auth state user: ${authState.user}');
+  
+  final businessId = authState.business?.id;
+  print('🔍 CATEGORIES DEBUG: Business ID: $businessId');
+  
+  if (businessId == null) {
+    print('❌ CATEGORIES DEBUG: No businessId found in auth state');
+    throw Exception('No businessId found in auth state');
+  }
+  
+  print('🔍 CATEGORIES DEBUG: Making API call with businessId: $businessId');
+  final result = await repository.getCategories(businessId: businessId);
+  
+  print('🔍 CATEGORIES DEBUG: API result - isSuccess: ${result.isSuccess}');
+  print('🔍 CATEGORIES DEBUG: API result - errorMessage: ${result.errorMessage}');
+  print('🔍 CATEGORIES DEBUG: API result - data: ${result.data}');
+  
   if (result.isSuccess) {
     return result.data;
   } else {

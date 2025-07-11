@@ -995,7 +995,9 @@ class _TransactionsTab extends ConsumerWidget {
 
   double _calculateTotal(List<Map<String, dynamic>> transactions) {
     return transactions.fold(0.0, (sum, transaction) {
-      return sum + ((transaction['finalAmount'] as num?)?.toDouble() ?? 0.0);
+      final totalValue = (transaction['finalAmount'] ?? transaction['totalAmount'] ?? transaction['total'] ?? 0.0);
+      final total = (totalValue is num) ? totalValue.toDouble() : double.tryParse(totalValue.toString()) ?? 0.0;
+      return sum + total;
     });
   }
 
@@ -1021,7 +1023,8 @@ class _TransactionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final amount = (transaction['finalAmount'] as num?)?.toDouble() ?? 0.0;
+    final totalValue = transaction['finalAmount'] ?? transaction['totalAmount'] ?? transaction['total'] ?? 0.0;
+    final amount = (totalValue is num) ? totalValue.toDouble() : double.tryParse(totalValue.toString()) ?? 0.0;
     final status = transaction['status'] as String? ?? 'unknown';
     final paymentMethod = transaction['paymentMethod'] as String? ?? 'unknown';
     final createdAt = DateTime.tryParse(transaction['createdAt'] as String? ?? '') ?? DateTime.now();
@@ -1174,7 +1177,8 @@ class _TransactionDetailsSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final amount = (transaction['finalAmount'] as num?)?.toDouble() ?? 0.0;
+    final totalValue = transaction['finalAmount'] as num? ?? 0.0;
+    final amount = (totalValue is num) ? totalValue.toDouble() : double.tryParse(totalValue.toString()) ?? 0.0;
     final status = transaction['status'] as String? ?? 'unknown';
     final paymentMethod = transaction['paymentMethod'] as String? ?? 'unknown';
     final createdAt = DateTime.tryParse(transaction['createdAt'] as String? ?? '') ?? DateTime.now();

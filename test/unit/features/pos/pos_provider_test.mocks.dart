@@ -3,15 +3,17 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i4;
+import 'dart:async' as _i5;
 
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:white_label_pos_mobile/src/features/pos/models/cart_item.dart'
-    as _i5;
+    as _i6;
 import 'package:white_label_pos_mobile/src/features/pos/models/sale.dart'
     as _i2;
-import 'package:white_label_pos_mobile/src/features/pos/pos_repository.dart'
+import 'package:white_label_pos_mobile/src/features/pos/models/split_payment.dart'
     as _i3;
+import 'package:white_label_pos_mobile/src/features/pos/pos_repository.dart'
+    as _i4;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -37,37 +39,69 @@ class _FakeSale_0 extends _i1.SmartFake implements _i2.Sale {
         );
 }
 
+class _FakeSplitSaleResponse_1 extends _i1.SmartFake
+    implements _i3.SplitSaleResponse {
+  _FakeSplitSaleResponse_1(
+    Object parent,
+    Invocation parentInvocation,
+  ) : super(
+          parent,
+          parentInvocation,
+        );
+}
+
+class _FakeSplitSale_2 extends _i1.SmartFake implements _i3.SplitSale {
+  _FakeSplitSale_2(
+    Object parent,
+    Invocation parentInvocation,
+  ) : super(
+          parent,
+          parentInvocation,
+        );
+}
+
+class _FakeSplitBillingStats_3 extends _i1.SmartFake
+    implements _i3.SplitBillingStats {
+  _FakeSplitBillingStats_3(
+    Object parent,
+    Invocation parentInvocation,
+  ) : super(
+          parent,
+          parentInvocation,
+        );
+}
+
 /// A class which mocks [PosRepository].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockPosRepository extends _i1.Mock implements _i3.PosRepository {
+class MockPosRepository extends _i1.Mock implements _i4.PosRepository {
   MockPosRepository() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i4.Future<List<_i5.CartItem>> searchItems(String? query) =>
+  _i5.Future<List<_i6.CartItem>> searchItems(String? query) =>
       (super.noSuchMethod(
         Invocation.method(
           #searchItems,
           [query],
         ),
-        returnValue: _i4.Future<List<_i5.CartItem>>.value(<_i5.CartItem>[]),
-      ) as _i4.Future<List<_i5.CartItem>>);
+        returnValue: _i5.Future<List<_i6.CartItem>>.value(<_i6.CartItem>[]),
+      ) as _i5.Future<List<_i6.CartItem>>);
 
   @override
-  _i4.Future<_i5.CartItem?> getItemByBarcode(String? barcode) =>
+  _i5.Future<_i6.CartItem?> getItemByBarcode(String? barcode) =>
       (super.noSuchMethod(
         Invocation.method(
           #getItemByBarcode,
           [barcode],
         ),
-        returnValue: _i4.Future<_i5.CartItem?>.value(),
-      ) as _i4.Future<_i5.CartItem?>);
+        returnValue: _i5.Future<_i6.CartItem?>.value(),
+      ) as _i5.Future<_i6.CartItem?>);
 
   @override
-  _i4.Future<_i2.Sale> createSale({
-    required List<_i5.CartItem>? items,
+  _i5.Future<_i2.Sale> createSale({
+    required List<_i6.CartItem>? items,
     required _i2.PaymentMethod? paymentMethod,
     String? customerName,
     String? customerEmail,
@@ -83,7 +117,7 @@ class MockPosRepository extends _i1.Mock implements _i3.PosRepository {
             #customerEmail: customerEmail,
           },
         ),
-        returnValue: _i4.Future<_i2.Sale>.value(_FakeSale_0(
+        returnValue: _i5.Future<_i2.Sale>.value(_FakeSale_0(
           this,
           Invocation.method(
             #createSale,
@@ -96,21 +130,21 @@ class MockPosRepository extends _i1.Mock implements _i3.PosRepository {
             },
           ),
         )),
-      ) as _i4.Future<_i2.Sale>);
+      ) as _i5.Future<_i2.Sale>);
 
   @override
-  _i4.Future<List<_i2.Sale>> getRecentSales({int? limit = 50}) =>
+  _i5.Future<List<_i2.Sale>> getRecentSales({int? limit = 50}) =>
       (super.noSuchMethod(
         Invocation.method(
           #getRecentSales,
           [],
           {#limit: limit},
         ),
-        returnValue: _i4.Future<List<_i2.Sale>>.value(<_i2.Sale>[]),
-      ) as _i4.Future<List<_i2.Sale>>);
+        returnValue: _i5.Future<List<_i2.Sale>>.value(<_i2.Sale>[]),
+      ) as _i5.Future<List<_i2.Sale>>);
 
   @override
-  _i4.Future<Map<String, dynamic>> getSalesSummary({
+  _i5.Future<Map<String, dynamic>> getSalesSummary({
     required DateTime? startDate,
     required DateTime? endDate,
   }) =>
@@ -124,28 +158,113 @@ class MockPosRepository extends _i1.Mock implements _i3.PosRepository {
           },
         ),
         returnValue:
-            _i4.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
-      ) as _i4.Future<Map<String, dynamic>>);
+            _i5.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
+      ) as _i5.Future<Map<String, dynamic>>);
 
   @override
-  _i4.Future<List<_i5.CartItem>> getTopSellingItems({int? limit = 10}) =>
+  _i5.Future<List<_i6.CartItem>> getTopSellingItems({int? limit = 10}) =>
       (super.noSuchMethod(
         Invocation.method(
           #getTopSellingItems,
           [],
           {#limit: limit},
         ),
-        returnValue: _i4.Future<List<_i5.CartItem>>.value(<_i5.CartItem>[]),
-      ) as _i4.Future<List<_i5.CartItem>>);
+        returnValue: _i5.Future<List<_i6.CartItem>>.value(<_i6.CartItem>[]),
+      ) as _i5.Future<List<_i6.CartItem>>);
 
   @override
-  _i4.Future<void> updateStockLevels(List<_i5.CartItem>? items) =>
+  _i5.Future<void> updateStockLevels(List<_i6.CartItem>? items) =>
       (super.noSuchMethod(
         Invocation.method(
           #updateStockLevels,
           [items],
         ),
-        returnValue: _i4.Future<void>.value(),
-        returnValueForMissingStub: _i4.Future<void>.value(),
-      ) as _i4.Future<void>);
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
+
+  @override
+  _i5.Future<_i3.SplitSaleResponse> createSplitSale(
+          _i3.SplitSaleRequest? request) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #createSplitSale,
+          [request],
+        ),
+        returnValue:
+            _i5.Future<_i3.SplitSaleResponse>.value(_FakeSplitSaleResponse_1(
+          this,
+          Invocation.method(
+            #createSplitSale,
+            [request],
+          ),
+        )),
+      ) as _i5.Future<_i3.SplitSaleResponse>);
+
+  @override
+  _i5.Future<_i3.SplitSale> addPaymentToSale(
+    int? saleId,
+    _i3.AddPaymentRequest? request,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #addPaymentToSale,
+          [
+            saleId,
+            request,
+          ],
+        ),
+        returnValue: _i5.Future<_i3.SplitSale>.value(_FakeSplitSale_2(
+          this,
+          Invocation.method(
+            #addPaymentToSale,
+            [
+              saleId,
+              request,
+            ],
+          ),
+        )),
+      ) as _i5.Future<_i3.SplitSale>);
+
+  @override
+  _i5.Future<_i3.SplitSale> refundSplitPayment(
+    int? saleId,
+    _i3.RefundRequest? request,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #refundSplitPayment,
+          [
+            saleId,
+            request,
+          ],
+        ),
+        returnValue: _i5.Future<_i3.SplitSale>.value(_FakeSplitSale_2(
+          this,
+          Invocation.method(
+            #refundSplitPayment,
+            [
+              saleId,
+              request,
+            ],
+          ),
+        )),
+      ) as _i5.Future<_i3.SplitSale>);
+
+  @override
+  _i5.Future<_i3.SplitBillingStats> getSplitBillingStats() =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getSplitBillingStats,
+          [],
+        ),
+        returnValue:
+            _i5.Future<_i3.SplitBillingStats>.value(_FakeSplitBillingStats_3(
+          this,
+          Invocation.method(
+            #getSplitBillingStats,
+            [],
+          ),
+        )),
+      ) as _i5.Future<_i3.SplitBillingStats>);
 }

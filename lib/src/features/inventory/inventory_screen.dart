@@ -227,10 +227,10 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
                 final category = categories[index];
                 return ListTile(
                   leading: const Icon(Icons.category),
-                  title: Text(category),
+                  title: Text(category.name),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
-                    ref.read(inventoryProvider.notifier).filterByCategory(category);
+                    ref.read(inventoryProvider.notifier).filterByCategory(category.name);
                     _tabController.animateTo(0); // Switch to All Items tab
                   },
                 );
