@@ -5,6 +5,7 @@ import 'auth_provider.dart';
 import 'auth_validators.dart';
 import '../../shared/widgets/message_dialog.dart';
 import '../../core/config/env_config.dart';
+import '../../core/theme/app_theme.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -228,6 +229,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   enabled: authState.status != AuthStatus.loading,
                   child: ElevatedButton(
                     onPressed: authState.status == AuthStatus.loading ? null : _handleLogin,
+                    style: AppTheme.neutralButtonStyle,
                     child: authState.status == AuthStatus.loading
                         ? Semantics(
                             label: 'Loading indicator',

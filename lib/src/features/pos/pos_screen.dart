@@ -10,6 +10,7 @@ import 'package:white_label_pos_mobile/src/features/pos/split_payment_dialog.dar
 import 'package:white_label_pos_mobile/src/features/auth/auth_provider.dart';
 import 'package:white_label_pos_mobile/src/features/auth/models/user.dart';
 import 'package:white_label_pos_mobile/src/core/config/env_config.dart';
+import '../../core/theme/app_theme.dart';
 
 class PosScreen extends ConsumerStatefulWidget {
   const PosScreen({super.key});
@@ -974,14 +975,7 @@ class _CartSection extends StatelessWidget {
                     height: 50,
                     child: ElevatedButton(
                       onPressed: onCheckout,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: theme.colorScheme.primary,
-                        foregroundColor: theme.colorScheme.onPrimary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 2,
-                      ),
+                      style: AppTheme.neutralButtonStyle,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -1522,17 +1516,11 @@ class _CheckoutDialogState extends State<_CheckoutDialog> {
           onPressed: _isLoading ? null : _showSplitPaymentDialog,
           icon: const Icon(Icons.account_balance_wallet),
           label: const Text('Split Payment'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: theme.colorScheme.secondary,
-            foregroundColor: theme.colorScheme.onSecondary,
-          ),
+          style: AppTheme.neutralButtonStyle,
         ),
         ElevatedButton(
           onPressed: _isLoading ? null : _completeSale,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: theme.colorScheme.primary,
-            foregroundColor: theme.colorScheme.onPrimary,
-          ),
+          style: AppTheme.neutralButtonStyle,
           child: _isLoading 
             ? const SizedBox(
                 width: 16,

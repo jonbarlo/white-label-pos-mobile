@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'reports_provider.dart';
 import 'models/sales_report.dart';
 import 'models/revenue_report.dart';
+import '../../core/theme/app_theme.dart';
 
 class ReportsScreen extends ConsumerStatefulWidget {
   const ReportsScreen({super.key});
@@ -502,6 +503,7 @@ class _OverviewTab extends ConsumerWidget {
               onPressed: () {
                 ref.invalidate(salesReportProvider(startDate: startDate, endDate: endDate));
               },
+              style: AppTheme.neutralButtonStyle,
               child: const Text('Retry'),
             ),
           ],
@@ -908,6 +910,7 @@ class _TransactionsTab extends ConsumerWidget {
                   paymentMethod: paymentMethod,
                 ));
               },
+              style: AppTheme.neutralButtonStyle,
               child: const Text('Retry'),
             ),
           ],
@@ -1479,6 +1482,7 @@ class _RevenueTab extends ConsumerWidget {
               onPressed: () {
                 ref.invalidate(revenueReportProvider(startDate: startDate, endDate: endDate));
               },
+              style: AppTheme.neutralButtonStyle,
               child: const Text('Retry'),
             ),
           ],

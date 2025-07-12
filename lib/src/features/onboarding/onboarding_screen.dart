@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/theme/app_theme.dart';
 
 class OnboardingScreen extends StatefulWidget {
   final VoidCallback? onOnboardingComplete;
@@ -205,6 +206,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             button: true,
                             child: ElevatedButton(
                               onPressed: _nextPage,
+                              style: AppTheme.neutralButtonStyle,
                               child: Text(
                                 _currentPage == _pages.length - 1 ? 'Get Started' : 'Next',
                                 style: theme.textTheme.labelLarge?.copyWith(

@@ -170,27 +170,27 @@ Future<Sale> createSale(
   print('🛒 PROVIDER: Repository obtained, calling createSale...');
   
   try {
-    final sale = await repository.createSale(
-      items: cart,
-      paymentMethod: paymentMethod,
-      customerName: customerName,
-      customerEmail: customerEmail,
-    );
+  final sale = await repository.createSale(
+    items: cart,
+    paymentMethod: paymentMethod,
+    customerName: customerName,
+    customerEmail: customerEmail,
+  );
     
     print('🛒 PROVIDER: Sale created successfully!');
     print('🛒 PROVIDER: Sale ID: ${sale.id}');
     print('🛒 PROVIDER: Sale total: ${sale.total}');
 
-    // Clear cart after successful sale
+  // Clear cart after successful sale
     print('🛒 PROVIDER: Clearing cart...');
-    ref.read(cartNotifierProvider.notifier).clearCart();
-    
-    // Add to recent sales
+  ref.read(cartNotifierProvider.notifier).clearCart();
+  
+  // Add to recent sales
     print('🛒 PROVIDER: Adding to recent sales...');
-    ref.read(recentSalesNotifierProvider.notifier).addSale(sale);
+  ref.read(recentSalesNotifierProvider.notifier).addSale(sale);
 
     print('🛒 PROVIDER: Returning sale object');
-    return sale;
+  return sale;
   } catch (e) {
     print('🛒 PROVIDER: EXCEPTION in createSale: $e');
     print('🛒 PROVIDER: Exception type: ${e.runtimeType}');

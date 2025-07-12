@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:white_label_pos_mobile/src/features/inventory/inventory_provider.dart';
 import 'package:white_label_pos_mobile/src/features/inventory/models/inventory_item.dart';
+import '../../core/theme/app_theme.dart';
 
 class InventoryScreen extends ConsumerStatefulWidget {
   const InventoryScreen({super.key});
@@ -540,7 +541,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
               ref.read(inventoryProvider.notifier).deleteInventoryItem(item.id);
               Navigator.of(context).pop();
             },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            style: AppTheme.neutralButtonStyle,
             child: const Text('Delete'),
           ),
         ],

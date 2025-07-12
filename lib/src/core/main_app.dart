@@ -211,12 +211,33 @@ class _MainAppState extends ConsumerState<MainApp> {
     }
 
     // Route viewer users to BarScreen or KitchenScreen based on assignment
-    if (authState.user?.role.toString() == 'UserRole.viewer') {
+    if (authState.user?.role == 'viewer' || authState.user?.role.toString() == 'UserRole.viewer') {
       final assignment = authState.user?.assignment;
-      if (assignment == 'bar') {
-        return const BarScreen();
-      } else if (assignment == 'kitchen') {
-        return const KitchenScreen();
+      if (assignment == null || assignment.isEmpty) {
+        return Scaffold(
+          body: Center(
+            child: Text(
+              'Viewer user is missing assignment (kitchen/bar). Please check user setup.',
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            ),
+          ),
+        );
+      }
+      switch (assignment) {
+        case 'bar':
+          return const BarScreen();
+        case 'kitchen':
+          return const KitchenScreen();
+        default:
+          return Scaffold(
+            body: Center(
+              child: Text(
+                'Unknown viewer assignment: '
+                ' [31m$assignment [0m',
+                style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+              ),
+            ),
+          );
       }
     }
 

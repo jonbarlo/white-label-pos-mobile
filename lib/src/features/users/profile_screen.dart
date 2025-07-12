@@ -6,6 +6,7 @@ import 'package:white_label_pos_mobile/src/features/auth/models/user.dart';
 import 'package:white_label_pos_mobile/src/shared/widgets/loading_widget.dart';
 import 'package:white_label_pos_mobile/src/shared/widgets/error_widget.dart';
 import 'package:white_label_pos_mobile/src/core/config/env_config.dart';
+import '../../core/theme/app_theme.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
