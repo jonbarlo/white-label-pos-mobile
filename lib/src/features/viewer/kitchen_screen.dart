@@ -92,9 +92,9 @@ class KitchenScreen extends ConsumerWidget {
                   itemCount: orders.length,
                   itemBuilder: (context, index) {
                     final order = orders[index];
-                    return _KitchenOrderCard(
+                    return KitchenOrderCard(
                       order: order,
-                      onStatusChanged: () {
+                      onStatusChanged: (updatedOrder) {
                         // Refresh the orders after status change
                         ref.invalidate(kitchenOrdersProvider);
                       },
@@ -150,24 +150,55 @@ class KitchenScreen extends ConsumerWidget {
   }
 }
 
-class _KitchenOrderCard extends StatelessWidget {
+class KitchenOrderCard extends StatefulWidget {
   final KitchenOrder order;
-  final VoidCallback onStatusChanged;
+  final void Function(KitchenOrder) onStatusChanged;
 
-  const _KitchenOrderCard({
+  const KitchenOrderCard({
     required this.order,
     required this.onStatusChanged,
-  });
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<KitchenOrderCard> createState() => _KitchenOrderCardState();
+}
+
+class _KitchenOrderCardState extends State<KitchenOrderCard> {
+  late List<KitchenOrderItem> _items;
+
+  @override
+  void initState() {
+    super.initState();
+    _items = List<KitchenOrderItem>.from(widget.order.items);
+  }
+
+  void _toggleItemStatus(int index) {
+    setState(() {
+      final item = _items[index];
+      final isCompleted = item.status == 'completed';
+      _items[index] = item.copyWith(status: isCompleted ? 'pending' : 'completed');
+    });
+    // Call onStatusChanged with updated order
+    final completedItems = _items.where((item) => item.status == 'completed').length;
+    widget.onStatusChanged(widget.order.copyWith(
+      items: _items,
+      completedItems: completedItems,
+    ));
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final dishNames = order.items.map((item) => '${item.quantity}x ${item.itemName}').join(', ');
-    final orderNotes = order.notes ?? '';
-    final orderInstructions = order.specialInstructions ?? '';
-    final allergies = order.allergies?.join(', ');
-    final dietary = order.dietaryRestrictions?.join(', ');
+    final dishNames = _items.map((item) => '${item.quantity}x ${item.itemName}').join(', ');
+    final orderNotes = widget.order.notes ?? '';
+    final orderInstructions = widget.order.specialInstructions ?? '';
+    final allergies = widget.order.allergies?.join(', ');
+    final dietary = widget.order.dietaryRestrictions?.join(', ');
     bool showMore = orderNotes.length > 40 || orderInstructions.length > 40;
+    final totalItems = _items.length;
+    final completedItems = _items.where((item) => item.status == 'completed').length;
+    final progress = totalItems > 0 ? completedItems / totalItems : 0.0;
 
     return Card(
       margin: EdgeInsets.zero,
@@ -178,7 +209,7 @@ class _KitchenOrderCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Dish names (very prominent)
-            if (order.items.isNotEmpty) ...[
+            if (_items.isNotEmpty) ...[
               Text(
                 dishNames,
                 style: theme.textTheme.headlineMedium?.copyWith(
@@ -193,7 +224,7 @@ class _KitchenOrderCard extends StatelessWidget {
             ],
             // Order number
             Text(
-              order.orderNumber,
+              widget.order.orderNumber,
               style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -203,20 +234,28 @@ class _KitchenOrderCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _StatusChip(status: order.status ?? ''),
-                _PriorityBadge(priority: order.priority ?? 'normal'),
+                _StatusChip(status: widget.order.status ?? ''),
+                _PriorityBadge(priority: widget.order.priority ?? 'normal'),
               ],
             ),
             const SizedBox(height: 6),
             // Items summary
-            if (order.items.isNotEmpty) ...[
+            if (_items.isNotEmpty) ...[
               Text('Items:', style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
-              Text(
-                order.items.map((item) => '${item.quantity}x ${item.itemName}').join(', '),
-                style: theme.textTheme.bodyMedium,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
+              // List items vertically with switches
+              ..._items.asMap().entries.map((entry) {
+                final idx = entry.key;
+                final item = entry.value;
+                return Row(
+                  children: [
+                    Expanded(child: Text('${item.quantity}x ${item.itemName}')),
+                    Switch(
+                      value: item.status == 'completed',
+                      onChanged: (_) => _toggleItemStatus(idx),
+                    ),
+                  ],
+                );
+              }).toList(),
             ],
             // Allergies and dietary restrictions (icons only if present)
             if (allergies != null && allergies.isNotEmpty)
@@ -271,12 +310,42 @@ class _KitchenOrderCard extends StatelessWidget {
               ),
             const Spacer(),
             // Progress section (compact)
-            _ProgressSection(order: order),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Progress',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      '$completedItems/$totalItems items',
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                LinearProgressIndicator(
+                  value: progress,
+                  backgroundColor: theme.colorScheme.surfaceVariant ?? Colors.grey[300],
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    theme.colorScheme.primary,
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 6),
             // Action buttons
             _ActionButtonsSection(
-              order: order,
-              onStatusChanged: onStatusChanged,
+              order: widget.order,
+              onStatusChanged: widget.onStatusChanged,
             ),
           ],
         ),
@@ -288,19 +357,19 @@ class _KitchenOrderCard extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Order ${order.orderNumber}'),
+        title: Text('Order ${widget.order.orderNumber}'),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Status: ${order.status}'),
-              Text('Priority: ${order.priority ?? 'normal'}'),
-              Text('Type: ${order.orderType ?? 'dine_in'}'),
-              if (order.specialInstructions != null && order.specialInstructions!.isNotEmpty)
-                Text('Special Instructions: ${order.specialInstructions}'),
-              if (order.notes != null && order.notes!.isNotEmpty)
-                Text('Notes: ${order.notes}'),
+              Text('Status: ${widget.order.status}'),
+              Text('Priority: ${widget.order.priority ?? 'normal'}'),
+              Text('Type: ${widget.order.orderType ?? 'dine_in'}'),
+              if (widget.order.specialInstructions != null && widget.order.specialInstructions!.isNotEmpty)
+                Text('Special Instructions: ${widget.order.specialInstructions}'),
+              if (widget.order.notes != null && widget.order.notes!.isNotEmpty)
+                Text('Notes: ${widget.order.notes}'),
             ],
           ),
         ),
@@ -682,7 +751,7 @@ class _ProgressSection extends StatelessWidget {
 
 class _ActionButtonsSection extends StatelessWidget {
   final KitchenOrder order;
-  final VoidCallback onStatusChanged;
+  final void Function(KitchenOrder) onStatusChanged;
 
   const _ActionButtonsSection({
     required this.order,
@@ -764,7 +833,7 @@ class _ActionButtonsSection extends StatelessWidget {
             behavior: SnackBarBehavior.floating,
           ),
         );
-        onStatusChanged();
+        onStatusChanged(order);
       },
       loading: () {
         ScaffoldMessenger.of(context).showSnackBar(
