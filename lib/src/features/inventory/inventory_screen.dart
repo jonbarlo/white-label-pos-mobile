@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:white_label_pos_mobile/src/features/inventory/inventory_provider.dart';
 import 'package:white_label_pos_mobile/src/features/inventory/models/inventory_item.dart';
 import '../../core/theme/app_theme.dart';
+import '../../shared/widgets/theme_toggle_button.dart';
 
 class InventoryScreen extends ConsumerStatefulWidget {
   const InventoryScreen({super.key});
@@ -60,6 +61,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
               _showFilterDialog();
             },
           ),
+          const ThemeToggleButton(),
         ],
       ),
       body: TabBarView(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'src/core/main_app.dart';
-import 'src/core/theme/app_theme.dart';
+import 'src/core/theme/theme_provider.dart';
 import 'src/core/config/env_config.dart';
 import 'src/core/di/dependency_injection.dart';
 import 'src/core/network/dio_client.dart';
@@ -44,14 +44,16 @@ void main() async {
   );
 }
 
-class WhiteLabelPOSApp extends StatelessWidget {
+class WhiteLabelPOSApp extends ConsumerWidget {
   const WhiteLabelPOSApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeData = ref.watch(themeDataProvider);
+    
     return MaterialApp(
       title: EnvConfig.appName,
-      theme: AppTheme.lightTheme,
+      theme: themeData,
       home: const MainApp(),
       debugShowCheckedModeBanner: EnvConfig.isDebugMode,
     );

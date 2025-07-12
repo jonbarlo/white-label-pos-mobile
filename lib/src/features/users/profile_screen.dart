@@ -7,6 +7,7 @@ import 'package:white_label_pos_mobile/src/shared/widgets/loading_widget.dart';
 import 'package:white_label_pos_mobile/src/shared/widgets/error_widget.dart';
 import 'package:white_label_pos_mobile/src/core/config/env_config.dart';
 import '../../core/theme/app_theme.dart';
+import '../../shared/widgets/theme_toggle_button.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -122,6 +123,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         title: const Text('Profile'),
         centerTitle: true,
         actions: [
+          const ThemeToggleButton(),
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Logout',

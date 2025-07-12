@@ -3,17 +3,14 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i6;
+import 'dart:async' as _i4;
 
 import 'package:dio/dio.dart' as _i2;
-import 'package:flutter_riverpod/flutter_riverpod.dart' as _i3;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:white_label_pos_mobile/src/features/auth/auth_provider.dart'
-    as _i4;
 import 'package:white_label_pos_mobile/src/features/viewer/kitchen_order.dart'
-    as _i7;
-import 'package:white_label_pos_mobile/src/features/viewer/kitchen_order_repository.dart'
     as _i5;
+import 'package:white_label_pos_mobile/src/features/viewer/kitchen_order_repository.dart'
+    as _i3;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -39,32 +36,11 @@ class _FakeDio_0 extends _i1.SmartFake implements _i2.Dio {
         );
 }
 
-class _FakeAutoDisposeNotifierProviderRef_1<T> extends _i1.SmartFake
-    implements _i3.AutoDisposeNotifierProviderRef<T> {
-  _FakeAutoDisposeNotifierProviderRef_1(
-    Object parent,
-    Invocation parentInvocation,
-  ) : super(
-          parent,
-          parentInvocation,
-        );
-}
-
-class _FakeAuthState_2 extends _i1.SmartFake implements _i4.AuthState {
-  _FakeAuthState_2(
-    Object parent,
-    Invocation parentInvocation,
-  ) : super(
-          parent,
-          parentInvocation,
-        );
-}
-
 /// A class which mocks [KitchenOrderRepository].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockKitchenOrderRepository extends _i1.Mock
-    implements _i5.KitchenOrderRepository {
+    implements _i3.KitchenOrderRepository {
   MockKitchenOrderRepository() {
     _i1.throwOnMissingStub(this);
   }
@@ -79,7 +55,7 @@ class MockKitchenOrderRepository extends _i1.Mock
       ) as _i2.Dio);
 
   @override
-  _i6.Future<List<_i7.KitchenOrder>> fetchKitchenOrders({
+  _i4.Future<List<_i5.KitchenOrder>> fetchKitchenOrders({
     required int? businessId,
     String? status,
   }) =>
@@ -93,11 +69,11 @@ class MockKitchenOrderRepository extends _i1.Mock
           },
         ),
         returnValue:
-            _i6.Future<List<_i7.KitchenOrder>>.value(<_i7.KitchenOrder>[]),
-      ) as _i6.Future<List<_i7.KitchenOrder>>);
+            _i4.Future<List<_i5.KitchenOrder>>.value(<_i5.KitchenOrder>[]),
+      ) as _i4.Future<List<_i5.KitchenOrder>>);
 
   @override
-  _i6.Future<void> updateOrderStatus(
+  _i4.Future<void> updateOrderStatus(
     int? orderId,
     String? status,
   ) =>
@@ -109,144 +85,7 @@ class MockKitchenOrderRepository extends _i1.Mock
             status,
           ],
         ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
-}
-
-/// A class which mocks [AuthNotifier].
-///
-/// See the documentation for Mockito's code generation for more information.
-class MockAuthNotifier extends _i1.Mock implements _i4.AuthNotifier {
-  MockAuthNotifier() {
-    _i1.throwOnMissingStub(this);
-  }
-
-  @override
-  _i3.AutoDisposeNotifierProviderRef<_i4.AuthState> get ref =>
-      (super.noSuchMethod(
-        Invocation.getter(#ref),
-        returnValue: _FakeAutoDisposeNotifierProviderRef_1<_i4.AuthState>(
-          this,
-          Invocation.getter(#ref),
-        ),
-      ) as _i3.AutoDisposeNotifierProviderRef<_i4.AuthState>);
-
-  @override
-  _i4.AuthState get state => (super.noSuchMethod(
-        Invocation.getter(#state),
-        returnValue: _FakeAuthState_2(
-          this,
-          Invocation.getter(#state),
-        ),
-      ) as _i4.AuthState);
-
-  @override
-  set state(_i4.AuthState? value) => super.noSuchMethod(
-        Invocation.setter(
-          #state,
-          value,
-        ),
-        returnValueForMissingStub: null,
-      );
-
-  @override
-  _i4.AuthState build() => (super.noSuchMethod(
-        Invocation.method(
-          #build,
-          [],
-        ),
-        returnValue: _FakeAuthState_2(
-          this,
-          Invocation.method(
-            #build,
-            [],
-          ),
-        ),
-      ) as _i4.AuthState);
-
-  @override
-  _i6.Future<void> login({
-    required String? email,
-    required String? password,
-    required String? businessSlug,
-  }) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #login,
-          [],
-          {
-            #email: email,
-            #password: password,
-            #businessSlug: businessSlug,
-          },
-        ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
-
-  @override
-  _i6.Future<void> logout() => (super.noSuchMethod(
-        Invocation.method(
-          #logout,
-          [],
-        ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
-
-  @override
-  _i6.Future<void> checkAuthStatus() => (super.noSuchMethod(
-        Invocation.method(
-          #checkAuthStatus,
-          [],
-        ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
-
-  @override
-  void clearError() => super.noSuchMethod(
-        Invocation.method(
-          #clearError,
-          [],
-        ),
-        returnValueForMissingStub: null,
-      );
-
-  @override
-  void listenSelf(
-    void Function(
-      _i4.AuthState?,
-      _i4.AuthState,
-    )? listener, {
-    void Function(
-      Object,
-      StackTrace,
-    )? onError,
-  }) =>
-      super.noSuchMethod(
-        Invocation.method(
-          #listenSelf,
-          [listener],
-          {#onError: onError},
-        ),
-        returnValueForMissingStub: null,
-      );
-
-  @override
-  bool updateShouldNotify(
-    _i4.AuthState? previous,
-    _i4.AuthState? next,
-  ) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #updateShouldNotify,
-          [
-            previous,
-            next,
-          ],
-        ),
-        returnValue: false,
-      ) as bool);
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
 }

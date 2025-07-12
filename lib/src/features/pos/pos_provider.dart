@@ -7,6 +7,7 @@ import 'models/sale.dart';
 import 'models/menu_item.dart';
 import 'models/split_payment.dart';
 import '../../core/network/dio_client.dart';
+import '../auth/auth_provider.dart';
 
 part 'pos_provider.g.dart';
 
@@ -306,4 +307,56 @@ Future<SplitSale> refundSplitPayment(
 Future<SplitBillingStats> getSplitBillingStats(GetSplitBillingStatsRef ref) async {
   final repository = await ref.read(posRepositoryProvider.future);
   return await repository.getSplitBillingStats();
+} 
+
+// Menu items provider to fetch real inventory
+@riverpod
+Future<List<MenuItem>> menuItems(MenuItemsRef ref) async {
+  print('🍽️ MENU: Fetching menu items from backend...');
+  
+  try {
+    final repository = await ref.read(posRepositoryProvider.future);
+    
+    // Fetch all available menu items
+    final response = await repository.searchItems(''); // Empty query to get all items
+    
+    print('🍽️ MENU: Found ${response.length} items from backend');
+    for (int i = 0; i < response.length; i++) {
+      final item = response[i];
+      print('🍽️ MENU: Item $i: ${item.id} - ${item.name} - \$${item.price}');
+    }
+    
+    // Get business ID from auth state
+    final authState = ref.read(authNotifierProvider);
+    final businessId = authState.business?.id ?? 1;
+    
+    print('🍽️ MENU: Using businessId from auth state: $businessId');
+    
+    // Convert CartItem results to MenuItem for display
+    final menuItems = response.map((item) => MenuItem(
+      id: int.parse(item.id),
+      businessId: businessId,
+      categoryId: int.tryParse(item.category ?? '1') ?? 1,
+      name: item.name,
+      description: '', // CartItem doesn't have description, use empty string
+      price: item.price,
+      cost: 0.0,
+      image: item.imageUrl,
+      allergens: null,
+      nutritionalInfo: null,
+      preparationTime: 0,
+      isAvailable: true,
+      isActive: true,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    )).toList();
+    
+    print('🍽️ MENU: Converted to ${menuItems.length} MenuItem objects');
+    return menuItems;
+  } catch (e) {
+    print('🍽️ MENU: ERROR fetching menu items: $e');
+    print('🍽️ MENU: Returning empty list - NO MOCK ITEMS');
+    // Return empty list on error - NO FALLBACK ITEMS
+    return [];
+  }
 } 

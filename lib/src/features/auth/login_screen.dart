@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'auth_provider.dart';
 import 'auth_validators.dart';
 import '../../shared/widgets/message_dialog.dart';
+import '../../shared/widgets/theme_toggle_button.dart';
 import '../../core/config/env_config.dart';
 import '../../core/theme/app_theme.dart';
 
@@ -111,6 +112,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       appBar: AppBar(
         title: const Text('Login'),
         centerTitle: true,
+        actions: const [
+          ThemeToggleButton(),
+        ],
       ),
       body: Semantics(
         label: 'Login form',

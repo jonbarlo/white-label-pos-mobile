@@ -1084,6 +1084,22 @@ final getSplitBillingStatsProvider =
 // ignore: unused_element
 typedef GetSplitBillingStatsRef
     = AutoDisposeFutureProviderRef<SplitBillingStats>;
+String _$menuItemsHash() => r'51973b459dbc742bd5528471e56f743db0239b35';
+
+/// See also [menuItems].
+@ProviderFor(menuItems)
+final menuItemsProvider = AutoDisposeFutureProvider<List<MenuItem>>.internal(
+  menuItems,
+  name: r'menuItemsProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$menuItemsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef MenuItemsRef = AutoDisposeFutureProviderRef<List<MenuItem>>;
 String _$cartNotifierHash() => r'3c7b3606d59f8a0be1ed390808870100bf6e87c1';
 
 /// See also [CartNotifier].

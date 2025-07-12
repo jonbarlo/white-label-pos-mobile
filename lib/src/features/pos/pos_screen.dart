@@ -11,6 +11,7 @@ import 'package:white_label_pos_mobile/src/features/auth/auth_provider.dart';
 import 'package:white_label_pos_mobile/src/features/auth/models/user.dart';
 import 'package:white_label_pos_mobile/src/core/config/env_config.dart';
 import '../../core/theme/app_theme.dart';
+import '../../shared/widgets/theme_toggle_button.dart';
 
 class PosScreen extends ConsumerStatefulWidget {
   const PosScreen({super.key});
@@ -36,60 +37,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
     {'id': 'drinks', 'name': 'Drinks', 'icon': Icons.local_drink},
   ];
 
-  // Mock popular items for better UX
-  final List<MenuItem> _popularItems = [
-    MenuItem(
-      id: 1,
-      businessId: 1,
-      categoryId: 1,
-      name: 'Classic Burger',
-      description: 'Juicy beef burger with fresh vegetables',
-      price: 12.99,
-      cost: 6.50,
-      image: null,
-      allergens: null,
-      nutritionalInfo: null,
-      preparationTime: 10,
-      isAvailable: true,
-      isActive: true,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ),
-    MenuItem(
-      id: 2,
-      businessId: 1,
-      categoryId: 1,
-      name: 'Chicken Wings',
-      description: 'Crispy wings with your choice of sauce',
-      price: 9.99,
-      cost: 5.00,
-      image: null,
-      allergens: null,
-      nutritionalInfo: null,
-      preparationTime: 8,
-      isAvailable: true,
-      isActive: true,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ),
-    MenuItem(
-      id: 3,
-      businessId: 1,
-      categoryId: 2,
-      name: 'Caesar Salad',
-      description: 'Fresh romaine lettuce with caesar dressing',
-      price: 8.99,
-      cost: 4.50,
-      image: null,
-      allergens: null,
-      nutritionalInfo: null,
-      preparationTime: 5,
-      isAvailable: true,
-      isActive: true,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ),
-  ];
+  // No hardcoded items - only real data from backend
 
   @override
   void initState() {
@@ -327,6 +275,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
     final cartTotal = ref.watch(cartTotalProvider);
     final searchResults = ref.watch(searchNotifierProvider);
     final recentSales = ref.watch(recentSalesNotifierProvider);
+    final menuItemsAsync = ref.watch(menuItemsProvider);
     final authState = ref.watch(authNotifierProvider);
     final userRole = authState.user?.role;
     final canSeeReportsTab = userRole == UserRole.admin || userRole == UserRole.manager;
@@ -337,6 +286,9 @@ class _PosScreenState extends ConsumerState<PosScreen>
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
         elevation: 2,
+        actions: const [
+          ThemeToggleButton(),
+        ],
         bottom: TabBar(
           controller: _tabController,
           tabs: [
@@ -356,29 +308,36 @@ class _PosScreenState extends ConsumerState<PosScreen>
       body: TabBarView(
         controller: _tabController,
         children: [
-          LayoutBuilder(
-            builder: (context, constraints) {
-              // Responsive: if width < 700, stack vertically
-              final isWide = constraints.maxWidth >= 700;
-              return isWide
-                  ? Row(
-                      children: [
-                        Expanded(
-                          flex: 3,
-                          child: _SalesTab(
-                            cart: cart,
-                            cartTotal: cartTotal,
-                            searchResults: searchResults,
-                            searchController: _searchController,
-                            onSearchChanged: _onSearchChanged,
-                            onAddToCart: _addToCart,
-                            onRemoveFromCart: _removeFromCart,
-                            onUpdateQuantity: _updateQuantity,
-                            onCheckout: _showCheckoutDialog,
-                            categories: _categories,
-                            selectedCategory: _selectedCategory,
-                            onCategorySelected: _onCategorySelected,
-                            popularItems: _popularItems,
+          menuItemsAsync.when(
+            data: (menuItems) {
+              print('🍽️ UI: Received ${menuItems.length} menu items from provider');
+              for (int i = 0; i < menuItems.length; i++) {
+                final item = menuItems[i];
+                print('🍽️ UI: Item $i: ${item.id} - ${item.name} - \$${item.price}');
+              }
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  // Responsive: if width < 700, stack vertically
+                  final isWide = constraints.maxWidth >= 700;
+                  return isWide
+                      ? Row(
+                          children: [
+                            Expanded(
+                              flex: 3,
+                              child: _SalesTab(
+                                cart: cart,
+                                cartTotal: cartTotal,
+                                searchResults: searchResults,
+                                searchController: _searchController,
+                                onSearchChanged: _onSearchChanged,
+                                onAddToCart: _addToCart,
+                                onRemoveFromCart: _removeFromCart,
+                                onUpdateQuantity: _updateQuantity,
+                                onCheckout: _showCheckoutDialog,
+                                categories: _categories,
+                                selectedCategory: _selectedCategory,
+                                onCategorySelected: _onCategorySelected,
+                                                            popularItems: menuItems,
                             isSearching: _isSearching,
                           ),
                         ),
@@ -411,24 +370,66 @@ class _PosScreenState extends ConsumerState<PosScreen>
                             categories: _categories,
                             selectedCategory: _selectedCategory,
                             onCategorySelected: _onCategorySelected,
-                            popularItems: _popularItems,
-                            isSearching: _isSearching,
-                          ),
-                        ),
-                        Divider(height: 1),
-                        SizedBox(
-                          height: 320,
-                          child: _CartSection(
-                            cart: cart,
-                            cartTotal: cartTotal,
-                            onRemoveFromCart: _removeFromCart,
-                            onUpdateQuantity: _updateQuantity,
-                            onCheckout: _showCheckoutDialog,
-                          ),
-                        ),
-                      ],
-                    );
+                            popularItems: menuItems,
+                                isSearching: _isSearching,
+                              ),
+                            ),
+                            Divider(height: 1),
+                            SizedBox(
+                              height: 320,
+                              child: _CartSection(
+                                cart: cart,
+                                cartTotal: cartTotal,
+                                onRemoveFromCart: _removeFromCart,
+                                onUpdateQuantity: _updateQuantity,
+                                onCheckout: _showCheckoutDialog,
+                              ),
+                            ),
+                          ],
+                        );
+                },
+              );
             },
+            loading: () => const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Loading menu items...'),
+                ],
+              ),
+            ),
+            error: (error, stack) => Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.error_outline,
+                    size: 64,
+                    color: Colors.red,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Error loading menu items',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    error.toString(),
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      ref.invalidate(menuItemsProvider);
+                    },
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            ),
           ),
           if (canSeeReportsTab) _RecentSalesTab(sales: recentSales),
         ],
@@ -1302,6 +1303,11 @@ class _CheckoutDialogState extends State<_CheckoutDialog> {
     print('🛒 UI: Selected customer name: $_selectedCustomerName');
     print('🛒 UI: Selected customer email: $_selectedCustomerEmail');
     print('🛒 UI: Selected payment method: ${_selectedMethod?.name}');
+    print('🛒 UI: Cart items count: ${widget.cart.length}');
+    for (int i = 0; i < widget.cart.length; i++) {
+      final item = widget.cart[i];
+      print('🛒 UI: Cart item $i: ${item.quantity}x ${item.name} - \$${item.total}');
+    }
     
     if (_selectedCustomerName == null || _selectedCustomerName!.isEmpty) {
       print('🛒 UI: ERROR - No customer selected');
@@ -1441,12 +1447,17 @@ class _CheckoutDialogState extends State<_CheckoutDialog> {
             // Customer Selection Button
             OutlinedButton.icon(
               onPressed: _selectCustomer,
-              icon: const Icon(Icons.person),
+              icon: Icon(_selectedCustomerName != null ? Icons.person : Icons.person_add, 
+                        color: _selectedCustomerName != null ? Colors.green : Colors.orange),
               label: Text(_selectedCustomerName != null 
                 ? 'Customer: $_selectedCustomerName' 
-                : 'Select Customer'),
+                : 'Select Customer (Required)'),
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 48),
+                side: BorderSide(
+                  color: _selectedCustomerName != null ? Colors.green : Colors.orange,
+                  width: 2,
+                ),
               ),
             ),
             if (_selectedCustomerName != null) ...[

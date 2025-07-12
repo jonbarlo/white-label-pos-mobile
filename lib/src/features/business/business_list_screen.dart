@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'business_provider.dart';
 import 'models/business.dart';
+import '../../shared/widgets/theme_toggle_button.dart';
 
 class BusinessListScreen extends ConsumerWidget {
   const BusinessListScreen({super.key});
@@ -15,6 +16,7 @@ class BusinessListScreen extends ConsumerWidget {
         title: const Text('Business Management'),
         centerTitle: true,
         actions: [
+          const ThemeToggleButton(),
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () {

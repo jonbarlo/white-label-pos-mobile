@@ -220,8 +220,8 @@ void main() {
                   requestOptions: RequestOptions(path: '/orders/1/items'),
                 ));
 
-        // Mock sale creation
-        when(mockDio.post('/sales', data: anyNamed('data')))
+        // Mock sale creation with items
+        when(mockDio.post('/api/sales/with-items', data: anyNamed('data')))
             .thenAnswer((_) async => Response(
                   data: {
                     'success': true,
@@ -231,7 +231,7 @@ void main() {
                     }
                   },
                   statusCode: 201,
-                  requestOptions: RequestOptions(path: '/sales'),
+                  requestOptions: RequestOptions(path: '/api/sales/with-items'),
                 ));
 
         // Mock auth state
@@ -258,9 +258,7 @@ void main() {
         expect(result.total, 21.98);
         expect(result.customerName, 'John Doe');
 
-        verify(mockDio.post('/orders', data: anyNamed('data'))).called(1);
-        verify(mockDio.post('/orders/1/items', data: anyNamed('data'))).called(1);
-        verify(mockDio.post('/sales', data: anyNamed('data'))).called(1);
+        verify(mockDio.post('/api/sales/with-items', data: anyNamed('data'))).called(1);
       });
 
       test('should create sale with orderType in response', () async {
@@ -304,8 +302,8 @@ void main() {
                   requestOptions: RequestOptions(path: '/orders/1/items'),
                 ));
 
-        // Mock sale creation
-        when(mockDio.post('/sales', data: anyNamed('data')))
+        // Mock sale creation with items
+        when(mockDio.post('/api/sales/with-items', data: anyNamed('data')))
             .thenAnswer((_) async => Response(
                   data: {
                     'success': true,
@@ -315,7 +313,7 @@ void main() {
                     }
                   },
                   statusCode: 201,
-                  requestOptions: RequestOptions(path: '/sales'),
+                  requestOptions: RequestOptions(path: '/api/sales/with-items'),
                 ));
 
         // Mock auth state

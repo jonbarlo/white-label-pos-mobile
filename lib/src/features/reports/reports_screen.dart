@@ -5,6 +5,7 @@ import 'reports_provider.dart';
 import 'models/sales_report.dart';
 import 'models/revenue_report.dart';
 import '../../core/theme/app_theme.dart';
+import '../../shared/widgets/theme_toggle_button.dart';
 
 class ReportsScreen extends ConsumerStatefulWidget {
   const ReportsScreen({super.key});
@@ -110,6 +111,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
             },
             tooltip: 'Export Report',
           ),
+          const ThemeToggleButton(),
         ],
         bottom: TabBar(
           controller: _tabController,

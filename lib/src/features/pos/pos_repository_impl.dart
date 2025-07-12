@@ -50,8 +50,20 @@ class PosRepositoryImpl implements PosRepository {
         print('🔍 POS SEARCH: Making request to /menu/items');
       }
 
+      // Get business ID from auth state
+      final authState = _ref.read(authNotifierProvider);
+      final businessId = authState.business?.id;
+      
+      if (businessId == null) {
+        print('🔍 POS SEARCH: ERROR - No businessId found in auth state');
+        throw Exception('No businessId found in auth state');
+      }
+
+      print('🔍 POS SEARCH: Using businessId: $businessId');
+
       final response = await _dio.get('/menu/items', queryParameters: {
-        'search': query,
+        'businessId': businessId,
+        if (query.isNotEmpty) 'search': query,
         'isAvailable': true,
         'isActive': true,
       });
@@ -64,9 +76,9 @@ class PosRepositoryImpl implements PosRepository {
       if (response.statusCode == 200 && response.data['success'] == true) {
         final List<dynamic> items = response.data['data'] ?? [];
         if (EnvConfig.isDebugMode) {
-          print('🔍 POS SEARCH: Found ${items.length} items');
+          print('🔍 POS SEARCH: Found  [32m${items.length} [0m items');
         }
-        return items.map((item) => _convertMenuItemToCartItem(MenuItem.fromJson(item))).toList();
+        return items.map((item) => _convertMenuItemToCartItem(_safeMenuItemFromJson(item))).toList();
       } else {
         if (EnvConfig.isDebugMode) {
           print('🔍 POS SEARCH: Response not successful or wrong format');
@@ -134,24 +146,40 @@ class PosRepositoryImpl implements PosRepository {
       final total = items.fold<double>(0.0, (sum, item) => sum + (item.price * (item.quantity ?? 1)));
       print('🛒 SALE CREATION: Calculated total: $total');
 
-      // Create sale with the fields the backend actually expects based on API documentation
-      // Using the regular sale endpoint: POST /sales
+      // Create sale with items using the /api/sales/with-items endpoint
+      // This will automatically create kitchen orders
+      final orderItems = items.map((item) => {
+        'itemId': int.tryParse(item.id) ?? 1,
+        'quantity': item.quantity ?? 1,
+        'unitPrice': item.price,
+      }).toList();
+
       final saleData = {
         'userId': authState.user?.id ?? businessId,
         'businessId': businessId,
-        'totalAmount': total,
+        'customerName': customerName ?? 'Guest',
+        'customerEmail': customerEmail ?? 'guest@pos.com',
+        'total': total,
         'paymentMethod': _mapPaymentMethodToApi(paymentMethod),
         'status': 'completed',
-        'notes': 'Customer: ${customerName ?? 'Guest'} (${customerEmail ?? 'guest@pos.com'})',
+        'orderItems': orderItems,
       };
 
       print('🛒 SALE CREATION: Final sale data to send:');
       saleData.forEach((key, value) {
-        print('🛒 SALE CREATION:   $key: $value');
+        if (key == 'orderItems') {
+          print('🛒 SALE CREATION:   $key: ${(value as List).length} items');
+          for (int i = 0; i < (value as List).length; i++) {
+            final item = value[i];
+            print('🛒 SALE CREATION:     Item $i: ID=${item['itemId']}, Qty=${item['quantity']}, Price=${item['unitPrice']}');
+          }
+        } else {
+          print('🛒 SALE CREATION:   $key: $value');
+        }
       });
 
-      print('🛒 SALE CREATION: Making POST request to /sales');
-      final saleResponse = await _dio.post('/sales', data: saleData);
+      print('🛒 SALE CREATION: Making POST request to /sales/with-items');
+      final saleResponse = await _dio.post('/sales/with-items', data: saleData);
       
       print('🛒 SALE CREATION: Response received!');
       print('🛒 SALE CREATION: Response status code: ${saleResponse.statusCode}');
@@ -171,7 +199,8 @@ class PosRepositoryImpl implements PosRepository {
         
         // Handle both success formats
         final hasSuccessField = responseData['success'] == true;
-        final hasSuccessMessage = responseData['message']?.toString().toLowerCase().contains('sale created successfully') == true;
+        final hasSuccessMessage = responseData['message']?.toString().toLowerCase().contains('sale') == true && 
+                                 responseData['message']?.toString().toLowerCase().contains('successfully') == true;
         
         print('🛒 SALE CREATION: Has success field: $hasSuccessField');
         print('🛒 SALE CREATION: Has success message: $hasSuccessMessage');
@@ -291,6 +320,26 @@ class PosRepositoryImpl implements PosRepository {
   }
 
   // Helper methods
+  MenuItem _safeMenuItemFromJson(Map<String, dynamic> json) {
+    return MenuItem(
+      id: json['id'] as int,
+      businessId: json['businessId'] as int,
+      categoryId: json['categoryId'] as int,
+      name: json['name'] as String,
+      description: json['description'] as String? ?? '',
+      price: (json['price'] as num).toDouble(),
+      cost: (json['cost'] as num).toDouble(),
+      image: json['imageUrl'] as String?,
+      allergens: null, // Not in API response
+      nutritionalInfo: null, // Not in API response
+      preparationTime: json['preparationTime'] as int? ?? 15,
+      isAvailable: json['isAvailable'] as bool? ?? true,
+      isActive: json['isActive'] as bool? ?? true,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
+    );
+  }
+
   CartItem _convertMenuItemToCartItem(MenuItem menuItem) {
     return CartItem(
       id: menuItem.id.toString(),

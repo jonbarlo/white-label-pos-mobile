@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'kitchen_order_provider.dart';
 import 'kitchen_order.dart';
 import '../../core/theme/app_theme.dart';
+import '../../shared/widgets/theme_toggle_button.dart';
 import 'package:collection/collection.dart';
 
 class KitchenScreen extends ConsumerWidget {
@@ -19,6 +20,16 @@ class KitchenScreen extends ConsumerWidget {
         elevation: 2,
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              ref.invalidate(kitchenOrdersProvider);
+            },
+            tooltip: 'Refresh Orders',
+          ),
+          const ThemeToggleButton(),
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -26,6 +37,13 @@ class KitchenScreen extends ConsumerWidget {
         },
         child: ordersAsync.when(
           data: (orders) {
+            // Debug logging
+            print('🍳 SCREEN: Received ${orders.length} orders to display');
+            for (int i = 0; i < orders.length; i++) {
+              final order = orders[i];
+              print('🍳 SCREEN: Order $i: ${order.orderNumber}, status: ${order.status}, items: ${order.items.length}');
+            }
+            
             if (orders.isEmpty) {
               return const Center(
                 child: Column(
