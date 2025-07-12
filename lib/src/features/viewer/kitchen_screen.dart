@@ -58,16 +58,29 @@ class KitchenScreen extends ConsumerWidget {
               );
             }
 
-            return ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: orders.length,
-              itemBuilder: (context, index) {
-                final order = orders[index];
-                return _KitchenOrderCard(
-                  order: order,
-                  onStatusChanged: () {
-                    // Refresh the orders after status change
-                    ref.invalidate(kitchenOrdersProvider);
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                // Calculate number of columns so each card is ~25% of width
+                int crossAxisCount = (constraints.maxWidth / 350).floor();
+                if (crossAxisCount < 1) crossAxisCount = 1;
+                return GridView.builder(
+                  padding: const EdgeInsets.all(16),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: 0.75,
+                  ),
+                  itemCount: orders.length,
+                  itemBuilder: (context, index) {
+                    final order = orders[index];
+                    return _KitchenOrderCard(
+                      order: order,
+                      onStatusChanged: () {
+                        // Refresh the orders after status change
+                        ref.invalidate(kitchenOrdersProvider);
+                      },
+                    );
                   },
                 );
               },
@@ -131,18 +144,18 @@ class _KitchenOrderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    // Dish names with quantity
     final dishNames = order.items.map((item) => '${item.quantity}x ${item.itemName}').join(', ');
     final orderNotes = order.notes ?? '';
     final orderInstructions = order.specialInstructions ?? '';
     final allergies = order.allergies?.join(', ');
     final dietary = order.dietaryRestrictions?.join(', ');
-    
+    bool showMore = orderNotes.length > 40 || orderInstructions.length > 40;
+
     return Card(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: EdgeInsets.zero,
       elevation: 4,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -153,141 +166,132 @@ class _KitchenOrderCard extends StatelessWidget {
                 style: theme.textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: theme.colorScheme.primary,
-                  fontSize: 22,
+                  fontSize: 20,
                 ),
-              ),
-              const SizedBox(height: 4),
-            ] else ...[
-              Text(
-                'Order #${order.orderNumber}',
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.primary,
-                  fontSize: 22,
-                ),
-              ),
-              const SizedBox(height: 4),
-            ],
-            // Order-level notes and special instructions
-            if (orderInstructions.isNotEmpty) ...[
-              Text(
-                orderInstructions,
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  fontStyle: FontStyle.italic,
-                  color: theme.colorScheme.primary,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                ),
-              ),
-              const SizedBox(height: 4),
-            ],
-            if (orderNotes.isNotEmpty) ...[
-              Text(
-                orderNotes,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.tertiary,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 4),
-            ],
-            // Allergies and dietary restrictions
-            if (allergies != null && allergies.isNotEmpty) ...[
-              Row(
-                children: [
-                  Icon(Icons.warning, color: theme.colorScheme.error, size: 18),
-                  const SizedBox(width: 4),
-                  Text('Allergies: $allergies', style: TextStyle(color: theme.colorScheme.error, fontWeight: FontWeight.bold)),
-                ],
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 2),
             ],
-            if (dietary != null && dietary.isNotEmpty) ...[
-              Row(
-                children: [
-                  Icon(Icons.info_outline, color: theme.colorScheme.tertiary, size: 18),
-                  const SizedBox(width: 4),
-                  Text('Dietary: $dietary', style: TextStyle(color: theme.colorScheme.tertiary, fontWeight: FontWeight.bold)),
-                ],
-              ),
-              const SizedBox(height: 2),
-            ],
-            // Header with order number and status
+            // Order number
+            Text(
+              order.orderNumber,
+              style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 2),
+            // Status and priority
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        order.orderNumber,
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      _StatusChip(status: order.status ?? ''),
-                    ],
-                  ),
-                ),
+                _StatusChip(status: order.status ?? ''),
                 _PriorityBadge(priority: order.priority ?? 'normal'),
               ],
             ),
-            const SizedBox(height: 12),
-            // Item breakdown
+            const SizedBox(height: 6),
+            // Items summary
             if (order.items.isNotEmpty) ...[
-              Text('Items:', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 4),
-              ...order.items.asMap().entries.map((entry) {
-                final i = entry.key;
-                final item = entry.value;
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text('${item.quantity}x ', style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
-                          Text(item.itemName, style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
-                        ],
-                      ),
-                      if (item.specialInstructions != null && item.specialInstructions!.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8, top: 2),
-                          child: Text(item.specialInstructions!, style: theme.textTheme.bodyMedium?.copyWith(fontStyle: FontStyle.italic)),
-                        ),
-                      if (item.modifications != null && item.modifications!.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8, top: 2),
-                          child: Text('Mods: ${item.modifications!.join(', ')}', style: theme.textTheme.bodySmall),
-                        ),
-                      if (item.allergens != null && item.allergens!.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8, top: 2),
-                          child: Text('Allergens: ${item.allergens!.join(', ')}', style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.error)),
-                        ),
-                    ],
-                  ),
-                );
-              }),
+              Text('Items:', style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
+              Text(
+                order.items.map((item) => '${item.quantity}x ${item.itemName}').join(', '),
+                style: theme.textTheme.bodyMedium,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ],
-            
-            const SizedBox(height: 16),
-            
-            // Progress section
+            // Allergies and dietary restrictions (icons only if present)
+            if (allergies != null && allergies.isNotEmpty)
+              Row(
+                children: [
+                  Icon(Icons.warning, color: theme.colorScheme.error, size: 16),
+                  const SizedBox(width: 2),
+                  Flexible(
+                    child: Text('Allergies', style: TextStyle(color: theme.colorScheme.error, fontWeight: FontWeight.bold, fontSize: 12)),
+                  ),
+                ],
+              ),
+            if (dietary != null && dietary.isNotEmpty)
+              Row(
+                children: [
+                  Icon(Icons.info_outline, color: theme.colorScheme.tertiary, size: 16),
+                  const SizedBox(width: 2),
+                  Flexible(
+                    child: Text('Dietary', style: TextStyle(color: theme.colorScheme.tertiary, fontWeight: FontWeight.bold, fontSize: 12)),
+                  ),
+                ],
+              ),
+            // Notes and instructions (truncated)
+            if (orderInstructions.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child: Text(
+                  orderInstructions,
+                  style: theme.textTheme.bodySmall?.copyWith(fontStyle: FontStyle.italic, color: theme.colorScheme.primary, fontWeight: FontWeight.w600),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            if (orderNotes.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child: Text(
+                  orderNotes,
+                  style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.tertiary, fontWeight: FontWeight.w500),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            if (showMore)
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton(
+                  style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: Size(40, 24)),
+                  onPressed: () => _showOrderDetails(context),
+                  child: const Text('More', style: TextStyle(fontSize: 12)),
+                ),
+              ),
+            const Spacer(),
+            // Progress section (compact)
             _ProgressSection(order: order),
-            
-            const SizedBox(height: 16),
-            
-            // Action buttons - Compact Apple-style
+            const SizedBox(height: 6),
+            // Action buttons
             _ActionButtonsSection(
               order: order,
               onStatusChanged: onStatusChanged,
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showOrderDetails(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Order ${order.orderNumber}'),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Status: ${order.status}'),
+              Text('Priority: ${order.priority ?? 'normal'}'),
+              Text('Type: ${order.orderType ?? 'dine_in'}'),
+              if (order.specialInstructions != null && order.specialInstructions!.isNotEmpty)
+                Text('Special Instructions: ${order.specialInstructions}'),
+              if (order.notes != null && order.notes!.isNotEmpty)
+                Text('Notes: ${order.notes}'),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
+          ),
+        ],
       ),
     );
   }
@@ -300,38 +304,50 @@ class _StatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final lowerStatus = status.toLowerCase();
     Color color;
+    Color textColor = Colors.white;
     IconData icon;
-    
-    switch (status.toLowerCase()) {
+
+    switch (lowerStatus) {
       case 'confirmed':
-        color = theme.colorScheme.primary;
-        icon = Icons.schedule;
+        color = const Color(0xFF0176d3); // Blue
+        icon = Icons.check_circle_outline;
         break;
       case 'preparing':
-        color = theme.colorScheme.primary;
+        color = const Color(0xFFfe9339); // Orange
         icon = Icons.restaurant;
         break;
       case 'ready':
-        color = theme.colorScheme.tertiary;
+        color = const Color(0xFF2e844a); // Green
         icon = Icons.check_circle;
         break;
       case 'served':
-        color = theme.colorScheme.surfaceVariant ?? Colors.grey;
+        color = const Color(0xFF747474); // Gray
         icon = Icons.done_all;
+        textColor = const Color(0xFFfff); // White for contrast
+        break;
+      case 'cancelled':
+        color = const Color(0xFFea001e); // Red
+        icon = Icons.cancel;
+        break;
+      case 'pending':
+        color = const Color(0xFFfed850); // Yellow
+        icon = Icons.hourglass_empty;
+        textColor = const Color(0xFF181818); // Dark text for yellow
         break;
       default:
-        color = theme.colorScheme.surfaceVariant ?? Colors.grey;
-        icon = Icons.info;
+        color = const Color(0xFFc3c3c3); // Light gray
+        icon = Icons.info_outline;
+        textColor = const Color(0xFF181818); // Dark text for neutral
     }
 
     return Chip(
-      avatar: Icon(icon, color: Colors.white, size: 16),
+      avatar: Icon(icon, color: textColor, size: 16),
       label: Text(
         status.toUpperCase(),
-        style: const TextStyle(
-          color: Colors.white,
+        style: TextStyle(
+          color: textColor,
           fontWeight: FontWeight.w600,
           fontSize: 12,
         ),
@@ -355,19 +371,19 @@ class _PriorityBadge extends StatelessWidget {
     
     switch (priority.toLowerCase()) {
       case 'high':
-        color = theme.colorScheme.tertiary;
+        color = Colors.red[600]!;
         text = 'HIGH';
         break;
       case 'normal':
-        color = theme.colorScheme.primary;
+        color = Colors.orange[600]!;
         text = 'NORMAL';
         break;
       case 'low':
-        color = theme.colorScheme.surfaceVariant ?? Colors.grey;
+        color = Colors.grey[500]!;
         text = 'LOW';
         break;
       default:
-        color = theme.colorScheme.surfaceVariant ?? Colors.grey;
+        color = Colors.grey[500]!;
         text = priority.toUpperCase();
     }
 
@@ -663,14 +679,20 @@ class _ActionButtonsSection extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        if (currentStatus == 'confirmed') ...[
+        if (currentStatus == 'confirmed' || currentStatus == 'pending') ...[
           SizedBox(
             height: 44,
             child: ElevatedButton.icon(
               onPressed: () => _updateOrderStatus(context, 'preparing'),
               icon: const Icon(Icons.restaurant, size: 18),
               label: const Text('Start Preparing', style: TextStyle(fontSize: 14)),
-              style: AppTheme.neutralButtonStyle,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange[600],
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
             ),
           ),
           const SizedBox(width: 12),
@@ -681,7 +703,13 @@ class _ActionButtonsSection extends StatelessWidget {
               onPressed: () => _updateOrderStatus(context, 'ready'),
               icon: const Icon(Icons.check_circle, size: 18),
               label: const Text('Mark Ready', style: TextStyle(fontSize: 14)),
-              style: AppTheme.neutralButtonStyle,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.amber[600],
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
             ),
           ),
           const SizedBox(width: 12),
@@ -706,16 +734,41 @@ class _ActionButtonsSection extends StatelessWidget {
   }
 
   void _updateOrderStatus(BuildContext context, String newStatus) {
-    // TODO: Implement API call to update order status
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Order status updated to $newStatus'),
-        backgroundColor: AppTheme.neutralButtonColor,
-        duration: const Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
-      ),
+    // Use the provider to update the order status
+    final container = ProviderScope.containerOf(context);
+    container.read(updateOrderStatusProvider((orderId: order.id, status: newStatus))).when(
+      data: (_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Order status updated to $newStatus'),
+            backgroundColor: Colors.orange[600],
+            duration: const Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        onStatusChanged();
+      },
+      loading: () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Updating order status...'),
+            backgroundColor: Colors.orange,
+            duration: Duration(seconds: 1),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      },
+      error: (error, stack) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error updating status: ${error.toString()}'),
+            backgroundColor: Colors.red[600],
+            duration: const Duration(seconds: 3),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      },
     );
-    onStatusChanged();
   }
 
   void _showOrderDetails(BuildContext context) {

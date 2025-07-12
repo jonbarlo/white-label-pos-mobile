@@ -15,14 +15,16 @@ final kitchenOrdersProvider = FutureProvider.autoDispose<List<KitchenOrder>>((re
   if (user == null) throw Exception('Not authenticated');
   final businessId = user.businessId;
   
-  // Fetch orders with statuses that kitchen staff should see
-  // 'preparing' and 'confirmed' are the active statuses for kitchen orders
-  final preparingOrders = await repo.fetchKitchenOrders(businessId: businessId, status: 'preparing');
-  final confirmedOrders = await repo.fetchKitchenOrders(businessId: businessId, status: 'confirmed');
+  // Fetch all kitchen orders without status filter to get all active orders
+  final orders = await repo.fetchKitchenOrders(businessId: businessId);
   
-  // Combine and sort by order number
-  final allOrders = [...preparingOrders, ...confirmedOrders];
-  allOrders.sort((a, b) => a.orderNumber.compareTo(b.orderNumber));
+  // Sort by order number
+  orders.sort((a, b) => a.orderNumber.compareTo(b.orderNumber));
   
-  return allOrders;
+  return orders;
+});
+
+final updateOrderStatusProvider = FutureProvider.family<void, ({int orderId, String status})>((ref, params) async {
+  final repo = ref.watch(kitchenOrderRepositoryProvider);
+  await repo.updateOrderStatus(params.orderId, params.status);
 }); 
