@@ -47,7 +47,7 @@ class PosRepositoryImpl implements PosRepository {
     try {
       if (EnvConfig.isDebugMode) {
         print('🔍 POS SEARCH: Searching for items with query: "$query"');
-        print('🔍 POS SEARCH: Making request to /menu/items');
+        print('🔍 POS SEARCH: Making request to /items (menu routes disabled)');
       }
 
       // Get business ID from auth state
@@ -61,34 +61,27 @@ class PosRepositoryImpl implements PosRepository {
 
       print('🔍 POS SEARCH: Using businessId: $businessId');
 
-      final response = await _dio.get('/menu/items', queryParameters: {
+      final response = await _dio.get('/items', queryParameters: {
         'businessId': businessId,
         if (query.isNotEmpty) 'search': query,
-        'isAvailable': true,
         'isActive': true,
       });
 
       if (EnvConfig.isDebugMode) {
-        print('🔍 POS SEARCH: Response status: ${response.statusCode}');
-        print('🔍 POS SEARCH: Response data: ${response.data}');
+        print('✅ RESPONSE[${response.statusCode}] => FULL URL: ${response.requestOptions.uri}');
+        print('✅ Response Data: ${response.data}');
       }
 
-      if (response.statusCode == 200 && response.data['success'] == true) {
-        final List<dynamic> items = response.data['data'] ?? [];
-        if (EnvConfig.isDebugMode) {
-          print('🔍 POS SEARCH: Found  [32m${items.length} [0m items');
-        }
-        return items.map((item) => _convertMenuItemToCartItem(_safeMenuItemFromJson(item))).toList();
-      } else {
-        if (EnvConfig.isDebugMode) {
-          print('🔍 POS SEARCH: Response not successful or wrong format');
-          print('🔍 POS SEARCH: success field: ${response.data['success']}');
-          print('🔍 POS SEARCH: data field: ${response.data['data']}');
-        }
+      // The new /items endpoint returns a List directly
+      final items = (response.data as List)
+          .map((item) => _convertMenuItemToCartItem(_safeMenuItemFromJson(item as Map<String, dynamic>)))
+          .toList();
+
+      if (EnvConfig.isDebugMode) {
+        print('🔍 POS SEARCH: Found \x1B[32m${items.length}\x1B[0m items');
       }
-      
-      return [];
-    } catch (e) {
+      return items;
+    } catch (e, stack) {
       if (EnvConfig.isDebugMode) {
         print('🔍 POS SEARCH: Error occurred: $e');
       }
@@ -99,9 +92,8 @@ class PosRepositoryImpl implements PosRepository {
   @override
   Future<CartItem?> getItemByBarcode(String barcode) async {
     try {
-      final response = await _dio.get('/menu/items', queryParameters: {
+      final response = await _dio.get('/items', queryParameters: {
         'barcode': barcode,
-        'isAvailable': true,
         'isActive': true,
       });
 
@@ -159,7 +151,7 @@ class PosRepositoryImpl implements PosRepository {
         'businessId': businessId,
         'customerName': customerName ?? 'Guest',
         'customerEmail': customerEmail ?? 'guest@pos.com',
-        'total': total,
+        'totalAmount': total,
         'paymentMethod': _mapPaymentMethodToApi(paymentMethod),
         'status': 'completed',
         'orderItems': orderItems,
@@ -310,7 +302,7 @@ class PosRepositoryImpl implements PosRepository {
     try {
       for (final item in items) {
         // Update stock for each item
-        await _dio.patch('/menu/items/${item.id}/stock', data: {
+        await _dio.patch('/items/${item.id}/stock', data: {
           'quantity': -item.quantity, // Decrease stock
         });
       }
@@ -324,11 +316,11 @@ class PosRepositoryImpl implements PosRepository {
     return MenuItem(
       id: json['id'] as int,
       businessId: json['businessId'] as int,
-      categoryId: json['categoryId'] as int,
+      categoryId: json['categoryId'] as int? ?? 1, // Handle missing categoryId
       name: json['name'] as String,
       description: json['description'] as String? ?? '',
-      price: (json['price'] as num).toDouble(),
-      cost: (json['cost'] as num).toDouble(),
+      price: (json['price'] as num?)?.toDouble() ?? 0.0, // Handle null price
+      cost: (json['cost'] as num?)?.toDouble() ?? 0.0, // Handle null cost
       image: json['imageUrl'] as String?,
       allergens: null, // Not in API response
       nutritionalInfo: null, // Not in API response
@@ -356,9 +348,9 @@ class PosRepositoryImpl implements PosRepository {
       case PaymentMethod.cash:
         return 'cash';
       case PaymentMethod.card:
-        return 'credit_card'; // Default to credit_card for card payments
+        return 'card'; // Use 'card' instead of 'credit_card'
       case PaymentMethod.mobile:
-        return 'mobile_payment';
+        return 'card'; // Map mobile payments to 'card' since API doesn't support mobile_payment
       case PaymentMethod.check:
         return 'check';
       default:

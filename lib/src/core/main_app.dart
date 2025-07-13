@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../features/auth/auth_provider.dart';
+import '../features/auth/models/user.dart';
 import '../features/auth/login_screen.dart';
 import '../features/onboarding/onboarding_screen.dart';
 import '../features/dashboard/dashboard_screen.dart';
@@ -13,6 +14,8 @@ import '../features/business/business_list_screen.dart';
 import '../core/config/env_config.dart';
 import '../features/viewer/bar_screen.dart';
 import '../features/viewer/kitchen_screen.dart';
+import '../features/waiter/table_selection_screen.dart';
+import '../features/waiter/waiter_dashboard_screen.dart';
 
 class MainApp extends ConsumerStatefulWidget {
   const MainApp({super.key});
@@ -210,8 +213,13 @@ class _MainAppState extends ConsumerState<MainApp> {
       print('🔐 MAIN APP: User assignment: ${authState.user?.assignment}');
     }
 
+    // Route waitstaff users to WaiterDashboardScreen
+    if (authState.canAccessWaiterDashboard) {
+      return const WaiterDashboardScreen();
+    }
+
     // Route viewer users to BarScreen or KitchenScreen based on assignment
-    if (authState.user?.role == 'viewer' || authState.user?.role.toString() == 'UserRole.viewer') {
+    if (authState.userRole == UserRole.viewer) {
       final assignment = authState.user?.assignment;
       if (assignment == null || assignment.isEmpty) {
         return Scaffold(
@@ -223,7 +231,11 @@ class _MainAppState extends ConsumerState<MainApp> {
           ),
         );
       }
-      switch (assignment) {
+      
+      // Convert assignment to lowercase for case-insensitive comparison
+      final assignmentLower = assignment.toLowerCase();
+      
+      switch (assignmentLower) {
         case 'bar':
           return const BarScreen();
         case 'kitchen':
@@ -233,7 +245,7 @@ class _MainAppState extends ConsumerState<MainApp> {
             body: Center(
               child: Text(
                 'Unknown viewer assignment: '
-                ' [31m$assignment [0m',
+                ' [31m$assignment [0m (expected: kitchen or bar)',
                 style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
               ),
             ),

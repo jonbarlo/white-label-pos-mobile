@@ -11,6 +11,7 @@ import 'package:white_label_pos_mobile/src/features/pos/models/menu_item.dart';
 import 'pos_repository_impl_test.mocks.dart';
 
 import 'package:white_label_pos_mobile/src/features/auth/auth_provider.dart';
+import 'package:white_label_pos_mobile/src/features/auth/models/user.dart';
 import 'package:white_label_pos_mobile/src/features/business/models/business.dart';
 
 @GenerateMocks([Dio, Ref])
@@ -26,6 +27,36 @@ void main() {
       mockRef = MockRef();
       when(mockDio.options).thenReturn(BaseOptions());
       when(mockDio.interceptors).thenReturn(Interceptors());
+      
+      // Mock auth state
+      final mockAuthState = AuthState(
+        status: AuthStatus.authenticated,
+        user: User(
+          id: 1,
+          businessId: 1,
+          name: 'Test User',
+          email: 'test@example.com',
+          role: UserRole.cashier,
+          isActive: true,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        ),
+        business: Business(
+          id: 1,
+          name: 'Test Business',
+          slug: 'test-business',
+          type: BusinessType.restaurant,
+          taxRate: 8.5,
+          currency: 'USD',
+          timezone: 'America/New_York',
+          isActive: true,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        ),
+      );
+      
+      when(mockRef.read(authNotifierProvider)).thenReturn(mockAuthState);
+      
       repository = PosRepositoryImpl(mockDio, mockRef);
     });
 
@@ -33,7 +64,7 @@ void main() {
       test('should return list of cart items when API call is successful', () async {
         // Arrange
         when(mockDio.get(
-          '/menu/items',
+          '/items',
           queryParameters: anyNamed('queryParameters'),
         )).thenAnswer((_) async => Response(
           data: {
@@ -48,7 +79,6 @@ void main() {
                 'price': 10.99,
                 'cost': 5.00,
                 'preparationTime': 10,
-                'isAvailable': true,
                 'isActive': true,
                 'createdAt': '2025-07-10T01:00:00.000Z',
                 'updatedAt': '2025-07-10T01:00:00.000Z',
@@ -56,7 +86,7 @@ void main() {
             ]
           },
           statusCode: 200,
-          requestOptions: RequestOptions(path: '/menu/items'),
+          requestOptions: RequestOptions(path: '/items'),
         ));
 
         // Act
@@ -68,10 +98,9 @@ void main() {
         expect(result.first.price, 10.99);
 
         verify(mockDio.get(
-          '/menu/items',
+          '/items',
           queryParameters: {
             'search': 'test',
-            'isAvailable': true,
             'isActive': true,
           },
         )).called(1);
@@ -79,7 +108,7 @@ void main() {
 
       test('should return empty list when search fails', () async {
         when(mockDio.get(
-          '/menu/items',
+          '/items',
           queryParameters: anyNamed('queryParameters'),
         )).thenAnswer((_) async => Response(
           data: {
@@ -87,7 +116,7 @@ void main() {
             'message': 'Search failed',
           },
           statusCode: 200,
-          requestOptions: RequestOptions(path: '/menu/items'),
+          requestOptions: RequestOptions(path: '/items'),
         ));
 
         final result = await repository.searchItems('test');
@@ -97,13 +126,13 @@ void main() {
 
       test('should throw exception when network error occurs', () async {
         when(mockDio.get(
-          '/menu/items',
+          '/items',
           queryParameters: anyNamed('queryParameters'),
         )).thenThrow(DioException(
-          requestOptions: RequestOptions(path: '/menu/items'),
+          requestOptions: RequestOptions(path: '/items'),
           response: Response(
             statusCode: 500,
-            requestOptions: RequestOptions(path: '/menu/items'),
+            requestOptions: RequestOptions(path: '/items'),
           ),
         ));
 
@@ -117,7 +146,7 @@ void main() {
     group('getItemByBarcode', () {
       test('should return item when barcode is found', () async {
         when(mockDio.get(
-          '/menu/items',
+          '/items',
           queryParameters: anyNamed('queryParameters'),
         )).thenAnswer((_) async => Response(
           data: {
@@ -132,7 +161,6 @@ void main() {
                 'price': 15.99,
                 'cost': 7.00,
                 'preparationTime': 5,
-                'isAvailable': true,
                 'isActive': true,
                 'createdAt': '2025-07-10T01:00:00.000Z',
                 'updatedAt': '2025-07-10T01:00:00.000Z',
@@ -140,7 +168,7 @@ void main() {
             ]
           },
           statusCode: 200,
-          requestOptions: RequestOptions(path: '/menu/items'),
+          requestOptions: RequestOptions(path: '/items'),
         ));
 
         final result = await repository.getItemByBarcode('123456789');
@@ -150,10 +178,9 @@ void main() {
         expect(result.price, 15.99);
 
         verify(mockDio.get(
-          '/menu/items',
+          '/items',
           queryParameters: {
             'barcode': '123456789',
-            'isAvailable': true,
             'isActive': true,
           },
         )).called(1);
@@ -161,7 +188,7 @@ void main() {
 
       test('should return null when barcode not found', () async {
         when(mockDio.get(
-          '/menu/items',
+          '/items',
           queryParameters: anyNamed('queryParameters'),
         )).thenAnswer((_) async => Response(
           data: {
@@ -169,7 +196,7 @@ void main() {
             'data': [],
           },
           statusCode: 200,
-          requestOptions: RequestOptions(path: '/menu/items'),
+          requestOptions: RequestOptions(path: '/items'),
         ));
 
         final result = await repository.getItemByBarcode('nonexistent');

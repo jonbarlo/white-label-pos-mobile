@@ -57,10 +57,10 @@ function Invoke-ApiCall {
 Write-Host "[Login Script]" -ForegroundColor Cyan
 Write-Host "=============" -ForegroundColor Cyan
 
-# Set credentials for viewer user
-$email = "antonio@bellavista.com"
-$password = "viewer123"
-$business = "bella-vista-italian"
+# Use parameters or defaults
+$email = $Email
+$password = $Password
+$business = $BusinessSlug
 
 $LoginBody = @{
     email = $email

@@ -18,7 +18,7 @@ void main() {
     mockPosRepository = MockPosRepository();
     container = ProviderContainer(
       overrides: [
-        posRepositoryProvider.overrideWithValue(mockPosRepository),
+        posRepositoryProvider.overrideWith((ref) => mockPosRepository),
       ],
     );
   });

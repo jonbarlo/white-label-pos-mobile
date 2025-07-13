@@ -6,6 +6,7 @@ import 'package:white_label_pos_mobile/src/features/auth/data/repositories/auth_
 import 'package:white_label_pos_mobile/src/features/auth/data/repositories/auth_repository.dart';
 import 'package:white_label_pos_mobile/src/features/auth/models/user.dart';
 import 'package:white_label_pos_mobile/src/shared/models/result.dart';
+import 'package:white_label_pos_mobile/src/features/business/models/business.dart';
 
 import 'auth_repository_impl_test.mocks.dart';
 
@@ -30,13 +31,26 @@ void main() {
           email: 'test@example.com',
           role: UserRole.cashier,
           isActive: true,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
+          createdAt: DateTime(2023, 1, 1),
+          updatedAt: DateTime(2023, 1, 1),
+        );
+
+        final business = Business(
+          id: 1,
+          name: 'Test Business',
+          slug: 'test-business',
+          type: BusinessType.restaurant,
+          taxRate: 8.5,
+          currency: 'USD',
+          timezone: 'America/New_York',
+          isActive: true,
+          createdAt: DateTime(2023, 1, 1),
+          updatedAt: DateTime(2023, 1, 1),
         );
 
         final responseData = {
-          'success': true,
-          'data': {
+          'message': 'Login successful',
+          'user': {
             'id': user.id,
             'businessId': user.businessId,
             'name': user.name,
@@ -45,6 +59,19 @@ void main() {
             'isActive': user.isActive,
             'createdAt': user.createdAt.toIso8601String(),
             'updatedAt': user.updatedAt.toIso8601String(),
+          },
+          'token': 'valid-token-123',
+          'business': {
+            'id': business.id,
+            'name': business.name,
+            'slug': business.slug,
+            'type': 'restaurant',
+            'taxRate': business.taxRate,
+            'currency': business.currency,
+            'timezone': business.timezone,
+            'isActive': business.isActive,
+            'createdAt': business.createdAt?.toIso8601String(),
+            'updatedAt': business.updatedAt?.toIso8601String(),
           },
         };
 
@@ -60,9 +87,12 @@ void main() {
 
         // Assert
         expect(result.isSuccess, true);
-        expect(result.data.user.id, user.id);
-        expect(result.data.user.email, user.email);
-        expect(result.data.user.role, user.role);
+        expect(result.data!.user.id, user.id);
+        expect(result.data!.user.email, user.email);
+        expect(result.data!.user.role, user.role);
+        expect(result.data!.token, 'valid-token-123');
+        expect(result.data!.business.id, business.id);
+        expect(result.data!.business.name, business.name);
       });
 
       test('should return failure result when login fails', () async {

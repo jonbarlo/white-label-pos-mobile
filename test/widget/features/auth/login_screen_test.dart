@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:white_label_pos_mobile/src/features/auth/auth_provider.dart';
 import 'package:white_label_pos_mobile/src/features/auth/data/repositories/auth_repository.dart';
+import 'package:white_label_pos_mobile/src/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:white_label_pos_mobile/src/features/auth/login_screen.dart';
 
 import 'login_screen_test.mocks.dart';

@@ -51,34 +51,46 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   // Add this to the _LoginScreenState class:
   final List<Map<String, String>> _testUsers = [
     {
-      'label': 'Marco Rossi (admin)',
-      'email': 'marco@bellavista.com',
-      'password': 'admin123',
-      'role': 'admin',
+      'label': 'Marco Rossi (Owner) - Kitchen Manager',
+      'email': 'marco@italiandelight.com',
+      'password': 'Password123',
+      'role': 'owner',
     },
     {
-      'label': 'Sofia Bianchi (manager)',
-      'email': 'sofia@bellavista.com',
-      'password': 'manager123',
+      'label': 'Sofia Bianchi (Manager) - Floor Manager',
+      'email': 'sofia@italiandelight.com',
+      'password': 'Password123',
       'role': 'manager',
     },
     {
-      'label': 'Giuseppe Romano (cashier)',
-      'email': 'giuseppe@bellavista.com',
-      'password': 'cashier123',
+      'label': 'Giuseppe Verdi (Waitstaff) - Section A',
+      'email': 'giuseppe@italiandelight.com',
+      'password': 'Password123',
+      'role': 'waitstaff',
+    },
+    {
+      'label': 'Maria Esposito (Waitstaff) - Section B',
+      'email': 'maria@italiandelight.com',
+      'password': 'Password123',
+      'role': 'waitstaff',
+    },
+    {
+      'label': 'Antonio Romano (Cashier) - Front Counter',
+      'email': 'antonio@italiandelight.com',
+      'password': 'Password123',
       'role': 'cashier',
     },
     {
-      'label': 'Maria Esposito (cashier)',
-      'email': 'maria@bellavista.com',
-      'password': 'cashier123',
-      'role': 'cashier',
-    },
-    {
-      'label': 'Antonio Marino (viewer)',
-      'email': 'antonio@bellavista.com',
-      'password': 'viewer123',
+      'label': 'Elena Conti (Viewer) - Reports Only',
+      'email': 'elena@italiandelight.com',
+      'password': 'Password123',
       'role': 'viewer',
+    },
+    {
+      'label': 'Carlo Moretti (Admin) - System Admin',
+      'email': 'carlo@italiandelight.com',
+      'password': 'Password123',
+      'role': 'admin',
     },
   ];
   String? _selectedTestUserLabel;
@@ -175,7 +187,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         final user = _testUsers.firstWhere((u) => u['label'] == label);
                         _emailController.text = user['email']!;
                         _passwordController.text = user['password']!;
-                        _businessSlugController.text = 'bella-vista-italian';
+                        _businessSlugController.text = 'italian-delight';
                       });
                     },
                     isExpanded: true,

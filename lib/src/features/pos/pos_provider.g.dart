@@ -1084,7 +1084,7 @@ final getSplitBillingStatsProvider =
 // ignore: unused_element
 typedef GetSplitBillingStatsRef
     = AutoDisposeFutureProviderRef<SplitBillingStats>;
-String _$menuItemsHash() => r'51973b459dbc742bd5528471e56f743db0239b35';
+String _$menuItemsHash() => r'0b0644ceb06e4ce841cdc13e36b928baf12c66fc';
 
 /// See also [menuItems].
 @ProviderFor(menuItems)

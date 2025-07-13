@@ -350,7 +350,56 @@ void main() {
       test('returns categories successfully', () async {
         final responseData = {
           'success': true,
-          'data': ['Fruits', 'Vegetables', 'Dairy', 'Meat']
+          'data': [
+            {
+              'id': 1,
+              'businessId': 1,
+              'name': 'Fruits',
+              'description': 'Fresh fruits',
+              'displayOrder': 1,
+              'isActive': true,
+              'imageUrl': null,
+              'colorCode': null,
+              'createdAt': '2023-01-01T00:00:00.000Z',
+              'updatedAt': '2023-01-01T00:00:00.000Z',
+            },
+            {
+              'id': 2,
+              'businessId': 1,
+              'name': 'Vegetables',
+              'description': 'Fresh vegetables',
+              'displayOrder': 2,
+              'isActive': true,
+              'imageUrl': null,
+              'colorCode': null,
+              'createdAt': '2023-01-01T00:00:00.000Z',
+              'updatedAt': '2023-01-01T00:00:00.000Z',
+            },
+            {
+              'id': 3,
+              'businessId': 1,
+              'name': 'Dairy',
+              'description': 'Dairy products',
+              'displayOrder': 3,
+              'isActive': true,
+              'imageUrl': null,
+              'colorCode': null,
+              'createdAt': '2023-01-01T00:00:00.000Z',
+              'updatedAt': '2023-01-01T00:00:00.000Z',
+            },
+            {
+              'id': 4,
+              'businessId': 1,
+              'name': 'Meat',
+              'description': 'Fresh meat',
+              'displayOrder': 4,
+              'isActive': true,
+              'imageUrl': null,
+              'colorCode': null,
+              'createdAt': '2023-01-01T00:00:00.000Z',
+              'updatedAt': '2023-01-01T00:00:00.000Z',
+            },
+          ]
         };
 
         final response = Response(
@@ -359,15 +408,15 @@ void main() {
           requestOptions: RequestOptions(path: '/menu/categories'),
         );
 
-        when(mockDio.get('/menu/categories'))
+        when(mockDio.get('/menu/categories', queryParameters: anyNamed('queryParameters')))
             .thenAnswer((_) async => response);
 
-        final result = await repository.getCategories();
+        final result = await repository.getCategories(businessId: 1);
 
         expect(result.isSuccess, isTrue);
         expect(result.data!.length, 4);
-        expect(result.data!.contains('Fruits'), isTrue);
-        verify(mockDio.get('/menu/categories')).called(1);
+        expect(result.data!.any((c) => c.name == 'Fruits'), isTrue);
+        verify(mockDio.get('/menu/categories', queryParameters: anyNamed('queryParameters'))).called(1);
       });
     });
 

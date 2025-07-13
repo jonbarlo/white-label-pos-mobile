@@ -1,33 +1,79 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
-import 'package:riverpod/riverpod.dart';
 import 'package:white_label_pos_mobile/src/features/inventory/inventory_provider.dart';
 import 'package:white_label_pos_mobile/src/features/inventory/inventory_repository.dart';
 import 'package:white_label_pos_mobile/src/features/inventory/models/inventory_item.dart';
 import 'package:white_label_pos_mobile/src/shared/models/result.dart';
+import 'package:white_label_pos_mobile/src/features/inventory/models/category.dart';
+import 'package:white_label_pos_mobile/src/features/auth/auth_provider.dart';
+import 'package:white_label_pos_mobile/src/features/auth/models/user.dart';
+import 'package:white_label_pos_mobile/src/features/business/models/business.dart';
 
 import 'inventory_provider_test.mocks.dart';
 
+class StubAuthNotifier extends AuthNotifier {
+  final AuthState _stubState;
+  StubAuthNotifier(this._stubState) : super();
+  @override
+  AuthState build() => _stubState;
+}
+
 @GenerateMocks([InventoryRepository])
 void main() {
-  late MockInventoryRepository mockInventoryRepository;
-  late ProviderContainer container;
-
-  setUp(() {
-    mockInventoryRepository = MockInventoryRepository();
-    container = ProviderContainer(
-      overrides: [
-        inventoryRepositoryProvider.overrideWithValue(mockInventoryRepository),
-      ],
-    );
-  });
-
-  tearDown(() {
-    container.dispose();
-  });
-
   group('InventoryProvider', () {
+    late ProviderContainer container;
+    late MockInventoryRepository mockInventoryRepository;
+    late User mockUser;
+    late Business mockBusiness;
+
+    setUp(() {
+      mockInventoryRepository = MockInventoryRepository();
+      
+      mockUser = User(
+        id: 1,
+        businessId: 1,
+        name: 'Test User',
+        email: 'test@example.com',
+        role: UserRole.admin,
+        isActive: true,
+        createdAt: DateTime(2023, 1, 1),
+        updatedAt: DateTime(2023, 1, 1),
+      );
+      
+      mockBusiness = Business(
+        id: 1,
+        name: 'Test Business',
+        slug: 'test-business',
+        type: BusinessType.restaurant,
+        taxRate: 8.5,
+        currency: 'USD',
+        timezone: 'America/New_York',
+        isActive: true,
+        createdAt: DateTime(2023, 1, 1),
+        updatedAt: DateTime(2023, 1, 1),
+      );
+
+      final mockAuthState = AuthState(
+        status: AuthStatus.authenticated,
+        user: mockUser,
+        business: mockBusiness,
+        token: 'test-token',
+      );
+
+      container = ProviderContainer(
+        overrides: [
+          inventoryRepositoryProvider.overrideWithValue(mockInventoryRepository),
+          authNotifierProvider.overrideWith(() => StubAuthNotifier(mockAuthState)),
+        ],
+      );
+    });
+
+    tearDown(() {
+      container.dispose();
+    });
+
     group('inventoryItemsProvider', () {
       test('returns list of inventory items', () async {
         final expectedItems = [
@@ -133,21 +179,58 @@ void main() {
 
     group('categoriesProvider', () {
       test('returns list of categories', () async {
-        final categories = ['Fruits', 'Vegetables', 'Dairy', 'Beverages'];
+        final categories = [
+          Category(
+            id: 1,
+            businessId: 1,
+            name: 'Fruits',
+            displayOrder: 1,
+            isActive: true,
+            createdAt: DateTime(2023, 1, 1),
+            updatedAt: DateTime(2023, 1, 1),
+          ),
+          Category(
+            id: 2,
+            businessId: 1,
+            name: 'Vegetables',
+            displayOrder: 2,
+            isActive: true,
+            createdAt: DateTime(2023, 1, 1),
+            updatedAt: DateTime(2023, 1, 1),
+          ),
+          Category(
+            id: 3,
+            businessId: 1,
+            name: 'Dairy',
+            displayOrder: 3,
+            isActive: true,
+            createdAt: DateTime(2023, 1, 1),
+            updatedAt: DateTime(2023, 1, 1),
+          ),
+          Category(
+            id: 4,
+            businessId: 1,
+            name: 'Beverages',
+            displayOrder: 4,
+            isActive: true,
+            createdAt: DateTime(2023, 1, 1),
+            updatedAt: DateTime(2023, 1, 1),
+          ),
+        ];
 
-        when(mockInventoryRepository.getCategories())
+        when(mockInventoryRepository.getCategories(businessId: 1))
             .thenAnswer((_) async => Result.success(categories));
 
         final result = await container.read(categoriesProvider.future);
 
         expect(result, categories);
         expect(result.length, 4);
-        expect(result.contains('Fruits'), isTrue);
+        expect(result.any((c) => c.name == 'Fruits'), isTrue);
       });
 
       test('returns empty list when no categories exist', () async {
-        when(mockInventoryRepository.getCategories())
-            .thenAnswer((_) async => Result.success(<String>[]));
+        when(mockInventoryRepository.getCategories(businessId: 1))
+            .thenAnswer((_) async => Result.success(<Category>[]));
 
         final result = await container.read(categoriesProvider.future);
 

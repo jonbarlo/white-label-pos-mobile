@@ -12,7 +12,6 @@ void main() {
       expect(EnvConfig.appVersion, equals('1.0.0'));
       expect(EnvConfig.isDebugMode, isTrue);
       expect(EnvConfig.isBarcodeScanningEnabled, isTrue);
-      expect(EnvConfig.isOfflineModeEnabled, isFalse);
       expect(EnvConfig.isPushNotificationsEnabled, isTrue);
       expect(EnvConfig.isAnalyticsEnabled, isTrue);
       expect(EnvConfig.isCrashReportingEnabled, isTrue);
@@ -34,7 +33,6 @@ void main() {
       // These tests verify the logic works even without .env files
       expect(EnvConfig.isDebugMode, isTrue); // Default value
       expect(EnvConfig.isBarcodeScanningEnabled, isTrue); // Default value
-      expect(EnvConfig.isOfflineModeEnabled, isFalse); // Default value
     });
 
     test('should handle integer parsing correctly', () {

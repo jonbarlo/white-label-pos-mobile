@@ -4,14 +4,56 @@ part 'user.freezed.dart';
 part 'user.g.dart';
 
 enum UserRole {
-  @JsonValue('admin')
   admin,
-  @JsonValue('manager')
   manager,
-  @JsonValue('cashier')
   cashier,
-  @JsonValue('viewer')
+  waiter,
+  waitstaff,
   viewer,
+}
+
+// Custom converter for case-insensitive role parsing
+class UserRoleConverter implements JsonConverter<UserRole, String> {
+  const UserRoleConverter();
+
+  @override
+  UserRole fromJson(String json) {
+    final lowerJson = json.toLowerCase();
+    switch (lowerJson) {
+      case 'admin':
+        return UserRole.admin;
+      case 'manager':
+        return UserRole.manager;
+      case 'cashier':
+        return UserRole.cashier;
+      case 'waiter':
+        return UserRole.waiter;
+      case 'waitstaff':
+        return UserRole.waitstaff;
+      case 'viewer':
+        return UserRole.viewer;
+      default:
+        throw ArgumentError('Unknown user role: $json');
+    }
+  }
+
+  @override
+  String toJson(UserRole role) {
+    switch (role) {
+      case UserRole.admin:
+        return 'admin';
+      case UserRole.manager:
+        return 'manager';
+      case UserRole.cashier:
+        return 'cashier';
+      case UserRole.waiter:
+        return 'waiter';
+      case UserRole.waitstaff:
+        return 'waitstaff';
+      case UserRole.viewer:
+        return 'viewer';
+    }
+  }
 }
 
 @freezed
@@ -21,7 +63,7 @@ class User with _$User {
     required int businessId,
     required String name,
     required String email,
-    required UserRole role,
+    @UserRoleConverter() required UserRole role,
     required bool isActive,
     required DateTime createdAt,
     required DateTime updatedAt,
@@ -40,6 +82,10 @@ extension UserRoleExtension on UserRole {
         return 'Manager';
       case UserRole.cashier:
         return 'Cashier';
+      case UserRole.waiter:
+        return 'Waiter';
+      case UserRole.waitstaff:
+        return 'Waitstaff';
       case UserRole.viewer:
         return 'Viewer';
     }
@@ -48,6 +94,7 @@ extension UserRoleExtension on UserRole {
   bool get canAccessBusinessManagement => this == UserRole.admin;
   bool get canAccessPOS => this != UserRole.admin && this != UserRole.viewer;
   bool get canAccessKitchen => this == UserRole.viewer;
+  bool get canAccessWaiterDashboard => this == UserRole.waiter || this == UserRole.waitstaff;
   bool get canAccessReports => this == UserRole.admin || this == UserRole.manager;
   bool get canManageUsers => this == UserRole.admin;
   bool get canViewOnly => this == UserRole.viewer;

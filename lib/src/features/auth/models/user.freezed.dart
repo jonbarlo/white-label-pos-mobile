@@ -24,6 +24,7 @@ mixin _$User {
   int get businessId => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   String get email => throw _privateConstructorUsedError;
+  @UserRoleConverter()
   UserRole get role => throw _privateConstructorUsedError;
   bool get isActive => throw _privateConstructorUsedError;
   DateTime get createdAt => throw _privateConstructorUsedError;
@@ -49,7 +50,7 @@ abstract class $UserCopyWith<$Res> {
       int businessId,
       String name,
       String email,
-      UserRole role,
+      @UserRoleConverter() UserRole role,
       bool isActive,
       DateTime createdAt,
       DateTime updatedAt,
@@ -134,7 +135,7 @@ abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
       int businessId,
       String name,
       String email,
-      UserRole role,
+      @UserRoleConverter() UserRole role,
       bool isActive,
       DateTime createdAt,
       DateTime updatedAt,
@@ -212,7 +213,7 @@ class _$UserImpl implements _User {
       required this.businessId,
       required this.name,
       required this.email,
-      required this.role,
+      @UserRoleConverter() required this.role,
       required this.isActive,
       required this.createdAt,
       required this.updatedAt,
@@ -230,6 +231,7 @@ class _$UserImpl implements _User {
   @override
   final String email;
   @override
+  @UserRoleConverter()
   final UserRole role;
   @override
   final bool isActive;
@@ -293,7 +295,7 @@ abstract class _User implements User {
       required final int businessId,
       required final String name,
       required final String email,
-      required final UserRole role,
+      @UserRoleConverter() required final UserRole role,
       required final bool isActive,
       required final DateTime createdAt,
       required final DateTime updatedAt,
@@ -310,6 +312,7 @@ abstract class _User implements User {
   @override
   String get email;
   @override
+  @UserRoleConverter()
   UserRole get role;
   @override
   bool get isActive;

@@ -6,6 +6,7 @@ import 'data/repositories/auth_repository.dart';
 import 'data/repositories/auth_repository_impl.dart';
 import 'models/user.dart';
 import '../business/models/business.dart';
+import '../business/data/repositories/business_repository_impl.dart';
 import '../../core/config/env_config.dart';
 
 part 'auth_provider.g.dart';
@@ -48,11 +49,12 @@ class AuthState {
   bool get isAdmin => userRole == UserRole.admin;
   bool get isManager => userRole == UserRole.manager;
   bool get isCashier => userRole == UserRole.cashier;
-  bool get isKitchen => userRole == UserRole.viewer && user?.assignment == 'kitchen';
+  bool get isKitchen => userRole == UserRole.viewer && user?.assignment?.toLowerCase() == 'kitchen';
   
   bool get canAccessBusinessManagement => userRole?.canAccessBusinessManagement ?? false;
   bool get canAccessPOS => userRole?.canAccessPOS ?? false;
   bool get canAccessKitchen => userRole?.canAccessKitchen ?? false;
+  bool get canAccessWaiterDashboard => userRole?.canAccessWaiterDashboard ?? false;
   bool get canAccessReports => userRole?.canAccessReports ?? false;
   bool get canManageUsers => userRole?.canManageUsers ?? false;
 }
@@ -204,11 +206,26 @@ class AuthNotifier extends _$AuthNotifier {
         if (EnvConfig.isDebugMode) {
           print('🔐 AUTH PROVIDER: User is authenticated');
           print('🔐 AUTH PROVIDER: Current user: ${result.data!.name}');
+          print('🔐 AUTH PROVIDER: User businessId: ${result.data!.businessId}');
         }
+        
+        // Preserve existing business data if available, otherwise we'll need to fetch it
+        final currentBusiness = state.business;
+        
         state = state.copyWith(
           status: AuthStatus.authenticated,
           user: result.data,
+          business: currentBusiness, // Preserve existing business data
         );
+        
+        if (EnvConfig.isDebugMode) {
+          print('🔐 AUTH PROVIDER: Preserved business data: ${currentBusiness?.name} (ID: ${currentBusiness?.id})');
+        }
+        
+        // If business data is missing, try to fetch it
+        if (currentBusiness == null) {
+          await fetchBusinessDataIfNeeded();
+        }
       } else {
         if (EnvConfig.isDebugMode) {
           print('🔐 AUTH PROVIDER: User is not authenticated - ${result.errorMessage}');
@@ -232,6 +249,48 @@ class AuthNotifier extends _$AuthNotifier {
       print('🔐 AUTH PROVIDER: Clearing error state');
     }
     state = const AuthState(status: AuthStatus.unauthenticated);
+  }
+
+  /// Fetch business data if it's missing from auth state
+  Future<void> fetchBusinessDataIfNeeded() async {
+    if (state.business != null) {
+      if (EnvConfig.isDebugMode) {
+        print('🔐 AUTH PROVIDER: Business data already available: ${state.business!.name}');
+      }
+      return;
+    }
+
+    if (state.user?.businessId == null) {
+      if (EnvConfig.isDebugMode) {
+        print('🔐 AUTH PROVIDER: No business ID available from user data');
+      }
+      return;
+    }
+
+    if (EnvConfig.isDebugMode) {
+      print('🔐 AUTH PROVIDER: Fetching business data for ID: ${state.user!.businessId}');
+    }
+
+    try {
+      // Import the business repository
+      final businessRepository = ref.read(businessRepositoryProvider);
+      final result = await businessRepository.getBusiness(state.user!.businessId);
+
+      if (result.isSuccess && result.data != null) {
+        if (EnvConfig.isDebugMode) {
+          print('🔐 AUTH PROVIDER: Successfully fetched business: ${result.data!.name}');
+        }
+        state = state.copyWith(business: result.data);
+      } else {
+        if (EnvConfig.isDebugMode) {
+          print('🔐 AUTH PROVIDER: Failed to fetch business: ${result.errorMessage}');
+        }
+      }
+    } catch (e) {
+      if (EnvConfig.isDebugMode) {
+        print('🔐 AUTH PROVIDER: Error fetching business data: $e');
+      }
+    }
   }
 }
 

@@ -4,6 +4,7 @@ import 'package:mockito/annotations.dart';
 import 'package:white_label_pos_mobile/src/features/inventory/inventory_repository.dart';
 import 'package:white_label_pos_mobile/src/features/inventory/models/inventory_item.dart';
 import 'package:white_label_pos_mobile/src/shared/models/result.dart';
+import 'package:white_label_pos_mobile/src/features/inventory/models/category.dart';
 
 import 'inventory_repository_test.mocks.dart';
 
@@ -334,24 +335,61 @@ void main() {
 
     group('getCategories', () {
       test('returns success with categories', () async {
-        final categories = ['Fruits', 'Vegetables', 'Dairy', 'Meat'];
+        final categories = [
+          Category(
+            id: 1,
+            businessId: 1,
+            name: 'Fruits',
+            displayOrder: 1,
+            isActive: true,
+            createdAt: DateTime(2023, 1, 1),
+            updatedAt: DateTime(2023, 1, 1),
+          ),
+          Category(
+            id: 2,
+            businessId: 1,
+            name: 'Vegetables',
+            displayOrder: 2,
+            isActive: true,
+            createdAt: DateTime(2023, 1, 1),
+            updatedAt: DateTime(2023, 1, 1),
+          ),
+          Category(
+            id: 3,
+            businessId: 1,
+            name: 'Dairy',
+            displayOrder: 3,
+            isActive: true,
+            createdAt: DateTime(2023, 1, 1),
+            updatedAt: DateTime(2023, 1, 1),
+          ),
+          Category(
+            id: 4,
+            businessId: 1,
+            name: 'Meat',
+            displayOrder: 4,
+            isActive: true,
+            createdAt: DateTime(2023, 1, 1),
+            updatedAt: DateTime(2023, 1, 1),
+          ),
+        ];
 
-        when(mockInventoryRepository.getCategories())
+        when(mockInventoryRepository.getCategories(businessId: 1))
             .thenAnswer((_) async => Result.success(categories));
 
-        final result = await mockInventoryRepository.getCategories();
+        final result = await mockInventoryRepository.getCategories(businessId: 1);
 
         expect(result.isSuccess, isTrue);
         expect(result.data, categories);
         expect(result.data!.length, 4);
-        expect(result.data!.contains('Fruits'), isTrue);
+        expect(result.data!.any((c) => c.name == 'Fruits'), isTrue);
       });
 
       test('returns failure when categories cannot be loaded', () async {
-        when(mockInventoryRepository.getCategories())
+        when(mockInventoryRepository.getCategories(businessId: 1))
             .thenAnswer((_) async => Result.failure('Failed to load categories'));
 
-        final result = await mockInventoryRepository.getCategories();
+        final result = await mockInventoryRepository.getCategories(businessId: 1);
 
         expect(result.isFailure, isTrue);
         expect(result.errorMessage, 'Failed to load categories');
