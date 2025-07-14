@@ -235,21 +235,21 @@ class _MainAppState extends ConsumerState<MainApp> {
       // Convert assignment to lowercase for case-insensitive comparison
       final assignmentLower = assignment.toLowerCase();
       
-      switch (assignmentLower) {
-        case 'bar':
-          return const BarScreen();
-        case 'kitchen':
-          return const KitchenScreen();
-        default:
-          return Scaffold(
-            body: Center(
-              child: Text(
-                'Unknown viewer assignment: '
-                ' [31m$assignment [0m (expected: kitchen or bar)',
-                style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-              ),
+      // Check if assignment starts with 'kitchen' or 'bar' to handle variations like 'kitchen_read'
+      if (assignmentLower.startsWith('kitchen')) {
+        return const KitchenScreen();
+      } else if (assignmentLower.startsWith('bar')) {
+        return const BarScreen();
+      } else {
+        return Scaffold(
+          body: Center(
+            child: Text(
+              'Unknown viewer assignment: '
+              ' [31m$assignment [0m (expected: kitchen or bar)',
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
             ),
-          );
+          ),
+        );
       }
     }
 

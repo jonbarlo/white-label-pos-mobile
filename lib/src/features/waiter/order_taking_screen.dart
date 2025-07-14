@@ -8,6 +8,7 @@ import '../pos/models/menu_item.dart';
 import '../pos/pos_provider.dart';
 import 'waiter_order_provider.dart';
 import 'table_provider.dart';
+import 'package:another_flushbar/flushbar.dart';
 
 class OrderTakingScreen extends ConsumerStatefulWidget {
   final waiter_table.Table table;
@@ -26,12 +27,30 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
   String _customerName = '';
   String _customerNotes = '';
   bool _isSubmitting = false;
+  bool _isPrefilled = false;
+  bool _customerNameEditable = true;
 
   @override
   void initState() {
     super.initState();
     // Pre-fill customer name if available
     _customerName = widget.table.customerName ?? '';
+    _customerNotes = widget.table.notes ?? '';
+    if (widget.table.currentOrderId != null) {
+      // Fetch order details for ongoing order
+      Future.microtask(() async {
+        final container = ProviderScope.containerOf(context, listen: false);
+        final orderDetails = await container.read(orderByIdProvider(widget.table.currentOrderId!).future);
+        setState(() {
+          // Handle both old and new response formats
+          final customerData = orderDetails['customer'] ?? orderDetails['customerData'];
+          _customerName = customerData?['name'] ?? _customerName;
+          _customerNotes = orderDetails['notes'] ?? _customerNotes;
+          _customerNameEditable = false;
+          _isPrefilled = true;
+        });
+      });
+    }
   }
 
   @override
@@ -40,7 +59,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
     
     return Scaffold(
       appBar: AppBar(
-        title: Text('Order - Table ${widget.table.tableNumber}'),
+        title: Text('Order - Table ${widget.table.name}'),
         centerTitle: true,
         elevation: 2,
         backgroundColor: theme.colorScheme.primary,
@@ -167,6 +186,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
                   ),
                   onChanged: (value) => _customerName = value,
                   controller: TextEditingController(text: _customerName),
+                  enabled: _customerNameEditable,
                 ),
               ),
             ],
@@ -180,6 +200,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
             ),
             maxLines: 2,
             onChanged: (value) => _customerNotes = value,
+            controller: TextEditingController(text: _customerNotes),
           ),
         ],
       ),
@@ -609,22 +630,28 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
       ref.invalidate(tablesProvider);
       
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Order submitted! Table is now occupied.'),
-            backgroundColor: Colors.green,
-          ),
-        );
+        await Flushbar(
+          message: 'Order submitted! Table is now occupied.',
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 2),
+          margin: const EdgeInsets.all(16),
+          borderRadius: BorderRadius.circular(8),
+          flushbarPosition: FlushbarPosition.TOP,
+          icon: const Icon(Icons.check_circle, color: Colors.white),
+        ).show(context);
         Navigator.of(context).pop();
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error submitting order: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        Flushbar(
+          message: 'Error submitting order: $e',
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+          margin: const EdgeInsets.all(16),
+          borderRadius: BorderRadius.circular(8),
+          flushbarPosition: FlushbarPosition.TOP,
+          icon: const Icon(Icons.error, color: Colors.white),
+        ).show(context);
       }
     } finally {
       if (mounted) {

@@ -80,7 +80,7 @@ final tableProvider = FutureProvider.family<waiter_table.Table, int>((ref, table
   final table = await repo.getTable(tableId);
   
   if (EnvConfig.isDebugMode) {
-    print('🪑 PROVIDER: Received table ${table.tableNumber}');
+            print('🪑 PROVIDER: Received table ${table.name}');
   }
   
   return table;

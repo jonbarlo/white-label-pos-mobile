@@ -215,7 +215,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
         final filteredTables = tables.where((table) {
           final matchesStatus = filterStatus == null || table.status == filterStatus;
           final matchesSearch = _searchQuery.isEmpty ||
-              table.tableNumber.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+              table.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
               (table.customerName?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false);
           return matchesStatus && matchesSearch;
         }).toList();
@@ -373,7 +373,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Table ${table.tableNumber}',
+                      'Table ${table.name}',
                       style: theme.textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: statusColor,
@@ -478,17 +478,31 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
                 const Spacer(),
                 
                 // Action buttons
-                if (canTakeOrder) ...[
+                if (table.status == waiter_table.TableStatus.available) ...[
                   const SizedBox(height: 12),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
                       onPressed: () => _onTableSelected(table),
                       icon: const Icon(Icons.add_shopping_cart, size: 16),
-                      label: Text(
-                        table.currentOrderId != null ? 'Add Items' : 'Start Order',
-                        style: const TextStyle(fontSize: 12),
+                      label: const Text('Start Order', style: TextStyle(fontSize: 12)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: statusColor,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
+                    ),
+                  ),
+                ] else if (table.status == waiter_table.TableStatus.occupied && table.currentOrderId != null) ...[
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () => _onTableSelected(table),
+                      icon: const Icon(Icons.add_shopping_cart, size: 16),
+                      label: const Text('Add Items', style: TextStyle(fontSize: 12)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: statusColor,
                         foregroundColor: Colors.white,
@@ -555,7 +569,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Table ${table.tableNumber} Details'),
+        title: Text('Table ${table.name} Details'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,

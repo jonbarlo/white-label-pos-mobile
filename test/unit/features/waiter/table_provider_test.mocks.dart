@@ -115,10 +115,12 @@ class MockTableRepository extends _i1.Mock implements _i4.TableRepository {
       ) as _i2.Dio);
 
   @override
-  _i5.Future<List<_i3.Table>> getTables() => (super.noSuchMethod(
+  _i5.Future<List<_i3.Table>> getTables({int? businessId}) =>
+      (super.noSuchMethod(
         Invocation.method(
           #getTables,
           [],
+          {#businessId: businessId},
         ),
         returnValue: _i5.Future<List<_i3.Table>>.value(<_i3.Table>[]),
       ) as _i5.Future<List<_i3.Table>>);
@@ -199,21 +201,29 @@ class MockTableRepository extends _i1.Mock implements _i4.TableRepository {
       ) as _i5.Future<void>);
 
   @override
-  _i5.Future<List<_i3.Table>> getTablesByStatus(_i3.TableStatus? status) =>
+  _i5.Future<List<_i3.Table>> getTablesByStatus(
+    _i3.TableStatus? status, {
+    int? businessId,
+  }) =>
       (super.noSuchMethod(
         Invocation.method(
           #getTablesByStatus,
           [status],
+          {#businessId: businessId},
         ),
         returnValue: _i5.Future<List<_i3.Table>>.value(<_i3.Table>[]),
       ) as _i5.Future<List<_i3.Table>>);
 
   @override
-  _i5.Future<List<_i3.Table>> getMyAssignedTables(int? waiterId) =>
+  _i5.Future<List<_i3.Table>> getMyAssignedTables(
+    int? waiterId, {
+    int? businessId,
+  }) =>
       (super.noSuchMethod(
         Invocation.method(
           #getMyAssignedTables,
           [waiterId],
+          {#businessId: businessId},
         ),
         returnValue: _i5.Future<List<_i3.Table>>.value(<_i3.Table>[]),
       ) as _i5.Future<List<_i3.Table>>);

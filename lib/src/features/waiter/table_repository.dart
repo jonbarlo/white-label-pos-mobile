@@ -22,14 +22,25 @@ class TableRepository {
       print('🪑 TABLE: Response data: ${response.data}');
     }
 
-    final data = response.data['data'] as List<dynamic>;
+    // Handle the new response format with success/data structure
+    final responseData = response.data;
+    List<dynamic> data;
+    
+    if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
+      data = responseData['data'] as List<dynamic>;
+    } else if (responseData is List<dynamic>) {
+      data = responseData;
+    } else {
+      throw Exception('Unexpected response format');
+    }
+    
     final tables = data.map((json) => waiter_table.Table.fromJson(json)).toList();
 
     if (EnvConfig.isDebugMode) {
       print('🪑 TABLE: Parsed ${tables.length} tables');
       for (int i = 0; i < tables.length; i++) {
         final table = tables[i];
-        print('🪑 TABLE: Table $i: ${table.tableNumber}, status: ${table.status}, capacity: ${table.capacity}');
+        print('🪑 TABLE: Table $i: ${table.name}, status: ${table.status}, capacity: ${table.capacity}');
       }
     }
 
@@ -42,7 +53,13 @@ class TableRepository {
     }
 
     final response = await dio.get('/tables/$tableId');
-    return waiter_table.Table.fromJson(response.data['data']);
+    final responseData = response.data;
+    
+    if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
+      return waiter_table.Table.fromJson(responseData['data']);
+    } else {
+      return waiter_table.Table.fromJson(responseData);
+    }
   }
 
   Future<waiter_table.Table> updateTableStatus(int tableId, waiter_table.TableStatus status) async {
@@ -55,7 +72,13 @@ class TableRepository {
       data: {'status': status.name},
     );
 
-    return waiter_table.Table.fromJson(response.data['data']);
+    final responseData = response.data;
+    
+    if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
+      return waiter_table.Table.fromJson(responseData['data']);
+    } else {
+      return waiter_table.Table.fromJson(responseData);
+    }
   }
 
   Future<waiter_table.Table> assignTable(int tableId, int waiterId) async {
@@ -68,7 +91,13 @@ class TableRepository {
       data: {'waiterId': waiterId},
     );
 
-    return waiter_table.Table.fromJson(response.data['data']);
+    final responseData = response.data;
+    
+    if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
+      return waiter_table.Table.fromJson(responseData['data']);
+    } else {
+      return waiter_table.Table.fromJson(responseData);
+    }
   }
 
   Future<void> clearTable(int tableId) async {
@@ -95,7 +124,18 @@ class TableRepository {
       queryParameters: queryParams,
     );
 
-    final data = response.data['data'] as List<dynamic>;
+    // Handle the new response format with success/data structure
+    final responseData = response.data;
+    List<dynamic> data;
+    
+    if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
+      data = responseData['data'] as List<dynamic>;
+    } else if (responseData is List<dynamic>) {
+      data = responseData;
+    } else {
+      throw Exception('Unexpected response format');
+    }
+    
     final tables = data.map((json) => waiter_table.Table.fromJson(json)).toList();
 
     if (EnvConfig.isDebugMode) {
@@ -121,7 +161,18 @@ class TableRepository {
       queryParameters: queryParams,
     );
 
-    final data = response.data['data'] as List<dynamic>;
+    // Handle the new response format with success/data structure
+    final responseData = response.data;
+    List<dynamic> data;
+    
+    if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
+      data = responseData['data'] as List<dynamic>;
+    } else if (responseData is List<dynamic>) {
+      data = responseData;
+    } else {
+      throw Exception('Unexpected response format');
+    }
+    
     final tables = data.map((json) => waiter_table.Table.fromJson(json)).toList();
 
     if (EnvConfig.isDebugMode) {

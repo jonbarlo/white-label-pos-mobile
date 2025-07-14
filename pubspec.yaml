@@ -83,6 +83,7 @@ dependencies:
   # Localization
   flutter_localizations:
     sdk: flutter
+  another_flushbar: ^1.12.30
 
 dev_dependencies:
   flutter_test:

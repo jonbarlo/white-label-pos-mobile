@@ -19,7 +19,7 @@ class PosRepositoryImpl implements PosRepository {
   }
 
   void _setupDio() {
-    _dio.options.baseUrl = EnvConfig.apiBaseUrl;
+    // Remove hardcoded baseUrl setup - let DioClient handle it
     _dio.options.connectTimeout = Duration(milliseconds: EnvConfig.apiTimeout);
     _dio.options.receiveTimeout = Duration(milliseconds: EnvConfig.apiTimeout);
     
@@ -143,18 +143,18 @@ class PosRepositoryImpl implements PosRepository {
       final orderItems = items.map((item) => {
         'itemId': int.tryParse(item.id) ?? 1,
         'quantity': item.quantity ?? 1,
-        'unitPrice': item.price,
+        'unitPrice': item.price, // Required field as per API documentation
       }).toList();
 
       final saleData = {
-        'userId': authState.user?.id ?? businessId,
-        'businessId': businessId,
+        'userId': authState.user?.id ?? businessId, // Required field
+        'businessId': businessId, // Required field
         'customerName': customerName ?? 'Guest',
         'customerEmail': customerEmail ?? 'guest@pos.com',
         'totalAmount': total,
         'paymentMethod': _mapPaymentMethodToApi(paymentMethod),
         'status': 'completed',
-        'orderItems': orderItems,
+        'orderItems': orderItems, // Required field with unitPrice
       };
 
       print('🛒 SALE CREATION: Final sale data to send:');
@@ -199,6 +199,7 @@ class PosRepositoryImpl implements PosRepository {
         
         if (hasSuccessField || hasSuccessMessage) {
           print('🛒 SALE CREATION: Sale creation successful!');
+          // Handle both new response formats: {success, data} and {message, sale}
           final saleObj = responseData['data'] ?? responseData['sale'] ?? {};
           print('🛒 SALE CREATION: Sale object: $saleObj');
           

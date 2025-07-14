@@ -22,10 +22,18 @@ Table _$TableFromJson(Map<String, dynamic> json) {
 mixin _$Table {
   int get id => throw _privateConstructorUsedError;
   int get businessId => throw _privateConstructorUsedError;
-  String get tableNumber => throw _privateConstructorUsedError;
+  String get name =>
+      throw _privateConstructorUsedError; // Changed from tableNumber to name as per API
   TableStatus get status => throw _privateConstructorUsedError;
   int get capacity => throw _privateConstructorUsedError;
-  String? get currentOrderId => throw _privateConstructorUsedError;
+  String? get location =>
+      throw _privateConstructorUsedError; // Changed from section to location as per API
+  int? get currentOrderId => throw _privateConstructorUsedError;
+  int? get serverId => throw _privateConstructorUsedError;
+  bool? get isActive => throw _privateConstructorUsedError;
+  DateTime? get createdAt => throw _privateConstructorUsedError;
+  DateTime? get updatedAt =>
+      throw _privateConstructorUsedError; // Legacy fields for backward compatibility
   String? get currentOrderNumber => throw _privateConstructorUsedError;
   double? get currentOrderTotal => throw _privateConstructorUsedError;
   int? get currentOrderItemCount => throw _privateConstructorUsedError;
@@ -54,10 +62,15 @@ abstract class $TableCopyWith<$Res> {
   $Res call(
       {int id,
       int businessId,
-      String tableNumber,
+      String name,
       TableStatus status,
       int capacity,
-      String? currentOrderId,
+      String? location,
+      int? currentOrderId,
+      int? serverId,
+      bool? isActive,
+      DateTime? createdAt,
+      DateTime? updatedAt,
       String? currentOrderNumber,
       double? currentOrderTotal,
       int? currentOrderItemCount,
@@ -87,10 +100,15 @@ class _$TableCopyWithImpl<$Res, $Val extends Table>
   $Res call({
     Object? id = null,
     Object? businessId = null,
-    Object? tableNumber = null,
+    Object? name = null,
     Object? status = null,
     Object? capacity = null,
+    Object? location = freezed,
     Object? currentOrderId = freezed,
+    Object? serverId = freezed,
+    Object? isActive = freezed,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
     Object? currentOrderNumber = freezed,
     Object? currentOrderTotal = freezed,
     Object? currentOrderItemCount = freezed,
@@ -111,9 +129,9 @@ class _$TableCopyWithImpl<$Res, $Val extends Table>
           ? _value.businessId
           : businessId // ignore: cast_nullable_to_non_nullable
               as int,
-      tableNumber: null == tableNumber
-          ? _value.tableNumber
-          : tableNumber // ignore: cast_nullable_to_non_nullable
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
               as String,
       status: null == status
           ? _value.status
@@ -123,10 +141,30 @@ class _$TableCopyWithImpl<$Res, $Val extends Table>
           ? _value.capacity
           : capacity // ignore: cast_nullable_to_non_nullable
               as int,
+      location: freezed == location
+          ? _value.location
+          : location // ignore: cast_nullable_to_non_nullable
+              as String?,
       currentOrderId: freezed == currentOrderId
           ? _value.currentOrderId
           : currentOrderId // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as int?,
+      serverId: freezed == serverId
+          ? _value.serverId
+          : serverId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      isActive: freezed == isActive
+          ? _value.isActive
+          : isActive // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      updatedAt: freezed == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
       currentOrderNumber: freezed == currentOrderNumber
           ? _value.currentOrderNumber
           : currentOrderNumber // ignore: cast_nullable_to_non_nullable
@@ -181,10 +219,15 @@ abstract class _$$TableImplCopyWith<$Res> implements $TableCopyWith<$Res> {
   $Res call(
       {int id,
       int businessId,
-      String tableNumber,
+      String name,
       TableStatus status,
       int capacity,
-      String? currentOrderId,
+      String? location,
+      int? currentOrderId,
+      int? serverId,
+      bool? isActive,
+      DateTime? createdAt,
+      DateTime? updatedAt,
       String? currentOrderNumber,
       double? currentOrderTotal,
       int? currentOrderItemCount,
@@ -212,10 +255,15 @@ class __$$TableImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? businessId = null,
-    Object? tableNumber = null,
+    Object? name = null,
     Object? status = null,
     Object? capacity = null,
+    Object? location = freezed,
     Object? currentOrderId = freezed,
+    Object? serverId = freezed,
+    Object? isActive = freezed,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
     Object? currentOrderNumber = freezed,
     Object? currentOrderTotal = freezed,
     Object? currentOrderItemCount = freezed,
@@ -236,9 +284,9 @@ class __$$TableImplCopyWithImpl<$Res>
           ? _value.businessId
           : businessId // ignore: cast_nullable_to_non_nullable
               as int,
-      tableNumber: null == tableNumber
-          ? _value.tableNumber
-          : tableNumber // ignore: cast_nullable_to_non_nullable
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
               as String,
       status: null == status
           ? _value.status
@@ -248,10 +296,30 @@ class __$$TableImplCopyWithImpl<$Res>
           ? _value.capacity
           : capacity // ignore: cast_nullable_to_non_nullable
               as int,
+      location: freezed == location
+          ? _value.location
+          : location // ignore: cast_nullable_to_non_nullable
+              as String?,
       currentOrderId: freezed == currentOrderId
           ? _value.currentOrderId
           : currentOrderId // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as int?,
+      serverId: freezed == serverId
+          ? _value.serverId
+          : serverId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      isActive: freezed == isActive
+          ? _value.isActive
+          : isActive // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      updatedAt: freezed == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
       currentOrderNumber: freezed == currentOrderNumber
           ? _value.currentOrderNumber
           : currentOrderNumber // ignore: cast_nullable_to_non_nullable
@@ -302,10 +370,15 @@ class _$TableImpl implements _Table {
   const _$TableImpl(
       {required this.id,
       required this.businessId,
-      required this.tableNumber,
+      required this.name,
       required this.status,
       required this.capacity,
+      this.location,
       this.currentOrderId,
+      this.serverId,
+      this.isActive,
+      this.createdAt,
+      this.updatedAt,
       this.currentOrderNumber,
       this.currentOrderTotal,
       this.currentOrderItemCount,
@@ -326,13 +399,26 @@ class _$TableImpl implements _Table {
   @override
   final int businessId;
   @override
-  final String tableNumber;
+  final String name;
+// Changed from tableNumber to name as per API
   @override
   final TableStatus status;
   @override
   final int capacity;
   @override
-  final String? currentOrderId;
+  final String? location;
+// Changed from section to location as per API
+  @override
+  final int? currentOrderId;
+  @override
+  final int? serverId;
+  @override
+  final bool? isActive;
+  @override
+  final DateTime? createdAt;
+  @override
+  final DateTime? updatedAt;
+// Legacy fields for backward compatibility
   @override
   final String? currentOrderNumber;
   @override
@@ -363,7 +449,7 @@ class _$TableImpl implements _Table {
 
   @override
   String toString() {
-    return 'Table(id: $id, businessId: $businessId, tableNumber: $tableNumber, status: $status, capacity: $capacity, currentOrderId: $currentOrderId, currentOrderNumber: $currentOrderNumber, currentOrderTotal: $currentOrderTotal, currentOrderItemCount: $currentOrderItemCount, customerName: $customerName, notes: $notes, lastActivity: $lastActivity, reservationTime: $reservationTime, assignedWaiter: $assignedWaiter, assignedWaiterId: $assignedWaiterId, metadata: $metadata)';
+    return 'Table(id: $id, businessId: $businessId, name: $name, status: $status, capacity: $capacity, location: $location, currentOrderId: $currentOrderId, serverId: $serverId, isActive: $isActive, createdAt: $createdAt, updatedAt: $updatedAt, currentOrderNumber: $currentOrderNumber, currentOrderTotal: $currentOrderTotal, currentOrderItemCount: $currentOrderItemCount, customerName: $customerName, notes: $notes, lastActivity: $lastActivity, reservationTime: $reservationTime, assignedWaiter: $assignedWaiter, assignedWaiterId: $assignedWaiterId, metadata: $metadata)';
   }
 
   @override
@@ -374,13 +460,22 @@ class _$TableImpl implements _Table {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.businessId, businessId) ||
                 other.businessId == businessId) &&
-            (identical(other.tableNumber, tableNumber) ||
-                other.tableNumber == tableNumber) &&
+            (identical(other.name, name) || other.name == name) &&
             (identical(other.status, status) || other.status == status) &&
             (identical(other.capacity, capacity) ||
                 other.capacity == capacity) &&
+            (identical(other.location, location) ||
+                other.location == location) &&
             (identical(other.currentOrderId, currentOrderId) ||
                 other.currentOrderId == currentOrderId) &&
+            (identical(other.serverId, serverId) ||
+                other.serverId == serverId) &&
+            (identical(other.isActive, isActive) ||
+                other.isActive == isActive) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt) &&
             (identical(other.currentOrderNumber, currentOrderNumber) ||
                 other.currentOrderNumber == currentOrderNumber) &&
             (identical(other.currentOrderTotal, currentOrderTotal) ||
@@ -403,24 +498,30 @@ class _$TableImpl implements _Table {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      id,
-      businessId,
-      tableNumber,
-      status,
-      capacity,
-      currentOrderId,
-      currentOrderNumber,
-      currentOrderTotal,
-      currentOrderItemCount,
-      customerName,
-      notes,
-      lastActivity,
-      reservationTime,
-      assignedWaiter,
-      assignedWaiterId,
-      const DeepCollectionEquality().hash(_metadata));
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        id,
+        businessId,
+        name,
+        status,
+        capacity,
+        location,
+        currentOrderId,
+        serverId,
+        isActive,
+        createdAt,
+        updatedAt,
+        currentOrderNumber,
+        currentOrderTotal,
+        currentOrderItemCount,
+        customerName,
+        notes,
+        lastActivity,
+        reservationTime,
+        assignedWaiter,
+        assignedWaiterId,
+        const DeepCollectionEquality().hash(_metadata)
+      ]);
 
   /// Create a copy of Table
   /// with the given fields replaced by the non-null parameter values.
@@ -442,10 +543,15 @@ abstract class _Table implements Table {
   const factory _Table(
       {required final int id,
       required final int businessId,
-      required final String tableNumber,
+      required final String name,
       required final TableStatus status,
       required final int capacity,
-      final String? currentOrderId,
+      final String? location,
+      final int? currentOrderId,
+      final int? serverId,
+      final bool? isActive,
+      final DateTime? createdAt,
+      final DateTime? updatedAt,
       final String? currentOrderNumber,
       final double? currentOrderTotal,
       final int? currentOrderItemCount,
@@ -464,13 +570,23 @@ abstract class _Table implements Table {
   @override
   int get businessId;
   @override
-  String get tableNumber;
+  String get name; // Changed from tableNumber to name as per API
   @override
   TableStatus get status;
   @override
   int get capacity;
   @override
-  String? get currentOrderId;
+  String? get location; // Changed from section to location as per API
+  @override
+  int? get currentOrderId;
+  @override
+  int? get serverId;
+  @override
+  bool? get isActive;
+  @override
+  DateTime? get createdAt;
+  @override
+  DateTime? get updatedAt; // Legacy fields for backward compatibility
   @override
   String? get currentOrderNumber;
   @override

@@ -5,10 +5,12 @@ part 'user.g.dart';
 
 enum UserRole {
   admin,
+  owner,
   manager,
   cashier,
   waiter,
   waitstaff,
+  kitchen_staff,
   viewer,
 }
 
@@ -22,6 +24,8 @@ class UserRoleConverter implements JsonConverter<UserRole, String> {
     switch (lowerJson) {
       case 'admin':
         return UserRole.admin;
+      case 'owner':
+        return UserRole.owner;
       case 'manager':
         return UserRole.manager;
       case 'cashier':
@@ -29,7 +33,10 @@ class UserRoleConverter implements JsonConverter<UserRole, String> {
       case 'waiter':
         return UserRole.waiter;
       case 'waitstaff':
+      case 'wait_staff': // Handle both formats from API
         return UserRole.waitstaff;
+      case 'kitchen_staff':
+        return UserRole.kitchen_staff;
       case 'viewer':
         return UserRole.viewer;
       default:
@@ -42,6 +49,8 @@ class UserRoleConverter implements JsonConverter<UserRole, String> {
     switch (role) {
       case UserRole.admin:
         return 'admin';
+      case UserRole.owner:
+        return 'owner';
       case UserRole.manager:
         return 'manager';
       case UserRole.cashier:
@@ -50,6 +59,8 @@ class UserRoleConverter implements JsonConverter<UserRole, String> {
         return 'waiter';
       case UserRole.waitstaff:
         return 'waitstaff';
+      case UserRole.kitchen_staff:
+        return 'kitchen_staff';
       case UserRole.viewer:
         return 'viewer';
     }
@@ -78,6 +89,8 @@ extension UserRoleExtension on UserRole {
     switch (this) {
       case UserRole.admin:
         return 'Administrator';
+      case UserRole.owner:
+        return 'Owner';
       case UserRole.manager:
         return 'Manager';
       case UserRole.cashier:
@@ -86,6 +99,8 @@ extension UserRoleExtension on UserRole {
         return 'Waiter';
       case UserRole.waitstaff:
         return 'Waitstaff';
+      case UserRole.kitchen_staff:
+        return 'Kitchen Staff';
       case UserRole.viewer:
         return 'Viewer';
     }

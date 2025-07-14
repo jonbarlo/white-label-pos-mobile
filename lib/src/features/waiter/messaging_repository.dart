@@ -21,11 +21,25 @@ class MessagingRepository {
 
     final response = await dio.get('/messages', queryParameters: queryParams);
 
-    if (EnvConfig.isDebugMode) {
-      print('💬 MESSAGING: Found ${response.data['data']?.length ?? 0} messages');
+    // Handle both response formats: direct array or wrapped in data field
+    final responseData = response.data;
+    List<dynamic> messagesData;
+    
+    if (responseData is List) {
+      // Direct array response
+      messagesData = responseData;
+    } else if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
+      // Wrapped in data field
+      messagesData = responseData['data'] as List<dynamic>? ?? [];
+    } else {
+      messagesData = [];
     }
 
-    return List<Map<String, dynamic>>.from(response.data['data'] ?? []);
+    if (EnvConfig.isDebugMode) {
+      print('💬 MESSAGING: Found ${messagesData.length} messages');
+    }
+
+    return List<Map<String, dynamic>>.from(messagesData);
   }
 
   Future<Map<String, dynamic>> sendMessage({
@@ -92,11 +106,25 @@ class MessagingRepository {
 
     final response = await dio.get('/promotions', queryParameters: queryParams);
 
-    if (EnvConfig.isDebugMode) {
-      print('🎉 PROMOTIONS: Found ${response.data['data']?.length ?? 0} promotions');
+    // Handle both response formats: direct array or wrapped in data field
+    final responseData = response.data;
+    List<dynamic> promotionsData;
+    
+    if (responseData is List) {
+      // Direct array response
+      promotionsData = responseData;
+    } else if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
+      // Wrapped in data field
+      promotionsData = responseData['data'] as List<dynamic>? ?? [];
+    } else {
+      promotionsData = [];
     }
 
-    return List<Map<String, dynamic>>.from(response.data['data'] ?? []);
+    if (EnvConfig.isDebugMode) {
+      print('🎉 PROMOTIONS: Found ${promotionsData.length} promotions');
+    }
+
+    return List<Map<String, dynamic>>.from(promotionsData);
   }
 
   Future<Map<String, dynamic>> createPromotion({

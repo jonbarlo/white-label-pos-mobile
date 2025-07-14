@@ -104,10 +104,11 @@ class ReportsRepositoryImpl implements ReportsRepository {
         'endDate': endDate.toIso8601String(),
       });
 
-      // Handle both response.data and response.data['data'] formats
-      final data = response.data is Map<String, dynamic> && response.data['data'] != null 
-          ? response.data['data'] as Map<String, dynamic>
-          : response.data as Map<String, dynamic>;
+      // Handle the new response format with success/data structure
+      final responseData = response.data;
+      final data = responseData is Map<String, dynamic> && responseData.containsKey('data')
+          ? responseData['data'] as Map<String, dynamic>
+          : responseData as Map<String, dynamic>;
 
       final revenueReport = RevenueReport.fromJson(data);
       

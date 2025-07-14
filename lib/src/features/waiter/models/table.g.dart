@@ -9,10 +9,19 @@ part of 'table.dart';
 _$TableImpl _$$TableImplFromJson(Map<String, dynamic> json) => _$TableImpl(
       id: (json['id'] as num).toInt(),
       businessId: (json['businessId'] as num).toInt(),
-      tableNumber: json['tableNumber'] as String,
+      name: json['name'] as String,
       status: $enumDecode(_$TableStatusEnumMap, json['status']),
       capacity: (json['capacity'] as num).toInt(),
-      currentOrderId: json['currentOrderId'] as String?,
+      location: json['location'] as String?,
+      currentOrderId: (json['currentOrderId'] as num?)?.toInt(),
+      serverId: (json['serverId'] as num?)?.toInt(),
+      isActive: json['isActive'] as bool?,
+      createdAt: json['createdAt'] == null
+          ? null
+          : DateTime.parse(json['createdAt'] as String),
+      updatedAt: json['updatedAt'] == null
+          ? null
+          : DateTime.parse(json['updatedAt'] as String),
       currentOrderNumber: json['currentOrderNumber'] as String?,
       currentOrderTotal: (json['currentOrderTotal'] as num?)?.toDouble(),
       currentOrderItemCount: (json['currentOrderItemCount'] as num?)?.toInt(),
@@ -33,10 +42,15 @@ Map<String, dynamic> _$$TableImplToJson(_$TableImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
       'businessId': instance.businessId,
-      'tableNumber': instance.tableNumber,
+      'name': instance.name,
       'status': _$TableStatusEnumMap[instance.status]!,
       'capacity': instance.capacity,
+      'location': instance.location,
       'currentOrderId': instance.currentOrderId,
+      'serverId': instance.serverId,
+      'isActive': instance.isActive,
+      'createdAt': instance.createdAt?.toIso8601String(),
+      'updatedAt': instance.updatedAt?.toIso8601String(),
       'currentOrderNumber': instance.currentOrderNumber,
       'currentOrderTotal': instance.currentOrderTotal,
       'currentOrderItemCount': instance.currentOrderItemCount,

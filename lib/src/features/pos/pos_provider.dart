@@ -8,6 +8,7 @@ import 'models/menu_item.dart';
 import 'models/split_payment.dart';
 import '../../core/network/dio_client.dart';
 import '../auth/auth_provider.dart';
+import '../waiter/table_provider.dart';
 
 part 'pos_provider.g.dart';
 
@@ -189,6 +190,9 @@ Future<Sale> createSale(
   // Add to recent sales
     print('🛒 PROVIDER: Adding to recent sales...');
   ref.read(recentSalesNotifierProvider.notifier).addSale(sale);
+
+  // Invalidate tablesProvider to refresh table cards after order submission
+  ref.invalidate(tablesProvider); // <-- Add this line
 
     print('🛒 PROVIDER: Returning sale object');
   return sale;

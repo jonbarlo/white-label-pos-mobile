@@ -8,7 +8,8 @@ import 'models/table.dart' as waiter_table;
 
 class WaiterOrderRepository {
   final Dio dio;
-  WaiterOrderRepository(this.dio);
+  final Ref _ref;
+  WaiterOrderRepository(this.dio, this._ref);
 
   Future<Map<String, dynamic>> submitTableOrder({
     required int tableId,
@@ -30,30 +31,50 @@ class WaiterOrderRepository {
     final orderItems = items.map((cartItem) => {
       'itemId': int.parse(cartItem.id),
       'quantity': cartItem.quantity,
-      'price': cartItem.price,
-      'notes': cartItem.category ?? '',
+      'notes': cartItem.category ?? '', // Add notes field as per API documentation
     }).toList();
+
+    // Get auth state for business and user info
+    final authState = _ref.read(authNotifierProvider);
+    final businessId = authState.business?.id;
+    final userId = authState.user?.id;
+    
+    if (businessId == null || userId == null) {
+      throw Exception('Missing business or user information');
+    }
 
     final orderData = {
       'tableId': tableId,
-      'customerName': customerName,
-      'customerNotes': customerNotes,
+      'orderType': 'dine_in', // Required field as per API documentation
       'items': orderItems,
-      'subtotal': subtotal,
-      'tax': tax,
-      'total': total,
-      'orderType': 'table_service',
-      'waiterId': null, // Will be set from auth context
+      'notes': customerNotes, // Use notes instead of customerNotes
     };
+    
+    // Add customerId if we have customer information
+    if (customerName.isNotEmpty && customerName != 'Guest') {
+      // Note: In a real implementation, you might want to create/find customer first
+      // For now, we'll just include the customer name in notes
+      orderData['notes'] = '${orderData['notes']}\nCustomer: $customerName';
+    }
 
-    final response = await dio.post('/orders/table', data: orderData);
+    final response = await dio.post('/orders', data: orderData);
 
     if (EnvConfig.isDebugMode) {
       print('🪑 WAITER ORDER: Response status: ${response.statusCode}');
       print('🪑 WAITER ORDER: Response data: ${response.data}');
     }
 
-    return response.data;
+    // Handle the new response format with success/data structure
+    final responseData = response.data;
+    if (responseData is Map<String, dynamic>) {
+      if (responseData['success'] == true) {
+        return responseData;
+      } else {
+        throw Exception(responseData['message'] ?? 'Order submission failed');
+      }
+    }
+
+    return responseData;
   }
 
   Future<List<Map<String, dynamic>>> getTableOrders(int tableId) async {
@@ -108,11 +129,33 @@ class WaiterOrderRepository {
 
     return response.data;
   }
+
+  Future<Map<String, dynamic>> getOrderById(int orderId) async {
+    if (EnvConfig.isDebugMode) {
+      print('🪑 WAITER ORDER: Fetching order by ID $orderId');
+    }
+    final response = await dio.get('/orders/$orderId');
+    if (EnvConfig.isDebugMode) {
+      print('🪑 WAITER ORDER: Order details: ${response.data}');
+    }
+    
+    // Handle the new response format with success/data structure
+    final responseData = response.data;
+    if (responseData is Map<String, dynamic>) {
+      if (responseData.containsKey('data')) {
+        return responseData['data'] ?? {};
+      } else if (responseData.containsKey('success') && responseData['success'] == true) {
+        return responseData;
+      }
+    }
+    
+    return responseData;
+  }
 }
 
 final waiterOrderRepositoryProvider = Provider<WaiterOrderRepository>((ref) {
   final dio = ref.watch(dioClientProvider);
-  return WaiterOrderRepository(dio);
+  return WaiterOrderRepository(dio, ref);
 });
 
 final submitTableOrderProvider = FutureProvider.family<Map<String, dynamic>, ({
@@ -171,4 +214,11 @@ final addItemsToOrderProvider = FutureProvider.family<Map<String, dynamic>, ({St
     orderId: params.orderId,
     items: params.items,
   );
+}); 
+
+final orderByIdProvider = FutureProvider.family<Map<String, dynamic>, int>((ref, orderId) async {
+  final repo = ref.watch(waiterOrderRepositoryProvider);
+  final user = ref.watch(authNotifierProvider).user;
+  if (user == null) throw Exception('Not authenticated');
+  return await repo.getOrderById(orderId);
 }); 

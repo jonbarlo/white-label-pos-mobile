@@ -22,22 +22,22 @@ StaffMessage _$StaffMessageFromJson(Map<String, dynamic> json) {
 mixin _$StaffMessage {
   int get id => throw _privateConstructorUsedError;
   int get businessId => throw _privateConstructorUsedError;
+  int get senderId => throw _privateConstructorUsedError;
+  String get senderName => throw _privateConstructorUsedError;
   String get title => throw _privateConstructorUsedError;
   String get content => throw _privateConstructorUsedError;
   String get messageType => throw _privateConstructorUsedError;
+  String get recipientType => throw _privateConstructorUsedError;
   String get priority => throw _privateConstructorUsedError;
   String get status => throw _privateConstructorUsedError;
-  List<String> get targetRoles => throw _privateConstructorUsedError;
-  List<int>? get targetUserIds => throw _privateConstructorUsedError;
+  List<int>? get recipientIds => throw _privateConstructorUsedError;
+  List<String>? get readBy => throw _privateConstructorUsedError;
+  List<String>? get acknowledgedBy => throw _privateConstructorUsedError;
   String get createdAt => throw _privateConstructorUsedError;
   String? get updatedAt => throw _privateConstructorUsedError;
   String? get expiresAt => throw _privateConstructorUsedError;
   bool? get isRead => throw _privateConstructorUsedError;
-  bool? get isAcknowledged => throw _privateConstructorUsedError;
   String? get readAt => throw _privateConstructorUsedError;
-  String? get acknowledgedAt => throw _privateConstructorUsedError;
-  int? get readByUserId => throw _privateConstructorUsedError;
-  int? get acknowledgedByUserId => throw _privateConstructorUsedError;
   Map<String, dynamic>? get metadata => throw _privateConstructorUsedError;
 
   /// Serializes this StaffMessage to a JSON map.
@@ -59,22 +59,22 @@ abstract class $StaffMessageCopyWith<$Res> {
   $Res call(
       {int id,
       int businessId,
+      int senderId,
+      String senderName,
       String title,
       String content,
       String messageType,
+      String recipientType,
       String priority,
       String status,
-      List<String> targetRoles,
-      List<int>? targetUserIds,
+      List<int>? recipientIds,
+      List<String>? readBy,
+      List<String>? acknowledgedBy,
       String createdAt,
       String? updatedAt,
       String? expiresAt,
       bool? isRead,
-      bool? isAcknowledged,
       String? readAt,
-      String? acknowledgedAt,
-      int? readByUserId,
-      int? acknowledgedByUserId,
       Map<String, dynamic>? metadata});
 }
 
@@ -95,22 +95,22 @@ class _$StaffMessageCopyWithImpl<$Res, $Val extends StaffMessage>
   $Res call({
     Object? id = null,
     Object? businessId = null,
+    Object? senderId = null,
+    Object? senderName = null,
     Object? title = null,
     Object? content = null,
     Object? messageType = null,
+    Object? recipientType = null,
     Object? priority = null,
     Object? status = null,
-    Object? targetRoles = null,
-    Object? targetUserIds = freezed,
+    Object? recipientIds = freezed,
+    Object? readBy = freezed,
+    Object? acknowledgedBy = freezed,
     Object? createdAt = null,
     Object? updatedAt = freezed,
     Object? expiresAt = freezed,
     Object? isRead = freezed,
-    Object? isAcknowledged = freezed,
     Object? readAt = freezed,
-    Object? acknowledgedAt = freezed,
-    Object? readByUserId = freezed,
-    Object? acknowledgedByUserId = freezed,
     Object? metadata = freezed,
   }) {
     return _then(_value.copyWith(
@@ -122,6 +122,14 @@ class _$StaffMessageCopyWithImpl<$Res, $Val extends StaffMessage>
           ? _value.businessId
           : businessId // ignore: cast_nullable_to_non_nullable
               as int,
+      senderId: null == senderId
+          ? _value.senderId
+          : senderId // ignore: cast_nullable_to_non_nullable
+              as int,
+      senderName: null == senderName
+          ? _value.senderName
+          : senderName // ignore: cast_nullable_to_non_nullable
+              as String,
       title: null == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -134,6 +142,10 @@ class _$StaffMessageCopyWithImpl<$Res, $Val extends StaffMessage>
           ? _value.messageType
           : messageType // ignore: cast_nullable_to_non_nullable
               as String,
+      recipientType: null == recipientType
+          ? _value.recipientType
+          : recipientType // ignore: cast_nullable_to_non_nullable
+              as String,
       priority: null == priority
           ? _value.priority
           : priority // ignore: cast_nullable_to_non_nullable
@@ -142,14 +154,18 @@ class _$StaffMessageCopyWithImpl<$Res, $Val extends StaffMessage>
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
               as String,
-      targetRoles: null == targetRoles
-          ? _value.targetRoles
-          : targetRoles // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      targetUserIds: freezed == targetUserIds
-          ? _value.targetUserIds
-          : targetUserIds // ignore: cast_nullable_to_non_nullable
+      recipientIds: freezed == recipientIds
+          ? _value.recipientIds
+          : recipientIds // ignore: cast_nullable_to_non_nullable
               as List<int>?,
+      readBy: freezed == readBy
+          ? _value.readBy
+          : readBy // ignore: cast_nullable_to_non_nullable
+              as List<String>?,
+      acknowledgedBy: freezed == acknowledgedBy
+          ? _value.acknowledgedBy
+          : acknowledgedBy // ignore: cast_nullable_to_non_nullable
+              as List<String>?,
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -166,26 +182,10 @@ class _$StaffMessageCopyWithImpl<$Res, $Val extends StaffMessage>
           ? _value.isRead
           : isRead // ignore: cast_nullable_to_non_nullable
               as bool?,
-      isAcknowledged: freezed == isAcknowledged
-          ? _value.isAcknowledged
-          : isAcknowledged // ignore: cast_nullable_to_non_nullable
-              as bool?,
       readAt: freezed == readAt
           ? _value.readAt
           : readAt // ignore: cast_nullable_to_non_nullable
               as String?,
-      acknowledgedAt: freezed == acknowledgedAt
-          ? _value.acknowledgedAt
-          : acknowledgedAt // ignore: cast_nullable_to_non_nullable
-              as String?,
-      readByUserId: freezed == readByUserId
-          ? _value.readByUserId
-          : readByUserId // ignore: cast_nullable_to_non_nullable
-              as int?,
-      acknowledgedByUserId: freezed == acknowledgedByUserId
-          ? _value.acknowledgedByUserId
-          : acknowledgedByUserId // ignore: cast_nullable_to_non_nullable
-              as int?,
       metadata: freezed == metadata
           ? _value.metadata
           : metadata // ignore: cast_nullable_to_non_nullable
@@ -205,22 +205,22 @@ abstract class _$$StaffMessageImplCopyWith<$Res>
   $Res call(
       {int id,
       int businessId,
+      int senderId,
+      String senderName,
       String title,
       String content,
       String messageType,
+      String recipientType,
       String priority,
       String status,
-      List<String> targetRoles,
-      List<int>? targetUserIds,
+      List<int>? recipientIds,
+      List<String>? readBy,
+      List<String>? acknowledgedBy,
       String createdAt,
       String? updatedAt,
       String? expiresAt,
       bool? isRead,
-      bool? isAcknowledged,
       String? readAt,
-      String? acknowledgedAt,
-      int? readByUserId,
-      int? acknowledgedByUserId,
       Map<String, dynamic>? metadata});
 }
 
@@ -239,22 +239,22 @@ class __$$StaffMessageImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? businessId = null,
+    Object? senderId = null,
+    Object? senderName = null,
     Object? title = null,
     Object? content = null,
     Object? messageType = null,
+    Object? recipientType = null,
     Object? priority = null,
     Object? status = null,
-    Object? targetRoles = null,
-    Object? targetUserIds = freezed,
+    Object? recipientIds = freezed,
+    Object? readBy = freezed,
+    Object? acknowledgedBy = freezed,
     Object? createdAt = null,
     Object? updatedAt = freezed,
     Object? expiresAt = freezed,
     Object? isRead = freezed,
-    Object? isAcknowledged = freezed,
     Object? readAt = freezed,
-    Object? acknowledgedAt = freezed,
-    Object? readByUserId = freezed,
-    Object? acknowledgedByUserId = freezed,
     Object? metadata = freezed,
   }) {
     return _then(_$StaffMessageImpl(
@@ -266,6 +266,14 @@ class __$$StaffMessageImplCopyWithImpl<$Res>
           ? _value.businessId
           : businessId // ignore: cast_nullable_to_non_nullable
               as int,
+      senderId: null == senderId
+          ? _value.senderId
+          : senderId // ignore: cast_nullable_to_non_nullable
+              as int,
+      senderName: null == senderName
+          ? _value.senderName
+          : senderName // ignore: cast_nullable_to_non_nullable
+              as String,
       title: null == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -278,6 +286,10 @@ class __$$StaffMessageImplCopyWithImpl<$Res>
           ? _value.messageType
           : messageType // ignore: cast_nullable_to_non_nullable
               as String,
+      recipientType: null == recipientType
+          ? _value.recipientType
+          : recipientType // ignore: cast_nullable_to_non_nullable
+              as String,
       priority: null == priority
           ? _value.priority
           : priority // ignore: cast_nullable_to_non_nullable
@@ -286,14 +298,18 @@ class __$$StaffMessageImplCopyWithImpl<$Res>
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
               as String,
-      targetRoles: null == targetRoles
-          ? _value._targetRoles
-          : targetRoles // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      targetUserIds: freezed == targetUserIds
-          ? _value._targetUserIds
-          : targetUserIds // ignore: cast_nullable_to_non_nullable
+      recipientIds: freezed == recipientIds
+          ? _value._recipientIds
+          : recipientIds // ignore: cast_nullable_to_non_nullable
               as List<int>?,
+      readBy: freezed == readBy
+          ? _value._readBy
+          : readBy // ignore: cast_nullable_to_non_nullable
+              as List<String>?,
+      acknowledgedBy: freezed == acknowledgedBy
+          ? _value._acknowledgedBy
+          : acknowledgedBy // ignore: cast_nullable_to_non_nullable
+              as List<String>?,
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -310,26 +326,10 @@ class __$$StaffMessageImplCopyWithImpl<$Res>
           ? _value.isRead
           : isRead // ignore: cast_nullable_to_non_nullable
               as bool?,
-      isAcknowledged: freezed == isAcknowledged
-          ? _value.isAcknowledged
-          : isAcknowledged // ignore: cast_nullable_to_non_nullable
-              as bool?,
       readAt: freezed == readAt
           ? _value.readAt
           : readAt // ignore: cast_nullable_to_non_nullable
               as String?,
-      acknowledgedAt: freezed == acknowledgedAt
-          ? _value.acknowledgedAt
-          : acknowledgedAt // ignore: cast_nullable_to_non_nullable
-              as String?,
-      readByUserId: freezed == readByUserId
-          ? _value.readByUserId
-          : readByUserId // ignore: cast_nullable_to_non_nullable
-              as int?,
-      acknowledgedByUserId: freezed == acknowledgedByUserId
-          ? _value.acknowledgedByUserId
-          : acknowledgedByUserId // ignore: cast_nullable_to_non_nullable
-              as int?,
       metadata: freezed == metadata
           ? _value._metadata
           : metadata // ignore: cast_nullable_to_non_nullable
@@ -344,25 +344,26 @@ class _$StaffMessageImpl implements _StaffMessage {
   const _$StaffMessageImpl(
       {required this.id,
       required this.businessId,
+      required this.senderId,
+      required this.senderName,
       required this.title,
       required this.content,
       required this.messageType,
+      required this.recipientType,
       required this.priority,
       required this.status,
-      required final List<String> targetRoles,
-      final List<int>? targetUserIds,
+      final List<int>? recipientIds,
+      final List<String>? readBy,
+      final List<String>? acknowledgedBy,
       required this.createdAt,
       this.updatedAt,
       this.expiresAt,
       this.isRead,
-      this.isAcknowledged,
       this.readAt,
-      this.acknowledgedAt,
-      this.readByUserId,
-      this.acknowledgedByUserId,
       final Map<String, dynamic>? metadata})
-      : _targetRoles = targetRoles,
-        _targetUserIds = targetUserIds,
+      : _recipientIds = recipientIds,
+        _readBy = readBy,
+        _acknowledgedBy = acknowledgedBy,
         _metadata = metadata;
 
   factory _$StaffMessageImpl.fromJson(Map<String, dynamic> json) =>
@@ -373,29 +374,47 @@ class _$StaffMessageImpl implements _StaffMessage {
   @override
   final int businessId;
   @override
+  final int senderId;
+  @override
+  final String senderName;
+  @override
   final String title;
   @override
   final String content;
   @override
   final String messageType;
   @override
+  final String recipientType;
+  @override
   final String priority;
   @override
   final String status;
-  final List<String> _targetRoles;
+  final List<int>? _recipientIds;
   @override
-  List<String> get targetRoles {
-    if (_targetRoles is EqualUnmodifiableListView) return _targetRoles;
+  List<int>? get recipientIds {
+    final value = _recipientIds;
+    if (value == null) return null;
+    if (_recipientIds is EqualUnmodifiableListView) return _recipientIds;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_targetRoles);
+    return EqualUnmodifiableListView(value);
   }
 
-  final List<int>? _targetUserIds;
+  final List<String>? _readBy;
   @override
-  List<int>? get targetUserIds {
-    final value = _targetUserIds;
+  List<String>? get readBy {
+    final value = _readBy;
     if (value == null) return null;
-    if (_targetUserIds is EqualUnmodifiableListView) return _targetUserIds;
+    if (_readBy is EqualUnmodifiableListView) return _readBy;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
+  final List<String>? _acknowledgedBy;
+  @override
+  List<String>? get acknowledgedBy {
+    final value = _acknowledgedBy;
+    if (value == null) return null;
+    if (_acknowledgedBy is EqualUnmodifiableListView) return _acknowledgedBy;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(value);
   }
@@ -409,15 +428,7 @@ class _$StaffMessageImpl implements _StaffMessage {
   @override
   final bool? isRead;
   @override
-  final bool? isAcknowledged;
-  @override
   final String? readAt;
-  @override
-  final String? acknowledgedAt;
-  @override
-  final int? readByUserId;
-  @override
-  final int? acknowledgedByUserId;
   final Map<String, dynamic>? _metadata;
   @override
   Map<String, dynamic>? get metadata {
@@ -430,7 +441,7 @@ class _$StaffMessageImpl implements _StaffMessage {
 
   @override
   String toString() {
-    return 'StaffMessage(id: $id, businessId: $businessId, title: $title, content: $content, messageType: $messageType, priority: $priority, status: $status, targetRoles: $targetRoles, targetUserIds: $targetUserIds, createdAt: $createdAt, updatedAt: $updatedAt, expiresAt: $expiresAt, isRead: $isRead, isAcknowledged: $isAcknowledged, readAt: $readAt, acknowledgedAt: $acknowledgedAt, readByUserId: $readByUserId, acknowledgedByUserId: $acknowledgedByUserId, metadata: $metadata)';
+    return 'StaffMessage(id: $id, businessId: $businessId, senderId: $senderId, senderName: $senderName, title: $title, content: $content, messageType: $messageType, recipientType: $recipientType, priority: $priority, status: $status, recipientIds: $recipientIds, readBy: $readBy, acknowledgedBy: $acknowledgedBy, createdAt: $createdAt, updatedAt: $updatedAt, expiresAt: $expiresAt, isRead: $isRead, readAt: $readAt, metadata: $metadata)';
   }
 
   @override
@@ -441,17 +452,24 @@ class _$StaffMessageImpl implements _StaffMessage {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.businessId, businessId) ||
                 other.businessId == businessId) &&
+            (identical(other.senderId, senderId) ||
+                other.senderId == senderId) &&
+            (identical(other.senderName, senderName) ||
+                other.senderName == senderName) &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.content, content) || other.content == content) &&
             (identical(other.messageType, messageType) ||
                 other.messageType == messageType) &&
+            (identical(other.recipientType, recipientType) ||
+                other.recipientType == recipientType) &&
             (identical(other.priority, priority) ||
                 other.priority == priority) &&
             (identical(other.status, status) || other.status == status) &&
             const DeepCollectionEquality()
-                .equals(other._targetRoles, _targetRoles) &&
+                .equals(other._recipientIds, _recipientIds) &&
+            const DeepCollectionEquality().equals(other._readBy, _readBy) &&
             const DeepCollectionEquality()
-                .equals(other._targetUserIds, _targetUserIds) &&
+                .equals(other._acknowledgedBy, _acknowledgedBy) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
@@ -459,15 +477,7 @@ class _$StaffMessageImpl implements _StaffMessage {
             (identical(other.expiresAt, expiresAt) ||
                 other.expiresAt == expiresAt) &&
             (identical(other.isRead, isRead) || other.isRead == isRead) &&
-            (identical(other.isAcknowledged, isAcknowledged) ||
-                other.isAcknowledged == isAcknowledged) &&
             (identical(other.readAt, readAt) || other.readAt == readAt) &&
-            (identical(other.acknowledgedAt, acknowledgedAt) ||
-                other.acknowledgedAt == acknowledgedAt) &&
-            (identical(other.readByUserId, readByUserId) ||
-                other.readByUserId == readByUserId) &&
-            (identical(other.acknowledgedByUserId, acknowledgedByUserId) ||
-                other.acknowledgedByUserId == acknowledgedByUserId) &&
             const DeepCollectionEquality().equals(other._metadata, _metadata));
   }
 
@@ -477,22 +487,22 @@ class _$StaffMessageImpl implements _StaffMessage {
         runtimeType,
         id,
         businessId,
+        senderId,
+        senderName,
         title,
         content,
         messageType,
+        recipientType,
         priority,
         status,
-        const DeepCollectionEquality().hash(_targetRoles),
-        const DeepCollectionEquality().hash(_targetUserIds),
+        const DeepCollectionEquality().hash(_recipientIds),
+        const DeepCollectionEquality().hash(_readBy),
+        const DeepCollectionEquality().hash(_acknowledgedBy),
         createdAt,
         updatedAt,
         expiresAt,
         isRead,
-        isAcknowledged,
         readAt,
-        acknowledgedAt,
-        readByUserId,
-        acknowledgedByUserId,
         const DeepCollectionEquality().hash(_metadata)
       ]);
 
@@ -516,22 +526,22 @@ abstract class _StaffMessage implements StaffMessage {
   const factory _StaffMessage(
       {required final int id,
       required final int businessId,
+      required final int senderId,
+      required final String senderName,
       required final String title,
       required final String content,
       required final String messageType,
+      required final String recipientType,
       required final String priority,
       required final String status,
-      required final List<String> targetRoles,
-      final List<int>? targetUserIds,
+      final List<int>? recipientIds,
+      final List<String>? readBy,
+      final List<String>? acknowledgedBy,
       required final String createdAt,
       final String? updatedAt,
       final String? expiresAt,
       final bool? isRead,
-      final bool? isAcknowledged,
       final String? readAt,
-      final String? acknowledgedAt,
-      final int? readByUserId,
-      final int? acknowledgedByUserId,
       final Map<String, dynamic>? metadata}) = _$StaffMessageImpl;
 
   factory _StaffMessage.fromJson(Map<String, dynamic> json) =
@@ -542,19 +552,27 @@ abstract class _StaffMessage implements StaffMessage {
   @override
   int get businessId;
   @override
+  int get senderId;
+  @override
+  String get senderName;
+  @override
   String get title;
   @override
   String get content;
   @override
   String get messageType;
   @override
+  String get recipientType;
+  @override
   String get priority;
   @override
   String get status;
   @override
-  List<String> get targetRoles;
+  List<int>? get recipientIds;
   @override
-  List<int>? get targetUserIds;
+  List<String>? get readBy;
+  @override
+  List<String>? get acknowledgedBy;
   @override
   String get createdAt;
   @override
@@ -564,15 +582,7 @@ abstract class _StaffMessage implements StaffMessage {
   @override
   bool? get isRead;
   @override
-  bool? get isAcknowledged;
-  @override
   String? get readAt;
-  @override
-  String? get acknowledgedAt;
-  @override
-  int? get readByUserId;
-  @override
-  int? get acknowledgedByUserId;
   @override
   Map<String, dynamic>? get metadata;
 
