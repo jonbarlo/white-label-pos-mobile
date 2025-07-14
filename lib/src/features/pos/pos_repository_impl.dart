@@ -46,8 +46,8 @@ class PosRepositoryImpl implements PosRepository {
   Future<List<CartItem>> searchItems(String query) async {
     try {
       if (EnvConfig.isDebugMode) {
-        print('🔍 POS SEARCH: Searching for items with query: "$query"');
-        print('🔍 POS SEARCH: Making request to /items (menu routes disabled)');
+        print('🔍 POS SEARCH: Searching for menu items with query: "$query"');
+        print('🔍 POS SEARCH: Making request to /menu-items');
       }
 
       // Get business ID from auth state
@@ -61,10 +61,10 @@ class PosRepositoryImpl implements PosRepository {
 
       print('🔍 POS SEARCH: Using businessId: $businessId');
 
-      final response = await _dio.get('/items', queryParameters: {
+      final response = await _dio.get('/menu-items', queryParameters: {
         'businessId': businessId,
         if (query.isNotEmpty) 'search': query,
-        'isActive': true,
+        'isAvailable': true,
       });
 
       if (EnvConfig.isDebugMode) {
@@ -72,29 +72,29 @@ class PosRepositoryImpl implements PosRepository {
         print('✅ Response Data: ${response.data}');
       }
 
-      // The new /items endpoint returns a List directly
+      // The /menu-items endpoint returns a List directly
       final items = (response.data as List)
           .map((item) => _convertMenuItemToCartItem(_safeMenuItemFromJson(item as Map<String, dynamic>)))
           .toList();
 
       if (EnvConfig.isDebugMode) {
-        print('🔍 POS SEARCH: Found \x1B[32m${items.length}\x1B[0m items');
+        print('🔍 POS SEARCH: Found \x1B[32m${items.length}\x1B[0m menu items');
       }
       return items;
     } catch (e, stack) {
       if (EnvConfig.isDebugMode) {
         print('🔍 POS SEARCH: Error occurred: $e');
       }
-      throw Exception('Failed to search items: $e');
+      throw Exception('Failed to search menu items: $e');
     }
   }
 
   @override
   Future<CartItem?> getItemByBarcode(String barcode) async {
     try {
-      final response = await _dio.get('/items', queryParameters: {
+      final response = await _dio.get('/menu-items', queryParameters: {
         'barcode': barcode,
-        'isActive': true,
+        'isAvailable': true,
       });
 
       if (response.statusCode == 200 && response.data['success'] == true) {
@@ -106,7 +106,7 @@ class PosRepositoryImpl implements PosRepository {
       
       return null;
     } catch (e) {
-      throw Exception('Failed to get item by barcode: $e');
+      throw Exception('Failed to get menu item by barcode: $e');
     }
   }
 

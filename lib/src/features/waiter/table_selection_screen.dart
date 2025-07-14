@@ -5,6 +5,7 @@ import 'models/table.dart' as waiter_table;
 import '../../core/theme/app_theme.dart';
 import '../../shared/widgets/theme_toggle_button.dart';
 import 'order_taking_screen.dart';
+import 'waiter_order_provider.dart';
 
 class TableSelectionScreen extends ConsumerStatefulWidget {
   const TableSelectionScreen({Key? key}) : super(key: key);
@@ -480,22 +481,40 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
                 // Action buttons
                 if (table.status == waiter_table.TableStatus.available) ...[
                   const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: () => _onTableSelected(table),
-                      icon: const Icon(Icons.add_shopping_cart, size: 16),
-                      label: const Text('Start Order', style: TextStyle(fontSize: 12)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: statusColor,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () => _onTableSelected(table),
+                          icon: const Icon(Icons.add_shopping_cart, size: 16),
+                          label: const Text('Start Order', style: TextStyle(fontSize: 12)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: statusColor,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => _showReserveTableDialog(table),
+                          icon: const Icon(Icons.event_available, size: 16),
+                          label: const Text('Reserve', style: TextStyle(fontSize: 12)),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.blue,
+                            side: const BorderSide(color: Colors.blue),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ] else if (table.status == waiter_table.TableStatus.occupied && table.currentOrderId != null) ...[
+                ] else if (table.status == waiter_table.TableStatus.available || table.status == waiter_table.TableStatus.reserved || table.status == waiter_table.TableStatus.occupied) ...[
                   const SizedBox(height: 12),
                   SizedBox(
                     width: double.infinity,
@@ -506,6 +525,41 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
                       style: ElevatedButton.styleFrom(
                         backgroundColor: statusColor,
                         foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (table.status == waiter_table.TableStatus.occupied) ...[
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () => _clearTable(table),
+                        icon: const Icon(Icons.cleaning_services, size: 16),
+                        label: const Text('Clear Table', style: TextStyle(fontSize: 12)),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.green,
+                          side: const BorderSide(color: Colors.green),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ] else if (table.status == waiter_table.TableStatus.cleaning) ...[
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () => _clearTable(table),
+                      icon: const Icon(Icons.cleaning_services, size: 16),
+                      label: const Text('Clear Table', style: TextStyle(fontSize: 12)),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.green,
+                        side: const BorderSide(color: Colors.green),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -556,32 +610,104 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
     }
   }
 
-  void _onTableSelected(waiter_table.Table table) {
-    // Navigate to order taking screen
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => OrderTakingScreen(table: table),
-      ),
-    );
+  void _onTableSelected(waiter_table.Table table) async {
+    if (table.status == waiter_table.TableStatus.occupied && table.currentOrderId != null) {
+      // Fetch all orders for this table
+      final container = ProviderScope.containerOf(context, listen: false);
+      final orders = await container.read(tableOrdersProvider(table.id).future);
+      // Filter for open orders (not completed/cancelled)
+      final openOrders = orders.where((order) =>
+        order['status'] != 'completed' && order['status'] != 'cancelled').toList();
+      if (openOrders.isEmpty) {
+        // Fallback: just use the current order
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => OrderTakingScreen(table: table),
+          ),
+        );
+        return;
+      }
+      if (openOrders.length == 1) {
+        // Only one open order, use it
+        final order = openOrders.first;
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => OrderTakingScreen(
+              table: table,
+              prefillOrder: order,
+            ),
+          ),
+        );
+      } else {
+        // Multiple open orders, prompt user to select
+        final selected = await showDialog<Map<String, dynamic>>(
+          context: context,
+          builder: (context) => SimpleDialog(
+            title: const Text('Select Open Order'),
+            children: openOrders.map((order) => SimpleDialogOption(
+              onPressed: () => Navigator.pop(context, order),
+              child: Text('Order #${order['orderNumber'] ?? order['id']}'),
+            )).toList(),
+          ),
+        );
+        if (selected != null) {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => OrderTakingScreen(
+                table: table,
+                prefillOrder: selected,
+              ),
+            ),
+          );
+        }
+      }
+    } else {
+      // Default: start new order
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => OrderTakingScreen(table: table),
+        ),
+      );
+    }
   }
 
-  void _showTableDetails(waiter_table.Table table) {
+  void _showTableDetails(waiter_table.Table table) async {
+    // Fetch order details if there is a current order
+    Map<String, dynamic>? orderDetails;
+    if (table.currentOrderId != null) {
+      final container = ProviderScope.containerOf(context, listen: false);
+      orderDetails = await container.read(orderByIdProvider(table.currentOrderId!).future);
+    }
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Table ${table.name} Details'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Status: ${table.status.displayName}'),
-            Text('Capacity: ${table.capacity} seats'),
-            if (table.customerName != null) Text('Customer: ${table.customerName}'),
-            if (table.assignedWaiter != null) Text('Assigned to: ${table.assignedWaiter}'),
-            if (table.notes != null) Text('Notes: ${table.notes}'),
-            if (table.lastActivity != null) Text('Last Activity: ${_formatDateTime(table.lastActivity!)}'),
-            if (table.reservationTime != null) Text('Reservation: ${_formatDateTime(table.reservationTime!)}'),
-          ],
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Status: ${table.status.displayName}'),
+              Text('Capacity: ${table.capacity} seats'),
+              if (table.customerName != null) Text('Customer: ${table.customerName}'),
+              if (table.assignedWaiter != null) Text('Assigned to: ${table.assignedWaiter}'),
+              if (table.notes != null) Text('Notes: ${table.notes}'),
+              if (table.lastActivity != null) Text('Last Activity: ${_formatDateTime(table.lastActivity!)}'),
+              if (table.reservationTime != null) Text('Reservation: ${_formatDateTime(table.reservationTime!)}'),
+              if (orderDetails != null) ...[
+                const Divider(height: 24),
+                Text('Order Items:', style: TextStyle(fontWeight: FontWeight.bold)),
+                ...((orderDetails['items'] as List?)?.map((item) => Text(
+                  '${item['quantity']}x ${item['name']}',
+                  style: const TextStyle(fontSize: 15),
+                )) ?? [const Text('No items')]),
+                if (orderDetails['total'] != null) ...[
+                  const SizedBox(height: 8),
+                  Text('Total:  \$${orderDetails['total'].toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                ],
+              ],
+            ],
+          ),
         ),
         actions: [
           TextButton(
@@ -591,6 +717,131 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
         ],
       ),
     );
+  }
+
+  void _showReserveTableDialog(waiter_table.Table table) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        final _nameController = TextEditingController();
+        final _notesController = TextEditingController();
+        DateTime? _reservationTime;
+        return StatefulBuilder(
+          builder: (context, setState) => AlertDialog(
+            title: Text('Reserve Table ${table.name}'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(labelText: 'Customer Name'),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _notesController,
+                  decoration: const InputDecoration(labelText: 'Notes'),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    const Text('Time:'),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () async {
+                          final picked = await showTimePicker(
+                            context: context,
+                            initialTime: TimeOfDay.now(),
+                          );
+                          if (picked != null) {
+                            setState(() {
+                              _reservationTime = DateTime(
+                                DateTime.now().year,
+                                DateTime.now().month,
+                                DateTime.now().day,
+                                picked.hour,
+                                picked.minute,
+                              );
+                            });
+                          }
+                        },
+                        child: Text(_reservationTime != null
+                            ? '${_reservationTime!.hour.toString().padLeft(2, '0')}:${_reservationTime!.minute.toString().padLeft(2, '0')}'
+                            : 'Select Time'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  // TODO: Call backend to reserve table
+                  // For now, just close dialog
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Table reserved (placeholder)!')),
+                  );
+                },
+                child: const Text('Reserve'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _clearTable(waiter_table.Table table) async {
+    try {
+      final container = ProviderScope.containerOf(context, listen: false);
+      
+      // Show loading indicator
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+              const SizedBox(width: 16),
+              Text('Clearing table ${table.name}...'),
+            ],
+          ),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+
+      // Call the clear table provider
+      await container.read(clearTableProvider(table.id).future);
+
+      // Show success message
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Table ${table.name} cleared successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      // Show error message
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to clear table: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   String _formatDateTime(DateTime dateTime) {

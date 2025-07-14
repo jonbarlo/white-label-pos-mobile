@@ -14,6 +14,8 @@ import '../features/business/business_list_screen.dart';
 import '../core/config/env_config.dart';
 import '../features/viewer/bar_screen.dart';
 import '../features/viewer/kitchen_screen.dart';
+import '../features/viewer/kitchen_screen_readonly.dart';
+import '../features/viewer/kitchen_screen_manager.dart';
 import '../features/waiter/table_selection_screen.dart';
 import '../features/waiter/waiter_dashboard_screen.dart';
 
@@ -237,7 +239,13 @@ class _MainAppState extends ConsumerState<MainApp> {
       
       // Check if assignment starts with 'kitchen' or 'bar' to handle variations like 'kitchen_read'
       if (assignmentLower.startsWith('kitchen')) {
-        return const KitchenScreen();
+        // Route to different kitchen screens based on assignment
+        if (assignmentLower == 'kitchen_read') {
+          return const KitchenScreenReadOnly();
+        } else {
+          // kitchen_write, kitchen_manager, etc. get the interactive manager view
+          return const KitchenScreenManager();
+        }
       } else if (assignmentLower.startsWith('bar')) {
         return const BarScreen();
       } else {

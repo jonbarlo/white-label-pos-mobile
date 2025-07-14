@@ -786,7 +786,7 @@ class _MenuItemCard extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  IconButton(
+                  ElevatedButton.icon(
                     onPressed: () => onAddToCart(CartItem(
                       id: item.id.toString(),
                       name: item.name,
@@ -795,12 +795,16 @@ class _MenuItemCard extends StatelessWidget {
                       imageUrl: item.image,
                       category: item.categoryId.toString(),
                     )),
-                    icon: Icon(
-                      Icons.add_circle,
-                      color: theme.colorScheme.primary,
-                    ),
-                    style: IconButton.styleFrom(
-                      backgroundColor: theme.colorScheme.primaryContainer,
+                    icon: const Icon(Icons.add_circle, size: 20),
+                    label: const Text('Add to Cart', style: TextStyle(fontSize: 16)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                      textStyle: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],
@@ -974,21 +978,18 @@ class _CartSection extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     height: 50,
-                    child: ElevatedButton(
+                    child: ElevatedButton.icon(
                       onPressed: onCheckout,
-                      style: AppTheme.neutralButtonStyle,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.payment),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Checkout',
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                      icon: const Icon(Icons.shopping_cart_checkout, size: 20),
+                      label: const Text('Checkout', style: TextStyle(fontSize: 16)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                        textStyle: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),

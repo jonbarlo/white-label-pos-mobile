@@ -34,6 +34,15 @@ class WaiterOrderRepository {
       'notes': cartItem.category ?? '', // Add notes field as per API documentation
     }).toList();
 
+    if (EnvConfig.isDebugMode) {
+      print('🪑 WAITER ORDER: Order items being sent:');
+      for (int i = 0; i < orderItems.length; i++) {
+        final item = orderItems[i];
+        print('🪑 WAITER ORDER:   Item $i: itemId=${item['itemId']}, quantity=${item['quantity']}, notes=${item['notes']}');
+      }
+      print('🪑 WAITER ORDER: Using menu item IDs from /menu-items endpoint');
+    }
+
     // Get auth state for business and user info
     final authState = _ref.read(authNotifierProvider);
     final businessId = authState.business?.id;
@@ -45,7 +54,6 @@ class WaiterOrderRepository {
 
     final orderData = {
       'tableId': tableId,
-      'orderType': 'dine_in', // Required field as per API documentation
       'items': orderItems,
       'notes': customerNotes, // Use notes instead of customerNotes
     };
@@ -57,7 +65,7 @@ class WaiterOrderRepository {
       orderData['notes'] = '${orderData['notes']}\nCustomer: $customerName';
     }
 
-    final response = await dio.post('/orders', data: orderData);
+    final response = await dio.post('/orders/table', data: orderData);
 
     if (EnvConfig.isDebugMode) {
       print('🪑 WAITER ORDER: Response status: ${response.statusCode}');
@@ -68,6 +76,10 @@ class WaiterOrderRepository {
     final responseData = response.data;
     if (responseData is Map<String, dynamic>) {
       if (responseData['success'] == true) {
+        if (EnvConfig.isDebugMode) {
+          print('🪑 WAITER ORDER: Order submitted successfully!');
+          print('🪑 WAITER ORDER: Order ID: ${responseData['data']?['id'] ?? responseData['id']}');
+        }
         return responseData;
       } else {
         throw Exception(responseData['message'] ?? 'Order submission failed');
@@ -79,16 +91,31 @@ class WaiterOrderRepository {
 
   Future<List<Map<String, dynamic>>> getTableOrders(int tableId) async {
     if (EnvConfig.isDebugMode) {
-      print('🪑 WAITER ORDER: Fetching orders for table $tableId');
+      print('🪑 WAITER ORDER: Fetching orders for table $tableId using new endpoint');
     }
 
     final response = await dio.get('/orders/table/$tableId');
 
     if (EnvConfig.isDebugMode) {
-      print('🪑 WAITER ORDER: Found ${response.data['data']?.length ?? 0} orders');
+      print('🪑 WAITER ORDER: Response status: ${response.statusCode}');
+      print('🪑 WAITER ORDER: Response data: ${response.data}');
     }
 
-    return List<Map<String, dynamic>>.from(response.data['data'] ?? []);
+    // Handle the new response format
+    List<dynamic> orders;
+    if (response.data is Map<String, dynamic> && response.data.containsKey('data')) {
+      orders = response.data['data'] as List<dynamic>;
+    } else if (response.data is List<dynamic>) {
+      orders = response.data;
+    } else {
+      orders = [];
+    }
+
+    if (EnvConfig.isDebugMode) {
+      print('🪑 WAITER ORDER: Found ${orders.length} orders');
+    }
+
+    return List<Map<String, dynamic>>.from(orders);
   }
 
   Future<Map<String, dynamic>> updateOrderStatus({
@@ -136,20 +163,97 @@ class WaiterOrderRepository {
     }
     final response = await dio.get('/orders/$orderId');
     if (EnvConfig.isDebugMode) {
-      print('🪑 WAITER ORDER: Order details: ${response.data}');
+      print('🪑 WAITER ORDER: Raw response data: ${response.data}');
+      print('🪑 WAITER ORDER: Response status: ${response.statusCode}');
     }
     
     // Handle the new response format with success/data structure
     final responseData = response.data;
     if (responseData is Map<String, dynamic>) {
       if (responseData.containsKey('data')) {
-        return responseData['data'] ?? {};
+        final data = responseData['data'] ?? {};
+        if (EnvConfig.isDebugMode) {
+          print('🪑 WAITER ORDER: Using data field: $data');
+          print('🪑 WAITER ORDER: Order items in data: ${data['items']}');
+        }
+        return data;
       } else if (responseData.containsKey('success') && responseData['success'] == true) {
+        if (EnvConfig.isDebugMode) {
+          print('🪑 WAITER ORDER: Using success response: $responseData');
+          print('🪑 WAITER ORDER: Order items in success: ${responseData['items']}');
+        }
         return responseData;
       }
     }
     
+    if (EnvConfig.isDebugMode) {
+      print('🪑 WAITER ORDER: Returning raw response data: $responseData');
+    }
     return responseData;
+  }
+
+  Future<List<Map<String, dynamic>>> getMenuItems({String? search}) async {
+    if (EnvConfig.isDebugMode) {
+      print('🪑 WAITER ORDER: Fetching menu items');
+      if (search != null) print('🪑 WAITER ORDER: Search query: $search');
+    }
+
+    try {
+      // Get business ID from auth state
+      final authState = _ref.read(authNotifierProvider);
+      final businessId = authState.business?.id;
+      
+      if (businessId == null) {
+        throw Exception('Missing business information');
+      }
+
+      final queryParams = <String, dynamic>{
+        'businessId': businessId,
+        'isAvailable': true,
+      };
+      
+      if (search != null && search.isNotEmpty) {
+        queryParams['search'] = search;
+      }
+
+      if (EnvConfig.isDebugMode) {
+        print('🪑 WAITER ORDER: Making request to /menu-items with params: $queryParams');
+      }
+
+      final response = await dio.get('/menu-items', queryParameters: queryParams);
+
+      if (EnvConfig.isDebugMode) {
+        print('🪑 WAITER ORDER: Response status: ${response.statusCode}');
+        print('🪑 WAITER ORDER: Response data: ${response.data}');
+      }
+
+      // Handle different response formats
+      List<dynamic> data;
+      if (response.data is Map<String, dynamic> && response.data.containsKey('data')) {
+        data = response.data['data'] as List<dynamic>;
+      } else if (response.data is List<dynamic>) {
+        data = response.data;
+      } else {
+        throw Exception('Unexpected response format from /menu-items');
+      }
+
+      final menuItems = List<Map<String, dynamic>>.from(data);
+
+      if (EnvConfig.isDebugMode) {
+        print('🪑 WAITER ORDER: Found ${menuItems.length} menu items');
+      }
+
+      return menuItems;
+    } catch (e) {
+      if (EnvConfig.isDebugMode) {
+        print('🪑 WAITER ORDER: Error fetching menu items: $e');
+        if (e is DioException) {
+          print('🪑 WAITER ORDER: DioException status: ${e.response?.statusCode}');
+          print('🪑 WAITER ORDER: DioException data: ${e.response?.data}');
+        }
+      }
+      rethrow;
+    }
   }
 }
 
@@ -221,4 +325,11 @@ final orderByIdProvider = FutureProvider.family<Map<String, dynamic>, int>((ref,
   final user = ref.watch(authNotifierProvider).user;
   if (user == null) throw Exception('Not authenticated');
   return await repo.getOrderById(orderId);
+});
+
+final menuItemsProvider = FutureProvider.family<List<Map<String, dynamic>>, String?>((ref, search) async {
+  final repo = ref.watch(waiterOrderRepositoryProvider);
+  final user = ref.watch(authNotifierProvider).user;
+  if (user == null) throw Exception('Not authenticated');
+  return await repo.getMenuItems(search: search);
 }); 

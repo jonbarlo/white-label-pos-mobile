@@ -40,7 +40,7 @@ class TableRepository {
       print('🪑 TABLE: Parsed ${tables.length} tables');
       for (int i = 0; i < tables.length; i++) {
         final table = tables[i];
-        print('🪑 TABLE: Table $i: ${table.name}, status: ${table.status}, capacity: ${table.capacity}');
+        print('🪑 TABLE: Table $i: ${table.name}, status: ${table.status}, capacity: ${table.capacity}, currentOrderId: ${table.currentOrderId}');
       }
     }
 
@@ -105,7 +105,10 @@ class TableRepository {
       print('🪑 TABLE: Clearing table $tableId');
     }
 
-    await dio.post('/tables/$tableId/clear');
+    await dio.put(
+      '/tables/$tableId/status',
+      data: {'status': 'available'},
+    );
   }
 
   Future<List<waiter_table.Table>> getTablesByStatus(waiter_table.TableStatus status, {int? businessId}) async {
