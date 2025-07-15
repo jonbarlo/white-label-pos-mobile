@@ -90,7 +90,7 @@ class KitchenScreen extends ConsumerWidget {
                     crossAxisCount: crossAxisCount,
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
-                    childAspectRatio: 1.0, // Square cards
+                    childAspectRatio: 0.8, // Taller cards to show more items
                   ),
                   itemCount: orders.length,
                   itemBuilder: (context, index) {
@@ -242,31 +242,39 @@ class _KitchenOrderCardState extends State<KitchenOrderCard> {
             
             const SizedBox(height: 6),
             
-            // Items List - Compact
+            // Items List - Scrollable for many items
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ..._items.take(2).map((item) => Padding(
-                    padding: const EdgeInsets.only(bottom: 1),
-                    child: Text(
-                      '${item.quantity}x ${item.itemName}',
-                      style: theme.textTheme.bodySmall?.copyWith(fontSize: 11),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  )),
-                  if (_items.length > 2)
-                    Text(
-                      '+${_items.length - 2} more',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.primary,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 10,
-                      ),
-                    ),
-                ],
-              ),
+              child: _items.length <= 6 
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ..._items.map((item) => Padding(
+                        padding: const EdgeInsets.only(bottom: 2),
+                        child: Text(
+                          '${item.quantity}x ${item.itemName}',
+                          style: theme.textTheme.bodySmall?.copyWith(fontSize: 11),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      )),
+                    ],
+                  )
+                : ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: _items.length,
+                    itemBuilder: (context, index) {
+                      final item = _items[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 2),
+                        child: Text(
+                          '${item.quantity}x ${item.itemName}',
+                          style: theme.textTheme.bodySmall?.copyWith(fontSize: 11),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      );
+                    },
+                  ),
             ),
             
             const SizedBox(height: 4),
