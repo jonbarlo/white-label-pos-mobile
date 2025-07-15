@@ -44,6 +44,7 @@ mixin _$Table {
   String? get assignedWaiter => throw _privateConstructorUsedError;
   int? get assignedWaiterId => throw _privateConstructorUsedError;
   Map<String, dynamic>? get metadata => throw _privateConstructorUsedError;
+  int? get partySize => throw _privateConstructorUsedError;
 
   /// Serializes this Table to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -80,7 +81,8 @@ abstract class $TableCopyWith<$Res> {
       DateTime? reservationTime,
       String? assignedWaiter,
       int? assignedWaiterId,
-      Map<String, dynamic>? metadata});
+      Map<String, dynamic>? metadata,
+      int? partySize});
 }
 
 /// @nodoc
@@ -119,6 +121,7 @@ class _$TableCopyWithImpl<$Res, $Val extends Table>
     Object? assignedWaiter = freezed,
     Object? assignedWaiterId = freezed,
     Object? metadata = freezed,
+    Object? partySize = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -205,6 +208,10 @@ class _$TableCopyWithImpl<$Res, $Val extends Table>
           ? _value.metadata
           : metadata // ignore: cast_nullable_to_non_nullable
               as Map<String, dynamic>?,
+      partySize: freezed == partySize
+          ? _value.partySize
+          : partySize // ignore: cast_nullable_to_non_nullable
+              as int?,
     ) as $Val);
   }
 }
@@ -237,7 +244,8 @@ abstract class _$$TableImplCopyWith<$Res> implements $TableCopyWith<$Res> {
       DateTime? reservationTime,
       String? assignedWaiter,
       int? assignedWaiterId,
-      Map<String, dynamic>? metadata});
+      Map<String, dynamic>? metadata,
+      int? partySize});
 }
 
 /// @nodoc
@@ -274,6 +282,7 @@ class __$$TableImplCopyWithImpl<$Res>
     Object? assignedWaiter = freezed,
     Object? assignedWaiterId = freezed,
     Object? metadata = freezed,
+    Object? partySize = freezed,
   }) {
     return _then(_$TableImpl(
       id: null == id
@@ -360,6 +369,10 @@ class __$$TableImplCopyWithImpl<$Res>
           ? _value._metadata
           : metadata // ignore: cast_nullable_to_non_nullable
               as Map<String, dynamic>?,
+      partySize: freezed == partySize
+          ? _value.partySize
+          : partySize // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }
@@ -388,7 +401,8 @@ class _$TableImpl implements _Table {
       this.reservationTime,
       this.assignedWaiter,
       this.assignedWaiterId,
-      final Map<String, dynamic>? metadata})
+      final Map<String, dynamic>? metadata,
+      this.partySize})
       : _metadata = metadata;
 
   factory _$TableImpl.fromJson(Map<String, dynamic> json) =>
@@ -448,8 +462,11 @@ class _$TableImpl implements _Table {
   }
 
   @override
+  final int? partySize;
+
+  @override
   String toString() {
-    return 'Table(id: $id, businessId: $businessId, name: $name, status: $status, capacity: $capacity, location: $location, currentOrderId: $currentOrderId, serverId: $serverId, isActive: $isActive, createdAt: $createdAt, updatedAt: $updatedAt, currentOrderNumber: $currentOrderNumber, currentOrderTotal: $currentOrderTotal, currentOrderItemCount: $currentOrderItemCount, customerName: $customerName, notes: $notes, lastActivity: $lastActivity, reservationTime: $reservationTime, assignedWaiter: $assignedWaiter, assignedWaiterId: $assignedWaiterId, metadata: $metadata)';
+    return 'Table(id: $id, businessId: $businessId, name: $name, status: $status, capacity: $capacity, location: $location, currentOrderId: $currentOrderId, serverId: $serverId, isActive: $isActive, createdAt: $createdAt, updatedAt: $updatedAt, currentOrderNumber: $currentOrderNumber, currentOrderTotal: $currentOrderTotal, currentOrderItemCount: $currentOrderItemCount, customerName: $customerName, notes: $notes, lastActivity: $lastActivity, reservationTime: $reservationTime, assignedWaiter: $assignedWaiter, assignedWaiterId: $assignedWaiterId, metadata: $metadata, partySize: $partySize)';
   }
 
   @override
@@ -493,7 +510,9 @@ class _$TableImpl implements _Table {
                 other.assignedWaiter == assignedWaiter) &&
             (identical(other.assignedWaiterId, assignedWaiterId) ||
                 other.assignedWaiterId == assignedWaiterId) &&
-            const DeepCollectionEquality().equals(other._metadata, _metadata));
+            const DeepCollectionEquality().equals(other._metadata, _metadata) &&
+            (identical(other.partySize, partySize) ||
+                other.partySize == partySize));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -520,7 +539,8 @@ class _$TableImpl implements _Table {
         reservationTime,
         assignedWaiter,
         assignedWaiterId,
-        const DeepCollectionEquality().hash(_metadata)
+        const DeepCollectionEquality().hash(_metadata),
+        partySize
       ]);
 
   /// Create a copy of Table
@@ -561,7 +581,8 @@ abstract class _Table implements Table {
       final DateTime? reservationTime,
       final String? assignedWaiter,
       final int? assignedWaiterId,
-      final Map<String, dynamic>? metadata}) = _$TableImpl;
+      final Map<String, dynamic>? metadata,
+      final int? partySize}) = _$TableImpl;
 
   factory _Table.fromJson(Map<String, dynamic> json) = _$TableImpl.fromJson;
 
@@ -607,6 +628,8 @@ abstract class _Table implements Table {
   int? get assignedWaiterId;
   @override
   Map<String, dynamic>? get metadata;
+  @override
+  int? get partySize;
 
   /// Create a copy of Table
   /// with the given fields replaced by the non-null parameter values.

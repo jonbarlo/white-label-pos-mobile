@@ -152,6 +152,23 @@ final clearTableProvider = FutureProvider.family<void, int>((ref, tableId) async
   ref.invalidate(myAssignedTablesProvider);
 });
 
+// Seat customer at table
+final seatCustomerProvider = FutureProvider.family<void, (int tableId, String customerName, int partySize, String notes)>((ref, params) async {
+  final repo = ref.watch(tableRepositoryProvider);
+  final user = ref.watch(authNotifierProvider).user;
+  if (user == null) throw Exception('Not authenticated');
+
+  final (tableId, customerName, partySize, notes) = params;
+  if (EnvConfig.isDebugMode) {
+    print('🪑 PROVIDER: Seating customer "$customerName" (party size: $partySize) at table $tableId');
+  }
+
+  await repo.seatCustomer(tableId, customerName, partySize, notes);
+
+  // Invalidate tables provider to refresh the list
+  ref.invalidate(tablesProvider);
+});
+
 // Computed providers for filtered views
 final availableTablesProvider = Provider<AsyncValue<List<waiter_table.Table>>>((ref) {
   return ref.watch(tablesByStatusProvider(waiter_table.TableStatus.available));

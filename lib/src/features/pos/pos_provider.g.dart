@@ -39,7 +39,7 @@ final cartTotalProvider = AutoDisposeProvider<double>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CartTotalRef = AutoDisposeProviderRef<double>;
-String _$createSaleHash() => r'f18c8dfcf0b5ba5d6e47a4aa907be4d64f3f584e';
+String _$createSaleHash() => r'90b662c0a580f63dc3e8513be529acc83f41331f';
 
 /// Copied from Dart SDK
 class _SystemHash {

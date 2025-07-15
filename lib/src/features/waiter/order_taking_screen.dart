@@ -10,6 +10,7 @@ import 'waiter_order_provider.dart' as waiter_order;
 import 'table_provider.dart';
 import 'package:another_flushbar/flushbar.dart';
 import '../../core/config/env_config.dart';
+import '../pos/split_billing_screen.dart';
 
 class OrderTakingScreen extends ConsumerStatefulWidget {
   final waiter_table.Table table;
@@ -55,15 +56,17 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
       _customerName = customerData?['name'] ?? '';
       _customerNotes = order['notes'] ?? '';
       _customerNameEditable = false;
-      _isPrefilled = true;
-      final items = order['items'] as List?;
+      // Check for all possible item fields
+      final items = order['items'] as List? ??
+                   order['orderItems'] as List? ??
+                   order['order_items'] as List?;
       if (items != null) {
         _cartItems.clear();
         for (final item in items) {
           _cartItems.add(CartItem(
-            id: item['id'].toString(),
-            name: item['name'] ?? '',
-            price: (item['price'] ?? item['unitPrice'] ?? 0).toDouble(),
+            id: item['itemId']?.toString() ?? item['menuItemId']?.toString() ?? item['id']?.toString() ?? '',
+            name: item['name'] ?? item['itemName'] ?? item['menuItem']?['name'] ?? '',
+            price: (item['price'] ?? item['unitPrice'] ?? item['menuItem']?['price'] ?? 0).toDouble(),
             quantity: (item['quantity'] ?? 1) as int,
             imageUrl: item['imageUrl'],
             category: item['category'],
@@ -139,6 +142,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
     _customerName = customerData?['name'] ?? _customerName;
     _customerNotes = latestOrder['notes'] ?? _customerNotes;
     _customerNameEditable = false;
+    // Set _isPrefilled = true ONLY after processing the backend order
     _isPrefilled = true;
     
     if (EnvConfig.isDebugMode) {
@@ -174,12 +178,13 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
         
         try {
           // Order items reference menu items by ID
-          final itemId = item['id']?.toString() ?? item['itemId']?.toString() ?? item['menuItemId']?.toString() ?? '';
+          // Use itemId (menu item ID) not id (order item ID)
+          final itemId = item['itemId']?.toString() ?? item['menuItemId']?.toString() ?? item['id']?.toString() ?? '';
           final quantity = (item['quantity'] ?? 1) as int;
           final unitPrice = (item['price'] ?? item['unitPrice'] ?? 0).toDouble();
           
           if (EnvConfig.isDebugMode) {
-            print('🪑 ORDER TAKING: Extracted data - ID: $itemId, Quantity: $quantity, UnitPrice: $unitPrice');
+            print('🪑 ORDER TAKING: Extracted data - Menu Item ID: $itemId, Quantity: $quantity, UnitPrice: $unitPrice');
           }
           
           // Get menu item details from the item itself (it should have menuItem field)
@@ -290,17 +295,10 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
         print('🪑 ORDER TAKING: Found ${tableOrders.length} orders for table ${widget.table.name}');
       }
       
-      // Get the most recent order (assuming it's the active one)
+      // Process all open orders and merge their items
       if (tableOrders.isNotEmpty) {
-        final latestOrder = tableOrders.first; // Assuming orders are sorted by date
-        
         if (EnvConfig.isDebugMode) {
-          print('🪑 ORDER TAKING: Loading latest order: ${latestOrder['id']}');
-          print('🪑 ORDER TAKING: Order details: $latestOrder');
-          print('🪑 ORDER TAKING: Available fields: ${latestOrder.keys.toList()}');
-          print('🪑 ORDER TAKING: items field: ${latestOrder['items']}');
-          print('🪑 ORDER TAKING: orderItems field: ${latestOrder['orderItems']}');
-          print('🪑 ORDER TAKING: order_items field: ${latestOrder['order_items']}');
+          print('🪑 ORDER TAKING: Processing ${tableOrders.length} orders for table ${widget.table.name}');
         }
         
         // Fetch menu items to get details for order items
@@ -332,21 +330,12 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
           
           if (EnvConfig.isDebugMode) {
             print('🪑 ORDER TAKING: Menu items map created with ${menuItemsMap.length} items');
-            print('🪑 ORDER TAKING: Menu items map keys: ${menuItemsMap.keys.toList()}');
-          }
-          
-          if (EnvConfig.isDebugMode) {
-            print('🪑 ORDER TAKING: About to process order items...');
           }
         } catch (e) {
           if (EnvConfig.isDebugMode) {
             print('🪑 ORDER TAKING: Failed to load menu items: $e');
             print('🪑 ORDER TAKING: Will use fallback data for order items');
           }
-        }
-        
-        if (EnvConfig.isDebugMode) {
-          print('🪑 ORDER TAKING: About to call setState...');
         }
         
         // Check if widget is still mounted before calling setState
@@ -361,69 +350,94 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
           if (EnvConfig.isDebugMode) {
             print('🪑 ORDER TAKING: Inside setState...');
           }
-          // Handle both old and new response formats
-          final customerData = latestOrder['customer'] ?? latestOrder['customerData'];
-          _customerName = customerData?['name'] ?? _customerName;
-          _customerNotes = latestOrder['notes'] ?? _customerNotes;
-          _customerNameEditable = false;
-          _isPrefilled = true;
-          // Preselect items in the cart - handle multiple possible field names
-          final items = latestOrder['items'] as List? ?? 
-                       latestOrder['orderItems'] as List? ?? 
-                       latestOrder['order_items'] as List?;
+          
+          // Clear existing cart items
+          _cartItems.clear();
+          
+          // Process each order and merge items
+          for (int orderIndex = 0; orderIndex < tableOrders.length; orderIndex++) {
+            final order = tableOrders[orderIndex];
+            
+            if (EnvConfig.isDebugMode) {
+              print('🪑 ORDER TAKING: Processing order ${orderIndex + 1}/${tableOrders.length}: ${order['id']}');
+            }
+            
+            // Handle both old and new response formats
+            final customerData = order['customer'] ?? order['customerData'];
+            if (orderIndex == 0) {
+              // Use customer data from first order
+              _customerName = customerData?['name'] ?? _customerName;
+              _customerNotes = order['notes'] ?? _customerNotes;
+              _customerNameEditable = false;
+            }
+            
+            // Get items from this order
+            final items = order['items'] as List? ?? 
+                         order['orderItems'] as List? ?? 
+                         order['order_items'] as List?;
                        
-          if (EnvConfig.isDebugMode) {
-            print('🪑 ORDER TAKING: Items found: ${items != null}');
+            if (EnvConfig.isDebugMode) {
+              print('🪑 ORDER TAKING: Order ${order['id']} has ${items?.length ?? 0} items');
+            }
+            
             if (items != null) {
-              print('🪑 ORDER TAKING: Items count: ${items.length}');
-              print('🪑 ORDER TAKING: Items data: $items');
+              for (final item in items) {
+                if (EnvConfig.isDebugMode) {
+                  print('🪑 ORDER TAKING: Processing item from order ${order['id']}: $item');
+                }
+                
+                // Order items reference menu items by ID
+                final itemId = item['id']?.toString() ?? item['itemId']?.toString() ?? item['menuItemId']?.toString() ?? '';
+                final quantity = (item['quantity'] ?? 1) as int;
+                final unitPrice = (item['price'] ?? item['unitPrice'] ?? 0).toDouble();
+                
+                if (EnvConfig.isDebugMode) {
+                  print('🪑 ORDER TAKING: Item ID: $itemId, Quantity: $quantity, Price: $unitPrice');
+                }
+                
+                // Get menu item details
+                final menuItem = menuItemsMap[itemId];
+                final name = menuItem?['name'] ?? item['name'] ?? item['itemName'] ?? 'Item #$itemId';
+                final price = menuItem?['price']?.toDouble() ?? unitPrice;
+                
+                if (EnvConfig.isDebugMode) {
+                  print('🪑 ORDER TAKING: Menu item found: ${menuItem != null}, Name: $name, Price: $price');
+                }
+                
+                // Check if item already exists in cart and merge quantities
+                final existingIndex = _cartItems.indexWhere((cartItem) => cartItem.id == itemId);
+                if (existingIndex >= 0) {
+                  // Merge quantities
+                  final existingItem = _cartItems[existingIndex];
+                  _cartItems[existingIndex] = existingItem.copyWith(
+                    quantity: existingItem.quantity + quantity,
+                  );
+                  if (EnvConfig.isDebugMode) {
+                    print('🪑 ORDER TAKING: Merged item ${name}, new quantity: ${_cartItems[existingIndex].quantity}');
+                  }
+                } else {
+                  // Add new item
+                  _cartItems.add(CartItem(
+                    id: itemId,
+                    name: name,
+                    price: price,
+                    quantity: quantity,
+                    imageUrl: menuItem?['imageUrl'] ?? item['imageUrl'],
+                    category: menuItem?['category']?.toString() ?? item['category'],
+                  ));
+                  if (EnvConfig.isDebugMode) {
+                    print('🪑 ORDER TAKING: Added new item: ${name} x${quantity}');
+                  }
+                }
+              }
             }
           }
           
-          if (items != null) {
-            if (EnvConfig.isDebugMode) {
-              print('🪑 ORDER TAKING: Processing ${items.length} items');
-            }
-            _cartItems.clear();
-            
-            for (final item in items) {
-              if (EnvConfig.isDebugMode) {
-                print('🪑 ORDER TAKING: Processing item: $item');
-              }
-              
-              // Order items reference menu items by ID
-              final itemId = item['id']?.toString() ?? item['itemId']?.toString() ?? item['menuItemId']?.toString() ?? '';
-              final quantity = (item['quantity'] ?? 1) as int;
-              final unitPrice = (item['price'] ?? item['unitPrice'] ?? 0).toDouble();
-              
-              if (EnvConfig.isDebugMode) {
-                print('🪑 ORDER TAKING: Item ID: $itemId, Quantity: $quantity, Price: $unitPrice');
-              }
-              
-              // Get menu item details
-              final menuItem = menuItemsMap[itemId];
-              final name = menuItem?['name'] ?? item['name'] ?? item['itemName'] ?? 'Item #$itemId';
-              final price = menuItem?['price']?.toDouble() ?? unitPrice;
-              
-              if (EnvConfig.isDebugMode) {
-                print('🪑 ORDER TAKING: Menu item found: ${menuItem != null}, Name: $name, Price: $price');
-              }
-              
-              _cartItems.add(CartItem(
-                id: itemId,
-                name: name,
-                price: price,
-                quantity: quantity,
-                imageUrl: menuItem?['imageUrl'] ?? item['imageUrl'],
-                category: menuItem?['category']?.toString() ?? item['category'],
-              ));
-            }
-            if (EnvConfig.isDebugMode) {
-              print('🪑 ORDER TAKING: Added ${_cartItems.length} items to cart');
-            }
-          } else {
-            if (EnvConfig.isDebugMode) {
-              print('🪑 ORDER TAKING: No items found in order');
+          if (EnvConfig.isDebugMode) {
+            print('🪑 ORDER TAKING: Final cart has ${_cartItems.length} unique items');
+            for (int i = 0; i < _cartItems.length; i++) {
+              final item = _cartItems[i];
+              print('🪑 ORDER TAKING: Cart item ${i + 1}: ${item.name} x${item.quantity} @\$${item.price}');
             }
           }
         });
@@ -441,6 +455,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print('OrderTakingScreen build called. Cart items:  [32m [1m [4m [3m [7m$_cartItems [0m');
     final theme = Theme.of(context);
     
     return Scaffold(
@@ -455,7 +470,11 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
         ],
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () {
+            if (mounted) {
+              Navigator.of(context).pop();
+            }
+          },
         ),
       ),
       body: Column(
@@ -465,61 +484,22 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
           
           // Load existing orders if table is occupied (Flutter convention)
           if (widget.table.status == waiter_table.TableStatus.occupied && 
-              widget.table.currentOrderId != null)
-            Consumer(
-              builder: (context, ref, child) {
-                if (EnvConfig.isDebugMode) {
-                  print('🪑 ORDER TAKING: Consumer widget building for table ${widget.table.id}');
+              widget.table.currentOrderId != null && !_isPrefilled)
+            FutureBuilder<List<Map<String, dynamic>>>(
+              future: ref.read(waiter_order.tableOrdersProvider(widget.table.id).future),
+              builder: (context, snapshot) {
+                if (snapshot.hasData && snapshot.data!.isNotEmpty && !_isPrefilled) {
+                  final latestOrder = snapshot.data!.first;
+                  if (EnvConfig.isDebugMode) {
+                    print('🪑 ORDER TAKING: Processing existing order ${latestOrder['id']}');
+                  }
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (mounted && !_isPrefilled) {
+                      _processExistingOrder(latestOrder);
+                    }
+                  });
                 }
-                
-                final tableOrdersAsync = ref.watch(
-                  waiter_order.tableOrdersProvider(widget.table.id)
-                );
-                
-                if (EnvConfig.isDebugMode) {
-                  print('🪑 ORDER TAKING: Table orders async state: ${tableOrdersAsync.runtimeType}');
-                }
-                
-                return tableOrdersAsync.when(
-                  data: (tableOrders) {
-                    if (EnvConfig.isDebugMode) {
-                      print('🪑 ORDER TAKING: Consumer received ${tableOrders.length} orders');
-                      print('🪑 ORDER TAKING: Is prefilled: $_isPrefilled');
-                    }
-                    
-                    if (tableOrders.isNotEmpty) {
-                      // Load the first order (most recent)
-                      final latestOrder = tableOrders.first;
-                      if (EnvConfig.isDebugMode) {
-                        print('🪑 ORDER TAKING: Scheduling order processing for order ${latestOrder['id']}');
-                      }
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        if (EnvConfig.isDebugMode) {
-                          print('🪑 ORDER TAKING: Post frame callback executing');
-                        }
-                        _processExistingOrder(latestOrder);
-                      });
-                    } else {
-                      if (EnvConfig.isDebugMode) {
-                        print('🪑 ORDER TAKING: No orders found in provider data');
-                      }
-                    }
-                    return const SizedBox.shrink();
-                  },
-                  loading: () {
-                    if (EnvConfig.isDebugMode) {
-                      print('🪑 ORDER TAKING: Consumer in loading state');
-                    }
-                    return const SizedBox.shrink();
-                  },
-                  error: (error, stack) {
-                    if (EnvConfig.isDebugMode) {
-                      print('🪑 ORDER TAKING: Consumer error: $error');
-                      print('🪑 ORDER TAKING: Error stack: $stack');
-                    }
-                    return const SizedBox.shrink();
-                  },
-                );
+                return const SizedBox.shrink();
               },
             ),
           
@@ -1086,7 +1066,11 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
         children: [
           Expanded(
             child: OutlinedButton.icon(
-              onPressed: _isSubmitting ? null : () => Navigator.of(context).pop(),
+              onPressed: _isSubmitting ? null : () {
+                if (mounted) {
+                  Navigator.of(context).pop();
+                }
+              },
               icon: const Icon(Icons.cancel),
               label: const Text('Cancel'),
               style: OutlinedButton.styleFrom(
@@ -1109,6 +1093,29 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
               label: Text(_isSubmitting ? 'Submitting...' : 'Submit Order'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            flex: 2,
+            child: ElevatedButton.icon(
+              onPressed: _cartItems.isEmpty ? null : () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => SplitBillingScreen(
+                      table: widget.table,
+                      cartItems: List<CartItem>.from(_cartItems),
+                    ),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.call_split),
+              label: const Text('Split Bill'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.secondary,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
@@ -1141,7 +1148,9 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
   }
 
   void _addToCartFromMap(Map<String, dynamic> item) {
-    final existingIndex = _cartItems.indexWhere((cartItem) => cartItem.id == item['id'].toString());
+    // Use the menu item ID that the backend expects
+    final menuItemId = item['id']?.toString() ?? '';
+    final existingIndex = _cartItems.indexWhere((cartItem) => cartItem.id == menuItemId);
     
     if (existingIndex >= 0) {
       setState(() {
@@ -1152,7 +1161,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
     } else {
       setState(() {
         _cartItems.add(CartItem(
-          id: item['id'].toString(),
+          id: menuItemId,
           name: item['name'] ?? '',
           price: (item['price'] ?? 0.0).toDouble(),
           quantity: 1,
@@ -1219,47 +1228,98 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
         print('🪑 ORDER TAKING: Cart items: ${_cartItems.length}');
       }
       
-      // Submit order using the waiter order provider
-      final result = await ref.read(waiter_order.submitTableOrderProvider((
-        tableId: widget.table.id,
-        customerName: _customerName.isNotEmpty ? _customerName : 'Guest',
-        customerNotes: _customerNotes,
-        items: _cartItems,
-        subtotal: _getSubtotal(),
-        tax: _getTax(),
-        total: _getTotal(),
-      )).future);
+      // Check if there's an existing order for this table
+      final container = ProviderScope.containerOf(context, listen: false);
+      final tableOrders = await container.read(waiter_order.tableOrdersProvider(widget.table.id).future);
+      
+      if (tableOrders.isNotEmpty && widget.prefillOrder != null) {
+        // Add items to existing order
+        if (EnvConfig.isDebugMode) {
+          print('🪑 ORDER TAKING: Adding items to existing order ${widget.prefillOrder!['id']}');
+        }
+        
+        final result = await ref.read(waiter_order.addItemsToOrderProvider((
+          orderId: widget.prefillOrder!['id'].toString(),
+          items: _cartItems,
+        )).future);
+        
+        if (EnvConfig.isDebugMode) {
+          print('🪑 ORDER TAKING: Items added to existing order successfully!');
+          print('🪑 ORDER TAKING: Result: $result');
+        }
+      } else {
+        // Create new order
+        if (EnvConfig.isDebugMode) {
+          print('🪑 ORDER TAKING: Creating new order for table ${widget.table.name}');
+        }
+        
+        final result = await ref.read(waiter_order.submitTableOrderProvider((
+          tableId: widget.table.id,
+          customerName: _customerName.isNotEmpty ? _customerName : 'Guest',
+          customerNotes: _customerNotes,
+          items: _cartItems,
+          subtotal: _getSubtotal(),
+          tax: _getTax(),
+          total: _getTotal(),
+        )).future);
 
-      if (EnvConfig.isDebugMode) {
-        print('🪑 ORDER TAKING: Order submitted successfully!');
-        print('🪑 ORDER TAKING: Result: $result');
+        if (EnvConfig.isDebugMode) {
+          print('🪑 ORDER TAKING: New order created successfully!');
+          print('🪑 ORDER TAKING: Result: $result');
+        }
       }
 
-      // Show success message
-      Flushbar(
-        message: 'Order submitted successfully!',
-        duration: const Duration(seconds: 2),
-        backgroundColor: Colors.green,
-        icon: const Icon(Icons.check, color: Colors.white),
-      ).show(context);
+      // Reset loading state
+      setState(() {
+        _isSubmitting = false;
+      });
 
-      // Navigate back to table selection
+      // Show success message (Flutter convention)
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.white),
+              SizedBox(width: 8),
+              Text('Order submitted successfully!'),
+            ],
+          ),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+
+      // Navigate back
       Navigator.of(context).pop();
     } catch (e) {
       if (EnvConfig.isDebugMode) {
         print('🪑 ORDER TAKING: Error submitting order: $e');
       }
       
-      // Show error message
-      Flushbar(
-        message: 'Failed to submit order: ${e.toString()}',
-        duration: const Duration(seconds: 3),
-        backgroundColor: Colors.red,
-        icon: const Icon(Icons.error, color: Colors.white),
-      ).show(context);
-    } finally {
+      // Check if widget is still mounted before showing error
+      if (!mounted) {
+        if (EnvConfig.isDebugMode) {
+          print('🪑 ORDER TAKING: Widget no longer mounted, skipping error display');
+        }
+        return;
+      }
+
+      // Reset loading state first
       setState(() {
         _isSubmitting = false;
+      });
+
+      // Show error message in next frame
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        
+        Flushbar(
+          message: 'Failed to submit order: ${e.toString()}',
+          duration: const Duration(seconds: 3),
+          backgroundColor: Colors.red,
+          icon: const Icon(Icons.error, color: Colors.white),
+        ).show(context);
       });
     }
   }

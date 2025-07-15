@@ -485,9 +485,9 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
                     children: [
                       Expanded(
                         child: ElevatedButton.icon(
-                          onPressed: () => _onTableSelected(table),
-                          icon: const Icon(Icons.add_shopping_cart, size: 16),
-                          label: const Text('Start Order', style: TextStyle(fontSize: 12)),
+                          onPressed: () => _showSeatCustomerDialog(table),
+                          icon: const Icon(Icons.event_seat, size: 16),
+                          label: const Text('Seat Customer', style: TextStyle(fontSize: 12)),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: statusColor,
                             foregroundColor: Colors.white,
@@ -514,12 +514,32 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
                       ),
                     ],
                   ),
-                ] else if (table.status == waiter_table.TableStatus.available || table.status == waiter_table.TableStatus.reserved || table.status == waiter_table.TableStatus.occupied) ...[
+                ] else if (table.status == waiter_table.TableStatus.reserved) ...[
                   const SizedBox(height: 12),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
-                      onPressed: () => _onTableSelected(table),
+                      onPressed: () => _showCheckInDialog(table),
+                      icon: const Icon(Icons.login, size: 16),
+                      label: const Text('Check-in', style: TextStyle(fontSize: 12)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ),
+                ] else if (table.status == waiter_table.TableStatus.occupied) ...[
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        print('Add Items button pressed for table:  [33m${table.name} [0m (id: ${table.id}, status: ${table.status}, currentOrderId: ${table.currentOrderId})');
+                        _onTableSelected(table);
+                      },
                       icon: const Icon(Icons.add_shopping_cart, size: 16),
                       label: const Text('Add Items', style: TextStyle(fontSize: 12)),
                       style: ElevatedButton.styleFrom(
@@ -650,7 +670,9 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
             )).toList(),
           ),
         );
+        print('Dialog closed. Selected order: $selected');
         if (selected != null) {
+          print('Navigating to OrderTakingScreen with order: $selected');
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => OrderTakingScreen(
@@ -797,6 +819,81 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
     );
   }
 
+  void _showSeatCustomerDialog(waiter_table.Table table) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        final _nameController = TextEditingController();
+        final _partySizeController = TextEditingController();
+        final _notesController = TextEditingController();
+        return StatefulBuilder(
+          builder: (context, setState) => AlertDialog(
+            title: Text('Seat Customer at Table ${table.name}'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(labelText: 'Customer Name'),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _partySizeController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(labelText: 'Party Size'),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _notesController,
+                  decoration: const InputDecoration(labelText: 'Notes'),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  final name = _nameController.text.trim();
+                  final partySize = int.tryParse(_partySizeController.text.trim());
+                  final notes = _notesController.text.trim();
+                  if (name.isEmpty || partySize == null || partySize < 1) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Please enter a valid name and party size.')),
+                    );
+                    return;
+                  }
+                  final container = ProviderScope.containerOf(context, listen: false);
+                  try {
+                    print('🪑 DIALOG: Calling seatCustomerProvider for table ${table.id}...');
+                    await container.read(seatCustomerProvider((table.id, name, partySize, notes)).future);
+                    print('🪑 DIALOG: seatCustomerProvider call succeeded.');
+                    if (mounted) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        Navigator.of(context).pop();
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Customer seated at table ${table.name}!')),
+                      );
+                    }
+                  } catch (e) {
+                    print('🪑 DIALOG: seatCustomerProvider call failed: $e');
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Failed to seat customer: $e')),
+                    );
+                  }
+                },
+                child: const Text('Seat'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   void _clearTable(waiter_table.Table table) async {
     try {
       final container = ProviderScope.containerOf(context, listen: false);
@@ -842,6 +939,81 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
         );
       }
     }
+  }
+
+  void _showCheckInDialog(waiter_table.Table table) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        final _nameController = TextEditingController(text: table.customerName ?? '');
+        final _partySizeController = TextEditingController(text: table.partySize?.toString() ?? '');
+        final _notesController = TextEditingController(text: table.notes ?? '');
+        return StatefulBuilder(
+          builder: (context, setState) => AlertDialog(
+            title: Text('Check-in Reservation for Table ${table.name}'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(labelText: 'Customer Name'),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _partySizeController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(labelText: 'Party Size'),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _notesController,
+                  decoration: const InputDecoration(labelText: 'Notes'),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  final name = _nameController.text.trim();
+                  final partySize = int.tryParse(_partySizeController.text.trim());
+                  final notes = _notesController.text.trim();
+                  if (name.isEmpty || partySize == null || partySize < 1) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Please enter a valid name and party size.')),
+                    );
+                    return;
+                  }
+                  final container = ProviderScope.containerOf(context, listen: false);
+                  try {
+                    print('🪑 DIALOG: Calling seatCustomerProvider for table ${table.id}...');
+                    await container.read(seatCustomerProvider((table.id, name, partySize, notes)).future);
+                    print('🪑 DIALOG: seatCustomerProvider call succeeded.');
+                    if (mounted) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        Navigator.of(context).pop();
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Reservation checked in for table ${table.name}!')),
+                      );
+                    }
+                  } catch (e) {
+                    print('🪑 DIALOG: seatCustomerProvider call failed: $e');
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Failed to check-in: $e')),
+                    );
+                  }
+                },
+                child: const Text('Check-in'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   String _formatDateTime(DateTime dateTime) {

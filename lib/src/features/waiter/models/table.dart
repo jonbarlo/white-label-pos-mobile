@@ -41,6 +41,7 @@ class Table with _$Table {
     String? assignedWaiter,
     int? assignedWaiterId,
     Map<String, dynamic>? metadata,
+    int? partySize,
   }) = _Table;
 
   factory Table.fromJson(Map<String, dynamic> json) => Table(
@@ -66,6 +67,7 @@ class Table with _$Table {
         assignedWaiter: json['assignedWaiter'] as String?,
         assignedWaiterId: json['assignedWaiterId'] as int?,
         metadata: json['metadata'] as Map<String, dynamic>?,
+        partySize: json['partySize'] as int?,
       );
 }
 

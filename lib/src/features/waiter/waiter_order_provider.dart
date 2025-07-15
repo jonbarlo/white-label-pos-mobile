@@ -28,10 +28,19 @@ class WaiterOrderRepository {
     }
 
     // Convert cart items to order items format
-    final orderItems = items.map((cartItem) => {
-      'itemId': int.parse(cartItem.id),
-      'quantity': cartItem.quantity,
-      'notes': cartItem.category ?? '', // Add notes field as per API documentation
+    // The cart item ID should be the menu item ID that the backend expects
+    final orderItems = items.map((cartItem) {
+      // Try to parse as integer, but if it fails, we need to handle this differently
+      final itemId = int.tryParse(cartItem.id);
+      if (itemId == null) {
+        throw Exception('Invalid menu item ID: ${cartItem.id}');
+      }
+      
+      return {
+        'itemId': itemId,
+        'quantity': cartItem.quantity,
+        'notes': cartItem.category ?? '', // Add notes field as per API documentation
+      };
     }).toList();
 
     if (EnvConfig.isDebugMode) {
@@ -41,6 +50,17 @@ class WaiterOrderRepository {
         print('🪑 WAITER ORDER:   Item $i: itemId=${item['itemId']}, quantity=${item['quantity']}, notes=${item['notes']}');
       }
       print('🪑 WAITER ORDER: Using menu item IDs from /menu-items endpoint');
+      
+      // Debug: Let's also fetch and log the available menu items to see what IDs are valid
+      try {
+        final menuItems = await getMenuItems();
+        print('🪑 WAITER ORDER: Available menu items:');
+        for (final menuItem in menuItems) {
+          print('🪑 WAITER ORDER:   Menu item: ID=${menuItem['id']}, Name=${menuItem['name']}, Price=${menuItem['price']}');
+        }
+      } catch (e) {
+        print('🪑 WAITER ORDER: Could not fetch menu items for debugging: $e');
+      }
     }
 
     // Get auth state for business and user info
@@ -65,28 +85,40 @@ class WaiterOrderRepository {
       orderData['notes'] = '${orderData['notes']}\nCustomer: $customerName';
     }
 
-    final response = await dio.post('/orders/table', data: orderData);
-
     if (EnvConfig.isDebugMode) {
-      print('🪑 WAITER ORDER: Response status: ${response.statusCode}');
-      print('🪑 WAITER ORDER: Response data: ${response.data}');
+      print('🪑 WAITER ORDER: Full orderData payload:');
+      print(orderData);
     }
 
-    // Handle the new response format with success/data structure
-    final responseData = response.data;
-    if (responseData is Map<String, dynamic>) {
-      if (responseData['success'] == true) {
-        if (EnvConfig.isDebugMode) {
-          print('🪑 WAITER ORDER: Order submitted successfully!');
-          print('🪑 WAITER ORDER: Order ID: ${responseData['data']?['id'] ?? responseData['id']}');
-        }
-        return responseData;
-      } else {
-        throw Exception(responseData['message'] ?? 'Order submission failed');
+    try {
+      final response = await dio.post('/orders/table', data: orderData);
+      if (EnvConfig.isDebugMode) {
+        print('🪑 WAITER ORDER: Response status: ${response.statusCode}');
+        print('🪑 WAITER ORDER: Response data: ${response.data}');
       }
+      final responseData = response.data;
+      if (responseData is Map<String, dynamic>) {
+        if (responseData['success'] == true) {
+          if (EnvConfig.isDebugMode) {
+            print('🪑 WAITER ORDER: Order submitted successfully!');
+            print('🪑 WAITER ORDER: Order ID: ${responseData['data']?['id'] ?? responseData['id']}');
+          }
+          return responseData;
+        } else {
+          throw Exception(responseData['message'] ?? 'Order submission failed');
+        }
+      }
+      return responseData;
+    } on DioException catch (e) {
+      if (EnvConfig.isDebugMode) {
+        print('🪑 WAITER ORDER: DioException caught during order submission!');
+        print('🪑 WAITER ORDER: DioException type: ${e.type}');
+        print('🪑 WAITER ORDER: DioException status: ${e.response?.statusCode}');
+        print('🪑 WAITER ORDER: DioException data: ${e.response?.data}');
+        print('🪑 WAITER ORDER: DioException message: ${e.message}');
+      }
+      rethrow;
     }
-
-    return responseData;
   }
 
   Future<List<Map<String, dynamic>>> getTableOrders(int tableId) async {

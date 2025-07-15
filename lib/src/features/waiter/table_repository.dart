@@ -184,4 +184,27 @@ class TableRepository {
 
     return tables;
   }
+
+  Future<void> seatCustomer(int tableId, String customerName, int partySize, String notes) async {
+    if (EnvConfig.isDebugMode) {
+      print('🪑 TABLE: Seating customer "$customerName" (party size: $partySize) at table $tableId');
+    }
+    try {
+      final response = await dio.post(
+        '/tables/$tableId/seat',
+        data: {
+          'customerName': customerName,
+          'partySize': partySize,
+          'notes': notes,
+          'status': 'occupied',
+        },
+      );
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Exception('Failed to seat customer: ${response.statusMessage}');
+      }
+    } on DioError catch (e) {
+      final msg = e.response?.data['message'] ?? e.message;
+      throw Exception('Failed to seat customer: $msg');
+    }
+  }
 } 

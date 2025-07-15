@@ -36,6 +36,7 @@ _$TableImpl _$$TableImplFromJson(Map<String, dynamic> json) => _$TableImpl(
       assignedWaiter: json['assignedWaiter'] as String?,
       assignedWaiterId: (json['assignedWaiterId'] as num?)?.toInt(),
       metadata: json['metadata'] as Map<String, dynamic>?,
+      partySize: (json['partySize'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$$TableImplToJson(_$TableImpl instance) =>
@@ -61,6 +62,7 @@ Map<String, dynamic> _$$TableImplToJson(_$TableImpl instance) =>
       'assignedWaiter': instance.assignedWaiter,
       'assignedWaiterId': instance.assignedWaiterId,
       'metadata': instance.metadata,
+      'partySize': instance.partySize,
     };
 
 const _$TableStatusEnumMap = {

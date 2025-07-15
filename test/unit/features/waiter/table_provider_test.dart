@@ -43,9 +43,10 @@ void main() {
       waiter_table.Table(
         id: 1,
         businessId: 1,
-        tableNumber: 'A1',
+        name: 'A1',
         status: waiter_table.TableStatus.available,
         capacity: 4,
+        partySize: null,
         currentOrderId: null,
         currentOrderNumber: null,
         currentOrderTotal: null,
@@ -61,10 +62,11 @@ void main() {
       waiter_table.Table(
         id: 2,
         businessId: 1,
-        tableNumber: 'A2',
+        name: 'A2',
         status: waiter_table.TableStatus.occupied,
         capacity: 6,
-        currentOrderId: 'ORD-001',
+        partySize: 3,
+        currentOrderId: 1,
         currentOrderNumber: '001',
         currentOrderTotal: 45.50,
         currentOrderItemCount: 3,
@@ -111,8 +113,8 @@ void main() {
         // Assert
         expect(result, equals(mockTables));
         expect(result.length, 2);
-        expect(result[0].tableNumber, 'A1');
-        expect(result[1].tableNumber, 'A2');
+        expect(result[0].name, 'A1');
+        expect(result[1].name, 'A2');
         verify(mockRepository.getTables()).called(1);
       });
 
@@ -201,7 +203,7 @@ void main() {
         // Assert
         expect(result, equals(table));
         expect(result.id, 1);
-        expect(result.tableNumber, 'A1');
+        expect(result.name, 'A1');
         verify(mockRepository.getTable(1)).called(1);
       });
     });
@@ -211,7 +213,7 @@ void main() {
         // Arrange
         final updatedTable = mockTables[0].copyWith(
           status: waiter_table.TableStatus.occupied,
-          currentOrderId: 'ORD-002',
+          currentOrderId: 2,
         );
         when(mockRepository.updateTableStatus(1, waiter_table.TableStatus.occupied))
             .thenAnswer((_) async => updatedTable);
@@ -224,7 +226,7 @@ void main() {
         // Assert
         expect(result, equals(updatedTable));
         expect(result.status, waiter_table.TableStatus.occupied);
-        expect(result.currentOrderId, 'ORD-002');
+        expect(result.currentOrderId, 2);
         verify(mockRepository.updateTableStatus(1, waiter_table.TableStatus.occupied)).called(1);
       });
     });
@@ -262,6 +264,19 @@ void main() {
 
         // Assert
         verify(mockRepository.clearTable(1)).called(1);
+      });
+    });
+
+    group('seatCustomerProvider', () {
+      test('should call seatCustomer on repository with correct arguments', () async {
+        // Arrange
+        when(mockRepository.seatCustomer(1, 'Alice', 2, 'Birthday')).thenAnswer((_) async => null);
+
+        // Act
+        await container.read(seatCustomerProvider((1, 'Alice', 2, 'Birthday')).future);
+
+        // Assert
+        verify(mockRepository.seatCustomer(1, 'Alice', 2, 'Birthday')).called(1);
       });
     });
 
