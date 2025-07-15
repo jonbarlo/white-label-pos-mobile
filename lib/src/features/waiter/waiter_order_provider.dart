@@ -149,14 +149,15 @@ class WaiterOrderRepository {
 
       final queryParams = <String, dynamic>{
         'businessId': businessId,
-        'isAvailable': true,
+        'available': true,
+        'limit': 100, // Get more items for waiter interface
       };
       
       if (search != null && search.isNotEmpty) {
-        queryParams['search'] = search;
+        queryParams['search'] = search; // Use 'search' for search as per API docs
       }
 
-      final response = await dio.get('/menu-items', queryParameters: queryParams);
+      final response = await dio.get('/menu/items', queryParameters: queryParams);
 
       // Handle different response formats
       List<dynamic> data;
@@ -165,7 +166,7 @@ class WaiterOrderRepository {
       } else if (response.data is List<dynamic>) {
         data = response.data;
       } else {
-        throw Exception('Unexpected response format from /menu-items');
+        throw Exception('Unexpected response format from /menu/items');
       }
 
       final menuItems = List<Map<String, dynamic>>.from(data);

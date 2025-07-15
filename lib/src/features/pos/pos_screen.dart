@@ -164,23 +164,26 @@ class _PosScreenState extends ConsumerState<PosScreen>
         _selectedPaymentMethod = PaymentMethod.cash;
       });
       
-      NavigationService.goBack(context); // Close dialog
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Row(
-            children: [
-              Icon(Icons.check_circle, color: Colors.white),
-              SizedBox(width: 8),
-              Text('Sale completed successfully!'),
-            ],
+      // Close dialog safely
+      if (mounted) {
+        NavigationService.goBack(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.check_circle, color: Colors.white),
+                SizedBox(width: 8),
+                Text('Sale completed successfully!'),
+              ],
+            ),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 3),
           ),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 3),
-        ),
-      );
+        );
+      }
     } catch (e) {
       if (mounted) {
-        NavigationService.goBack(context); // Close dialog
+        NavigationService.goBack(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
@@ -213,23 +216,26 @@ class _PosScreenState extends ConsumerState<PosScreen>
         _tabController.animateTo(1);
       }
       
-      NavigationService.goBack(context); // Close dialog
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Row(
-            children: [
-              Icon(Icons.check_circle, color: Colors.white),
-              SizedBox(width: 8),
-              Text('Split payment completed successfully!'),
-            ],
+      // Close dialog safely
+      if (mounted) {
+        NavigationService.goBack(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.check_circle, color: Colors.white),
+                SizedBox(width: 8),
+                Text('Split payment completed successfully!'),
+              ],
+            ),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 3),
           ),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 3),
-        ),
-      );
+        );
+      }
     } catch (e) {
       if (mounted) {
-        NavigationService.goBack(context); // Close dialog
+        NavigationService.goBack(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
@@ -589,9 +595,9 @@ class _MenuSection extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 1.2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
+        childAspectRatio: 0.85, // Better aspect ratio for image-focused cards
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
       ),
       itemCount: searchResults.length,
       itemBuilder: (context, index) {
@@ -609,9 +615,9 @@ class _MenuSection extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 1.2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
+        childAspectRatio: 0.85, // Better aspect ratio for image-focused cards
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
       ),
       itemCount: popularItems.length,
       itemBuilder: (context, index) {
@@ -694,9 +700,9 @@ class _MenuItemCard extends StatelessWidget {
     final theme = Theme.of(context);
     
     return Card(
-      elevation: 2,
+      elevation: 3,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: InkWell(
         onTap: () => onAddToCart(CartItem(
@@ -707,90 +713,186 @@ class _MenuItemCard extends StatelessWidget {
           imageUrl: item.image,
           category: item.categoryId.toString(),
         )),
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Item image
-              AppThumbnail(
-                imageUrl: item.image,
-                size: 80,
-                borderRadius: 8,
-                fallbackIcon: Icons.restaurant,
-                backgroundColor: theme.colorScheme.surfaceContainerHighest,
-              ),
-              SizedBox(height: 8),
-              // Item name
-              Text(
-                item.name,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
+        borderRadius: BorderRadius.circular(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Item image with better styling
+            Expanded(
+              flex: 3,
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  color: theme.colorScheme.surfaceContainerHighest,
                 ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              // Item description
-              if (item.description.isNotEmpty) ...[
-                SizedBox(height: 4),
-                Text(
-                  item.description,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                    fontSize: 14,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  child: item.image != null && item.image!.isNotEmpty
+                      ? AppImage(
+                          imageUrl: item.image,
+                          fit: BoxFit.cover,
+                          placeholder: _buildImagePlaceholder(theme, item),
+                          errorWidget: _buildImagePlaceholder(theme, item),
+                          backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                        )
+                      : _buildImagePlaceholder(theme, item),
                 ),
-              ],
-              SizedBox(height: 8),
-              // Price and add button
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    '\$${item.price.toStringAsFixed(2)}',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: theme.colorScheme.primary,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: () => onAddToCart(CartItem(
-                      id: item.id.toString(),
-                      name: item.name,
-                      price: item.price,
-                      quantity: 1,
-                      imageUrl: item.image,
-                      category: item.categoryId.toString(),
-                    )),
-                    icon: Icon(Icons.add_circle, size: 20),
-                    label: Text('Add to Cart', style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold
-                    )),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            // Item details
+            Expanded(
+              flex: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Item name
+                    Text(
+                      item.name,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
                       ),
-                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      minimumSize: Size(120, 48),
-                      textStyle: const TextStyle(fontWeight: FontWeight.bold),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 4),
+                    // Item description
+                    if (item.description.isNotEmpty) ...[
+                      Expanded(
+                        child: Text(
+                          item.description,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                            fontSize: 12,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 8),
+                    // Price and add button
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '\$${item.price.toStringAsFixed(2)}',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: theme.colorScheme.primary,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        ElevatedButton.icon(
+                          onPressed: () => onAddToCart(CartItem(
+                            id: item.id.toString(),
+                            name: item.name,
+                            price: item.price,
+                            quantity: 1,
+                            imageUrl: item.image,
+                            category: item.categoryId.toString(),
+                          )),
+                          icon: const Icon(Icons.add_circle, size: 18),
+                          label: const Text('Add', style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold
+                          )),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: theme.colorScheme.primary,
+                            foregroundColor: theme.colorScheme.onPrimary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            minimumSize: const Size(80, 36),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  Widget _buildImagePlaceholder(ThemeData theme, MenuItem item) {
+    // Create a gradient background based on the item category
+    final colors = _getCategoryColors(item.categoryId);
+    
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: colors,
+        ),
+      ),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              _getCategoryIcon(item.categoryId),
+              size: 32,
+              color: Colors.white.withValues(alpha: 0.8),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              item.name,
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.9),
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<Color> _getCategoryColors(int categoryId) {
+    // Define colors for different categories
+    switch (categoryId) {
+      case 1: // Appetizers
+        return [Colors.orange.shade400, Colors.orange.shade600];
+      case 2: // Main Course
+        return [Colors.red.shade400, Colors.red.shade600];
+      case 3: // Desserts
+        return [Colors.pink.shade400, Colors.pink.shade600];
+      case 4: // Drinks
+        return [Colors.blue.shade400, Colors.blue.shade600];
+      default:
+        return [Colors.grey.shade400, Colors.grey.shade600];
+    }
+  }
+
+  IconData _getCategoryIcon(int categoryId) {
+    // Define icons for different categories
+    switch (categoryId) {
+      case 1: // Appetizers
+        return Icons.restaurant_menu;
+      case 2: // Main Course
+        return Icons.dinner_dining;
+      case 3: // Desserts
+        return Icons.cake;
+      case 4: // Drinks
+        return Icons.local_drink;
+      default:
+        return Icons.restaurant;
+    }
   }
 }
 

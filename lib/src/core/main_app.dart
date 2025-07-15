@@ -22,7 +22,10 @@ class MainApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeData = ref.watch(themeDataProvider);
+    final themeMode = ref.watch(themeModeProvider);
     final initializationState = ref.watch(appInitializationProvider);
+    
+    print('MainApp build - Theme mode: $themeMode');
 
     return initializationState.when(
       loading: () => MaterialApp(

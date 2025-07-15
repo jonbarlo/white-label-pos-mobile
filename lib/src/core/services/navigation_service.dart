@@ -77,7 +77,10 @@ class NavigationService {
     final performanceService = PerformanceService();
     performanceService.startTimer('navigation_back');
     
-    Navigator.of(context).pop<T>(result);
+    // Check if we can pop before attempting to pop
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop<T>(result);
+    }
     performanceService.endTimer('navigation_back');
   }
 

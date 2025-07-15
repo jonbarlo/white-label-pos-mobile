@@ -1,48 +1,50 @@
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'business_repository_provider.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'data/repositories/business_repository_impl.dart';
 import 'models/business.dart';
 
-part 'business_provider.g.dart';
-
-@riverpod
-class Businesses extends _$Businesses {
-  @override
-  Future<List<Business>> build() async {
-    final repository = await ref.read(businessRepositoryProvider.future);
-    return repository.getBusinesses();
+/// Provider to get business by slug
+final businessBySlugProvider = FutureProvider.family<Business?, String>((ref, slug) async {
+  debugPrint('🔵 BusinessProvider: businessBySlugProvider called with slug: "$slug"');
+  if (slug.isEmpty) {
+    debugPrint('🔵 BusinessProvider: slug is empty, returning null');
+    return null;
   }
-
-  Future<void> createBusiness(Business business) async {
-    final repository = await ref.read(businessRepositoryProvider.future);
-    await repository.createBusiness(business);
-    ref.invalidateSelf();
+  
+  final repository = ref.watch(businessRepositoryProvider);
+  debugPrint('🔵 BusinessProvider: calling repository.getBusinessBySlug');
+  final result = await repository.getBusinessBySlug(slug);
+  
+  if (result.isSuccess) {
+    debugPrint('🔵 BusinessProvider: Success! Business: ${result.data?.name ?? 'null'}');
+    return result.data;
+  } else {
+    debugPrint('🔵 BusinessProvider: Error: ${result.errorMessage}');
+    // Return null if business not found, don't throw error
+    return null;
   }
+});
 
-  Future<void> updateBusiness(Business business) async {
-    final repository = await ref.read(businessRepositoryProvider.future);
-    await repository.updateBusiness(business);
-    ref.invalidateSelf();
+/// Provider to get all businesses
+final businessesProvider = FutureProvider<List<Business>>((ref) async {
+  final repository = ref.watch(businessRepositoryProvider);
+  final result = await repository.getBusinesses();
+  
+  if (result.isSuccess) {
+    return result.data;
+  } else {
+    throw Exception(result.errorMessage);
   }
+});
 
-  Future<void> deleteBusiness(int businessId) async {
-    final repository = await ref.read(businessRepositoryProvider.future);
-    await repository.deleteBusiness(businessId);
-    ref.invalidateSelf();
+/// Provider to get business by ID
+final businessByIdProvider = FutureProvider.family<Business?, int>((ref, id) async {
+  final repository = ref.watch(businessRepositoryProvider);
+  final result = await repository.getBusiness(id);
+  
+  if (result.isSuccess) {
+    return result.data;
+  } else {
+    return null;
   }
-}
-
-@riverpod
-class BusinessNotifier extends _$BusinessNotifier {
-  @override
-  Future<Business?> build(int businessId) async {
-    if (businessId == 0) return null;
-    final repository = await ref.read(businessRepositoryProvider.future);
-    return repository.getBusiness(businessId);
-  }
-
-  Future<void> updateBusiness(Business business) async {
-    final repository = await ref.read(businessRepositoryProvider.future);
-    await repository.updateBusiness(business);
-    ref.invalidateSelf();
-  }
-} 
+}); 

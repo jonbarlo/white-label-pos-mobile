@@ -6,6 +6,7 @@ import 'order_taking_screen.dart';
 
 import 'waiter_order_provider.dart';
 import '../../core/services/navigation_service.dart';
+import '../../core/theme/theme_provider.dart';
 
 class TableSelectionScreen extends ConsumerStatefulWidget {
   const TableSelectionScreen({super.key});
@@ -18,7 +19,6 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
     with TickerProviderStateMixin {
   late TabController _tabController;
   String _searchQuery = '';
-
 
   @override
   void initState() {
@@ -38,32 +38,45 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
     final tableStatsAsync = ref.watch(tableStatsProvider);
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Tables'),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        actions: [
+          Consumer(
+            builder: (context, ref, child) {
+              final themeMode = ref.watch(themeModeProvider);
+              return IconButton(
+                icon: Icon(
+                  themeMode == ThemeMode.dark ? Icons.light_mode : Icons.dark_mode,
+                ),
+                onPressed: () async {
+                  print('Theme toggle pressed. Current theme: $themeMode');
+                  await ref.read(themeModeProvider.notifier).toggleTheme();
+                  print('Theme toggled. New theme: ${ref.read(themeModeProvider)}');
+                  if (mounted) {
+                    setState(() {}); // Force rebuild
+                  }
+                },
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.person),
+            onPressed: () {
+              // Profile
+            },
+          ),
+        ],
+      ),
       body: Column(
         children: [
-          // Tab bar for table status filters
-          Container(
-            color: Theme.of(context).colorScheme.primary,
-            child: TabBar(
-              controller: _tabController,
-              isScrollable: true,
-              indicatorColor: Theme.of(context).colorScheme.onPrimary,
-              labelColor: Theme.of(context).colorScheme.onPrimary,
-              unselectedLabelColor: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.7),
-              tabs: [
-                _buildTab('All', null, tableStatsAsync),
-                _buildTab('Available', waiter_table.TableStatus.available, tableStatsAsync),
-                _buildTab('Occupied', waiter_table.TableStatus.occupied, tableStatsAsync),
-                _buildTab('Reserved', waiter_table.TableStatus.reserved, tableStatsAsync),
-                _buildTab('Cleaning', waiter_table.TableStatus.cleaning, tableStatsAsync),
-              ],
-            ),
-          ),
-          
-          // Search and filter bar
+          // Search bar
           _buildSearchBar(),
           
-          // Table statistics
-          _buildTableStats(tableStatsAsync),
+          // Status tabs
+          _buildStatusTabs(tableStatsAsync),
           
           // Tables grid
           Expanded(
@@ -88,38 +101,6 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
     );
   }
 
-  Widget _buildTab(String title, waiter_table.TableStatus? status, AsyncValue<Map<String, int>> statsAsync) {
-    return Tab(
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(title),
-          const SizedBox(width: 4),
-          statsAsync.when(
-            data: (stats) {
-              final count = status != null 
-                  ? stats[status.name] ?? 0
-                  : stats.values.fold(0, (sum, count) => sum + count);
-              return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  '$count',
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                ),
-              );
-            },
-            loading: () => const SizedBox.shrink(),
-            error: (_, __) => const SizedBox.shrink(),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildSearchBar() {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -131,10 +112,10 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
         },
         decoration: InputDecoration(
           hintText: 'Search tables...',
-          prefixIcon: const Icon(Icons.search),
+          prefixIcon: const Icon(Icons.search, size: 20),
           suffixIcon: _searchQuery.isNotEmpty
               ? IconButton(
-                  icon: const Icon(Icons.clear),
+                  icon: const Icon(Icons.clear, size: 20),
                   onPressed: () {
                     setState(() {
                       _searchQuery = '';
@@ -143,66 +124,74 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
                 )
               : null,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: Colors.grey[300]!),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: Colors.grey[300]!),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
           ),
           filled: true,
-          fillColor: Theme.of(context).colorScheme.surface,
+          fillColor: Colors.grey[50],
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         ),
       ),
     );
   }
 
-  Widget _buildTableStats(AsyncValue<Map<String, int>> statsAsync) {
-    return statsAsync.when(
-      data: (stats) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Row(
-          children: [
-            _buildStatChip('Available', stats['available'] ?? 0, Colors.green),
-            const SizedBox(width: 8),
-            _buildStatChip('Occupied', stats['occupied'] ?? 0, Colors.orange),
-            const SizedBox(width: 8),
-            _buildStatChip('Reserved', stats['reserved'] ?? 0, Colors.blue),
-            const SizedBox(width: 8),
-            _buildStatChip('Cleaning', stats['cleaning'] ?? 0, Colors.grey),
-          ],
-        ),
-      ),
-      loading: () => const Padding(
-        padding: EdgeInsets.all(16),
-        child: LinearProgressIndicator(),
-      ),
-      error: (_, __) => const SizedBox.shrink(),
-    );
-  }
-
-  Widget _buildStatChip(String label, int count, Color color) {
+  Widget _buildStatusTabs(AsyncValue<Map<String, int>> statsAsync) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
+      color: Theme.of(context).colorScheme.primary,
+      child: TabBar(
+        controller: _tabController,
+        isScrollable: true,
+        indicatorColor: Colors.white,
+        indicatorWeight: 3,
+        labelColor: Colors.white,
+        unselectedLabelColor: Colors.white.withValues(alpha: 0.7),
+        labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+        unselectedLabelStyle: const TextStyle(fontSize: 14),
+        tabs: [
+          _buildTab('All', null, statsAsync),
+          _buildTab('Available', waiter_table.TableStatus.available, statsAsync),
+          _buildTab('Occupied', waiter_table.TableStatus.occupied, statsAsync),
+          _buildTab('Reserved', waiter_table.TableStatus.reserved, statsAsync),
+          _buildTab('Cleaning', waiter_table.TableStatus.cleaning, statsAsync),
+        ],
       ),
+    );
+  }
+
+  Widget _buildTab(String title, waiter_table.TableStatus? status, AsyncValue<Map<String, int>> statsAsync) {
+    return Tab(
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 8,
-            height: 8,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-            ),
-          ),
+          Text(title),
           const SizedBox(width: 6),
-          Text(
-            '$label: $count',
-            style: TextStyle(
-              color: color,
-              fontWeight: FontWeight.w600,
-              fontSize: 12,
-            ),
+          statsAsync.when(
+            data: (stats) {
+              final count = status != null 
+                  ? stats[status.name] ?? 0
+                  : stats.values.fold(0, (sum, count) => sum + count);
+              return Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '$count',
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                ),
+              );
+            },
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => const SizedBox.shrink(),
           ),
         ],
       ),
@@ -228,10 +217,10 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
         return GridView.builder(
           padding: const EdgeInsets.all(16),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: 1.2,
+            crossAxisCount: 4,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            childAspectRatio: 1.0,
           ),
           itemCount: filteredTables.length,
           itemBuilder: (context, index) {
@@ -255,13 +244,13 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
           children: [
             const Icon(
               Icons.error_outline,
-              size: 64,
+              size: 48,
               color: Colors.red,
             ),
             const SizedBox(height: 16),
             Text(
               'Error loading tables',
-              style: Theme.of(context).textTheme.headlineSmall,
+              style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 8),
             Text(
@@ -319,13 +308,13 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
         children: [
           Icon(
             icon,
-            size: 64,
+            size: 48,
             color: Colors.grey,
           ),
           const SizedBox(height: 16),
           Text(
             message,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
               color: Colors.grey,
             ),
           ),
@@ -347,272 +336,103 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
     final canTakeOrder = table.status.canTakeOrder;
 
     return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       child: InkWell(
         onTap: canTakeOrder ? () => _onTableSelected(table) : null,
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            gradient: LinearGradient(
-              colors: [
-                statusColor.withValues(alpha: 0.1),
-                statusColor.withValues(alpha: 0.05),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Table number and status
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Table ${table.name}',
-                      style: theme.textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: statusColor,
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: statusColor.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        table.status.shortName,
-                        style: TextStyle(
-                          color: statusColor,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Table name
+              Text(
+                'Table ${table.name}',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
                 ),
-                
-                const SizedBox(height: 12),
-                
-                // Capacity
-                Row(
-                  children: [
-                    Icon(
-                      Icons.people,
-                      size: 16,
+              ),
+              
+              const SizedBox(height: 4),
+              
+              // Status with dot
+              Row(
+                children: [
+                  Container(
+                    width: 6,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: statusColor,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    table.status.shortName,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: statusColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+              
+              const SizedBox(height: 4),
+              
+              // Party size
+              Row(
+                children: [
+                  Icon(Icons.people, size: 12, color: Colors.grey[600]),
+                  const SizedBox(width: 2),
+                  Text(
+                    '${table.capacity} seats',
+                    style: theme.textTheme.bodySmall?.copyWith(
                       color: Colors.grey[600],
                     ),
-                    const SizedBox(width: 4),
+                  ),
+                ],
+              ),
+              
+              // Order info if exists
+              if (table.currentOrderId != null) ...[
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(Icons.receipt, size: 12, color: Colors.grey[600]),
+                    const SizedBox(width: 2),
                     Text(
-                      '${table.capacity} seats',
-                      style: theme.textTheme.bodyMedium?.copyWith(
+                      'Order ${table.currentOrderNumber ?? table.currentOrderId}',
+                      style: theme.textTheme.bodySmall?.copyWith(
                         color: Colors.grey[600],
                       ),
                     ),
                   ],
                 ),
-                
-                // Current order info
-                if (table.currentOrderId != null) ...[
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.receipt,
-                        size: 16,
-                        color: Colors.grey[600],
-                      ),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Text(
-                          'Order ${table.currentOrderNumber ?? table.currentOrderId}',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: Colors.grey[600],
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (table.currentOrderTotal != null) ...[
-                    const SizedBox(height: 4),
-                    Text(
-                      '\$${table.currentOrderTotal!.toStringAsFixed(2)}',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.primary,
-                      ),
-                    ),
-                  ],
-                ],
-                
-                // Customer name
-                if (table.customerName != null) ...[
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.person,
-                        size: 16,
-                        color: Colors.grey[600],
-                      ),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Text(
-                          table.customerName!,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: Colors.grey[600],
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-                
-                const Spacer(),
-                
-                // Action buttons
-                if (table.status == waiter_table.TableStatus.available) ...[
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () => _showSeatCustomerDialog(table),
-                          icon: const Icon(Icons.event_seat, size: 16),
-                          label: const Text('Seat Customer', style: TextStyle(fontSize: 12)),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: statusColor,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () => _showReserveTableDialog(table),
-                          icon: const Icon(Icons.event_available, size: 16),
-                          label: const Text('Reserve', style: TextStyle(fontSize: 12)),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.blue,
-                            side: const BorderSide(color: Colors.blue),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ] else if (table.status == waiter_table.TableStatus.reserved) ...[
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: () => _showCheckInDialog(table),
-                      icon: const Icon(Icons.login, size: 16),
-                      label: const Text('Check-in', style: TextStyle(fontSize: 12)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                  ),
-                ] else if (table.status == waiter_table.TableStatus.occupied) ...[
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        _onTableSelected(table);
-                      },
-                      icon: const Icon(Icons.add_shopping_cart, size: 16),
-                      label: const Text('Add Items', style: TextStyle(fontSize: 12)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: statusColor,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                  ),
-                  if (table.status == waiter_table.TableStatus.occupied) ...[
-                    const SizedBox(height: 8),
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: () => _clearTable(table),
-                        icon: const Icon(Icons.cleaning_services, size: 16),
-                        label: const Text('Clear Table', style: TextStyle(fontSize: 12)),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.green,
-                          side: const BorderSide(color: Colors.green),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ] else if (table.status == waiter_table.TableStatus.cleaning) ...[
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      onPressed: () => _clearTable(table),
-                      icon: const Icon(Icons.cleaning_services, size: 16),
-                      label: const Text('Clear Table', style: TextStyle(fontSize: 12)),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.green,
-                        side: const BorderSide(color: Colors.green),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                  ),
-                ] else ...[
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      onPressed: () => _showTableDetails(table),
-                      icon: const Icon(Icons.info_outline, size: 16),
-                      label: const Text(
-                        'Details',
-                        style: TextStyle(fontSize: 12),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: statusColor,
-                        side: BorderSide(color: statusColor),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
+                if (table.currentOrderTotal != null) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    '\$${table.currentOrderTotal!.toStringAsFixed(2)}',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.primary,
                     ),
                   ),
                 ],
               ],
-            ),
+              
+              const Spacer(),
+              
+              // Action buttons
+              _buildActionButtons(table, statusColor),
+            ],
           ),
         ),
       ),
     );
   }
+
+
 
   Color _getStatusColor(waiter_table.TableStatus status) {
     switch (status) {
@@ -1009,5 +829,129 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
 
   String _formatDateTime(DateTime dateTime) {
     return '${dateTime.month}/${dateTime.day}/${dateTime.year} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
+  }
+
+  VoidCallback? _getActionCallback(waiter_table.Table table) {
+    switch (table.status) {
+      case waiter_table.TableStatus.available:
+        return () => _showSeatCustomerDialog(table);
+      case waiter_table.TableStatus.reserved:
+        return () => _showCheckInDialog(table);
+      case waiter_table.TableStatus.occupied:
+        return () => _onTableSelected(table);
+      case waiter_table.TableStatus.cleaning:
+        return () => _clearTable(table);
+      default:
+        return () => _showTableDetails(table);
+    }
+  }
+
+  String _getActionText(waiter_table.Table table) {
+    switch (table.status) {
+      case waiter_table.TableStatus.available:
+        return 'Seat';
+      case waiter_table.TableStatus.reserved:
+        return 'Check-in';
+      case waiter_table.TableStatus.occupied:
+        return 'View';
+      case waiter_table.TableStatus.cleaning:
+        return 'Ready';
+      default:
+        return 'Details';
+    }
+  }
+
+  Widget _buildActionButtons(waiter_table.Table table, Color statusColor) {
+    switch (table.status) {
+      case waiter_table.TableStatus.available:
+        return SizedBox(
+          width: double.infinity,
+          height: 24,
+          child: ElevatedButton(
+            onPressed: () => _showSeatCustomerDialog(table),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: statusColor,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
+              padding: EdgeInsets.zero,
+            ),
+            child: const Text('Seat', style: TextStyle(fontSize: 10)),
+          ),
+        );
+        
+      case waiter_table.TableStatus.occupied:
+        return SizedBox(
+          width: double.infinity,
+          height: 24,
+          child: ElevatedButton(
+            onPressed: () => _onTableSelected(table),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: statusColor,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
+              padding: EdgeInsets.zero,
+            ),
+            child: const Text('View', style: TextStyle(fontSize: 10)),
+          ),
+        );
+        
+      case waiter_table.TableStatus.reserved:
+        return SizedBox(
+          width: double.infinity,
+          height: 24,
+          child: ElevatedButton(
+            onPressed: () => _showCheckInDialog(table),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
+              padding: EdgeInsets.zero,
+            ),
+            child: const Text('Check-in', style: TextStyle(fontSize: 10)),
+          ),
+        );
+        
+      case waiter_table.TableStatus.cleaning:
+        return SizedBox(
+          width: double.infinity,
+          height: 24,
+          child: OutlinedButton(
+            onPressed: () => _clearTable(table),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: Colors.green,
+              side: const BorderSide(color: Colors.green),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
+              padding: EdgeInsets.zero,
+            ),
+            child: const Text('Ready', style: TextStyle(fontSize: 10)),
+          ),
+        );
+        
+      default:
+        return SizedBox(
+          width: double.infinity,
+          height: 24,
+          child: OutlinedButton(
+            onPressed: () => _showTableDetails(table),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: statusColor,
+              side: BorderSide(color: statusColor),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
+              padding: EdgeInsets.zero,
+            ),
+            child: const Text('Details', style: TextStyle(fontSize: 10)),
+          ),
+        );
+    }
   }
 } 

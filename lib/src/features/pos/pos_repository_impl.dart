@@ -44,6 +44,7 @@ class PosRepositoryImpl implements PosRepository {
   @override
   Future<List<CartItem>> searchItems(String query) async {
     try {
+      // Get business ID from auth state
       final authState = _ref.read(authNotifierProvider);
       final businessId = authState.business?.id;
       
@@ -51,18 +52,28 @@ class PosRepositoryImpl implements PosRepository {
         throw Exception('No businessId found in auth state');
       }
 
-      final response = await _dio.get('/menu-items', queryParameters: {
-        'businessId': businessId,
-        if (query.isNotEmpty) 'search': query,
-        'isAvailable': true,
+      // Use the correct endpoint: /menu/items
+      final response = await _dio.get('/menu/items', queryParameters: {
+        'businessId': businessId, // Required parameter
+        if (query.isNotEmpty) 'search': query, // Use 'search' for search as per API docs
+        'limit': 100, // Get more items for POS
       });
 
-      // The /menu-items endpoint returns a List directly
-      final items = (response.data as List)
+      // The /menu/items endpoint returns {success: true, data: [...]}
+      final responseData = response.data;
+      List<dynamic> items;
+      
+      if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
+        items = responseData['data'] as List<dynamic>;
+      } else if (responseData is List<dynamic>) {
+        items = responseData;
+      } else {
+        throw Exception('Unexpected response format from /menu/items');
+      }
+
+      return items
           .map((item) => _convertMenuItemToCartItem(_safeMenuItemFromJson(item as Map<String, dynamic>)))
           .toList();
-
-      return items;
     } catch (e) {
       throw Exception('Failed to search menu items: $e');
     }
@@ -71,15 +82,33 @@ class PosRepositoryImpl implements PosRepository {
   @override
   Future<CartItem?> getItemByBarcode(String barcode) async {
     try {
-      final response = await _dio.get('/menu-items', queryParameters: {
+      // Get business ID from auth state
+      final authState = _ref.read(authNotifierProvider);
+      final businessId = authState.business?.id;
+      
+      if (businessId == null) {
+        throw Exception('No businessId found in auth state');
+      }
+
+      final response = await _dio.get('/menu/items', queryParameters: {
+        'businessId': businessId, // Required parameter
         'barcode': barcode,
-        'isAvailable': true,
       });
 
-      if (response.statusCode == 200 && response.data['success'] == true) {
-        final List<dynamic> items = response.data['data'] ?? [];
+      if (response.statusCode == 200) {
+        final responseData = response.data;
+        List<dynamic> items;
+        
+        if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
+          items = responseData['data'] as List<dynamic>;
+        } else if (responseData is List<dynamic>) {
+          items = responseData;
+        } else {
+          return null;
+        }
+        
         if (items.isNotEmpty) {
-          return _convertMenuItemToCartItem(MenuItem.fromJson(items.first));
+          return _convertMenuItemToCartItem(_safeMenuItemFromJson(items.first as Map<String, dynamic>));
         }
       }
       
@@ -239,23 +268,53 @@ class PosRepositoryImpl implements PosRepository {
 
   // Helper methods
   MenuItem _safeMenuItemFromJson(Map<String, dynamic> json) {
+    // Get image URL from API or use a sample image based on category
+    String? imageUrl = json['image'] as String?;
+    if (imageUrl == null || imageUrl.isEmpty) {
+      // Use sample images based on category for testing
+      final categoryId = int.tryParse(json['category']?.toString() ?? '1') ?? 1;
+      imageUrl = _getSampleImageUrl(categoryId, json['name'] as String);
+    }
+
     return MenuItem(
       id: json['id'] as int,
-      businessId: json['businessId'] as int,
-      categoryId: json['categoryId'] as int? ?? 1, // Handle missing categoryId
+      businessId: json['businessId'] as int? ?? 1,
+      categoryId: int.tryParse(json['category']?.toString() ?? '1') ?? 1, // Map 'category' string to categoryId
       name: json['name'] as String,
       description: json['description'] as String? ?? '',
       price: (json['price'] as num?)?.toDouble() ?? 0.0, // Handle null price
-      cost: (json['cost'] as num?)?.toDouble() ?? 0.0, // Handle null cost
-      image: json['imageUrl'] as String?,
+      cost: 0.0, // API doesn't provide cost
+      image: imageUrl, // Use sample image URL if API doesn't provide one
       allergens: null, // Not in API response
       nutritionalInfo: null, // Not in API response
-      preparationTime: json['preparationTime'] as int? ?? 15,
-      isAvailable: json['isAvailable'] as bool? ?? true,
-      isActive: json['isActive'] as bool? ?? true,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
+      preparationTime: 15, // Default preparation time
+      isAvailable: true,
+      isActive: true,
+      createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '') ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(json['updatedAt'] as String? ?? '') ?? DateTime.now(),
     );
+  }
+
+  String _getSampleImageUrl(int categoryId, String itemName) {
+    // Use Unsplash API for sample food images
+    final category = _getCategoryName(categoryId);
+    final encodedName = Uri.encodeComponent(itemName);
+    return 'https://source.unsplash.com/400x300/?$category,$encodedName';
+  }
+
+  String _getCategoryName(int categoryId) {
+    switch (categoryId) {
+      case 1:
+        return 'appetizer';
+      case 2:
+        return 'main-course';
+      case 3:
+        return 'dessert';
+      case 4:
+        return 'drink';
+      default:
+        return 'food';
+    }
   }
 
   CartItem _convertMenuItemToCartItem(MenuItem menuItem) {

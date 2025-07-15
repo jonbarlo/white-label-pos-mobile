@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../shared/models/api_response.dart';
 import '../../../../shared/models/result.dart';
@@ -75,6 +76,46 @@ class BusinessRepositoryImpl implements BusinessRepository {
     } catch (e) {
       return Result.failure(
         'An unexpected error occurred while getting business',
+        e,
+      );
+    }
+  }
+
+  @override
+  Future<Result<Business>> getBusinessBySlug(String slug) async {
+    try {
+      debugPrint('🔵 BusinessRepository: Making GET request to /public/businesses/slug/$slug');
+      final response = await _dio.get('/public/businesses/slug/$slug');
+      debugPrint('🔵 BusinessRepository: Response status: ${response.statusCode}');
+      debugPrint('🔵 BusinessRepository: Response data: ${response.data}');
+
+      final apiResponse = ApiResponse<Business>.fromJson(
+        response.data,
+        (json) => Business.fromJson(json as Map<String, dynamic>),
+      );
+
+      if (apiResponse.isSuccess && apiResponse.data != null) {
+        debugPrint('🔵 BusinessRepository: Success! Business: ${apiResponse.data!.name}');
+        return Result.success(apiResponse.data!);
+      } else {
+        debugPrint('🔵 BusinessRepository: API Error - ${apiResponse.message}');
+        return Result.failure(
+          apiResponse.message ?? 'Failed to get business by slug',
+          apiResponse.errors,
+        );
+      }
+    } on DioException catch (e) {
+      debugPrint('🔵 BusinessRepository: DioException - ${e.message}');
+      debugPrint('🔵 BusinessRepository: DioException status: ${e.response?.statusCode}');
+      debugPrint('🔵 BusinessRepository: DioException data: ${e.response?.data}');
+      return Result.failure(
+        AppException.fromDioException(e).message,
+        e,
+      );
+    } catch (e) {
+      debugPrint('🔵 BusinessRepository: Unexpected error: $e');
+      return Result.failure(
+        'An unexpected error occurred while getting business by slug',
         e,
       );
     }

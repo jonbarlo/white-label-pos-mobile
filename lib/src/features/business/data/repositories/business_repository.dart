@@ -9,6 +9,9 @@ abstract class BusinessRepository {
   /// Get a specific business by ID
   Future<Result<Business>> getBusiness(int id);
 
+  /// Get a specific business by slug
+  Future<Result<Business>> getBusinessBySlug(String slug);
+
   /// Create a new business
   Future<Result<Business>> createBusiness(Business business);
 

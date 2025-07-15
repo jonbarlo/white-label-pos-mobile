@@ -6,6 +6,7 @@ import 'package:white_label_pos_mobile/src/features/inventory/inventory_provider
 import 'package:white_label_pos_mobile/src/features/inventory/inventory_repository.dart';
 import 'package:white_label_pos_mobile/src/features/inventory/inventory_screen.dart';
 import 'package:white_label_pos_mobile/src/features/inventory/models/inventory_item.dart';
+import 'package:white_label_pos_mobile/src/shared/models/result.dart';
 import '../../../helpers/riverpod_test_helper.dart';
 
 import 'inventory_screen_test.mocks.dart';
@@ -28,7 +29,7 @@ void main() {
   group('InventoryScreen', () {
     testWidgets('displays inventory screen with title', (WidgetTester tester) async {
       when(mockInventoryRepository.getInventoryItems())
-          .thenAnswer((_) async => []);
+          .thenAnswer((_) async => Result.success([]));
 
       await RiverpodTestHelper.pumpWidget(tester, const InventoryScreen());
 
@@ -40,7 +41,7 @@ void main() {
       when(mockInventoryRepository.getInventoryItems())
           .thenAnswer((_) async {
         await Future.delayed(const Duration(milliseconds: 100));
-        return [];
+        return Result.success([]);
       });
 
       await tester.pumpWidget(RiverpodTestHelper.createTestWidget(const InventoryScreen()));

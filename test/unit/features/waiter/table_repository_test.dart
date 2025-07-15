@@ -77,14 +77,14 @@ void main() {
         
         final firstTable = result[0];
         expect(firstTable.id, 1);
-        expect(firstTable.tableNumber, 'A1');
+        expect(firstTable.name, 'A1');
         expect(firstTable.status, waiter_table.TableStatus.available);
         expect(firstTable.capacity, 4);
         expect(firstTable.currentOrderId, isNull);
         
         final secondTable = result[1];
         expect(secondTable.id, 2);
-        expect(secondTable.tableNumber, 'A2');
+        expect(secondTable.name, 'A2');
         expect(secondTable.status, waiter_table.TableStatus.occupied);
         expect(secondTable.capacity, 6);
         expect(secondTable.currentOrderId, 'ORD-001');
@@ -155,7 +155,7 @@ void main() {
         // Assert
         expect(result, isA<waiter_table.Table>());
         expect(result.id, 1);
-        expect(result.tableNumber, 'A1');
+        expect(result.name, 'A1');
         expect(result.status, waiter_table.TableStatus.available);
         expect(result.capacity, 4);
 

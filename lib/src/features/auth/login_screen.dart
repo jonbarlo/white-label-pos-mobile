@@ -4,8 +4,11 @@ import 'auth_provider.dart';
 import 'auth_validators.dart';
 import '../../shared/widgets/message_dialog.dart';
 import '../../shared/widgets/theme_toggle_button.dart';
+import '../../shared/widgets/app_image.dart';
 import '../../core/config/env_config.dart';
 import '../../core/theme/app_theme.dart';
+import '../business/business_provider.dart';
+import '../business/models/business.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -323,6 +326,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Widget _buildLoginForm(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
+    final businessSlug = _businessSlugController.text.trim();
+    debugPrint('🔵 LoginScreen: _buildLoginForm - businessSlug: "$businessSlug"');
+    final businessAsync = businessSlug.isNotEmpty 
+        ? ref.watch(businessBySlugProvider(businessSlug))
+        : null;
+    debugPrint('🔵 LoginScreen: _buildLoginForm - businessAsync is null: ${businessAsync == null}');
     
     return Center(
       child: SingleChildScrollView(
@@ -335,12 +344,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Logo
-                Icon(
-                  Icons.point_of_sale,
-                  size: 60,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
+                // Business Logo or Default Logo
+                businessAsync != null
+                    ? businessAsync.when(
+                        data: (business) {
+                          debugPrint('🔵 LoginScreen: Business data received: ${business?.name ?? 'null'}');
+                          return business != null
+                              ? _buildBusinessLogo(context, business)
+                              : _buildDefaultLogo(context);
+                        },
+                        loading: () {
+                          debugPrint('🔵 LoginScreen: Business loading...');
+                          return _buildLoadingLogo(context);
+                        },
+                        error: (error, stack) {
+                          debugPrint('🔵 LoginScreen: Business error: $error');
+                          return _buildDefaultLogo(context);
+                        },
+                      )
+                    : _buildDefaultLogo(context),
                 const SizedBox(height: 24),
                 
                 // Welcome text
@@ -376,6 +398,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   validator: AuthValidators.validateBusinessSlug,
                   textInputAction: TextInputAction.next,
+                  onChanged: (value) {
+                    debugPrint('🔵 LoginScreen: Business slug changed to: $value');
+                    // Trigger rebuild when business slug changes
+                    setState(() {
+                      debugPrint('🔵 LoginScreen: Business slug setState triggered');
+                    });
+                  },
                 ),
                 const SizedBox(height: 16),
 
@@ -436,13 +465,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       child: Text(user['label']!),
                     )).toList(),
                     onChanged: (label) {
+                      debugPrint('🔵 LoginScreen: Dropdown changed to: $label');
                       setState(() {
                         _selectedTestUserLabel = label;
                         final user = _testUsers.firstWhere((u) => u['label'] == label);
+                        debugPrint('🔵 LoginScreen: Setting email to: ${user['email']}');
+                        debugPrint('🔵 LoginScreen: Setting password to: ${user['password']}');
+                        debugPrint('🔵 LoginScreen: Setting business slug to: italian-delight');
                         _emailController.text = user['email']!;
                         _passwordController.text = user['password']!;
                         _businessSlugController.text = 'italian-delight';
                       });
+                      debugPrint('🔵 LoginScreen: First setState completed');
+                      // Trigger rebuild to fetch business logo
+                      setState(() {
+                        debugPrint('🔵 LoginScreen: Second setState triggered');
+                      });
+                      debugPrint('🔵 LoginScreen: Dropdown onChanged completed');
                     },
                     isExpanded: true,
                   ),
@@ -483,6 +522,157 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBusinessLogo(BuildContext context, Business business) {
+    return Column(
+      children: [
+        // Business Logo
+        if (business.logo != null && business.logo!.isNotEmpty)
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withAlpha(25),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: AppImage(
+                imageUrl: business.logo,
+                fit: BoxFit.cover,
+                placeholder: _buildLogoPlaceholder(context, business),
+                errorWidget: _buildLogoPlaceholder(context, business),
+              ),
+            ),
+          )
+        else
+          _buildLogoPlaceholder(context, business),
+        const SizedBox(height: 16),
+        // Business Name
+        Text(
+          business.name,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        if (business.type != null) ...[
+          const SizedBox(height: 4),
+          Text(
+            business.type!.displayName,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).colorScheme.onSurface.withAlpha(180),
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildLoadingLogo(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          width: 80,
+          height: 80,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+          ),
+          child: const Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          'Loading business...',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: Theme.of(context).colorScheme.onSurface.withAlpha(180),
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDefaultLogo(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          width: 80,
+          height: 80,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            color: Theme.of(context).colorScheme.primary.withAlpha(25),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withAlpha(25),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Icon(
+            Icons.point_of_sale,
+            size: 40,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          'White Label POS',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Point of Sale System',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: Theme.of(context).colorScheme.onSurface.withAlpha(180),
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLogoPlaceholder(BuildContext context, Business business) {
+    return Container(
+      width: 80,
+      height: 80,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Theme.of(context).colorScheme.primary.withAlpha(200),
+            Theme.of(context).colorScheme.primary.withAlpha(150),
+          ],
+        ),
+      ),
+      child: Center(
+        child: Text(
+          business.name.isNotEmpty ? business.name[0].toUpperCase() : 'B',
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
           ),
         ),
       ),
