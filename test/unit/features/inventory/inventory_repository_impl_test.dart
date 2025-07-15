@@ -24,22 +24,25 @@ void main() {
   group('InventoryRepositoryImpl', () {
     group('getInventoryItems', () {
       test('returns list of inventory items on success', () async {
-        final responseData = [
-          {
-            'id': '1',
-            'name': 'Apple',
-            'sku': 'APP001',
-            'price': 1.99,
-            'cost': 1.50,
-            'stockQuantity': 100,
-            'category': 'Fruits',
-            'barcode': '123456789',
-            'imageUrl': 'https://example.com/apple.jpg',
-            'description': 'Fresh red apples',
-            'minStockLevel': 10,
-            'maxStockLevel': 200,
-          }
-        ];
+        final responseData = {
+          'success': true,
+          'data': [
+            {
+              'id': '1',
+              'name': 'Apple',
+              'sku': 'APP001',
+              'price': 1.99,
+              'cost': 1.50,
+              'stock': 100, // API uses 'stock' field
+              'category': 'Fruits',
+              'barcode': '123456789',
+              'imageUrl': 'https://example.com/apple.jpg',
+              'description': 'Fresh red apples',
+              'minStockLevel': 10,
+              'maxStockLevel': 200,
+            }
+          ]
+        };
 
         final response = Response(
           data: responseData,
@@ -56,11 +59,15 @@ void main() {
         expect(result.data.length, 1);
         expect(result.data.first.name, 'Apple');
         expect(result.data.first.sku, 'APP001');
+        expect(result.data.first.stockQuantity, 100); // Should be mapped from 'stock'
         verify(mockDio.get('/items')).called(1);
       });
 
       test('returns empty list when no items exist', () async {
-        final responseData = <dynamic>[];
+        final responseData = {
+          'success': true,
+          'data': <dynamic>[]
+        };
 
         final response = Response(
           data: responseData,
@@ -309,22 +316,25 @@ void main() {
 
     group('searchItems', () {
       test('returns search results', () async {
-        final responseData = [
-          {
-            'id': '1',
-            'name': 'Apple',
-            'sku': 'APP001',
-            'price': 1.99,
-            'cost': 1.50,
-            'stockQuantity': 100,
-            'category': 'Fruits',
-            'barcode': '123456789',
-            'imageUrl': 'https://example.com/apple.jpg',
-            'description': 'Fresh red apples',
-            'minStockLevel': 10,
-            'maxStockLevel': 200,
-          }
-        ];
+        final responseData = {
+          'success': true,
+          'data': [
+            {
+              'id': '1',
+              'name': 'Apple',
+              'sku': 'APP001',
+              'price': 1.99,
+              'cost': 1.50,
+              'stock': 100, // API uses 'stock' field
+              'category': 'Fruits',
+              'barcode': '123456789',
+              'imageUrl': 'https://example.com/apple.jpg',
+              'description': 'Fresh red apples',
+              'minStockLevel': 10,
+              'maxStockLevel': 200,
+            }
+          ]
+        };
 
         final response = Response(
           data: responseData,
@@ -340,6 +350,7 @@ void main() {
         expect(result.isSuccess, isTrue);
         expect(result.data.length, 1);
         expect(result.data.first.name, 'Apple');
+        expect(result.data.first.stockQuantity, 100); // Should be mapped from 'stock'
         verify(mockDio.get('/items/search', queryParameters: anyNamed('queryParameters'))).called(1);
       });
     });
@@ -420,22 +431,25 @@ void main() {
 
     group('getItemsByCategory', () {
       test('returns items by category', () async {
-        final responseData = [
-          {
-            'id': '1',
-            'name': 'Apple',
-            'sku': 'APP001',
-            'price': 1.99,
-            'cost': 1.50,
-            'stockQuantity': 100,
-            'category': 'Fruits',
-            'barcode': '123456789',
-            'imageUrl': 'https://example.com/apple.jpg',
-            'description': 'Fresh red apples',
-            'minStockLevel': 10,
-            'maxStockLevel': 200,
-          }
-        ];
+        final responseData = {
+          'success': true,
+          'data': [
+            {
+              'id': '1',
+              'name': 'Apple',
+              'sku': 'APP001',
+              'price': 1.99,
+              'cost': 1.50,
+              'stock': 100, // API uses 'stock' field
+              'category': 'Fruits',
+              'barcode': '123456789',
+              'imageUrl': 'https://example.com/apple.jpg',
+              'description': 'Fresh red apples',
+              'minStockLevel': 10,
+              'maxStockLevel': 200,
+            }
+          ]
+        };
 
         final response = Response(
           data: responseData,
@@ -451,28 +465,32 @@ void main() {
         expect(result.isSuccess, isTrue);
         expect(result.data.length, 1);
         expect(result.data.first.category, 'Fruits');
+        expect(result.data.first.stockQuantity, 100); // Should be mapped from 'stock'
         verify(mockDio.get('/items/category/Fruits')).called(1);
       });
     });
 
     group('getLowStockItems', () {
       test('returns low stock items', () async {
-        final responseData = [
-          {
-            'id': '1',
-            'name': 'Apple',
-            'sku': 'APP001',
-            'price': 1.99,
-            'cost': 1.50,
-            'stockQuantity': 5,
-            'category': 'Fruits',
-            'barcode': '123456789',
-            'imageUrl': 'https://example.com/apple.jpg',
-            'description': 'Fresh red apples',
-            'minStockLevel': 10,
-            'maxStockLevel': 200,
-          }
-        ];
+        final responseData = {
+          'success': true,
+          'data': [
+            {
+              'id': '1',
+              'name': 'Apple',
+              'sku': 'APP001',
+              'price': 1.99,
+              'cost': 1.50,
+              'stock': 5, // API uses 'stock' field
+              'category': 'Fruits',
+              'barcode': '123456789',
+              'imageUrl': 'https://example.com/apple.jpg',
+              'description': 'Fresh red apples',
+              'minStockLevel': 10,
+              'maxStockLevel': 200,
+            }
+          ]
+        };
 
         final response = Response(
           data: responseData,
@@ -487,7 +505,7 @@ void main() {
 
         expect(result.isSuccess, isTrue);
         expect(result.data.length, 1);
-        expect(result.data.first.stockQuantity, 5);
+        expect(result.data.first.stockQuantity, 5); // Should be mapped from 'stock'
         verify(mockDio.get('/items/low-stock')).called(1);
       });
     });

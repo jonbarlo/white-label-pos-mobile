@@ -11,17 +11,48 @@ class InventoryRepositoryImpl implements InventoryRepository {
 
   InventoryRepositoryImpl(this._dio);
 
+  /// Helper method to parse API response and map fields
+  List<InventoryItem> _parseItemsResponse(dynamic responseData) {
+    List<dynamic> data;
+    
+    // Handle both response formats:
+    // 1. Direct array: [...]
+    // 2. Wrapped response: {"success": true, "data": [...]}
+    if (responseData is List<dynamic>) {
+      // Direct array format
+      data = responseData;
+    } else if (responseData is Map<String, dynamic>) {
+      // Wrapped response format
+      final responseMap = responseData;
+      final responseDataList = responseMap['data'] as List<dynamic>?;
+      if (responseDataList == null) {
+        throw Exception('No items data received from server');
+      }
+      data = responseDataList;
+    } else {
+      throw Exception('Unexpected response format from server');
+    }
+    
+    return data.map((json) {
+      final itemJson = json as Map<String, dynamic>;
+      // Map API field names to model field names
+      return InventoryItem.fromJson({
+        ...itemJson,
+        'stockQuantity': itemJson['stock'] ?? 0, // Map 'stock' to 'stockQuantity'
+        'cost': itemJson['cost'] ?? 0.0, // Ensure cost field exists
+        'minStockLevel': itemJson['minStockLevel'] ?? 0, // Ensure minStockLevel exists
+        'maxStockLevel': itemJson['maxStockLevel'] ?? 100, // Ensure maxStockLevel exists
+      });
+    }).toList();
+  }
+
   @override
   Future<Result<List<InventoryItem>>> getInventoryItems() async {
     try {
       final response = await _dio.get('/items');
-      final data = response.data as List<dynamic>?;
-      if (data == null) {
-        return Result.failure('No data received from server');
-      }
-      final items = data
-          .map((json) => InventoryItem.fromJson(json as Map<String, dynamic>))
-          .toList();
+      
+      final items = _parseItemsResponse(response.data);
+      
       return Result.success(items);
     } on DioException catch (e) {
       return Result.failure(AppException.fromDioException(e).message);
@@ -145,13 +176,8 @@ class InventoryRepositoryImpl implements InventoryRepository {
       final response = await _dio.get('/items/search', queryParameters: {
         'q': query,
       });
-      final data = response.data as List<dynamic>?;
-      if (data == null) {
-        return Result.failure('No search results found');
-      }
-      final items = data
-          .map((json) => InventoryItem.fromJson(json as Map<String, dynamic>))
-          .toList();
+      
+      final items = _parseItemsResponse(response.data);
       
       return Result.success(items);
     } on DioException catch (e) {
@@ -188,13 +214,8 @@ class InventoryRepositoryImpl implements InventoryRepository {
   Future<Result<List<InventoryItem>>> getItemsByCategory(String category) async {
     try {
       final response = await _dio.get('/items/category/$category');
-      final data = response.data as List<dynamic>?;
-      if (data == null) {
-        return Result.failure('No items found in category');
-      }
-      final items = data
-          .map((json) => InventoryItem.fromJson(json as Map<String, dynamic>))
-          .toList();
+      
+      final items = _parseItemsResponse(response.data);
       
       return Result.success(items);
     } on DioException catch (e) {
@@ -208,13 +229,8 @@ class InventoryRepositoryImpl implements InventoryRepository {
   Future<Result<List<InventoryItem>>> getLowStockItems() async {
     try {
       final response = await _dio.get('/items/low-stock');
-      final data = response.data as List<dynamic>?;
-      if (data == null) {
-        return Result.failure('No low stock items found');
-      }
-      final items = data
-          .map((json) => InventoryItem.fromJson(json as Map<String, dynamic>))
-          .toList();
+      
+      final items = _parseItemsResponse(response.data);
       
       return Result.success(items);
     } on DioException catch (e) {

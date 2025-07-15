@@ -2,7 +2,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 /// Environment configuration class that manages environment variables
 class EnvConfig {
-  static const String _defaultApiUrl = 'https://api.pos-engine.com';
+  static const String _defaultApiUrl = 'http://localhost:3031/api';
   static const int _defaultTimeout = 30000;
   static const int _defaultRetryAttempts = 3;
 
