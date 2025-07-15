@@ -3,9 +3,7 @@ import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 import 'package:dio/dio.dart';
 import 'package:white_label_pos_mobile/src/features/auth/data/repositories/auth_repository_impl.dart';
-import 'package:white_label_pos_mobile/src/features/auth/data/repositories/auth_repository.dart';
 import 'package:white_label_pos_mobile/src/features/auth/models/user.dart';
-import 'package:white_label_pos_mobile/src/shared/models/result.dart';
 import 'package:white_label_pos_mobile/src/features/business/models/business.dart';
 
 import 'auth_repository_impl_test.mocks.dart';
@@ -87,12 +85,12 @@ void main() {
 
         // Assert
         expect(result.isSuccess, true);
-        expect(result.data!.user.id, user.id);
-        expect(result.data!.user.email, user.email);
-        expect(result.data!.user.role, user.role);
-        expect(result.data!.token, 'valid-token-123');
-        expect(result.data!.business.id, business.id);
-        expect(result.data!.business.name, business.name);
+        expect(result.data.user.id, user.id);
+        expect(result.data.user.email, user.email);
+        expect(result.data.user.role, user.role);
+        expect(result.data.token, 'valid-token-123');
+        expect(result.data.business.id, business.id);
+        expect(result.data.business.name, business.name);
       });
 
       test('should return failure result when login fails', () async {

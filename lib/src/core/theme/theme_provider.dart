@@ -35,7 +35,6 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
       await prefs.setInt(_themeKey, newMode.index);
     } catch (e) {
       // Handle persistence error silently
-      debugPrint('Failed to persist theme mode: $e');
     }
   }
 
@@ -47,7 +46,6 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
       await prefs.setInt(_themeKey, mode.index);
     } catch (e) {
       // Handle persistence error silently
-      debugPrint('Failed to persist theme mode: $e');
     }
   }
 }

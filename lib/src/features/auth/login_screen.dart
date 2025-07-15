@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/semantics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'auth_provider.dart';
 import 'auth_validators.dart';
@@ -39,12 +38,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _handleLogin() async {
+    debugPrint('🔵 LoginScreen: _handleLogin() called');
     if (_formKey.currentState!.validate()) {
+      debugPrint('🔵 LoginScreen: Form validation passed');
+      debugPrint('🔵 LoginScreen: Email: ${_emailController.text.trim()}');
+      debugPrint('🔵 LoginScreen: Business Slug: ${_businessSlugController.text.trim()}');
+      debugPrint('🔵 LoginScreen: Password length: ${_passwordController.text.length}');
+      
       await ref.read(authNotifierProvider.notifier).login(
         email: _emailController.text.trim(),
         password: _passwordController.text,
         businessSlug: _businessSlugController.text.trim(),
       );
+      debugPrint('🔵 LoginScreen: Login call completed');
+    } else {
+      debugPrint('🔴 LoginScreen: Form validation failed');
     }
   }
 
@@ -244,7 +252,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   button: true,
                   enabled: authState.status != AuthStatus.loading,
                   child: ElevatedButton(
-                    onPressed: authState.status == AuthStatus.loading ? null : _handleLogin,
+                    onPressed: authState.status == AuthStatus.loading ? null : () {
+                      debugPrint('🔵 LoginScreen: Login button pressed');
+                      _handleLogin();
+                    },
                     style: AppTheme.neutralButtonStyle,
                     child: authState.status == AuthStatus.loading
                         ? Semantics(

@@ -40,7 +40,7 @@ void main() {
     );
 
     final mockTables = [
-      waiter_table.Table(
+      const waiter_table.Table(
         id: 1,
         businessId: 1,
         name: 'A1',
@@ -125,7 +125,7 @@ void main() {
             tableRepositoryProvider.overrideWithValue(mockRepository),
             dioClientProvider.overrideWithValue(mockDio),
             authNotifierProvider.overrideWith(() => FakeAuthNotifier(
-              AuthState(
+              const AuthState(
                 status: AuthStatus.unauthenticated,
                 user: null,
               ),
@@ -257,7 +257,7 @@ void main() {
     group('clearTableProvider', () {
       test('should clear table successfully', () async {
         // Arrange
-        when(mockRepository.clearTable(1)).thenAnswer((_) async => null);
+        when(mockRepository.clearTable(1)).thenAnswer((_) async {});
 
         // Act
         await container.read(clearTableProvider(1).future);
@@ -270,7 +270,7 @@ void main() {
     group('seatCustomerProvider', () {
       test('should call seatCustomer on repository with correct arguments', () async {
         // Arrange
-        when(mockRepository.seatCustomer(1, 'Alice', 2, 'Birthday')).thenAnswer((_) async => null);
+        when(mockRepository.seatCustomer(1, 'Alice', 2, 'Birthday')).thenAnswer((_) async {});
 
         // Act
         await container.read(seatCustomerProvider((1, 'Alice', 2, 'Birthday')).future);

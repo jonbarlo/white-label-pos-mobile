@@ -18,10 +18,10 @@ void main() {
   group('PosRepository', () {
     group('searchItems', () {
       test('returns list of items matching search query', () async {
-        final searchQuery = 'apple';
+        const searchQuery = 'apple';
         final expectedItems = [
-          CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 1),
-          CartItem(id: '2', name: 'Apple Juice', price: 2.99, quantity: 1),
+          const CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 1),
+          const CartItem(id: '2', name: 'Apple Juice', price: 2.99, quantity: 1),
         ];
 
         when(mockPosRepository.searchItems(searchQuery))
@@ -35,7 +35,7 @@ void main() {
       });
 
       test('returns empty list when no items match', () async {
-        final searchQuery = 'nonexistent';
+        const searchQuery = 'nonexistent';
 
         when(mockPosRepository.searchItems(searchQuery))
             .thenAnswer((_) async => []);
@@ -46,7 +46,7 @@ void main() {
       });
 
       test('throws exception on network error', () async {
-        final searchQuery = 'apple';
+        const searchQuery = 'apple';
 
         when(mockPosRepository.searchItems(searchQuery))
             .thenThrow(Exception('Network error'));
@@ -60,8 +60,8 @@ void main() {
 
     group('getItemByBarcode', () {
       test('returns item when barcode exists', () async {
-        final barcode = '123456789';
-        final expectedItem = CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 1);
+        const barcode = '123456789';
+        const expectedItem = CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 1);
 
         when(mockPosRepository.getItemByBarcode(barcode))
             .thenAnswer((_) async => expectedItem);
@@ -73,7 +73,7 @@ void main() {
       });
 
       test('returns null when barcode not found', () async {
-        final barcode = '999999999';
+        const barcode = '999999999';
 
         when(mockPosRepository.getItemByBarcode(barcode))
             .thenAnswer((_) async => null);
@@ -87,10 +87,10 @@ void main() {
     group('createSale', () {
       test('creates sale successfully', () async {
         final items = [
-          CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 2),
-          CartItem(id: '2', name: 'Banana', price: 0.99, quantity: 1),
+          const CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 2),
+          const CartItem(id: '2', name: 'Banana', price: 0.99, quantity: 1),
         ];
-        final paymentMethod = PaymentMethod.cash;
+        const paymentMethod = PaymentMethod.cash;
         final expectedSale = Sale(
           id: 'sale_123',
           items: items,
@@ -114,8 +114,8 @@ void main() {
       });
 
       test('throws exception when sale creation fails', () async {
-        final items = [CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 1)];
-        final paymentMethod = PaymentMethod.card;
+        final items = [const CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 1)];
+        const paymentMethod = PaymentMethod.card;
 
         when(mockPosRepository.createSale(items: items, paymentMethod: paymentMethod))
             .thenThrow(Exception('Sale creation failed'));
@@ -135,14 +135,14 @@ void main() {
         final expectedSales = [
           Sale(
             id: 'sale_1',
-            items: [CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 1)],
+            items: [const CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 1)],
             total: 1.99,
             paymentMethod: PaymentMethod.cash,
             createdAt: DateTime.now(),
           ),
           Sale(
             id: 'sale_2',
-            items: [CartItem(id: '2', name: 'Banana', price: 0.99, quantity: 2)],
+            items: [const CartItem(id: '2', name: 'Banana', price: 0.99, quantity: 2)],
             total: 1.98,
             paymentMethod: PaymentMethod.card,
             createdAt: DateTime.now(),

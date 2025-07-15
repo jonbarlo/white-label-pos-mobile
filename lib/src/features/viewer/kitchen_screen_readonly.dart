@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'kitchen_order_provider.dart';
 import 'kitchen_order.dart';
-import '../../core/theme/app_theme.dart';
 import '../../shared/widgets/theme_toggle_button.dart';
-import 'package:collection/collection.dart';
 
 class KitchenScreenReadOnly extends ConsumerWidget {
-  const KitchenScreenReadOnly({Key? key}) : super(key: key);
+  const KitchenScreenReadOnly({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -185,8 +183,8 @@ class KitchenOrderCardReadOnly extends StatelessWidget {
   const KitchenOrderCardReadOnly({
     required this.order,
     required this.isDark,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -231,7 +229,7 @@ class KitchenOrderCardReadOnly extends StatelessWidget {
                     ),
                     child: Text(
                       (order.status ?? 'pending').toUpperCase(),
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,

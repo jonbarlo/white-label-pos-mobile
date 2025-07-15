@@ -63,14 +63,14 @@ class _CustomerSelectionDialogState extends ConsumerState<CustomerSelectionDialo
       
       setState(() {
         _searchResults = [
-          Customer(
+          const Customer(
             id: 1,
             name: 'John Doe',
             email: 'john@example.com',
             phone: '+1234567890',
             businessId: 1,
           ),
-          Customer(
+          const Customer(
             id: 2,
             name: 'Jane Smith',
             email: 'jane@example.com',

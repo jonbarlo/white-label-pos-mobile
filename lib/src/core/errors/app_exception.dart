@@ -199,6 +199,31 @@ class AppException implements Exception {
     return 'Validation failed';
   }
 
+  String get userFriendlyMessage {
+    switch (type) {
+      case AppExceptionType.network:
+        return 'Network error. Please check your connection and try again.';
+      case AppExceptionType.unauthorized:
+        return 'Authentication failed. Please log in again.';
+      case AppExceptionType.forbidden:
+        return 'You don\'t have permission to perform this action.';
+      case AppExceptionType.validation:
+        return 'Please check your input and try again.';
+      case AppExceptionType.server:
+        return 'Server error. Please try again later.';
+      case AppExceptionType.notFound:
+        return 'Resource not found.';
+      case AppExceptionType.http:
+        return 'Request failed. Please try again.';
+      case AppExceptionType.ssl:
+        return 'SSL certificate error. Please contact support.';
+      case AppExceptionType.cancelled:
+        return 'Request was cancelled.';
+      case AppExceptionType.unknown:
+        return 'An unexpected error occurred. Please try again.';
+    }
+  }
+
   @override
   String toString() {
     return 'AppException: $message (${type.name})';

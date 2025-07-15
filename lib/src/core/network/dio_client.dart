@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/foundation.dart';
 import '../config/env_config.dart';
 import 'interceptors/logging_interceptor.dart';
 import 'interceptors/auth_interceptor.dart';
@@ -9,12 +10,15 @@ import 'interceptors/error_interceptor.dart';
 final dioClientProvider = Provider<Dio>((ref) {
   final baseUrl = EnvConfig.apiBaseUrl;
   
-  if (EnvConfig.isDebugMode) {
-    print('🔧 DIO CLIENT CONFIGURATION:');
-    print('🔧 Base URL: $baseUrl');
-    print('🔧 Connect Timeout: ${EnvConfig.apiTimeout}ms');
-    print('🔧 Debug Mode: ${EnvConfig.isDebugMode}');
-    print('🔧 App Name: ${EnvConfig.appName}');
+  // Base headers that work across all platforms
+  final headers = <String, String>{
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  };
+  
+  // Only add User-Agent header for non-web platforms
+  if (!kIsWeb) {
+    headers['User-Agent'] = 'WhiteLabelPOS-Mobile/${EnvConfig.appName}';
   }
   
   final dio = Dio(BaseOptions(
@@ -22,11 +26,9 @@ final dioClientProvider = Provider<Dio>((ref) {
     connectTimeout: Duration(milliseconds: EnvConfig.apiTimeout),
     receiveTimeout: Duration(milliseconds: EnvConfig.apiTimeout),
     sendTimeout: Duration(milliseconds: EnvConfig.apiTimeout),
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'User-Agent': 'WhiteLabelPOS-Mobile/${EnvConfig.appName}',
-    },
+    headers: headers,
+    // Web-specific settings
+    validateStatus: (status) => status != null && status < 500,
   ));
 
   // Add interceptors
@@ -35,10 +37,6 @@ final dioClientProvider = Provider<Dio>((ref) {
     AuthInterceptor(ref),
     ErrorInterceptor(),
   ]);
-
-  if (EnvConfig.isDebugMode) {
-    print('🔧 DIO CLIENT READY - Interceptors added: ${dio.interceptors.length}');
-  }
 
   return dio;
 }); 

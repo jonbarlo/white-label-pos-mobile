@@ -77,7 +77,7 @@ void main() {
     group('inventoryItemsProvider', () {
       test('returns list of inventory items', () async {
         final expectedItems = [
-          InventoryItem(
+          const InventoryItem(
             id: '1',
             name: 'Apple',
             sku: 'APP001',
@@ -91,7 +91,7 @@ void main() {
             minStockLevel: 10,
             maxStockLevel: 200,
           ),
-          InventoryItem(
+          const InventoryItem(
             id: '2',
             name: 'Banana',
             sku: 'BAN001',
@@ -141,7 +141,7 @@ void main() {
     group('lowStockItemsProvider', () {
       test('returns items with low stock', () async {
         final lowStockItems = [
-          InventoryItem(
+          const InventoryItem(
             id: '1',
             name: 'Apple',
             sku: 'APP001',
@@ -241,7 +241,7 @@ void main() {
     group('inventoryProvider', () {
       test('loads inventory items on initialization', () async {
         final expectedItems = [
-          InventoryItem(
+          const InventoryItem(
             id: '1',
             name: 'Apple',
             sku: 'APP001',
@@ -272,7 +272,7 @@ void main() {
       test('handles loading state correctly', () async {
         when(mockInventoryRepository.getInventoryItems())
             .thenAnswer((_) async {
-          await Future.delayed(Duration(milliseconds: 100));
+          await Future.delayed(const Duration(milliseconds: 100));
           return Result.success(<InventoryItem>[]);
         });
 
@@ -306,7 +306,7 @@ void main() {
       });
 
       test('creates inventory item successfully', () async {
-        final newItem = InventoryItem(
+        const newItem = InventoryItem(
           id: '',
           name: 'Orange',
           sku: 'ORA001',
@@ -321,7 +321,7 @@ void main() {
           maxStockLevel: 150,
         );
 
-        final createdItem = InventoryItem(
+        const createdItem = InventoryItem(
           id: '3',
           name: 'Orange',
           sku: 'ORA001',
@@ -357,7 +357,7 @@ void main() {
       });
 
       test('updates inventory item successfully', () async {
-        final originalItem = InventoryItem(
+        const originalItem = InventoryItem(
           id: '1',
           name: 'Apple',
           sku: 'APP001',
@@ -372,7 +372,7 @@ void main() {
           maxStockLevel: 200,
         );
 
-        final updatedItem = InventoryItem(
+        const updatedItem = InventoryItem(
           id: '1',
           name: 'Apple Updated',
           sku: 'APP001',
@@ -423,7 +423,7 @@ void main() {
       });
 
       test('updates stock level successfully', () async {
-        final originalItem = InventoryItem(
+        const originalItem = InventoryItem(
           id: '1',
           name: 'Apple',
           sku: 'APP001',
@@ -438,7 +438,7 @@ void main() {
           maxStockLevel: 200,
         );
 
-        final updatedItem = InventoryItem(
+        const updatedItem = InventoryItem(
           id: '1',
           name: 'Apple',
           sku: 'APP001',
@@ -475,7 +475,7 @@ void main() {
 
       test('searches items successfully', () async {
         final searchResults = [
-          InventoryItem(
+          const InventoryItem(
             id: '1',
             name: 'Apple',
             sku: 'APP001',
@@ -506,7 +506,7 @@ void main() {
 
       test('filters items by category successfully', () async {
         final categoryItems = [
-          InventoryItem(
+          const InventoryItem(
             id: '1',
             name: 'Apple',
             sku: 'APP001',

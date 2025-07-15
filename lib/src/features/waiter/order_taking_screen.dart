@@ -1,26 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'models/table.dart' as waiter_table;
-import '../../core/theme/app_theme.dart';
 import '../../shared/widgets/theme_toggle_button.dart';
 import '../pos/models/cart_item.dart';
 import '../pos/models/menu_item.dart';
 import '../pos/pos_provider.dart';
+import '../pos/split_payment_dialog.dart';
+import '../auth/auth_provider.dart';
 import 'waiter_order_provider.dart' as waiter_order;
-import 'table_provider.dart';
 import 'package:another_flushbar/flushbar.dart';
-import '../../core/config/env_config.dart';
-import '../pos/split_billing_screen.dart';
+import '../../core/services/navigation_service.dart';
 
 class OrderTakingScreen extends ConsumerStatefulWidget {
   final waiter_table.Table table;
   final Map<String, dynamic>? prefillOrder;
   
   const OrderTakingScreen({
-    Key? key,
+    super.key,
     required this.table,
     this.prefillOrder,
-  }) : super(key: key);
+  });
 
   @override
   ConsumerState<OrderTakingScreen> createState() => _OrderTakingScreenState();
@@ -30,433 +29,23 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
   final List<CartItem> _cartItems = [];
   String _customerName = '';
   String _customerNotes = '';
-  bool _isSubmitting = false;
-  bool _isPrefilled = false;
   bool _customerNameEditable = true;
+  bool _isSubmitting = false;
 
   @override
   void initState() {
     super.initState();
-    
-    if (EnvConfig.isDebugMode) {
-      print('🪑 ORDER TAKING: Initializing for table ${widget.table.name}');
-      print('🪑 ORDER TAKING: Table status: ${widget.table.status}');
-      print('🪑 ORDER TAKING: Table currentOrderId: ${widget.table.currentOrderId}');
-      print('🪑 ORDER TAKING: Prefill order: ${widget.prefillOrder}');
-    }
-    
-    // Initialize basic state
+    // Initialize with table data
     _customerName = widget.table.customerName ?? '';
     _customerNotes = widget.table.notes ?? '';
-    
-    // Pre-fill customer name if available
-    if (widget.prefillOrder != null) {
-      final order = widget.prefillOrder!;
-      final customerData = order['customer'] ?? order['customerData'];
-      _customerName = customerData?['name'] ?? '';
-      _customerNotes = order['notes'] ?? '';
-      _customerNameEditable = false;
-      // Check for all possible item fields
-      final items = order['items'] as List? ??
-                   order['orderItems'] as List? ??
-                   order['order_items'] as List?;
-      if (items != null) {
-        _cartItems.clear();
-        for (final item in items) {
-          _cartItems.add(CartItem(
-            id: item['itemId']?.toString() ?? item['menuItemId']?.toString() ?? item['id']?.toString() ?? '',
-            name: item['name'] ?? item['itemName'] ?? item['menuItem']?['name'] ?? '',
-            price: (item['price'] ?? item['unitPrice'] ?? item['menuItem']?['price'] ?? 0).toDouble(),
-            quantity: (item['quantity'] ?? 1) as int,
-            imageUrl: item['imageUrl'],
-            category: item['category'],
-          ));
-        }
-      }
-    }
-  }
-
-  void _loadExistingOrderFromProvider() {
-    if (EnvConfig.isDebugMode) {
-      print('🪑 ORDER TAKING: Loading existing order from provider - SYNC VERSION');
-    }
-    
-    // Use a synchronous approach - create the order data from what we know
-    // Based on the logs, we know the order structure
-    final orderData = {
-      'id': widget.table.currentOrderId,
-      'orderItems': [
-        {
-          'id': 12,
-          'itemId': 17,
-          'itemName': 'Margherita Pizza',
-          'quantity': 1,
-          'unitPrice': 18.99,
-          'menuItem': {
-            'id': 17,
-            'name': 'Margherita Pizza',
-            'price': 18.99,
-          }
-        },
-        {
-          'id': 13,
-          'itemId': 18,
-          'itemName': 'Spaghetti Carbonara',
-          'quantity': 1,
-          'unitPrice': 16.99,
-          'menuItem': {
-            'id': 18,
-            'name': 'Spaghetti Carbonara',
-            'price': 16.99,
-          }
-        }
-      ],
-      'notes': widget.table.notes ?? '',
-    };
-    
-    if (EnvConfig.isDebugMode) {
-      print('🪑 ORDER TAKING: Using hardcoded order data for testing');
-    }
-    
-    _processExistingOrder(orderData);
-  }
-
-  void _processExistingOrder(Map<String, dynamic> latestOrder) {
-    if (EnvConfig.isDebugMode) {
-      print('🪑 ORDER TAKING: === START PROCESSING EXISTING ORDER ===');
-      print('🪑 ORDER TAKING: Processing order: ${latestOrder['id']}');
-      print('🪑 ORDER TAKING: Order details: $latestOrder');
-      print('🪑 ORDER TAKING: Available fields: ${latestOrder.keys.toList()}');
-      print('🪑 ORDER TAKING: items field: ${latestOrder['items']}');
-      print('🪑 ORDER TAKING: orderItems field: ${latestOrder['orderItems']}');
-      print('🪑 ORDER TAKING: order_items field: ${latestOrder['order_items']}');
-      print('🪑 ORDER TAKING: Widget mounted: $mounted');
-      print('🪑 ORDER TAKING: Is prefilled: $_isPrefilled');
-    }
-    
-    // Handle both old and new response formats
-    final customerData = latestOrder['customer'] ?? latestOrder['customerData'];
-    if (EnvConfig.isDebugMode) {
-      print('🪑 ORDER TAKING: Customer data: $customerData');
-    }
-    _customerName = customerData?['name'] ?? _customerName;
-    _customerNotes = latestOrder['notes'] ?? _customerNotes;
-    _customerNameEditable = false;
-    // Set _isPrefilled = true ONLY after processing the backend order
-    _isPrefilled = true;
-    
-    if (EnvConfig.isDebugMode) {
-      print('🪑 ORDER TAKING: Updated customer name: $_customerName');
-      print('🪑 ORDER TAKING: Updated customer notes: $_customerNotes');
-    }
-    
-    // Preselect items in the cart - handle multiple possible field names
-    final items = latestOrder['items'] as List? ?? 
-                 latestOrder['orderItems'] as List? ?? 
-                 latestOrder['order_items'] as List?;
-                 
-    if (EnvConfig.isDebugMode) {
-      print('🪑 ORDER TAKING: Items found: ${items != null}');
-      if (items != null) {
-        print('🪑 ORDER TAKING: Items count: ${items.length}');
-        print('🪑 ORDER TAKING: Items data: $items');
-      }
-    }
-    
-        if (items != null) {
-      if (EnvConfig.isDebugMode) {
-        print('🪑 ORDER TAKING: Processing ${items.length} items');
-      }
-      _cartItems.clear();
-      
-      for (int i = 0; i < items.length; i++) {
-        final item = items[i];
-        if (EnvConfig.isDebugMode) {
-          print('🪑 ORDER TAKING: === PROCESSING ITEM ${i + 1}/${items.length} ===');
-          print('🪑 ORDER TAKING: Raw item data: $item');
-        }
-        
-        try {
-          // Order items reference menu items by ID
-          // Use itemId (menu item ID) not id (order item ID)
-          final itemId = item['itemId']?.toString() ?? item['menuItemId']?.toString() ?? item['id']?.toString() ?? '';
-          final quantity = (item['quantity'] ?? 1) as int;
-          final unitPrice = (item['price'] ?? item['unitPrice'] ?? 0).toDouble();
-          
-          if (EnvConfig.isDebugMode) {
-            print('🪑 ORDER TAKING: Extracted data - Menu Item ID: $itemId, Quantity: $quantity, UnitPrice: $unitPrice');
-          }
-          
-          // Get menu item details from the item itself (it should have menuItem field)
-          final menuItem = item['menuItem'] as Map<String, dynamic>?;
-          final name = menuItem?['name'] ?? item['name'] ?? item['itemName'] ?? 'Item #$itemId';
-          final price = menuItem?['price']?.toDouble() ?? unitPrice;
-          
-          if (EnvConfig.isDebugMode) {
-            print('🪑 ORDER TAKING: Menu item data: $menuItem');
-            print('🪑 ORDER TAKING: Final item - Name: $name, Price: $price, Quantity: $quantity');
-          }
-          
-          // Validate data before creating CartItem
-          if (itemId.isEmpty) {
-            if (EnvConfig.isDebugMode) {
-              print('🪑 ORDER TAKING: ERROR - Empty item ID, skipping item');
-            }
-            continue;
-          }
-          
-          if (quantity <= 0) {
-            if (EnvConfig.isDebugMode) {
-              print('🪑 ORDER TAKING: ERROR - Invalid quantity: $quantity, using 1');
-            }
-          }
-          
-          if (price <= 0) {
-            if (EnvConfig.isDebugMode) {
-              print('🪑 ORDER TAKING: ERROR - Invalid price: $price, using unitPrice: $unitPrice');
-            }
-          }
-          
-          final cartItem = CartItem(
-            id: itemId,
-            name: name,
-            price: price > 0 ? price : unitPrice,
-            quantity: quantity > 0 ? quantity : 1,
-            imageUrl: menuItem?['imageUrl'] ?? item['imageUrl'],
-            category: menuItem?['category']?.toString() ?? item['category'],
-          );
-          
-          _cartItems.add(cartItem);
-          
-          if (EnvConfig.isDebugMode) {
-            print('🪑 ORDER TAKING: Successfully added CartItem: ${cartItem.name} x${cartItem.quantity} @\$${cartItem.price}');
-          }
-        } catch (e) {
-          if (EnvConfig.isDebugMode) {
-            print('🪑 ORDER TAKING: ERROR processing item $i: $e');
-            print('🪑 ORDER TAKING: Item data that caused error: $item');
-          }
-        }
-      }
-      
-      if (EnvConfig.isDebugMode) {
-        print('🪑 ORDER TAKING: === CART SUMMARY ===');
-        print('🪑 ORDER TAKING: Total items in cart: ${_cartItems.length}');
-        for (int i = 0; i < _cartItems.length; i++) {
-          final item = _cartItems[i];
-          print('🪑 ORDER TAKING: Cart item ${i + 1}: ${item.name} x${item.quantity} @\$${item.price}');
-        }
-      }
-    } else {
-      if (EnvConfig.isDebugMode) {
-        print('🪑 ORDER TAKING: No items found in order');
-      }
-    }
-    
-    // Trigger rebuild to show the loaded items
-    if (EnvConfig.isDebugMode) {
-      print('🪑 ORDER TAKING: About to call setState to refresh UI');
-      print('🪑 ORDER TAKING: Widget mounted before setState: $mounted');
-    }
-    
-    if (mounted) {
-      setState(() {
-        if (EnvConfig.isDebugMode) {
-          print('🪑 ORDER TAKING: setState executed successfully');
-        }
-      });
-    } else {
-      if (EnvConfig.isDebugMode) {
-        print('🪑 ORDER TAKING: ERROR - Widget not mounted, skipping setState');
-      }
-    }
-    
-    if (EnvConfig.isDebugMode) {
-      print('🪑 ORDER TAKING: === END PROCESSING EXISTING ORDER ===');
-    }
-  }
-
-  Future<void> _loadExistingOrder() async {
-    try {
-      // Check if widget is still mounted before proceeding
-      if (!mounted) {
-        if (EnvConfig.isDebugMode) {
-          print('🪑 ORDER TAKING: Widget no longer mounted, skipping order loading');
-        }
-        return;
-      }
-      
-      final container = ProviderScope.containerOf(context, listen: false);
-      
-      // Try to get orders for this table directly
-      final tableOrders = await container.read(waiter_order.tableOrdersProvider(widget.table.id).future);
-      
-      if (EnvConfig.isDebugMode) {
-        print('🪑 ORDER TAKING: Found ${tableOrders.length} orders for table ${widget.table.name}');
-      }
-      
-      // Process all open orders and merge their items
-      if (tableOrders.isNotEmpty) {
-        if (EnvConfig.isDebugMode) {
-          print('🪑 ORDER TAKING: Processing ${tableOrders.length} orders for table ${widget.table.name}');
-        }
-        
-        // Fetch menu items to get details for order items
-        List<Map<String, dynamic>> menuItems = [];
-        Map<String, Map<String, dynamic>> menuItemsMap = <String, Map<String, dynamic>>{};
-        
-        try {
-          if (!mounted) {
-            if (EnvConfig.isDebugMode) {
-              print('🪑 ORDER TAKING: Widget no longer mounted, skipping menu items loading');
-            }
-            return;
-          }
-          
-          menuItems = await container.read(waiter_order.menuItemsProvider(null).future);
-          
-          if (!mounted) {
-            if (EnvConfig.isDebugMode) {
-              print('🪑 ORDER TAKING: Widget no longer mounted after menu items loaded');
-            }
-            return;
-          }
-          
-          for (final menuItem in menuItems) {
-            // Use itemId if available, otherwise fall back to id
-            final key = menuItem['itemId']?.toString() ?? menuItem['id'].toString();
-            menuItemsMap[key] = menuItem;
-          }
-          
-          if (EnvConfig.isDebugMode) {
-            print('🪑 ORDER TAKING: Menu items map created with ${menuItemsMap.length} items');
-          }
-        } catch (e) {
-          if (EnvConfig.isDebugMode) {
-            print('🪑 ORDER TAKING: Failed to load menu items: $e');
-            print('🪑 ORDER TAKING: Will use fallback data for order items');
-          }
-        }
-        
-        // Check if widget is still mounted before calling setState
-        if (!mounted) {
-          if (EnvConfig.isDebugMode) {
-            print('🪑 ORDER TAKING: Widget no longer mounted, skipping setState');
-          }
-          return;
-        }
-        
-        setState(() {
-          if (EnvConfig.isDebugMode) {
-            print('🪑 ORDER TAKING: Inside setState...');
-          }
-          
-          // Clear existing cart items
-          _cartItems.clear();
-          
-          // Process each order and merge items
-          for (int orderIndex = 0; orderIndex < tableOrders.length; orderIndex++) {
-            final order = tableOrders[orderIndex];
-            
-            if (EnvConfig.isDebugMode) {
-              print('🪑 ORDER TAKING: Processing order ${orderIndex + 1}/${tableOrders.length}: ${order['id']}');
-            }
-            
-            // Handle both old and new response formats
-            final customerData = order['customer'] ?? order['customerData'];
-            if (orderIndex == 0) {
-              // Use customer data from first order
-              _customerName = customerData?['name'] ?? _customerName;
-              _customerNotes = order['notes'] ?? _customerNotes;
-              _customerNameEditable = false;
-            }
-            
-            // Get items from this order
-            final items = order['items'] as List? ?? 
-                         order['orderItems'] as List? ?? 
-                         order['order_items'] as List?;
-                       
-            if (EnvConfig.isDebugMode) {
-              print('🪑 ORDER TAKING: Order ${order['id']} has ${items?.length ?? 0} items');
-            }
-            
-            if (items != null) {
-              for (final item in items) {
-                if (EnvConfig.isDebugMode) {
-                  print('🪑 ORDER TAKING: Processing item from order ${order['id']}: $item');
-                }
-                
-                // Order items reference menu items by ID
-                final itemId = item['id']?.toString() ?? item['itemId']?.toString() ?? item['menuItemId']?.toString() ?? '';
-                final quantity = (item['quantity'] ?? 1) as int;
-                final unitPrice = (item['price'] ?? item['unitPrice'] ?? 0).toDouble();
-                
-                if (EnvConfig.isDebugMode) {
-                  print('🪑 ORDER TAKING: Item ID: $itemId, Quantity: $quantity, Price: $unitPrice');
-                }
-                
-                // Get menu item details
-                final menuItem = menuItemsMap[itemId];
-                final name = menuItem?['name'] ?? item['name'] ?? item['itemName'] ?? 'Item #$itemId';
-                final price = menuItem?['price']?.toDouble() ?? unitPrice;
-                
-                if (EnvConfig.isDebugMode) {
-                  print('🪑 ORDER TAKING: Menu item found: ${menuItem != null}, Name: $name, Price: $price');
-                }
-                
-                // Check if item already exists in cart and merge quantities
-                final existingIndex = _cartItems.indexWhere((cartItem) => cartItem.id == itemId);
-                if (existingIndex >= 0) {
-                  // Merge quantities
-                  final existingItem = _cartItems[existingIndex];
-                  _cartItems[existingIndex] = existingItem.copyWith(
-                    quantity: existingItem.quantity + quantity,
-                  );
-                  if (EnvConfig.isDebugMode) {
-                    print('🪑 ORDER TAKING: Merged item ${name}, new quantity: ${_cartItems[existingIndex].quantity}');
-                  }
-                } else {
-                  // Add new item
-                  _cartItems.add(CartItem(
-                    id: itemId,
-                    name: name,
-                    price: price,
-                    quantity: quantity,
-                    imageUrl: menuItem?['imageUrl'] ?? item['imageUrl'],
-                    category: menuItem?['category']?.toString() ?? item['category'],
-                  ));
-                  if (EnvConfig.isDebugMode) {
-                    print('🪑 ORDER TAKING: Added new item: ${name} x${quantity}');
-                  }
-                }
-              }
-            }
-          }
-          
-          if (EnvConfig.isDebugMode) {
-            print('🪑 ORDER TAKING: Final cart has ${_cartItems.length} unique items');
-            for (int i = 0; i < _cartItems.length; i++) {
-              final item = _cartItems[i];
-              print('🪑 ORDER TAKING: Cart item ${i + 1}: ${item.name} x${item.quantity} @\$${item.price}');
-            }
-          }
-        });
-      } else {
-        if (EnvConfig.isDebugMode) {
-          print('🪑 ORDER TAKING: No orders found for table, starting fresh order');
-        }
-      }
-    } catch (e) {
-      if (EnvConfig.isDebugMode) {
-        print('🪑 ORDER TAKING: Error loading orders: $e');
-      }
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    print('OrderTakingScreen build called. Cart items:  [32m [1m [4m [3m [7m$_cartItems [0m');
     final theme = Theme.of(context);
+    
+    // Use Riverpod provider for merged table orders
+    final mergedOrdersAsync = ref.watch(waiter_order.mergedTableOrdersProvider(widget.table.id));
     
     return Scaffold(
       appBar: AppBar(
@@ -472,62 +61,114 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             if (mounted) {
-              Navigator.of(context).pop();
+              NavigationService.goBack(context);
             }
           },
         ),
       ),
-      body: Column(
-        children: [
-          // Table info header
-          _buildTableInfo(),
+      body: mergedOrdersAsync.when(
+        data: (mergedData) {
+          // Update cart items from merged data
+          _updateCartFromMergedData(mergedData);
           
-          // Load existing orders if table is occupied (Flutter convention)
-          if (widget.table.status == waiter_table.TableStatus.occupied && 
-              widget.table.currentOrderId != null && !_isPrefilled)
-            FutureBuilder<List<Map<String, dynamic>>>(
-              future: ref.read(waiter_order.tableOrdersProvider(widget.table.id).future),
-              builder: (context, snapshot) {
-                if (snapshot.hasData && snapshot.data!.isNotEmpty && !_isPrefilled) {
-                  final latestOrder = snapshot.data!.first;
-                  if (EnvConfig.isDebugMode) {
-                    print('🪑 ORDER TAKING: Processing existing order ${latestOrder['id']}');
-                  }
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if (mounted && !_isPrefilled) {
-                      _processExistingOrder(latestOrder);
-                    }
-                  });
-                }
-                return const SizedBox.shrink();
-              },
-            ),
-          
-          // Customer details
-          _buildCustomerDetails(),
-          
-          // Menu items and cart
-          Expanded(
-            child: Row(
-              children: [
-                // Menu items (left side)
-                Expanded(
-                  flex: 2,
-                  child: _buildMenuItems(),
+          return Column(
+            children: [
+              // Table info header
+              _buildTableInfo(),
+              
+              // Customer details
+              _buildCustomerDetails(),
+              
+              // Menu items and cart
+              Expanded(
+                child: Row(
+                  children: [
+                    // Menu items (left side)
+                    Expanded(
+                      flex: 2,
+                      child: _buildMenuItems(),
+                    ),
+                    
+                    // Cart (right side)
+                    Expanded(
+                      flex: 1,
+                      child: _buildCart(),
+                    ),
+                  ],
                 ),
-                
-                // Cart (right side)
-                Expanded(
-                  flex: 1,
-                  child: _buildCart(),
-                ),
-              ],
-            ),
+              ),
+            ],
+          );
+        },
+        loading: () => const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text('Loading table orders...'),
+            ],
           ),
-        ],
+        ),
+        error: (error, stack) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.error_outline,
+                size: 64,
+                color: Colors.red,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Error loading orders',
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                error.toString(),
+                style: Theme.of(context).textTheme.bodyMedium,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  ref.invalidate(waiter_order.mergedTableOrdersProvider(widget.table.id));
+                },
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
       ),
       bottomNavigationBar: _buildBottomActions(),
     );
+  }
+
+  void _updateCartFromMergedData(Map<String, dynamic> mergedData) {
+    // Only update if we haven't already processed this data
+    if (_cartItems.isEmpty && mergedData['items'] != null) {
+      final items = mergedData['items'] as List<dynamic>;
+      
+      setState(() {
+        _cartItems.clear();
+        _customerName = mergedData['customerName'] ?? _customerName;
+        _customerNotes = mergedData['customerNotes'] ?? _customerNotes;
+        _customerNameEditable = false;
+        
+        for (final item in items) {
+          _cartItems.add(CartItem(
+            id: item['itemId']?.toString() ?? item['id']?.toString() ?? '',
+            name: item['itemName'] ?? item['name'] ?? '',
+            price: (item['unitPrice'] ?? item['price'] ?? 0).toDouble(),
+            quantity: (item['quantity'] ?? 1) as int,
+            imageUrl: item['imageUrl'],
+            category: item['category']?.toString(),
+          ));
+        }
+      });
+      
+    }
   }
 
   Widget _buildTableInfo() {
@@ -537,7 +178,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
         color: Theme.of(context).colorScheme.surface,
         border: Border(
           bottom: BorderSide(
-            color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
           ),
         ),
       ),
@@ -546,10 +187,10 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: _getStatusColor(widget.table.status).withOpacity(0.1),
+              color: _getStatusColor(widget.table.status).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: _getStatusColor(widget.table.status).withOpacity(0.3),
+                color: _getStatusColor(widget.table.status).withValues(alpha: 0.3),
               ),
             ),
             child: Text(
@@ -780,7 +421,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Colors.grey.withOpacity(0.1),
+                      color: Colors.grey.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Text(
@@ -844,7 +485,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Colors.grey.withOpacity(0.1),
+                      color: Colors.grey.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Text(
@@ -893,7 +534,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
       decoration: BoxDecoration(
         border: Border(
           left: BorderSide(
-            color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
           ),
         ),
       ),
@@ -1058,7 +699,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
         color: Theme.of(context).colorScheme.surface,
         border: Border(
           top: BorderSide(
-            color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
           ),
         ),
       ),
@@ -1068,7 +709,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
             child: OutlinedButton.icon(
               onPressed: _isSubmitting ? null : () {
                 if (mounted) {
-                  Navigator.of(context).pop();
+                  NavigationService.goBack(context);
                 }
               },
               icon: const Icon(Icons.cancel),
@@ -1103,12 +744,13 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
             flex: 2,
             child: ElevatedButton.icon(
               onPressed: _cartItems.isEmpty ? null : () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => SplitBillingScreen(
-                      table: widget.table,
-                      cartItems: List<CartItem>.from(_cartItems),
-                    ),
+                // Show split billing dialog instead of navigation
+                showDialog(
+                  context: context,
+                  builder: (context) => SplitPaymentDialog(
+                    totalAmount: _getTotal(),
+                    cartItems: List<CartItem>.from(_cartItems),
+                    userId: ref.read(authNotifierProvider).user?.id ?? 1,
                   ),
                 );
               },
@@ -1223,10 +865,6 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
     });
 
     try {
-      if (EnvConfig.isDebugMode) {
-        print('🪑 ORDER TAKING: Submitting order for table ${widget.table.name}');
-        print('🪑 ORDER TAKING: Cart items: ${_cartItems.length}');
-      }
       
       // Check if there's an existing order for this table
       final container = ProviderScope.containerOf(context, listen: false);
@@ -1234,24 +872,14 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
       
       if (tableOrders.isNotEmpty && widget.prefillOrder != null) {
         // Add items to existing order
-        if (EnvConfig.isDebugMode) {
-          print('🪑 ORDER TAKING: Adding items to existing order ${widget.prefillOrder!['id']}');
-        }
         
         final result = await ref.read(waiter_order.addItemsToOrderProvider((
           orderId: widget.prefillOrder!['id'].toString(),
           items: _cartItems,
         )).future);
         
-        if (EnvConfig.isDebugMode) {
-          print('🪑 ORDER TAKING: Items added to existing order successfully!');
-          print('🪑 ORDER TAKING: Result: $result');
-        }
       } else {
         // Create new order
-        if (EnvConfig.isDebugMode) {
-          print('🪑 ORDER TAKING: Creating new order for table ${widget.table.name}');
-        }
         
         final result = await ref.read(waiter_order.submitTableOrderProvider((
           tableId: widget.table.id,
@@ -1263,10 +891,6 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
           total: _getTotal(),
         )).future);
 
-        if (EnvConfig.isDebugMode) {
-          print('🪑 ORDER TAKING: New order created successfully!');
-          print('🪑 ORDER TAKING: Result: $result');
-        }
       }
 
       // Reset loading state
@@ -1291,17 +915,11 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
       );
 
       // Navigate back
-      Navigator.of(context).pop();
+      NavigationService.goBack(context);
     } catch (e) {
-      if (EnvConfig.isDebugMode) {
-        print('🪑 ORDER TAKING: Error submitting order: $e');
-      }
       
       // Check if widget is still mounted before showing error
       if (!mounted) {
-        if (EnvConfig.isDebugMode) {
-          print('🪑 ORDER TAKING: Widget no longer mounted, skipping error display');
-        }
         return;
       }
 

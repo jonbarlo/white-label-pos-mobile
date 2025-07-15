@@ -14,10 +14,9 @@ class AppTheme {
 
     return ThemeData(
       fontFamily: 'SF Pro Display', // Apple HIG/modern look
-      colorScheme: ColorScheme.light(
+      colorScheme: const ColorScheme.light(
         primary: primaryColor,
         onPrimary: Colors.white,
-        background: backgroundColor,
         surface: cardColor,
         onSurface: textColor,
         error: errorColor,
@@ -120,10 +119,9 @@ class AppTheme {
 
     return ThemeData(
       fontFamily: 'SF Pro Display', // Apple HIG/modern look
-      colorScheme: ColorScheme.dark(
+      colorScheme: const ColorScheme.dark(
         primary: primaryColor,
         onPrimary: Colors.white,
-        background: backgroundColor,
         surface: cardColor,
         onSurface: textColor,
         error: errorColor,
@@ -215,8 +213,8 @@ class AppTheme {
 
   /// Standard neutral/secondary button style (Apple/Salesforce/Stripe/Material3 conventions)
   static final ButtonStyle neutralButtonStyle = ElevatedButton.styleFrom(
-    backgroundColor: Color(0xFFF3F3F3),
-    foregroundColor: Color(0xFF181818),
+    backgroundColor: const Color(0xFFF3F3F3),
+    foregroundColor: const Color(0xFF181818),
     elevation: 0,
     side: const BorderSide(color: Color(0xFFE5E5E5)),
     shape: RoundedRectangleBorder(

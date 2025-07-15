@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'kitchen_order_provider.dart';
 import 'kitchen_order.dart';
-import '../../core/theme/app_theme.dart';
 import '../../shared/widgets/theme_toggle_button.dart';
-import 'package:collection/collection.dart';
 
 class KitchenScreenManager extends ConsumerWidget {
-  const KitchenScreenManager({Key? key}) : super(key: key);
+  const KitchenScreenManager({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -191,8 +189,8 @@ class KitchenOrderCardManager extends StatefulWidget {
     required this.order,
     required this.isDark,
     required this.onStatusChanged,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<KitchenOrderCardManager> createState() => _KitchenOrderCardManagerState();
@@ -264,7 +262,7 @@ class _KitchenOrderCardManagerState extends State<KitchenOrderCardManager> {
                     ),
                     child: Text(
                       (widget.order.status ?? 'pending').toUpperCase(),
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,

@@ -93,15 +93,6 @@ class _SplitPaymentDialogState extends ConsumerState<SplitPaymentDialog> {
     final allPaymentsValid = _payments.every((p) => p.amount > 0 && p.method.isNotEmpty);
     final amountMatches = (_totalPaymentAmount - widget.totalAmount).abs() < 0.01;
     
-    print('💳 DIALOG: _isValid check:');
-    print('💳 DIALOG:   Form valid: $formValid');
-    print('💳 DIALOG:   All payments valid: $allPaymentsValid');
-    print('💳 DIALOG:   Amount matches: $amountMatches');
-    print('💳 DIALOG:   Total payment amount: $_totalPaymentAmount');
-    print('💳 DIALOG:   Widget total amount: ${widget.totalAmount}');
-    print('💳 DIALOG:   Difference: ${(_totalPaymentAmount - widget.totalAmount).abs()}');
-    print('💳 DIALOG:   Payments: ${_payments.map((p) => '${p.amount} (${p.method})').join(', ')}');
-    
     // For now, allow the button to be enabled if we have at least one valid payment
     // This will help us debug the actual API call
     final hasValidPayments = _payments.isNotEmpty && allPaymentsValid;
@@ -334,7 +325,7 @@ class _SplitPaymentDialogState extends ConsumerState<SplitPaymentDialog> {
                             ),
                           ),
                         );
-                      }).toList(),
+                      }),
                     ],
                   ),
                 ),
@@ -368,15 +359,11 @@ class _SplitPaymentDialogState extends ConsumerState<SplitPaymentDialog> {
   }
 
   void _completeSplitPayment() {
-    print('💳 DIALOG: _completeSplitPayment called');
-    print('💳 DIALOG: _isValid: $_isValid');
     
     if (!_isValid) {
-      print('💳 DIALOG: ERROR - Form is not valid, cannot complete split payment');
       return;
     }
 
-    print('💳 DIALOG: Creating split payments...');
     final splitPayments = _payments.map((entry) => SplitPayment(
       amount: entry.amount,
       method: entry.method,
@@ -385,7 +372,6 @@ class _SplitPaymentDialogState extends ConsumerState<SplitPaymentDialog> {
       reference: entry.reference?.isNotEmpty == true ? entry.reference : null,
     )).toList();
 
-    print('💳 DIALOG: Creating split sale request...');
     final splitSaleRequest = SplitSaleRequest(
       userId: widget.userId,
       totalAmount: widget.totalAmount,
@@ -400,13 +386,6 @@ class _SplitPaymentDialogState extends ConsumerState<SplitPaymentDialog> {
       )).toList(),
       payments: splitPayments,
     );
-
-    print('💳 DIALOG: Split sale request created successfully');
-    print('💳 DIALOG: User ID: ${splitSaleRequest.userId}');
-    print('💳 DIALOG: Total amount: ${splitSaleRequest.totalAmount}');
-    print('💳 DIALOG: Payments count: ${splitSaleRequest.payments.length}');
-    print('💳 DIALOG: Items count: ${splitSaleRequest.items?.length ?? 0}');
-    print('💳 DIALOG: Closing dialog with result...');
     
     Navigator.of(context).pop(splitSaleRequest);
   }

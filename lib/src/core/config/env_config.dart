@@ -19,7 +19,6 @@ class EnvConfig {
         await dotenv.load(fileName: '.env');
       } catch (e) {
         // If no .env file exists, use default values
-        print('Warning: No .env file found, using default values');
       }
     }
   }
@@ -28,18 +27,8 @@ class EnvConfig {
   static String get apiBaseUrl {
     try {
       final url = dotenv.env['API_BASE_URL'] ?? _defaultApiUrl;
-      if (isDebugMode) {
-        print('🔧 ENV CONFIG: API_BASE_URL from env: ${dotenv.env['API_BASE_URL']}');
-        print('🔧 ENV CONFIG: Default API URL: $_defaultApiUrl');
-        print('🔧 ENV CONFIG: Final API URL: $url');
-        print('🔧 ENV CONFIG: All env variables: ${dotenv.env}');
-      }
       return url;
     } catch (e) {
-      if (isDebugMode) {
-        print('🔧 ENV CONFIG: Error getting API_BASE_URL: $e');
-        print('🔧 ENV CONFIG: Using default URL: $_defaultApiUrl');
-      }
       return _defaultApiUrl;
     }
   }

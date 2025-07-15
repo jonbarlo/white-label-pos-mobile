@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
 import 'package:white_label_pos_mobile/src/features/viewer/kitchen_screen.dart';
 import 'package:white_label_pos_mobile/src/features/viewer/kitchen_order.dart';
 
@@ -8,7 +7,7 @@ void main() {
   group('KitchenOrderCard UI', () {
     testWidgets('displays order information correctly and toggles item status', (WidgetTester tester) async {
       // Arrange: Create a sample order with two items
-      final order = KitchenOrder(
+      const order = KitchenOrder(
         id: 1,
         businessId: 1,
         orderId: 1,
@@ -64,7 +63,7 @@ void main() {
 
     testWidgets('displays different status chips correctly', (WidgetTester tester) async {
       // Arrange: Create orders with different statuses
-      final pendingOrder = KitchenOrder(
+      const pendingOrder = KitchenOrder(
         id: 1,
         businessId: 1,
         orderId: 1,
@@ -76,7 +75,7 @@ void main() {
         completedItems: 0,
       );
 
-      final preparingOrder = KitchenOrder(
+      const preparingOrder = KitchenOrder(
         id: 2,
         businessId: 1,
         orderId: 2,
@@ -119,7 +118,7 @@ void main() {
 
     testWidgets('shows priority badges correctly', (WidgetTester tester) async {
       // Arrange: Create orders with different priorities
-      final highPriorityOrder = KitchenOrder(
+      const highPriorityOrder = KitchenOrder(
         id: 1,
         businessId: 1,
         orderId: 1,
@@ -149,7 +148,7 @@ void main() {
 
     testWidgets('displays progress bar correctly', (WidgetTester tester) async {
       // Arrange: Create an order with progress
-      final order = KitchenOrder(
+      const order = KitchenOrder(
         id: 1,
         businessId: 1,
         orderId: 1,

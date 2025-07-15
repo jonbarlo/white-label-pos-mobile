@@ -4,7 +4,7 @@ import 'package:white_label_pos_mobile/src/features/pos/models/split_payment.dar
 void main() {
   group('SplitPayment Models', () {
     test('SplitPayment should be created correctly', () {
-      final payment = SplitPayment(
+      const payment = SplitPayment(
         amount: 50.0,
         method: 'credit_card',
         customerName: 'John Doe',
@@ -20,7 +20,7 @@ void main() {
     });
 
     test('SplitPayment should handle optional fields', () {
-      final payment = SplitPayment(
+      const payment = SplitPayment(
         amount: 25.0,
         method: 'cash',
       );
@@ -34,9 +34,9 @@ void main() {
 
     test('SplitSaleRequest should be created correctly', () {
       final payments = [
-        SplitPayment(amount: 40.0, method: 'credit_card'),
-        SplitPayment(amount: 35.0, method: 'cash'),
-        SplitPayment(amount: 25.0, method: 'debit_card'),
+        const SplitPayment(amount: 40.0, method: 'credit_card'),
+        const SplitPayment(amount: 35.0, method: 'cash'),
+        const SplitPayment(amount: 25.0, method: 'debit_card'),
       ];
 
       final request = SplitSaleRequest(
@@ -62,7 +62,7 @@ void main() {
     });
 
     test('SplitSaleItem should be created correctly', () {
-      final item = SplitSaleItem(
+      const item = SplitSaleItem(
         itemId: 1,
         quantity: 2,
         unitPrice: 25.0,
@@ -74,7 +74,7 @@ void main() {
     });
 
     test('AddPaymentRequest should be created correctly', () {
-      final request = AddPaymentRequest(
+      const request = AddPaymentRequest(
         amount: 25.0,
         method: 'cash',
         customerName: 'Alice Johnson',
@@ -90,7 +90,7 @@ void main() {
     });
 
     test('RefundRequest should be created correctly', () {
-      final request = RefundRequest(
+      const request = RefundRequest(
         paymentIndex: 0,
         refundAmount: 20.0,
         reason: 'Customer requested partial refund',
@@ -102,7 +102,7 @@ void main() {
     });
 
     test('SplitBillingStats should be created correctly', () {
-      final stats = SplitBillingStats(
+      const stats = SplitBillingStats(
         totalSplitSales: 15,
         totalAmount: 2500.0,
         averageSplitAmount: 166.67,
@@ -118,7 +118,7 @@ void main() {
 
   group('SplitPayment JSON Serialization', () {
     test('SplitPayment should serialize to JSON correctly', () {
-      final payment = SplitPayment(
+      const payment = SplitPayment(
         amount: 50.0,
         method: 'credit_card',
         customerName: 'John Doe',
@@ -155,9 +155,9 @@ void main() {
 
     test('SplitSaleRequest should serialize to JSON correctly', () {
       final payments = [
-        SplitPayment(amount: 40.0, method: 'credit_card'),
-        SplitPayment(amount: 35.0, method: 'cash'),
-        SplitPayment(amount: 25.0, method: 'debit_card'),
+        const SplitPayment(amount: 40.0, method: 'credit_card'),
+        const SplitPayment(amount: 35.0, method: 'cash'),
+        const SplitPayment(amount: 25.0, method: 'debit_card'),
       ];
 
       final request = SplitSaleRequest(
@@ -186,9 +186,9 @@ void main() {
   group('SplitPayment Business Logic', () {
     test('Payment amounts should sum to total amount', () {
       final payments = [
-        SplitPayment(amount: 40.0, method: 'credit_card'),
-        SplitPayment(amount: 35.0, method: 'cash'),
-        SplitPayment(amount: 25.0, method: 'debit_card'),
+        const SplitPayment(amount: 40.0, method: 'credit_card'),
+        const SplitPayment(amount: 35.0, method: 'cash'),
+        const SplitPayment(amount: 25.0, method: 'debit_card'),
       ];
 
       final totalAmount = payments.fold<double>(0.0, (sum, payment) => sum + payment.amount);
@@ -198,9 +198,9 @@ void main() {
 
     test('SplitSaleRequest should validate payment total', () {
       final payments = [
-        SplitPayment(amount: 40.0, method: 'credit_card'),
-        SplitPayment(amount: 35.0, method: 'cash'),
-        SplitPayment(amount: 25.0, method: 'debit_card'),
+        const SplitPayment(amount: 40.0, method: 'credit_card'),
+        const SplitPayment(amount: 35.0, method: 'cash'),
+        const SplitPayment(amount: 25.0, method: 'debit_card'),
       ];
 
       final request = SplitSaleRequest(

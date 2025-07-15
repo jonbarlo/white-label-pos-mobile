@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/network/dio_client.dart';
-import '../../core/config/env_config.dart';
 import '../auth/auth_provider.dart';
 import 'staff_messaging_repository.dart';
 import 'models/staff_message.dart';
@@ -16,15 +15,7 @@ final staffMessagesProvider = FutureProvider.autoDispose<List<StaffMessage>>((re
   final user = ref.watch(authNotifierProvider).user;
   if (user == null) throw Exception('Not authenticated');
   
-  if (EnvConfig.isDebugMode) {
-    print('📢 PROVIDER: Fetching staff messages for user: ${user.name}');
-  }
-  
   final messages = await repo.getStaffMessages();
-  
-  if (EnvConfig.isDebugMode) {
-    print('📢 PROVIDER: Received ${messages.length} messages');
-  }
   
   return messages;
 });
@@ -35,15 +26,7 @@ final userMessagesProvider = FutureProvider.autoDispose<List<StaffMessage>>((ref
   final user = ref.watch(authNotifierProvider).user;
   if (user == null) throw Exception('Not authenticated');
   
-  if (EnvConfig.isDebugMode) {
-    print('📢 PROVIDER: Fetching user messages for: ${user.name}');
-  }
-  
   final messages = await repo.getUserMessages();
-  
-  if (EnvConfig.isDebugMode) {
-    print('📢 PROVIDER: Received ${messages.length} user messages');
-  }
   
   return messages;
 });
@@ -54,15 +37,7 @@ final activeMessagesProvider = FutureProvider.autoDispose<List<StaffMessage>>((r
   final user = ref.watch(authNotifierProvider).user;
   if (user == null) throw Exception('Not authenticated');
   
-  if (EnvConfig.isDebugMode) {
-    print('📢 PROVIDER: Fetching active messages for user: ${user.name}');
-  }
-  
   final messages = await repo.getActiveMessages();
-  
-  if (EnvConfig.isDebugMode) {
-    print('📢 PROVIDER: Received ${messages.length} active messages');
-  }
   
   return messages;
 });
@@ -73,15 +48,7 @@ final unreadMessageCountProvider = FutureProvider.autoDispose<int>((ref) async {
   final user = ref.watch(authNotifierProvider).user;
   if (user == null) throw Exception('Not authenticated');
   
-  if (EnvConfig.isDebugMode) {
-    print('📢 PROVIDER: Fetching unread count for user: ${user.name}');
-  }
-  
   final count = await repo.getUnreadMessageCount();
-  
-  if (EnvConfig.isDebugMode) {
-    print('📢 PROVIDER: Unread count: $count');
-  }
   
   return count;
 });
@@ -101,10 +68,6 @@ final createStaffMessageProvider = FutureProvider.family<StaffMessage, ({
   final user = ref.watch(authNotifierProvider).user;
   if (user == null) throw Exception('Not authenticated');
   
-  if (EnvConfig.isDebugMode) {
-    print('📢 PROVIDER: Creating staff message: ${params.title}');
-  }
-  
   final message = await repo.createStaffMessage(
     title: params.title,
     content: params.content,
@@ -116,10 +79,6 @@ final createStaffMessageProvider = FutureProvider.family<StaffMessage, ({
     metadata: params.metadata,
   );
   
-  if (EnvConfig.isDebugMode) {
-    print('📢 PROVIDER: Message created successfully');
-  }
-  
   return message;
 });
 
@@ -129,15 +88,7 @@ final markMessageAsReadProvider = FutureProvider.family<void, int>((ref, message
   final user = ref.watch(authNotifierProvider).user;
   if (user == null) throw Exception('Not authenticated');
   
-  if (EnvConfig.isDebugMode) {
-    print('📢 PROVIDER: Marking message $messageId as read');
-  }
-  
   await repo.markMessageAsRead(messageId);
-  
-  if (EnvConfig.isDebugMode) {
-    print('📢 PROVIDER: Message marked as read');
-  }
 });
 
 // Acknowledge message provider
@@ -146,15 +97,7 @@ final acknowledgeMessageProvider = FutureProvider.family<void, int>((ref, messag
   final user = ref.watch(authNotifierProvider).user;
   if (user == null) throw Exception('Not authenticated');
   
-  if (EnvConfig.isDebugMode) {
-    print('📢 PROVIDER: Acknowledging message $messageId');
-  }
-  
   await repo.acknowledgeMessage(messageId);
-  
-  if (EnvConfig.isDebugMode) {
-    print('📢 PROVIDER: Message acknowledged');
-  }
 });
 
 // Update staff message provider
@@ -174,10 +117,6 @@ final updateStaffMessageProvider = FutureProvider.family<StaffMessage, ({
   final user = ref.watch(authNotifierProvider).user;
   if (user == null) throw Exception('Not authenticated');
   
-  if (EnvConfig.isDebugMode) {
-    print('📢 PROVIDER: Updating message ${params.messageId}');
-  }
-  
   final message = await repo.updateStaffMessage(
     params.messageId,
     title: params.title,
@@ -191,10 +130,6 @@ final updateStaffMessageProvider = FutureProvider.family<StaffMessage, ({
     metadata: params.metadata,
   );
   
-  if (EnvConfig.isDebugMode) {
-    print('📢 PROVIDER: Message updated successfully');
-  }
-  
   return message;
 });
 
@@ -204,13 +139,5 @@ final deleteStaffMessageProvider = FutureProvider.family<void, int>((ref, messag
   final user = ref.watch(authNotifierProvider).user;
   if (user == null) throw Exception('Not authenticated');
   
-  if (EnvConfig.isDebugMode) {
-    print('📢 PROVIDER: Deleting message $messageId');
-  }
-  
   await repo.deleteStaffMessage(messageId);
-  
-  if (EnvConfig.isDebugMode) {
-    print('📢 PROVIDER: Message deleted successfully');
-  }
 }); 

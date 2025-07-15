@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:white_label_pos_mobile/src/features/inventory/inventory_provider.dart';
 import 'package:white_label_pos_mobile/src/features/inventory/inventory_repository.dart';
 import 'package:white_label_pos_mobile/src/features/inventory/inventory_screen.dart';
@@ -40,7 +39,7 @@ void main() {
     testWidgets('displays loading indicator when loading', (WidgetTester tester) async {
       when(mockInventoryRepository.getInventoryItems())
           .thenAnswer((_) async {
-        await Future.delayed(Duration(milliseconds: 100));
+        await Future.delayed(const Duration(milliseconds: 100));
         return [];
       });
 
@@ -52,7 +51,7 @@ void main() {
 
     testWidgets('displays inventory items when loaded', (WidgetTester tester) async {
       final items = [
-        InventoryItem(
+        const InventoryItem(
           id: '1',
           name: 'Apple',
           sku: 'APP001',
@@ -66,7 +65,7 @@ void main() {
           minStockLevel: 10,
           maxStockLevel: 200,
         ),
-        InventoryItem(
+        const InventoryItem(
           id: '2',
           name: 'Banana',
           sku: 'BAN001',
@@ -150,7 +149,7 @@ void main() {
 
     testWidgets('displays low stock indicator for items with low stock', (WidgetTester tester) async {
       final items = [
-        InventoryItem(
+        const InventoryItem(
           id: '1',
           name: 'Apple',
           sku: 'APP001',
@@ -177,7 +176,7 @@ void main() {
 
     testWidgets('displays out of stock indicator for items with zero stock', (WidgetTester tester) async {
       final items = [
-        InventoryItem(
+        const InventoryItem(
           id: '1',
           name: 'Apple',
           sku: 'APP001',
@@ -214,7 +213,7 @@ void main() {
 
     testWidgets('displays item details in list tile', (WidgetTester tester) async {
       final items = [
-        InventoryItem(
+        const InventoryItem(
           id: '1',
           name: 'Apple',
           sku: 'APP001',
@@ -253,7 +252,7 @@ void main() {
 
     testWidgets('shows low stock items in low stock tab', (WidgetTester tester) async {
       final items = [
-        InventoryItem(
+        const InventoryItem(
           id: '1',
           name: 'Apple',
           sku: 'APP001',
@@ -267,7 +266,7 @@ void main() {
           minStockLevel: 10,
           maxStockLevel: 200,
         ),
-        InventoryItem(
+        const InventoryItem(
           id: '2',
           name: 'Banana',
           sku: 'BAN001',

@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'table_provider.dart';
 import 'models/table.dart' as waiter_table;
-import '../../core/theme/app_theme.dart';
-import '../../shared/widgets/theme_toggle_button.dart';
 import 'order_taking_screen.dart';
+
 import 'waiter_order_provider.dart';
+import '../../core/services/navigation_service.dart';
 
 class TableSelectionScreen extends ConsumerStatefulWidget {
-  const TableSelectionScreen({Key? key}) : super(key: key);
+  const TableSelectionScreen({super.key});
 
   @override
   ConsumerState<TableSelectionScreen> createState() => _TableSelectionScreenState();
@@ -18,7 +18,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
     with TickerProviderStateMixin {
   late TabController _tabController;
   String _searchQuery = '';
-  waiter_table.TableStatus? _selectedStatus;
+
 
   @override
   void initState() {
@@ -48,7 +48,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
               isScrollable: true,
               indicatorColor: Theme.of(context).colorScheme.onPrimary,
               labelColor: Theme.of(context).colorScheme.onPrimary,
-              unselectedLabelColor: Theme.of(context).colorScheme.onPrimary.withOpacity(0.7),
+              unselectedLabelColor: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.7),
               tabs: [
                 _buildTab('All', null, tableStatsAsync),
                 _buildTab('Available', waiter_table.TableStatus.available, tableStatsAsync),
@@ -103,7 +103,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
               return Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.2),
+                  color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
@@ -180,9 +180,9 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -357,8 +357,8 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
             borderRadius: BorderRadius.circular(16),
             gradient: LinearGradient(
               colors: [
-                statusColor.withOpacity(0.1),
-                statusColor.withOpacity(0.05),
+                statusColor.withValues(alpha: 0.1),
+                statusColor.withValues(alpha: 0.05),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -383,7 +383,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: statusColor.withOpacity(0.2),
+                        color: statusColor.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
@@ -537,7 +537,6 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
                     width: double.infinity,
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        print('Add Items button pressed for table:  [33m${table.name} [0m (id: ${table.id}, status: ${table.status}, currentOrderId: ${table.currentOrderId})');
                         _onTableSelected(table);
                       },
                       icon: const Icon(Icons.add_shopping_cart, size: 16),
@@ -670,9 +669,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
             )).toList(),
           ),
         );
-        print('Dialog closed. Selected order: $selected');
         if (selected != null) {
-          print('Navigating to OrderTakingScreen with order: $selected');
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => OrderTakingScreen(
@@ -718,7 +715,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
               if (table.reservationTime != null) Text('Reservation: ${_formatDateTime(table.reservationTime!)}'),
               if (orderDetails != null) ...[
                 const Divider(height: 24),
-                Text('Order Items:', style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text('Order Items:', style: TextStyle(fontWeight: FontWeight.bold)),
                 ...((orderDetails['items'] as List?)?.map((item) => Text(
                   '${item['quantity']}x ${item['name']}',
                   style: const TextStyle(fontSize: 15),
@@ -733,7 +730,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => NavigationService.goBack(context),
             child: const Text('Close'),
           ),
         ],
@@ -745,9 +742,9 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
     showDialog(
       context: context,
       builder: (context) {
-        final _nameController = TextEditingController();
-        final _notesController = TextEditingController();
-        DateTime? _reservationTime;
+        final nameController = TextEditingController();
+        final notesController = TextEditingController();
+        DateTime? reservationTime;
         return StatefulBuilder(
           builder: (context, setState) => AlertDialog(
             title: Text('Reserve Table ${table.name}'),
@@ -755,12 +752,12 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
-                  controller: _nameController,
+                  controller: nameController,
                   decoration: const InputDecoration(labelText: 'Customer Name'),
                 ),
                 const SizedBox(height: 12),
                 TextField(
-                  controller: _notesController,
+                  controller: notesController,
                   decoration: const InputDecoration(labelText: 'Notes'),
                 ),
                 const SizedBox(height: 12),
@@ -777,7 +774,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
                           );
                           if (picked != null) {
                             setState(() {
-                              _reservationTime = DateTime(
+                              reservationTime = DateTime(
                                 DateTime.now().year,
                                 DateTime.now().month,
                                 DateTime.now().day,
@@ -787,8 +784,8 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
                             });
                           }
                         },
-                        child: Text(_reservationTime != null
-                            ? '${_reservationTime!.hour.toString().padLeft(2, '0')}:${_reservationTime!.minute.toString().padLeft(2, '0')}'
+                        child: Text(reservationTime != null
+                            ? '${reservationTime!.hour.toString().padLeft(2, '0')}:${reservationTime!.minute.toString().padLeft(2, '0')}'
                             : 'Select Time'),
                       ),
                     ),
@@ -805,7 +802,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
                 onPressed: () {
                   // TODO: Call backend to reserve table
                   // For now, just close dialog
-                  Navigator.of(context).pop();
+                  NavigationService.goBack(context);
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Table reserved (placeholder)!')),
                   );
@@ -823,9 +820,9 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
     showDialog(
       context: context,
       builder: (context) {
-        final _nameController = TextEditingController();
-        final _partySizeController = TextEditingController();
-        final _notesController = TextEditingController();
+        final nameController = TextEditingController();
+        final partySizeController = TextEditingController();
+        final notesController = TextEditingController();
         return StatefulBuilder(
           builder: (context, setState) => AlertDialog(
             title: Text('Seat Customer at Table ${table.name}'),
@@ -833,18 +830,18 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
-                  controller: _nameController,
+                  controller: nameController,
                   decoration: const InputDecoration(labelText: 'Customer Name'),
                 ),
                 const SizedBox(height: 12),
                 TextField(
-                  controller: _partySizeController,
+                  controller: partySizeController,
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(labelText: 'Party Size'),
                 ),
                 const SizedBox(height: 12),
                 TextField(
-                  controller: _notesController,
+                  controller: notesController,
                   decoration: const InputDecoration(labelText: 'Notes'),
                 ),
               ],
@@ -856,9 +853,9 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
               ),
               ElevatedButton(
                 onPressed: () async {
-                  final name = _nameController.text.trim();
-                  final partySize = int.tryParse(_partySizeController.text.trim());
-                  final notes = _notesController.text.trim();
+                  final name = nameController.text.trim();
+                  final partySize = int.tryParse(partySizeController.text.trim());
+                  final notes = notesController.text.trim();
                   if (name.isEmpty || partySize == null || partySize < 1) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Please enter a valid name and party size.')),
@@ -867,19 +864,16 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
                   }
                   final container = ProviderScope.containerOf(context, listen: false);
                   try {
-                    print('🪑 DIALOG: Calling seatCustomerProvider for table ${table.id}...');
                     await container.read(seatCustomerProvider((table.id, name, partySize, notes)).future);
-                    print('🪑 DIALOG: seatCustomerProvider call succeeded.');
                     if (mounted) {
                       WidgetsBinding.instance.addPostFrameCallback((_) {
-                        Navigator.of(context).pop();
+                        NavigationService.goBack(context);
                       });
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Customer seated at table ${table.name}!')),
                       );
                     }
                   } catch (e) {
-                    print('🪑 DIALOG: seatCustomerProvider call failed: $e');
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Failed to seat customer: $e')),
                     );
@@ -945,9 +939,9 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
     showDialog(
       context: context,
       builder: (context) {
-        final _nameController = TextEditingController(text: table.customerName ?? '');
-        final _partySizeController = TextEditingController(text: table.partySize?.toString() ?? '');
-        final _notesController = TextEditingController(text: table.notes ?? '');
+        final nameController = TextEditingController(text: table.customerName ?? '');
+        final partySizeController = TextEditingController(text: table.partySize?.toString() ?? '');
+        final notesController = TextEditingController(text: table.notes ?? '');
         return StatefulBuilder(
           builder: (context, setState) => AlertDialog(
             title: Text('Check-in Reservation for Table ${table.name}'),
@@ -955,18 +949,18 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
-                  controller: _nameController,
+                  controller: nameController,
                   decoration: const InputDecoration(labelText: 'Customer Name'),
                 ),
                 const SizedBox(height: 12),
                 TextField(
-                  controller: _partySizeController,
+                  controller: partySizeController,
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(labelText: 'Party Size'),
                 ),
                 const SizedBox(height: 12),
                 TextField(
-                  controller: _notesController,
+                  controller: notesController,
                   decoration: const InputDecoration(labelText: 'Notes'),
                 ),
               ],
@@ -978,9 +972,9 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
               ),
               ElevatedButton(
                 onPressed: () async {
-                  final name = _nameController.text.trim();
-                  final partySize = int.tryParse(_partySizeController.text.trim());
-                  final notes = _notesController.text.trim();
+                  final name = nameController.text.trim();
+                  final partySize = int.tryParse(partySizeController.text.trim());
+                  final notes = notesController.text.trim();
                   if (name.isEmpty || partySize == null || partySize < 1) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Please enter a valid name and party size.')),
@@ -989,19 +983,16 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
                   }
                   final container = ProviderScope.containerOf(context, listen: false);
                   try {
-                    print('🪑 DIALOG: Calling seatCustomerProvider for table ${table.id}...');
                     await container.read(seatCustomerProvider((table.id, name, partySize, notes)).future);
-                    print('🪑 DIALOG: seatCustomerProvider call succeeded.');
                     if (mounted) {
                       WidgetsBinding.instance.addPostFrameCallback((_) {
-                        Navigator.of(context).pop();
+                        NavigationService.goBack(context);
                       });
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Reservation checked in for table ${table.name}!')),
                       );
                     }
                   } catch (e) {
-                    print('🪑 DIALOG: seatCustomerProvider call failed: $e');
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Failed to check-in: $e')),
                     );

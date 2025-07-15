@@ -176,7 +176,7 @@ void main() {
 
     group('Edge Cases', () {
       test('handles very long inputs', () {
-        final longEmail = 'a'.padRight(1000, 'a') + '@example.com';
+        final longEmail = '${'a'.padRight(1000, 'a')}@example.com';
         final longPassword = 'a'.padRight(1000, 'a');
         final longSlug = 'a'.padRight(1000, 'a');
 
@@ -195,9 +195,9 @@ void main() {
 
       test('handles unicode characters', () {
         // Test with unicode characters
-        final unicodeEmail = 'test@example.com'; // Keep simple for now
-        final unicodePassword = 'password123'; // Keep simple for now
-        final unicodeSlug = 'business123'; // Keep simple for now
+        const unicodeEmail = 'test@example.com'; // Keep simple for now
+        const unicodePassword = 'password123'; // Keep simple for now
+        const unicodeSlug = 'business123'; // Keep simple for now
 
         expect(AuthValidators.validateEmail(unicodeEmail), isNull);
         expect(AuthValidators.validatePassword(unicodePassword), isNull);

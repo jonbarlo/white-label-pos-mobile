@@ -1,26 +1,15 @@
 import 'package:dio/dio.dart';
 import 'models/table.dart' as waiter_table;
-import '../../core/config/env_config.dart';
 
 class TableRepository {
   final Dio dio;
   TableRepository(this.dio);
 
   Future<List<waiter_table.Table>> getTables({int? businessId}) async {
-    if (EnvConfig.isDebugMode) {
-      print('🪑 TABLE: Fetching tables');
-      if (businessId != null) print('🪑 TABLE: Business ID: $businessId');
-    }
-
     final queryParams = <String, dynamic>{};
     if (businessId != null) queryParams['businessId'] = businessId;
 
     final response = await dio.get('/tables', queryParameters: queryParams);
-
-    if (EnvConfig.isDebugMode) {
-      print('🪑 TABLE: Response status: ${response.statusCode}');
-      print('🪑 TABLE: Response data: ${response.data}');
-    }
 
     // Handle the new response format with success/data structure
     final responseData = response.data;
@@ -36,22 +25,10 @@ class TableRepository {
     
     final tables = data.map((json) => waiter_table.Table.fromJson(json)).toList();
 
-    if (EnvConfig.isDebugMode) {
-      print('🪑 TABLE: Parsed ${tables.length} tables');
-      for (int i = 0; i < tables.length; i++) {
-        final table = tables[i];
-        print('🪑 TABLE: Table $i: ${table.name}, status: ${table.status}, capacity: ${table.capacity}, currentOrderId: ${table.currentOrderId}');
-      }
-    }
-
     return tables;
   }
 
   Future<waiter_table.Table> getTable(int tableId) async {
-    if (EnvConfig.isDebugMode) {
-      print('🪑 TABLE: Fetching table $tableId');
-    }
-
     final response = await dio.get('/tables/$tableId');
     final responseData = response.data;
     
@@ -63,10 +40,6 @@ class TableRepository {
   }
 
   Future<waiter_table.Table> updateTableStatus(int tableId, waiter_table.TableStatus status) async {
-    if (EnvConfig.isDebugMode) {
-      print('🪑 TABLE: Updating table $tableId status to $status');
-    }
-
     final response = await dio.put(
       '/tables/$tableId/status',
       data: {'status': status.name},
@@ -82,10 +55,6 @@ class TableRepository {
   }
 
   Future<waiter_table.Table> assignTable(int tableId, int waiterId) async {
-    if (EnvConfig.isDebugMode) {
-      print('🪑 TABLE: Assigning table $tableId to waiter $waiterId');
-    }
-
     final response = await dio.put(
       '/tables/$tableId/assign',
       data: {'waiterId': waiterId},
@@ -101,10 +70,6 @@ class TableRepository {
   }
 
   Future<void> clearTable(int tableId) async {
-    if (EnvConfig.isDebugMode) {
-      print('🪑 TABLE: Clearing table $tableId');
-    }
-
     await dio.put(
       '/tables/$tableId/status',
       data: {'status': 'available'},
@@ -112,11 +77,6 @@ class TableRepository {
   }
 
   Future<List<waiter_table.Table>> getTablesByStatus(waiter_table.TableStatus status, {int? businessId}) async {
-    if (EnvConfig.isDebugMode) {
-      print('🪑 TABLE: Fetching tables with status $status');
-      if (businessId != null) print('🪑 TABLE: Business ID: $businessId');
-    }
-
     final queryParams = <String, dynamic>{
       'status': status.name,
     };
@@ -141,19 +101,10 @@ class TableRepository {
     
     final tables = data.map((json) => waiter_table.Table.fromJson(json)).toList();
 
-    if (EnvConfig.isDebugMode) {
-      print('🪑 TABLE: Found ${tables.length} tables with status $status');
-    }
-
     return tables;
   }
 
   Future<List<waiter_table.Table>> getMyAssignedTables(int waiterId, {int? businessId}) async {
-    if (EnvConfig.isDebugMode) {
-      print('🪑 TABLE: Fetching tables assigned to waiter $waiterId');
-      if (businessId != null) print('🪑 TABLE: Business ID: $businessId');
-    }
-
     final queryParams = <String, dynamic>{
       'assignedWaiterId': waiterId,
     };
@@ -178,17 +129,10 @@ class TableRepository {
     
     final tables = data.map((json) => waiter_table.Table.fromJson(json)).toList();
 
-    if (EnvConfig.isDebugMode) {
-      print('🪑 TABLE: Found ${tables.length} tables assigned to waiter $waiterId');
-    }
-
     return tables;
   }
 
   Future<void> seatCustomer(int tableId, String customerName, int partySize, String notes) async {
-    if (EnvConfig.isDebugMode) {
-      print('🪑 TABLE: Seating customer "$customerName" (party size: $partySize) at table $tableId');
-    }
     try {
       final response = await dio.post(
         '/tables/$tableId/seat',
@@ -202,7 +146,7 @@ class TableRepository {
       if (response.statusCode != 200 && response.statusCode != 201) {
         throw Exception('Failed to seat customer: ${response.statusMessage}');
       }
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       final msg = e.response?.data['message'] ?? e.message;
       throw Exception('Failed to seat customer: $msg');
     }

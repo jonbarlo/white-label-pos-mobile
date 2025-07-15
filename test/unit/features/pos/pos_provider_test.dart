@@ -35,7 +35,7 @@ void main() {
       });
 
       test('addItem adds item to cart', () {
-        final item = CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 1);
+        const item = CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 1);
         
         container.read(cartNotifierProvider.notifier).addItem(item);
         
@@ -45,7 +45,7 @@ void main() {
       });
 
       test('addItem increases quantity if item already exists', () {
-        final item = CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 1);
+        const item = CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 1);
         
         container.read(cartNotifierProvider.notifier).addItem(item);
         container.read(cartNotifierProvider.notifier).addItem(item);
@@ -57,7 +57,7 @@ void main() {
       });
 
       test('removeItem removes item from cart', () {
-        final item = CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 1);
+        const item = CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 1);
         
         container.read(cartNotifierProvider.notifier).addItem(item);
         container.read(cartNotifierProvider.notifier).removeItem('1');
@@ -67,7 +67,7 @@ void main() {
       });
 
       test('updateItemQuantity updates item quantity', () {
-        final item = CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 1);
+        const item = CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 1);
         
         container.read(cartNotifierProvider.notifier).addItem(item);
         container.read(cartNotifierProvider.notifier).updateItemQuantity('1', 3);
@@ -78,8 +78,8 @@ void main() {
       });
 
       test('clearCart removes all items', () {
-        final item1 = CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 1);
-        final item2 = CartItem(id: '2', name: 'Banana', price: 0.99, quantity: 1);
+        const item1 = CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 1);
+        const item2 = CartItem(id: '2', name: 'Banana', price: 0.99, quantity: 1);
         
         container.read(cartNotifierProvider.notifier).addItem(item1);
         container.read(cartNotifierProvider.notifier).addItem(item2);
@@ -90,8 +90,8 @@ void main() {
       });
 
       test('cartTotal calculates total correctly', () {
-        final item1 = CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 2);
-        final item2 = CartItem(id: '2', name: 'Banana', price: 0.99, quantity: 1);
+        const item1 = CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 2);
+        const item2 = CartItem(id: '2', name: 'Banana', price: 0.99, quantity: 1);
         
         container.read(cartNotifierProvider.notifier).addItem(item1);
         container.read(cartNotifierProvider.notifier).addItem(item2);
@@ -108,10 +108,10 @@ void main() {
       });
 
       test('searchItems updates search results', () async {
-        final query = 'apple';
+        const query = 'apple';
         final expectedItems = [
-          CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 1),
-          CartItem(id: '2', name: 'Apple Juice', price: 2.99, quantity: 1),
+          const CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 1),
+          const CartItem(id: '2', name: 'Apple Juice', price: 2.99, quantity: 1),
         ];
 
         when(mockPosRepository.searchItems(query))
@@ -125,7 +125,7 @@ void main() {
       });
 
       test('searchItems handles empty results', () async {
-        final query = 'nonexistent';
+        const query = 'nonexistent';
 
         when(mockPosRepository.searchItems(query))
             .thenAnswer((_) async => []);
@@ -137,7 +137,7 @@ void main() {
       });
 
       test('searchItems handles errors', () async {
-        final query = 'apple';
+        const query = 'apple';
 
         when(mockPosRepository.searchItems(query))
             .thenThrow(Exception('Network error'));
@@ -159,7 +159,7 @@ void main() {
         final expectedSales = [
           Sale(
             id: 'sale_1',
-            items: [CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 1)],
+            items: [const CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 1)],
             total: 1.99,
             paymentMethod: PaymentMethod.cash,
             createdAt: DateTime.now(),
@@ -180,10 +180,10 @@ void main() {
     group('createSaleProvider', () {
       test('creates sale successfully', () async {
         final items = [
-          CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 2),
-          CartItem(id: '2', name: 'Banana', price: 0.99, quantity: 1),
+          const CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 2),
+          const CartItem(id: '2', name: 'Banana', price: 0.99, quantity: 1),
         ];
-        final paymentMethod = PaymentMethod.cash;
+        const paymentMethod = PaymentMethod.cash;
         final expectedSale = Sale(
           id: 'sale_123',
           items: items,
@@ -210,8 +210,8 @@ void main() {
       });
 
       test('throws exception when sale creation fails', () async {
-        final items = [CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 1)];
-        final paymentMethod = PaymentMethod.card;
+        final items = [const CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 1)];
+        const paymentMethod = PaymentMethod.card;
 
         when(mockPosRepository.createSale(
           items: items,

@@ -142,12 +142,12 @@ class _AppTextFieldState extends State<AppTextField> {
             ),
             disabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppConstants.defaultRadius),
-              borderSide: BorderSide(color: theme.dividerColor.withOpacity(0.5)),
+              borderSide: BorderSide(color: theme.dividerColor.withValues(alpha: 0.5)),
             ),
             filled: true,
             fillColor: widget.enabled 
                 ? theme.colorScheme.surface 
-                : theme.colorScheme.surface.withOpacity(0.5),
+                : theme.colorScheme.surface.withValues(alpha: 0.5),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: AppConstants.defaultPadding,
               vertical: AppConstants.defaultPadding,
@@ -163,7 +163,7 @@ class _AppTextFieldState extends State<AppTextField> {
       return IconButton(
         icon: Icon(
           _obscureText ? Icons.visibility : Icons.visibility_off,
-          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
         ),
         onPressed: () {
           setState(() {

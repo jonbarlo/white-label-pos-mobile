@@ -52,7 +52,7 @@ class ApiResponse<T> {
     return {
       'success': success,
       if (message != null) 'message': message,
-      if (data != null) 'data': toJsonT(data!),
+      if (data != null) 'data': toJsonT(data as T),
       if (errors != null) 'errors': errors,
       if (statusCode != null) 'statusCode': statusCode,
     };

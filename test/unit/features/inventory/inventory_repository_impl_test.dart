@@ -6,8 +6,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:white_label_pos_mobile/src/features/inventory/inventory_repository_impl.dart';
 import 'package:white_label_pos_mobile/src/features/inventory/models/inventory_item.dart';
-import 'package:white_label_pos_mobile/src/shared/models/result.dart';
-import 'package:white_label_pos_mobile/src/shared/models/api_response.dart';
 
 import 'inventory_repository_impl_test.mocks.dart';
 
@@ -55,9 +53,9 @@ void main() {
         final result = await repository.getInventoryItems();
 
         expect(result.isSuccess, isTrue);
-        expect(result.data!.length, 1);
-        expect(result.data!.first.name, 'Apple');
-        expect(result.data!.first.sku, 'APP001');
+        expect(result.data.length, 1);
+        expect(result.data.first.name, 'Apple');
+        expect(result.data.first.sku, 'APP001');
         verify(mockDio.get('/items')).called(1);
       });
 
@@ -128,8 +126,8 @@ void main() {
         final result = await repository.getInventoryItem('1');
 
         expect(result.isSuccess, isTrue);
-        expect(result.data!.name, 'Apple');
-        expect(result.data!.sku, 'APP001');
+        expect(result.data.name, 'Apple');
+        expect(result.data.sku, 'APP001');
         verify(mockDio.get('/items/1')).called(1);
       });
 
@@ -152,7 +150,7 @@ void main() {
 
     group('createInventoryItem', () {
       test('creates item successfully', () async {
-        final newItem = InventoryItem(
+        const newItem = InventoryItem(
           id: '',
           name: 'Orange',
           sku: 'ORA001',
@@ -197,15 +195,15 @@ void main() {
         final result = await repository.createInventoryItem(newItem);
 
         expect(result.isSuccess, isTrue);
-        expect(result.data!.id, '3');
-        expect(result.data!.name, 'Orange');
+        expect(result.data.id, '3');
+        expect(result.data.name, 'Orange');
         verify(mockDio.post('/items', data: anyNamed('data'))).called(1);
       });
     });
 
     group('updateInventoryItem', () {
       test('updates item successfully', () async {
-        final updatedItem = InventoryItem(
+        const updatedItem = InventoryItem(
           id: '1',
           name: 'Apple Updated',
           sku: 'APP001',
@@ -250,8 +248,8 @@ void main() {
         final result = await repository.updateInventoryItem(updatedItem);
 
         expect(result.isSuccess, isTrue);
-        expect(result.data!.name, 'Apple Updated');
-        expect(result.data!.price, 2.99);
+        expect(result.data.name, 'Apple Updated');
+        expect(result.data.price, 2.99);
         verify(mockDio.put('/items/1', data: anyNamed('data'))).called(1);
       });
     });
@@ -304,7 +302,7 @@ void main() {
         final result = await repository.updateStockLevel('1', 200);
 
         expect(result.isSuccess, isTrue);
-        expect(result.data!.stockQuantity, 200);
+        expect(result.data.stockQuantity, 200);
         verify(mockDio.patch('/items/1/stock', data: anyNamed('data'))).called(1);
       });
     });
@@ -340,8 +338,8 @@ void main() {
         final result = await repository.searchItems('apple');
 
         expect(result.isSuccess, isTrue);
-        expect(result.data!.length, 1);
-        expect(result.data!.first.name, 'Apple');
+        expect(result.data.length, 1);
+        expect(result.data.first.name, 'Apple');
         verify(mockDio.get('/items/search', queryParameters: anyNamed('queryParameters'))).called(1);
       });
     });
@@ -414,8 +412,8 @@ void main() {
         final result = await repository.getCategories(businessId: 1);
 
         expect(result.isSuccess, isTrue);
-        expect(result.data!.length, 4);
-        expect(result.data!.any((c) => c.name == 'Fruits'), isTrue);
+        expect(result.data.length, 4);
+        expect(result.data.any((c) => c.name == 'Fruits'), isTrue);
         verify(mockDio.get('/menu/categories', queryParameters: anyNamed('queryParameters'))).called(1);
       });
     });
@@ -451,8 +449,8 @@ void main() {
         final result = await repository.getItemsByCategory('Fruits');
 
         expect(result.isSuccess, isTrue);
-        expect(result.data!.length, 1);
-        expect(result.data!.first.category, 'Fruits');
+        expect(result.data.length, 1);
+        expect(result.data.first.category, 'Fruits');
         verify(mockDio.get('/items/category/Fruits')).called(1);
       });
     });
@@ -488,8 +486,8 @@ void main() {
         final result = await repository.getLowStockItems();
 
         expect(result.isSuccess, isTrue);
-        expect(result.data!.length, 1);
-        expect(result.data!.first.stockQuantity, 5);
+        expect(result.data.length, 1);
+        expect(result.data.first.stockQuantity, 5);
         verify(mockDio.get('/items/low-stock')).called(1);
       });
     });

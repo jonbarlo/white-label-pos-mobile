@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/semantics.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/navigation/app_router.dart';
 
-class OnboardingScreen extends StatefulWidget {
+class OnboardingScreen extends ConsumerStatefulWidget {
   final VoidCallback? onOnboardingComplete;
   
   const OnboardingScreen({
@@ -12,10 +12,10 @@ class OnboardingScreen extends StatefulWidget {
   });
 
   @override
-  State<OnboardingScreen> createState() => _OnboardingScreenState();
+  ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen> {
+class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
@@ -74,8 +74,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Future<void> _completeOnboarding() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('onboarding_completed', true);
+    // Use the proper onboarding provider
+    await ref.read(onboardingProvider).completeOnboarding();
     
     if (mounted) {
       // Use callback if provided, otherwise just mark as complete
@@ -88,7 +88,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final theme = Theme.of(context);
     
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: theme.colorScheme.surface,
       body: SafeArea(
         child: Semantics(
           label: 'Onboarding screen, page ${_currentPage + 1} of ${_pages.length}',
@@ -160,7 +160,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               decoration: BoxDecoration(
                                 color: _currentPage == index
                                     ? theme.colorScheme.primary
-                                    : theme.colorScheme.primary.withOpacity(0.3),
+                                    : theme.colorScheme.primary.withValues(alpha: 0.3),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                             ),
@@ -206,7 +206,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             button: true,
                             child: ElevatedButton(
                               onPressed: _nextPage,
-                              style: AppTheme.neutralButtonStyle,
                               child: Text(
                                 _currentPage == _pages.length - 1 ? 'Get Started' : 'Next',
                                 style: theme.textTheme.labelLarge?.copyWith(
@@ -273,7 +272,7 @@ class _OnboardingPageView extends StatelessWidget {
                 width: 120,
                 height: 120,
                 decoration: BoxDecoration(
-                  color: page.color.withOpacity(0.1),
+                  color: page.color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(60),
                 ),
                 child: Icon(
@@ -294,7 +293,7 @@ class _OnboardingPageView extends StatelessWidget {
                 page.title,
                 style: theme.textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.onBackground,
+                  color: theme.colorScheme.onSurface,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -308,7 +307,7 @@ class _OnboardingPageView extends StatelessWidget {
               child: Text(
                 page.description,
                 style: theme.textTheme.bodyLarge?.copyWith(
-                  color: theme.colorScheme.onBackground.withOpacity(0.7),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                   height: 1.5,
                 ),
                 textAlign: TextAlign.center,

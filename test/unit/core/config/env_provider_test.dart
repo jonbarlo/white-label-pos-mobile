@@ -50,7 +50,7 @@ void main() {
       // Wait for the async provider to complete
       await Future.delayed(const Duration(milliseconds: 100));
       
-      final config = await configAsync.value;
+      final config = configAsync.value;
       expect(config, isA<Map<String, dynamic>?>());
       if (config != null) {
         expect(config['apiBaseUrl'], equals('https://api.pos-engine.com'));

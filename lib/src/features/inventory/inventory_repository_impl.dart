@@ -164,13 +164,7 @@ class InventoryRepositoryImpl implements InventoryRepository {
   @override
   Future<Result<List<Category>>> getCategories({required int businessId}) async {
     try {
-      print('🔍 REPOSITORY DEBUG: Making GET request to /menu/categories with businessId: $businessId');
-      print('🔍 REPOSITORY DEBUG: Query parameters: {"businessId": $businessId}');
-      
       final response = await _dio.get('/menu/categories', queryParameters: {'businessId': businessId});
-      
-      print('🔍 REPOSITORY DEBUG: Response status:  [32m${response.statusCode} [0m');
-      print('🔍 REPOSITORY DEBUG: Response data: ${response.data}');
       
       final apiResponse = ApiResponse<List<dynamic>>.fromJson(
         response.data,
@@ -178,20 +172,14 @@ class InventoryRepositoryImpl implements InventoryRepository {
       );
       
       if (apiResponse.data == null) {
-        print('❌ REPOSITORY DEBUG: No categories found in response');
         return Result.failure('No categories found');
       }
       
       final categories = apiResponse.data! as List<Category>;
-      print('🔍 REPOSITORY DEBUG: Parsed categories: $categories');
       return Result.success(categories);
     } on DioException catch (e) {
-      print('❌ REPOSITORY DEBUG: DioException caught: ${e.message}');
-      print('❌ REPOSITORY DEBUG: DioException type: ${e.type}');
-      print('❌ REPOSITORY DEBUG: DioException response: ${e.response?.data}');
       return Result.failure(AppException.fromDioException(e).message);
     } catch (e) {
-      print('❌ REPOSITORY DEBUG: General exception caught: $e');
       return Result.failure(AppException.unknown(e.toString()).message);
     }
   }

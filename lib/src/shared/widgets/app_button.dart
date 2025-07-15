@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_constants.dart';
-import '../../core/theme/app_theme.dart';
+
 
 /// Custom button widget with consistent styling
 class AppButton extends StatelessWidget {
@@ -56,7 +56,7 @@ class AppButton extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: _getIconSize()),
-          SizedBox(width: AppConstants.smallPadding),
+          const SizedBox(width: AppConstants.smallPadding),
           Text(text, style: _getTextStyle()),
         ],
       );
@@ -77,31 +77,31 @@ class AppButton extends StatelessWidget {
     switch (type) {
       case AppButtonType.primary:
         return baseStyle.copyWith(
-          backgroundColor: MaterialStateProperty.all(theme.colorScheme.primary),
-          foregroundColor: MaterialStateProperty.all(Colors.white),
+          backgroundColor: WidgetStateProperty.all(theme.colorScheme.primary),
+          foregroundColor: WidgetStateProperty.all(Colors.white),
         );
       case AppButtonType.secondary:
         return baseStyle.copyWith(
-          backgroundColor: MaterialStateProperty.all(Colors.transparent),
-          foregroundColor: MaterialStateProperty.all(theme.colorScheme.primary),
-          side: MaterialStateProperty.all(
+          backgroundColor: WidgetStateProperty.all(Colors.transparent),
+          foregroundColor: WidgetStateProperty.all(theme.colorScheme.primary),
+          side: WidgetStateProperty.all(
             BorderSide(color: theme.colorScheme.primary),
           ),
         );
       case AppButtonType.danger:
         return baseStyle.copyWith(
-          backgroundColor: MaterialStateProperty.all(Colors.red),
-          foregroundColor: MaterialStateProperty.all(Colors.white),
+          backgroundColor: WidgetStateProperty.all(Colors.red),
+          foregroundColor: WidgetStateProperty.all(Colors.white),
         );
       case AppButtonType.success:
         return baseStyle.copyWith(
-          backgroundColor: MaterialStateProperty.all(Colors.green),
-          foregroundColor: MaterialStateProperty.all(Colors.white),
+          backgroundColor: WidgetStateProperty.all(Colors.green),
+          foregroundColor: WidgetStateProperty.all(Colors.white),
         );
       case AppButtonType.flat:
         return baseStyle.copyWith(
-          backgroundColor: MaterialStateProperty.all(Colors.transparent),
-          foregroundColor: MaterialStateProperty.all(theme.colorScheme.primary),
+          backgroundColor: WidgetStateProperty.all(Colors.transparent),
+          foregroundColor: WidgetStateProperty.all(theme.colorScheme.primary),
         );
     }
   }

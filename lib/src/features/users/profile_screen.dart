@@ -6,8 +6,8 @@ import 'package:white_label_pos_mobile/src/features/auth/models/user.dart';
 import 'package:white_label_pos_mobile/src/shared/widgets/loading_widget.dart';
 import 'package:white_label_pos_mobile/src/shared/widgets/error_widget.dart';
 import 'package:white_label_pos_mobile/src/core/config/env_config.dart';
-import '../../core/theme/app_theme.dart';
 import '../../shared/widgets/theme_toggle_button.dart';
+
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -69,7 +69,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final notifier = ref.read(authNotifierProvider.notifier);
     await notifier.logout();
     if (mounted) {
-      Navigator.of(context).pushReplacementNamed('/login');
+      // Navigate back to login - the auth state change will handle navigation
+      Navigator.of(context).popUntil((route) => route.isFirst);
     }
   }
 
@@ -141,7 +142,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               children: [
                 CircleAvatar(
                   radius: 40,
-                  backgroundColor: theme.colorScheme.primary.withOpacity(0.1),
+                  backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
                   child: Icon(Icons.person, size: 48, color: theme.colorScheme.primary),
                 ),
                 const SizedBox(height: 16),

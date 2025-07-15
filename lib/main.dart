@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'src/core/main_app.dart';
-import 'src/core/theme/theme_provider.dart';
 import 'src/core/config/env_config.dart';
 import 'src/core/di/dependency_injection.dart';
 import 'src/core/network/dio_client.dart';
@@ -49,13 +48,6 @@ class WhiteLabelPOSApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final themeData = ref.watch(themeDataProvider);
-    
-    return MaterialApp(
-      title: EnvConfig.appName,
-      theme: themeData,
-      home: const MainApp(),
-      debugShowCheckedModeBanner: EnvConfig.isDebugMode,
-    );
+    return const MainApp();
   }
 }

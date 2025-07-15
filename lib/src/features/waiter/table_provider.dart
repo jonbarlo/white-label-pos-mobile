@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/network/dio_client.dart';
-import '../../core/config/env_config.dart';
 import '../auth/auth_provider.dart';
 import 'table_repository.dart';
 import 'models/table.dart' as waiter_table;
@@ -16,15 +15,7 @@ final tablesProvider = FutureProvider.autoDispose<List<waiter_table.Table>>((ref
   final user = ref.watch(authNotifierProvider).user;
   if (user == null) throw Exception('Not authenticated');
   
-  if (EnvConfig.isDebugMode) {
-    print('🪑 PROVIDER: Fetching tables for user: ${user.name}');
-  }
-  
   final tables = await repo.getTables(businessId: user.businessId);
-  
-  if (EnvConfig.isDebugMode) {
-    print('🪑 PROVIDER: Received ${tables.length} tables');
-  }
   
   return tables;
 });
@@ -35,15 +26,7 @@ final tablesByStatusProvider = FutureProvider.family<List<waiter_table.Table>, w
   final user = ref.watch(authNotifierProvider).user;
   if (user == null) throw Exception('Not authenticated');
   
-  if (EnvConfig.isDebugMode) {
-    print('🪑 PROVIDER: Fetching tables with status $status for user: ${user.name}');
-  }
-  
   final tables = await repo.getTablesByStatus(status, businessId: user.businessId);
-  
-  if (EnvConfig.isDebugMode) {
-    print('🪑 PROVIDER: Found ${tables.length} tables with status $status');
-  }
   
   return tables;
 });
@@ -54,15 +37,7 @@ final myAssignedTablesProvider = FutureProvider.autoDispose<List<waiter_table.Ta
   final user = ref.watch(authNotifierProvider).user;
   if (user == null) throw Exception('Not authenticated');
   
-  if (EnvConfig.isDebugMode) {
-    print('🪑 PROVIDER: Fetching assigned tables for waiter: ${user.name}');
-  }
-  
   final tables = await repo.getMyAssignedTables(user.id, businessId: user.businessId);
-  
-  if (EnvConfig.isDebugMode) {
-    print('🪑 PROVIDER: Found ${tables.length} assigned tables');
-  }
   
   return tables;
 });
@@ -73,15 +48,7 @@ final tableProvider = FutureProvider.family<waiter_table.Table, int>((ref, table
   final user = ref.watch(authNotifierProvider).user;
   if (user == null) throw Exception('Not authenticated');
   
-  if (EnvConfig.isDebugMode) {
-    print('🪑 PROVIDER: Fetching table $tableId for user: ${user.name}');
-  }
-  
   final table = await repo.getTable(tableId);
-  
-  if (EnvConfig.isDebugMode) {
-            print('🪑 PROVIDER: Received table ${table.name}');
-  }
   
   return table;
 });
@@ -92,15 +59,7 @@ final updateTableStatusProvider = FutureProvider.family<waiter_table.Table, ({in
   final user = ref.watch(authNotifierProvider).user;
   if (user == null) throw Exception('Not authenticated');
   
-  if (EnvConfig.isDebugMode) {
-    print('🪑 PROVIDER: Updating table ${params.tableId} status to ${params.status}');
-  }
-  
   final table = await repo.updateTableStatus(params.tableId, params.status);
-  
-  if (EnvConfig.isDebugMode) {
-    print('🪑 PROVIDER: Table status updated successfully');
-  }
   
   // Invalidate tables provider to refresh the list
   ref.invalidate(tablesProvider);
@@ -114,15 +73,7 @@ final assignTableProvider = FutureProvider.family<waiter_table.Table, ({int tabl
   final user = ref.watch(authNotifierProvider).user;
   if (user == null) throw Exception('Not authenticated');
   
-  if (EnvConfig.isDebugMode) {
-    print('🪑 PROVIDER: Assigning table ${params.tableId} to waiter ${params.waiterId}');
-  }
-  
   final table = await repo.assignTable(params.tableId, params.waiterId);
-  
-  if (EnvConfig.isDebugMode) {
-    print('🪑 PROVIDER: Table assigned successfully');
-  }
   
   // Invalidate tables provider to refresh the list
   ref.invalidate(tablesProvider);
@@ -137,15 +88,7 @@ final clearTableProvider = FutureProvider.family<void, int>((ref, tableId) async
   final user = ref.watch(authNotifierProvider).user;
   if (user == null) throw Exception('Not authenticated');
   
-  if (EnvConfig.isDebugMode) {
-    print('🪑 PROVIDER: Clearing table $tableId');
-  }
-  
   await repo.clearTable(tableId);
-  
-  if (EnvConfig.isDebugMode) {
-    print('🪑 PROVIDER: Table cleared successfully');
-  }
   
   // Invalidate tables provider to refresh the list
   ref.invalidate(tablesProvider);
@@ -159,10 +102,6 @@ final seatCustomerProvider = FutureProvider.family<void, (int tableId, String cu
   if (user == null) throw Exception('Not authenticated');
 
   final (tableId, customerName, partySize, notes) = params;
-  if (EnvConfig.isDebugMode) {
-    print('🪑 PROVIDER: Seating customer "$customerName" (party size: $partySize) at table $tableId');
-  }
-
   await repo.seatCustomer(tableId, customerName, partySize, notes);
 
   // Invalidate tables provider to refresh the list

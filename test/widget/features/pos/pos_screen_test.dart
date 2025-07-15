@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:white_label_pos_mobile/src/features/pos/pos_screen.dart';
 import 'package:white_label_pos_mobile/src/features/pos/pos_provider.dart';
 import 'package:white_label_pos_mobile/src/features/pos/pos_repository.dart';
@@ -65,8 +64,8 @@ void main() {
 
     testWidgets('shows search results when searching', (tester) async {
       final searchResults = [
-        CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 1),
-        CartItem(id: '2', name: 'Apple Juice', price: 2.99, quantity: 1),
+        const CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 1),
+        const CartItem(id: '2', name: 'Apple Juice', price: 2.99, quantity: 1),
       ];
 
       when(mockPosRepository.searchItems('apple'))
@@ -109,7 +108,7 @@ void main() {
       final recentSales = [
         Sale(
           id: 'sale_1',
-          items: [CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 1)],
+          items: [const CartItem(id: '1', name: 'Apple', price: 1.99, quantity: 1)],
           total: 1.99,
           paymentMethod: PaymentMethod.cash,
           createdAt: DateTime.now(),

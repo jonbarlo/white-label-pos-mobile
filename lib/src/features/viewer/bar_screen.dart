@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../shared/widgets/theme_toggle_button.dart';
 
 class BarScreen extends StatelessWidget {
-  const BarScreen({Key? key}) : super(key: key);
+  const BarScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:white_label_pos_mobile/src/features/inventory/inventory_repository.dart';
 import 'package:white_label_pos_mobile/src/features/inventory/models/inventory_item.dart';
+import 'package:white_label_pos_mobile/src/features/inventory/models/category.dart';
 import 'package:white_label_pos_mobile/src/shared/models/result.dart';
 
 class InventoryRepositoryImplSimple implements InventoryRepository {
@@ -90,11 +90,13 @@ class InventoryRepositoryImplSimple implements InventoryRepository {
   }
 
   @override
-  Future<Result<List<String>>> getCategories() async {
+  Future<Result<List<Category>>> getCategories({required int businessId}) async {
     try {
-      final response = await _dio.get('/inventory/categories');
+      final response = await _dio.get('/inventory/categories', queryParameters: {
+        'businessId': businessId,
+      });
       final List<dynamic> data = response.data['data'] ?? response.data;
-      final categories = data.cast<String>();
+      final categories = data.map((json) => Category.fromJson(json)).toList();
       return Result.success(categories);
     } catch (e) {
       return Result.failure('Failed to load categories: ${e.toString()}');

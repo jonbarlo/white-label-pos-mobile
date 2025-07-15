@@ -1,5 +1,6 @@
 import 'package:white_label_pos_mobile/src/features/inventory/inventory_repository.dart';
 import 'package:white_label_pos_mobile/src/features/inventory/models/inventory_item.dart';
+import 'package:white_label_pos_mobile/src/features/inventory/models/category.dart';
 import 'package:white_label_pos_mobile/src/shared/models/result.dart';
 import 'mock_data.dart';
 
@@ -62,9 +63,19 @@ class MockInventoryRepository implements InventoryRepository {
   }
 
   @override
-  Future<Result<List<String>>> getCategories() async {
+  Future<Result<List<Category>>> getCategories({required int businessId}) async {
     await Future.delayed(const Duration(milliseconds: 200));
-    return Result.success(MockData.mockCategories);
+    // Convert string categories to Category objects
+    final categories = MockData.mockCategories.asMap().entries.map((entry) => Category(
+      id: entry.key + 1,
+      name: entry.value,
+      businessId: businessId,
+      displayOrder: entry.key,
+      isActive: true,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    )).toList();
+    return Result.success(categories);
   }
 
   @override

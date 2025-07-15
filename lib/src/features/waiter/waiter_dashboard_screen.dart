@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/theme/app_theme.dart';
+
 import '../../shared/widgets/theme_toggle_button.dart';
 import '../auth/auth_provider.dart';
 import 'table_selection_screen.dart';
@@ -8,7 +8,7 @@ import 'messaging_screen.dart';
 import 'table_provider.dart';
 
 class WaiterDashboardScreen extends ConsumerStatefulWidget {
-  const WaiterDashboardScreen({Key? key}) : super(key: key);
+  const WaiterDashboardScreen({super.key});
 
   @override
   ConsumerState<WaiterDashboardScreen> createState() => _WaiterDashboardScreenState();
@@ -63,7 +63,7 @@ class _WaiterDashboardScreenState extends ConsumerState<WaiterDashboardScreen> {
 }
 
 class WaiterHomeTab extends ConsumerStatefulWidget {
-  const WaiterHomeTab({Key? key}) : super(key: key);
+  const WaiterHomeTab({super.key});
 
   @override
   ConsumerState<WaiterHomeTab> createState() => _WaiterHomeTabState();
@@ -120,7 +120,7 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
           gradient: LinearGradient(
             colors: [
               Theme.of(context).colorScheme.primary,
-              Theme.of(context).colorScheme.primary.withOpacity(0.8),
+              Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -134,8 +134,8 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
               children: [
                 CircleAvatar(
                   radius: 30,
-                  backgroundColor: Colors.white.withOpacity(0.2),
-                  child: Icon(
+                  backgroundColor: Colors.white.withValues(alpha: 0.2),
+                  child: const Icon(
                     Icons.person,
                     size: 30,
                     color: Colors.white,
@@ -149,7 +149,7 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
                       Text(
                         'Welcome back,',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white.withValues(alpha: 0.9),
                           fontSize: 16,
                         ),
                       ),
@@ -170,7 +170,7 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
             Text(
               'Ready to serve your customers?',
               style: TextStyle(
-                color: Colors.white.withOpacity(0.9),
+                color: Colors.white.withValues(alpha: 0.9),
                 fontSize: 16,
               ),
             ),
@@ -395,7 +395,7 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
   Widget _buildActivityItem(String title, String time, IconData icon, Color color) {
     return ListTile(
       leading: CircleAvatar(
-        backgroundColor: color.withOpacity(0.1),
+                          backgroundColor: color.withValues(alpha: 0.1),
         child: Icon(
           icon,
           color: color,

@@ -5,10 +5,10 @@ import '../../../../shared/models/api_response.dart';
 import '../../../../shared/models/result.dart';
 import '../../../../core/errors/app_exception.dart';
 import '../../../../core/network/dio_client.dart';
-import '../../../../core/config/env_config.dart';
 import '../../models/user.dart';
 import '../../../business/models/business.dart';
 import 'auth_repository.dart';
+import 'package:flutter/foundation.dart';
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
   final dio = ref.watch(dioClientProvider);
@@ -286,18 +286,10 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<void> clearStoredAuth() async {
-    if (EnvConfig.isDebugMode) {
-      print('🔐 AUTH: Clearing all stored authentication data');
-    }
-    
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('auth_token');
     await prefs.remove('business_slug');
     await prefs.remove('user_id');
     await prefs.remove('business_id');
-    
-    if (EnvConfig.isDebugMode) {
-      print('🔐 AUTH: All stored authentication data cleared');
-    }
   }
 } 

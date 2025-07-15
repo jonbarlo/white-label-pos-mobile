@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/theme/app_theme.dart';
-import '../../shared/widgets/theme_toggle_button.dart';
 import 'messaging_provider.dart';
 
 class MessagingScreen extends ConsumerStatefulWidget {
-  const MessagingScreen({Key? key}) : super(key: key);
+  const MessagingScreen({super.key});
 
   @override
   ConsumerState<MessagingScreen> createState() => _MessagingScreenState();
@@ -43,7 +41,7 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen>
               controller: _tabController,
               indicatorColor: theme.colorScheme.onPrimary,
               labelColor: theme.colorScheme.onPrimary,
-              unselectedLabelColor: theme.colorScheme.onPrimary.withOpacity(0.7),
+              unselectedLabelColor: theme.colorScheme.onPrimary.withValues(alpha: 0.7),
               tabs: const [
                 Tab(text: 'Messages'),
                 Tab(text: 'Promotions'),
@@ -79,7 +77,7 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen>
             color: Theme.of(context).colorScheme.surface,
             border: Border(
               bottom: BorderSide(
-                color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
               ),
             ),
           ),
@@ -172,7 +170,7 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen>
       margin: const EdgeInsets.only(bottom: 12),
       elevation: isUnread ? 2 : 1,
       color: isUnread 
-          ? theme.colorScheme.primary.withOpacity(0.05)
+          ? theme.colorScheme.primary.withValues(alpha: 0.05)
           : null,
       child: ListTile(
         contentPadding: const EdgeInsets.all(16),
@@ -613,7 +611,7 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen>
       color: isExpired 
           ? Colors.grey[100]
           : isActive 
-              ? theme.colorScheme.primary.withOpacity(0.05)
+              ? theme.colorScheme.primary.withValues(alpha: 0.05)
               : null,
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -626,8 +624,8 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen>
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: isActive 
-                        ? Colors.green.withOpacity(0.1)
-                        : Colors.grey.withOpacity(0.1),
+                        ? Colors.green.withValues(alpha: 0.1)
+                        : Colors.grey.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: isActive ? Colors.green : Colors.grey,
@@ -646,7 +644,7 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withOpacity(0.1),
+                    color: theme.colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(

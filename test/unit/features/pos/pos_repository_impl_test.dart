@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:white_label_pos_mobile/src/features/pos/pos_repository_impl.dart';
 import 'package:white_label_pos_mobile/src/features/pos/models/cart_item.dart';
 import 'package:white_label_pos_mobile/src/features/pos/models/sale.dart';
-import 'package:white_label_pos_mobile/src/features/pos/models/menu_item.dart';
 
 import 'pos_repository_impl_test.mocks.dart';
 
@@ -208,7 +207,7 @@ void main() {
     group('createSale', () {
       test('should create sale successfully', () async {
         final items = [
-          CartItem(
+          const CartItem(
             id: '1',
             name: 'Test Item',
             price: 10.99,
@@ -290,7 +289,7 @@ void main() {
 
       test('should create sale with orderType in response', () async {
         final items = [
-          CartItem(
+          const CartItem(
             id: '1',
             name: 'Test Item',
             price: 10.99,

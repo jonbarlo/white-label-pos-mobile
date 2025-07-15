@@ -9,9 +9,9 @@ import 'package:white_label_pos_mobile/src/features/pos/customer_selection_dialo
 import 'package:white_label_pos_mobile/src/features/pos/split_payment_dialog.dart';
 import 'package:white_label_pos_mobile/src/features/auth/auth_provider.dart';
 import 'package:white_label_pos_mobile/src/features/auth/models/user.dart';
-import 'package:white_label_pos_mobile/src/core/config/env_config.dart';
 import '../../core/theme/app_theme.dart';
 import '../../shared/widgets/theme_toggle_button.dart';
+import '../../core/services/navigation_service.dart';
 
 class PosScreen extends ConsumerStatefulWidget {
   const PosScreen({super.key});
@@ -144,18 +144,10 @@ class _PosScreenState extends ConsumerState<PosScreen>
   }
 
   Future<void> _completeSale(String customerName, String customerEmail) async {
-    print('🛒 MAIN: _completeSale called');
-    print('🛒 MAIN: Customer name: $customerName');
-    print('🛒 MAIN: Customer email: $customerEmail');
-    print('🛒 MAIN: Payment method: ${_selectedPaymentMethod.name}');
-    
     try {
-      print('🛒 MAIN: Calling createSaleProvider...');
       await ref.read(createSaleProvider(_selectedPaymentMethod, customerName: customerName, customerEmail: customerEmail).future);
-      print('🛒 MAIN: Sale completed successfully!');
       
       // Refresh sales summary/report
-      print('🛒 MAIN: Refreshing sales summary...');
       ref.refresh(salesSummaryProvider(DateTime.now().subtract(const Duration(days: 7)), DateTime.now()));
       
       // Switch to Recent Sales tab if user can access reports
@@ -163,7 +155,6 @@ class _PosScreenState extends ConsumerState<PosScreen>
       final userRole = authState.user?.role;
       final canSeeReportsTab = userRole == UserRole.admin || userRole == UserRole.manager;
       if (mounted && canSeeReportsTab) {
-        print('🛒 MAIN: Switching to Recent Sales tab...');
         _tabController.animateTo(1);
       }
       
@@ -171,7 +162,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
         _selectedPaymentMethod = PaymentMethod.cash;
       });
       
-      Navigator.of(context).pop(); // Close dialog
+      NavigationService.goBack(context); // Close dialog
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Row(
@@ -186,10 +177,8 @@ class _PosScreenState extends ConsumerState<PosScreen>
         ),
       );
     } catch (e) {
-      print('🛒 MAIN: EXCEPTION in _completeSale: $e');
-      print('🛒 MAIN: Exception type: ${e.runtimeType}');
       if (mounted) {
-        Navigator.of(context).pop(); // Close dialog
+        NavigationService.goBack(context); // Close dialog
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
@@ -208,20 +197,10 @@ class _PosScreenState extends ConsumerState<PosScreen>
   }
 
   Future<void> _completeSplitSale(SplitSaleRequest request) async {
-    print('💳 MAIN: _completeSplitSale called');
-    print('💳 MAIN: User ID: ${request.userId}');
-    print('💳 MAIN: Total amount: ${request.totalAmount}');
-    print('💳 MAIN: Payments count: ${request.payments.length}');
-    print('💳 MAIN: Customer name: ${request.customerName}');
-    print('💳 MAIN: Customer email: ${request.customerEmail}');
-    
     try {
-      print('💳 MAIN: Calling createSplitSaleProvider...');
       await ref.read(createSplitSaleProvider(request).future);
-      print('💳 MAIN: Split sale completed successfully!');
       
       // Refresh sales summary/report
-      print('💳 MAIN: Refreshing sales summary...');
       ref.refresh(salesSummaryProvider(DateTime.now().subtract(const Duration(days: 7)), DateTime.now()));
       
       // Switch to Recent Sales tab if user can access reports
@@ -229,11 +208,10 @@ class _PosScreenState extends ConsumerState<PosScreen>
       final userRole = authState.user?.role;
       final canSeeReportsTab = userRole == UserRole.admin || userRole == UserRole.manager;
       if (mounted && canSeeReportsTab) {
-        print('💳 MAIN: Switching to Recent Sales tab...');
         _tabController.animateTo(1);
       }
       
-      Navigator.of(context).pop(); // Close dialog
+      NavigationService.goBack(context); // Close dialog
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Row(
@@ -248,10 +226,8 @@ class _PosScreenState extends ConsumerState<PosScreen>
         ),
       );
     } catch (e) {
-      print('💳 MAIN: EXCEPTION in _completeSplitSale: $e');
-      print('💳 MAIN: Exception type: ${e.runtimeType}');
       if (mounted) {
-        Navigator.of(context).pop(); // Close dialog
+        NavigationService.goBack(context); // Close dialog
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
@@ -310,10 +286,8 @@ class _PosScreenState extends ConsumerState<PosScreen>
         children: [
           menuItemsAsync.when(
             data: (menuItems) {
-              print('🍽️ UI: Received ${menuItems.length} menu items from provider');
               for (int i = 0; i < menuItems.length; i++) {
                 final item = menuItems[i];
-                print('🍽️ UI: Item $i: ${item.id} - ${item.name} - \$${item.price}');
               }
               return LayoutBuilder(
                 builder: (context, constraints) {
@@ -374,7 +348,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
                                 isSearching: _isSearching,
                               ),
                             ),
-                            Divider(height: 1),
+                            const Divider(height: 1),
                             SizedBox(
                               height: 320,
                               child: _CartSection(
@@ -521,7 +495,7 @@ class _MenuSection extends StatelessWidget {
             color: Theme.of(context).colorScheme.surface,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 4,
                 offset: const Offset(0, 2),
               ),
@@ -547,7 +521,7 @@ class _MenuSection extends StatelessWidget {
                 borderSide: BorderSide.none,
               ),
               filled: true,
-              fillColor: Theme.of(context).colorScheme.surfaceVariant,
+              fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 12,
@@ -669,7 +643,7 @@ class _CategoryChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected 
               ? Theme.of(context).colorScheme.primary
-              : Theme.of(context).colorScheme.surfaceVariant,
+              : Theme.of(context).colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isSelected 
@@ -743,7 +717,7 @@ class _MenuItemCard extends StatelessWidget {
                 height: 40,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceVariant,
+                  color: theme.colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
@@ -843,7 +817,7 @@ class _CartSection extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(-2, 0),
           ),
@@ -1033,7 +1007,7 @@ class _CartItemTile extends StatelessWidget {
               width: 50,
               height: 50,
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceVariant,
+                color: theme.colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
@@ -1086,7 +1060,7 @@ class _CartItemTile extends StatelessWidget {
                         : theme.colorScheme.error,
                   ),
                   style: IconButton.styleFrom(
-                    backgroundColor: theme.colorScheme.surfaceVariant,
+                    backgroundColor: theme.colorScheme.surfaceContainerHighest,
                     minimumSize: const Size(32, 32),
                   ),
                 ),
@@ -1114,7 +1088,7 @@ class _CartItemTile extends StatelessWidget {
                     color: theme.colorScheme.primary,
                   ),
                   style: IconButton.styleFrom(
-                    backgroundColor: theme.colorScheme.surfaceVariant,
+                    backgroundColor: theme.colorScheme.surfaceContainerHighest,
                     minimumSize: const Size(32, 32),
                   ),
                 ),
@@ -1300,18 +1274,7 @@ class _CheckoutDialogState extends State<_CheckoutDialog> {
   }
 
   void _completeSale() {
-    print('🛒 UI: _completeSale called');
-    print('🛒 UI: Selected customer name: $_selectedCustomerName');
-    print('🛒 UI: Selected customer email: $_selectedCustomerEmail');
-    print('🛒 UI: Selected payment method: ${_selectedMethod?.name}');
-    print('🛒 UI: Cart items count: ${widget.cart.length}');
-    for (int i = 0; i < widget.cart.length; i++) {
-      final item = widget.cart[i];
-      print('🛒 UI: Cart item $i: ${item.quantity}x ${item.name} - \$${item.total}');
-    }
-    
     if (_selectedCustomerName == null || _selectedCustomerName!.isEmpty) {
-      print('🛒 UI: ERROR - No customer selected');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please select a customer or enter customer information'),
@@ -1321,23 +1284,14 @@ class _CheckoutDialogState extends State<_CheckoutDialog> {
       return;
     }
 
-    print('🛒 UI: Setting loading state to true');
     setState(() {
       _isLoading = true;
     });
 
-    print('🛒 UI: Calling widget.onCompleteSale...');
     widget.onCompleteSale(_selectedCustomerName!, _selectedCustomerEmail ?? '');
   }
 
   void _showSplitPaymentDialog() {
-    if (EnvConfig.isDebugMode) {
-      print('💳 SPLIT PAYMENT: Opening split payment dialog');
-      print('💳 SPLIT PAYMENT: User ID: ${widget.userId}');
-      print('💳 SPLIT PAYMENT: Total amount: ${widget.total}');
-      print('💳 SPLIT PAYMENT: Cart items: ${widget.cart.length}');
-    }
-    
     showDialog(
       context: context,
       builder: (context) => SplitPaymentDialog(
@@ -1347,14 +1301,7 @@ class _CheckoutDialogState extends State<_CheckoutDialog> {
       ),
     ).then((result) {
       if (result != null && result is SplitSaleRequest) {
-        if (EnvConfig.isDebugMode) {
-          print('💳 SPLIT PAYMENT: Split payment request received');
-        }
         widget.onCompleteSplitSale(result);
-      } else {
-        if (EnvConfig.isDebugMode) {
-          print('💳 SPLIT PAYMENT: No valid result received: $result');
-        }
       }
     });
   }
@@ -1466,7 +1413,7 @@ class _CheckoutDialogState extends State<_CheckoutDialog> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Column(

@@ -20,7 +20,7 @@ void main() {
     group('getInventoryItems', () {
       test('returns success with list of inventory items', () async {
         final expectedItems = [
-          InventoryItem(
+          const InventoryItem(
             id: '1',
             name: 'Apple',
             sku: 'APP001',
@@ -34,7 +34,7 @@ void main() {
             minStockLevel: 10,
             maxStockLevel: 200,
           ),
-          InventoryItem(
+          const InventoryItem(
             id: '2',
             name: 'Banana',
             sku: 'BAN001',
@@ -57,9 +57,9 @@ void main() {
 
         expect(result.isSuccess, isTrue);
         expect(result.data, expectedItems);
-        expect(result.data!.length, 2);
-        expect(result.data!.first.name, 'Apple');
-        expect(result.data!.last.name, 'Banana');
+        expect(result.data.length, 2);
+        expect(result.data.first.name, 'Apple');
+        expect(result.data.last.name, 'Banana');
       });
 
       test('returns success with empty list when no items exist', () async {
@@ -85,7 +85,7 @@ void main() {
 
     group('getInventoryItem', () {
       test('returns success with item when id exists', () async {
-        final expectedItem = InventoryItem(
+        const expectedItem = InventoryItem(
           id: '1',
           name: 'Apple',
           sku: 'APP001',
@@ -107,8 +107,8 @@ void main() {
 
         expect(result.isSuccess, isTrue);
         expect(result.data, expectedItem);
-        expect(result.data!.name, 'Apple');
-        expect(result.data!.sku, 'APP001');
+        expect(result.data.name, 'Apple');
+        expect(result.data.sku, 'APP001');
       });
 
       test('returns failure when item not found', () async {
@@ -124,7 +124,7 @@ void main() {
 
     group('createInventoryItem', () {
       test('returns success with created item', () async {
-        final newItem = InventoryItem(
+        const newItem = InventoryItem(
           id: '',
           name: 'Orange',
           sku: 'ORA001',
@@ -148,12 +148,12 @@ void main() {
 
         expect(result.isSuccess, isTrue);
         expect(result.data, createdItem);
-        expect(result.data!.id, '3');
-        expect(result.data!.name, 'Orange');
+        expect(result.data.id, '3');
+        expect(result.data.name, 'Orange');
       });
 
       test('returns failure when creation fails', () async {
-        final newItem = InventoryItem(
+        const newItem = InventoryItem(
           id: '',
           name: 'Orange',
           sku: 'ORA001',
@@ -180,7 +180,7 @@ void main() {
 
     group('updateInventoryItem', () {
       test('returns success with updated item', () async {
-        final updatedItem = InventoryItem(
+        const updatedItem = InventoryItem(
           id: '1',
           name: 'Apple Updated',
           sku: 'APP001',
@@ -202,12 +202,12 @@ void main() {
 
         expect(result.isSuccess, isTrue);
         expect(result.data, updatedItem);
-        expect(result.data!.name, 'Apple Updated');
-        expect(result.data!.price, 2.49);
+        expect(result.data.name, 'Apple Updated');
+        expect(result.data.price, 2.49);
       });
 
       test('returns failure when update fails', () async {
-        final updatedItem = InventoryItem(
+        const updatedItem = InventoryItem(
           id: '1',
           name: 'Apple Updated',
           sku: 'APP001',
@@ -256,7 +256,7 @@ void main() {
 
     group('updateStockLevel', () {
       test('returns success with updated item', () async {
-        final updatedItem = InventoryItem(
+        const updatedItem = InventoryItem(
           id: '1',
           name: 'Apple',
           sku: 'APP001',
@@ -278,7 +278,7 @@ void main() {
 
         expect(result.isSuccess, isTrue);
         expect(result.data, updatedItem);
-        expect(result.data!.stockQuantity, 90);
+        expect(result.data.stockQuantity, 90);
       });
 
       test('returns failure when stock update fails', () async {
@@ -295,7 +295,7 @@ void main() {
     group('getLowStockItems', () {
       test('returns success with low stock items', () async {
         final lowStockItems = [
-          InventoryItem(
+          const InventoryItem(
             id: '1',
             name: 'Apple',
             sku: 'APP001',
@@ -318,8 +318,8 @@ void main() {
 
         expect(result.isSuccess, isTrue);
         expect(result.data, lowStockItems);
-        expect(result.data!.length, 1);
-        expect(result.data!.first.stockQuantity, 5);
+        expect(result.data.length, 1);
+        expect(result.data.first.stockQuantity, 5);
       });
 
       test('returns success with empty list when no low stock items', () async {
@@ -381,8 +381,8 @@ void main() {
 
         expect(result.isSuccess, isTrue);
         expect(result.data, categories);
-        expect(result.data!.length, 4);
-        expect(result.data!.any((c) => c.name == 'Fruits'), isTrue);
+        expect(result.data.length, 4);
+        expect(result.data.any((c) => c.name == 'Fruits'), isTrue);
       });
 
       test('returns failure when categories cannot be loaded', () async {
@@ -399,7 +399,7 @@ void main() {
     group('searchItems', () {
       test('returns success with search results', () async {
         final searchResults = [
-          InventoryItem(
+          const InventoryItem(
             id: '1',
             name: 'Apple',
             sku: 'APP001',
@@ -422,8 +422,8 @@ void main() {
 
         expect(result.isSuccess, isTrue);
         expect(result.data, searchResults);
-        expect(result.data!.length, 1);
-        expect(result.data!.first.name, 'Apple');
+        expect(result.data.length, 1);
+        expect(result.data.first.name, 'Apple');
       });
 
       test('returns success with empty list when no search results', () async {
@@ -440,7 +440,7 @@ void main() {
     group('getItemsByCategory', () {
       test('returns success with items in category', () async {
         final categoryItems = [
-          InventoryItem(
+          const InventoryItem(
             id: '1',
             name: 'Apple',
             sku: 'APP001',
@@ -463,8 +463,8 @@ void main() {
 
         expect(result.isSuccess, isTrue);
         expect(result.data, categoryItems);
-        expect(result.data!.length, 1);
-        expect(result.data!.first.category, 'Fruits');
+        expect(result.data.length, 1);
+        expect(result.data.first.category, 'Fruits');
       });
 
       test('returns success with empty list when no items in category', () async {

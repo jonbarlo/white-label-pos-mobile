@@ -58,7 +58,7 @@ void main() {
         );
 
         final mockOrders = [
-          KitchenOrder(
+          const KitchenOrder(
             id: 1,
             businessId: 1,
             orderId: 1,
@@ -88,7 +88,7 @@ void main() {
 
       test('should throw exception when user is not authenticated', () async {
         // Arrange
-        final mockAuthState = AuthState(
+        const mockAuthState = AuthState(
           status: AuthStatus.unauthenticated,
           user: null,
           token: null,
@@ -123,7 +123,7 @@ void main() {
         );
 
         final mockOrders = [
-          KitchenOrder(
+          const KitchenOrder(
             id: 2,
             businessId: 1,
             orderId: 2,
@@ -131,7 +131,7 @@ void main() {
             status: 'preparing',
             items: [],
           ),
-          KitchenOrder(
+          const KitchenOrder(
             id: 1,
             businessId: 1,
             orderId: 1,

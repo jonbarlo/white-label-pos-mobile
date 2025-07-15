@@ -30,7 +30,7 @@ void main() {
           updatedAt: DateTime.now(),
         );
         
-        final mockBusiness = Business(
+        const mockBusiness = Business(
           id: 1,
           name: 'Test Business',
           slug: 'test-business',
@@ -50,9 +50,9 @@ void main() {
 
         final result = await mockAuthRepository.login('test@example.com', 'password', 'biz1');
         expect(result.isSuccess, true);
-        expect(result.data?.token, 'mock_token');
-        expect(result.data?.user.email, 'test@example.com');
-        expect(result.data?.business.slug, 'test-business');
+        expect(result.data.token, 'mock_token');
+        expect(result.data.user.email, 'test@example.com');
+        expect(result.data.business.slug, 'test-business');
       });
 
       test('returns failure on error', () async {
@@ -91,7 +91,7 @@ void main() {
 
         final result = await mockAuthRepository.getCurrentUser();
         expect(result.isSuccess, true);
-        expect(result.data?.email, 'test@example.com');
+        expect(result.data.email, 'test@example.com');
       });
 
       test('returns failure when not authenticated', () async {

@@ -1,5 +1,4 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:dio/dio.dart';
 import 'pos_repository.dart';
 import 'pos_repository_impl.dart';
 import 'models/cart_item.dart';
@@ -154,22 +153,13 @@ Future<Sale> createSale(
   String? customerName,
   String? customerEmail,
 }) async {
-  print('🛒 PROVIDER: Starting createSale provider...');
-  print('🛒 PROVIDER: Payment method: ${paymentMethod.name}');
-  print('🛒 PROVIDER: Customer name: $customerName');
-  print('🛒 PROVIDER: Customer email: $customerEmail');
-  
   final cart = ref.read(cartNotifierProvider);
-  print('🛒 PROVIDER: Cart items count: ${cart.length}');
   
   if (cart.isEmpty) {
-    print('🛒 PROVIDER: ERROR - Cart is empty');
     throw Exception('Cannot create sale with empty cart');
   }
 
-  print('🛒 PROVIDER: Getting repository...');
   final repository = await ref.read(posRepositoryProvider.future);
-  print('🛒 PROVIDER: Repository obtained, calling createSale...');
   
   try {
   final sale = await repository.createSale(
@@ -179,26 +169,17 @@ Future<Sale> createSale(
     customerEmail: customerEmail,
   );
     
-    print('🛒 PROVIDER: Sale created successfully!');
-    print('🛒 PROVIDER: Sale ID: ${sale.id}');
-    print('🛒 PROVIDER: Sale total: ${sale.total}');
-
-  // Clear cart after successful sale
-    print('🛒 PROVIDER: Clearing cart...');
+    // Clear cart after successful sale
   ref.read(cartNotifierProvider.notifier).clearCart();
   
   // Add to recent sales
-    print('🛒 PROVIDER: Adding to recent sales...');
   ref.read(recentSalesNotifierProvider.notifier).addSale(sale);
 
   // Invalidate tablesProvider to refresh table cards after order submission
   ref.invalidate(tablesProvider); // <-- Add this line
 
-    print('🛒 PROVIDER: Returning sale object');
   return sale;
   } catch (e) {
-    print('🛒 PROVIDER: EXCEPTION in createSale: $e');
-    print('🛒 PROVIDER: Exception type: ${e.runtimeType}');
     rethrow;
   }
 }
@@ -245,28 +226,15 @@ Future<SplitSaleResponse> createSplitSale(
   CreateSplitSaleRef ref,
   SplitSaleRequest request,
 ) async {
-  print('💳 PROVIDER: Starting createSplitSale provider...');
-  print('💳 PROVIDER: User ID: ${request.userId}');
-  print('💳 PROVIDER: Total amount: ${request.totalAmount}');
-  print('💳 PROVIDER: Payments count: ${request.payments.length}');
-  print('💳 PROVIDER: Customer name: ${request.customerName}');
-  print('💳 PROVIDER: Customer email: ${request.customerEmail}');
-  
   try {
-    print('💳 PROVIDER: Getting repository...');
     final repository = await ref.read(posRepositoryProvider.future);
-    print('💳 PROVIDER: Repository obtained, calling createSplitSale...');
     
     final response = await repository.createSplitSale(request);
-    print('💳 PROVIDER: Split sale created successfully!');
-    print('💳 PROVIDER: Response sale ID: ${response.sale.id}');
 
     // Clear cart after successful sale
-    print('💳 PROVIDER: Clearing cart...');
     ref.read(cartNotifierProvider.notifier).clearCart();
     
     // Add to recent sales (convert to regular sale for display)
-    print('💳 PROVIDER: Converting to regular sale for display...');
     final sale = Sale(
       id: response.sale.id.toString(),
       customerName: response.sale.customerName ?? 'Split Payment',
@@ -275,14 +243,10 @@ Future<SplitSaleResponse> createSplitSale(
       createdAt: response.sale.createdAt,
       paymentMethod: PaymentMethod.card, // Default for split payments
     );
-    print('💳 PROVIDER: Adding to recent sales...');
     ref.read(recentSalesNotifierProvider.notifier).addSale(sale);
 
-    print('💳 PROVIDER: Returning split sale response');
     return response;
   } catch (e) {
-    print('💳 PROVIDER: EXCEPTION in createSplitSale: $e');
-    print('💳 PROVIDER: Exception type: ${e.runtimeType}');
     rethrow;
   }
 }
@@ -316,7 +280,6 @@ Future<SplitBillingStats> getSplitBillingStats(GetSplitBillingStatsRef ref) asyn
 // Menu items provider to fetch real inventory
 @riverpod
 Future<List<MenuItem>> menuItems(MenuItemsRef ref) async {
-  print('🍽️ MENU: Fetching menu items from backend...');
   
   try {
     final repository = await ref.read(posRepositoryProvider.future);
@@ -324,17 +287,9 @@ Future<List<MenuItem>> menuItems(MenuItemsRef ref) async {
     // Fetch all available menu items
     final response = await repository.searchItems(''); // Empty query to get all items
     
-    print('🍽️ MENU: Found ${response.length} items from backend');
-    for (int i = 0; i < response.length; i++) {
-      final item = response[i];
-      print('🍽️ MENU: Item $i: ${item.id} - ${item.name} - \$${item.price}');
-    }
-    
     // Get business ID from auth state
     final authState = ref.read(authNotifierProvider);
     final businessId = authState.business?.id ?? 1;
-    
-    print('🍽️ MENU: Using businessId from auth state: $businessId');
     
     // Convert CartItem results to MenuItem for display
     final menuItems = response.map((item) => MenuItem(
@@ -355,11 +310,8 @@ Future<List<MenuItem>> menuItems(MenuItemsRef ref) async {
       updatedAt: DateTime.now(),
     )).toList();
     
-    print('🍽️ MENU: Converted to ${menuItems.length} MenuItem objects');
     return menuItems;
   } catch (e) {
-    print('🍽️ MENU: ERROR fetching menu items: $e');
-    print('🍽️ MENU: Returning empty list - NO MOCK ITEMS');
     // Return empty list on error - NO FALLBACK ITEMS
     return [];
   }

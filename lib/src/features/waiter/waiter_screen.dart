@@ -3,17 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import '../staff_messaging/staff_messaging_provider.dart';
 import '../staff_messaging/models/staff_message.dart';
-import '../../core/theme/app_theme.dart';
+
 import '../../shared/widgets/theme_toggle_button.dart';
 import 'table_selection_screen.dart';
 
 class WaiterScreen extends ConsumerWidget {
-  const WaiterScreen({Key? key}) : super(key: key);
+  const WaiterScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final activeMessagesAsync = ref.watch(activeMessagesProvider);
-    final unreadCountAsync = ref.watch(unreadMessageCountProvider);
+
 
     return Scaffold(
       appBar: AppBar(
@@ -79,7 +79,7 @@ class WaiterScreen extends ConsumerWidget {
           gradient: LinearGradient(
             colors: [
               Theme.of(context).colorScheme.primary,
-              Theme.of(context).colorScheme.primary.withOpacity(0.8),
+              Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -93,7 +93,7 @@ class WaiterScreen extends ConsumerWidget {
               children: [
                 CircleAvatar(
                   radius: 30,
-                  backgroundColor: Colors.white.withOpacity(0.2),
+                  backgroundColor: Colors.white.withValues(alpha: 0.2),
                   child: const Icon(
                     Icons.person,
                     size: 30,
@@ -116,7 +116,7 @@ class WaiterScreen extends ConsumerWidget {
                       Text(
                         'Ready to serve your customers?',
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white.withValues(alpha: 0.9),
                         ),
                       ),
                     ],
@@ -160,7 +160,7 @@ class WaiterScreen extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.2),
+          color: Colors.white.withValues(alpha: 0.2),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Column(
@@ -177,7 +177,7 @@ class WaiterScreen extends ConsumerWidget {
             Text(
               title,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.white.withOpacity(0.9),
+                color: Colors.white.withValues(alpha: 0.9),
               ),
               textAlign: TextAlign.center,
             ),
@@ -280,7 +280,7 @@ class WaiterScreen extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
@@ -409,8 +409,8 @@ class WaiterScreen extends ConsumerWidget {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              cardColor.withOpacity(0.1),
-              cardColor.withOpacity(0.05),
+              cardColor.withValues(alpha: 0.1),
+              cardColor.withValues(alpha: 0.05),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -427,7 +427,7 @@ class WaiterScreen extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: cardColor.withOpacity(0.2),
+                      color: cardColor.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(icon, color: cardColor, size: 24),
@@ -449,7 +449,7 @@ class WaiterScreen extends ConsumerWidget {
                         Text(
                           message.messageType.toUpperCase(),
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: cardColor.withOpacity(0.8),
+                            color: cardColor.withValues(alpha: 0.8),
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -658,7 +658,7 @@ class WaiterScreen extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(icon, color: color, size: 20),
@@ -666,7 +666,7 @@ class WaiterScreen extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: isPositive ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                    color: isPositive ? Colors.green.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -719,7 +719,7 @@ class WaiterScreen extends ConsumerWidget {
             itemBuilder: (context, index) {
               return ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: Colors.blue.withOpacity(0.1),
+                  backgroundColor: Colors.blue.withValues(alpha: 0.1),
                   child: Text(
                     '${index + 1}',
                     style: const TextStyle(
@@ -733,7 +733,7 @@ class WaiterScreen extends ConsumerWidget {
                 trailing: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
+                    color: Colors.green.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Text(

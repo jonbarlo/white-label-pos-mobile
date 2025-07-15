@@ -11,10 +11,10 @@ class SplitBillingScreen extends ConsumerWidget {
   final List<CartItem> cartItems;
 
   const SplitBillingScreen({
-    Key? key,
+    super.key,
     required this.table,
     required this.cartItems,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -22,7 +22,7 @@ class SplitBillingScreen extends ConsumerWidget {
     final splitNotifier = ref.read(split_billing.splitBillingProvider(cartItems).notifier);
     final isLoading = ref.watch(_splitSaleLoadingProvider);
 
-    Future<void> _finalizeSplit() async {
+    Future<void> finalizeSplit() async {
       ref.read(_splitSaleLoadingProvider.notifier).state = true;
       try {
         // Prepare payload for /sales/split
@@ -34,7 +34,7 @@ class SplitBillingScreen extends ConsumerWidget {
           unitPrice: i.price,
         ))).toList();
         final totalAmount = splits.fold(0.0, (sum, s) => sum + s.subtotal);
-        final userId = 1; // TODO: get from auth provider
+        const userId = 1; // TODO: get from auth provider
         final request = SplitSaleRequest(
           userId: userId,
           totalAmount: totalAmount,
@@ -181,7 +181,7 @@ class SplitBillingScreen extends ConsumerWidget {
                 Text('Total splits: ${splitState.splits.length}'),
                 ElevatedButton(
                   onPressed: (splitState.splits.isNotEmpty && splitState.unassignedItems.isEmpty && !isLoading)
-                      ? _finalizeSplit
+                      ? finalizeSplit
                       : null,
                   child: isLoading
                       ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
