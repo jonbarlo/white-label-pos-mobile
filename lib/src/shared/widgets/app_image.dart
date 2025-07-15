@@ -67,13 +67,17 @@ class AppImage extends StatelessWidget {
 
     // If no image URL, show fallback
     if (imageUrl == null || imageUrl!.isEmpty) {
+      print('AppImage: No image URL provided');
       return defaultPlaceholder;
     }
 
     // Check if it's a valid URL
     if (!_isValidUrl(imageUrl!)) {
+      print('AppImage: Invalid URL: $imageUrl');
       return defaultErrorWidget;
     }
+
+    print('AppImage: Attempting to load: $imageUrl');
 
     return ClipRRect(
       borderRadius: borderRadius ?? BorderRadius.zero,
@@ -82,8 +86,14 @@ class AppImage extends StatelessWidget {
         width: width,
         height: height,
         fit: fit,
-        placeholder: (context, url) => placeholder ?? defaultPlaceholder,
-        errorWidget: (context, url, error) => errorWidget ?? defaultErrorWidget,
+        placeholder: (context, url) {
+          print('AppImage: Loading placeholder for $url');
+          return placeholder ?? defaultPlaceholder;
+        },
+        errorWidget: (context, url, error) {
+          print('AppImage: Error loading $url - $error');
+          return errorWidget ?? defaultErrorWidget;
+        },
         memCacheWidth: width?.toInt(),
         memCacheHeight: height?.toInt(),
       ),
