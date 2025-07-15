@@ -71,6 +71,11 @@ class PosRepositoryImpl implements PosRepository {
         throw Exception('Unexpected response format from /menu/items');
       }
 
+      // Debug: Print raw API response for first item
+      if (items.isNotEmpty) {
+        print('🔍 Raw API response for first item: ${items.first}');
+      }
+
       return items
           .map((item) => _convertMenuItemToCartItem(_safeMenuItemFromJson(item as Map<String, dynamic>)))
           .toList();
@@ -268,23 +273,40 @@ class PosRepositoryImpl implements PosRepository {
 
   // Helper methods
   MenuItem _safeMenuItemFromJson(Map<String, dynamic> json) {
-    // Get image URL from API or use a sample image based on category
-    String? imageUrl = json['image'] as String?;
-    if (imageUrl == null || imageUrl.isEmpty) {
-      // Use sample images based on category for testing
-      final categoryId = int.tryParse(json['category']?.toString() ?? '1') ?? 1;
-      imageUrl = _getSampleImageUrl(categoryId, json['name'] as String);
+    // Check for different possible image field names in the API response
+    String? imageUrl = json['image'] as String? ?? 
+                      json['imageUrl'] as String? ?? 
+                      json['image_url'] as String? ??
+                      json['photo'] as String? ??
+                      json['photoUrl'] as String? ??
+                      json['photo_url'] as String?;
+    
+    final itemName = json['name'] as String;
+    
+    // Handle both numeric and string category IDs
+    final categoryValue = json['category'];
+    int categoryId;
+    
+    if (categoryValue is int) {
+      categoryId = categoryValue;
+    } else if (categoryValue is String) {
+      categoryId = 1; // Default category ID
+    } else {
+      categoryId = 1;
     }
+    
+    print('Processing menu item: "$itemName" (category: $categoryValue, original image: $imageUrl)');
+    print('🔍 Available fields in JSON: ${json.keys.toList()}');
 
-    return MenuItem(
+    final menuItem = MenuItem(
       id: json['id'] as int,
       businessId: json['businessId'] as int? ?? 1,
-      categoryId: int.tryParse(json['category']?.toString() ?? '1') ?? 1, // Map 'category' string to categoryId
-      name: json['name'] as String,
+      categoryId: categoryId,
+      name: itemName,
       description: json['description'] as String? ?? '',
       price: (json['price'] as num?)?.toDouble() ?? 0.0, // Handle null price
       cost: 0.0, // API doesn't provide cost
-      image: imageUrl, // Use sample image URL if API doesn't provide one
+      image: imageUrl, // Use the actual image URL from API
       allergens: null, // Not in API response
       nutritionalInfo: null, // Not in API response
       preparationTime: 15, // Default preparation time
@@ -293,13 +315,19 @@ class PosRepositoryImpl implements PosRepository {
       createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '') ?? DateTime.now(),
       updatedAt: DateTime.tryParse(json['updatedAt'] as String? ?? '') ?? DateTime.now(),
     );
+    
+    print('Created MenuItem for "$itemName" with image: ${menuItem.image}');
+    return menuItem;
   }
 
   String _getSampleImageUrl(int categoryId, String itemName) {
-    // Use Unsplash API for sample food images
+    // Use Unsplash API for sample food images with better parameters
     final category = _getCategoryName(categoryId);
     final encodedName = Uri.encodeComponent(itemName);
-    return 'https://source.unsplash.com/400x300/?$category,$encodedName';
+    // Use more specific search terms and better image quality
+    final imageUrl = 'https://source.unsplash.com/400x300/?food,$category,$encodedName&fit=crop&w=400&h=300';
+    print('Generated sample image URL for "$itemName" (category $categoryId): $imageUrl');
+    return imageUrl;
   }
 
   String _getCategoryName(int categoryId) {
@@ -314,6 +342,24 @@ class PosRepositoryImpl implements PosRepository {
         return 'drink';
       default:
         return 'food';
+    }
+  }
+
+  String _getCategoryNameFromString(String categoryName) {
+    // Handle string-based category names from the API
+    final lowerCategory = categoryName.toLowerCase();
+    if (lowerCategory.contains('burger') || lowerCategory.contains('main') || lowerCategory.contains('entree')) {
+      return 'main-course';
+    } else if (lowerCategory.contains('side') || lowerCategory.contains('appetizer') || lowerCategory.contains('starter')) {
+      return 'appetizer';
+    } else if (lowerCategory.contains('dessert') || lowerCategory.contains('sweet')) {
+      return 'dessert';
+    } else if (lowerCategory.contains('drink') || lowerCategory.contains('beverage') || lowerCategory.contains('wine') || lowerCategory.contains('beer')) {
+      return 'drink';
+    } else if (lowerCategory.contains('salad')) {
+      return 'salad';
+    } else {
+      return 'food';
     }
   }
 

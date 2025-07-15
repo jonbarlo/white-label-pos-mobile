@@ -8,6 +8,8 @@ import 'models/split_payment.dart';
 import '../../core/network/dio_client.dart';
 import '../auth/auth_provider.dart';
 import '../waiter/table_provider.dart';
+import '../waiter/waiter_order_provider.dart';
+import '../waiter/models/table.dart' as waiter_table;
 
 part 'pos_provider.g.dart';
 
@@ -175,8 +177,19 @@ Future<Sale> createSale(
   // Add to recent sales
   ref.read(recentSalesNotifierProvider.notifier).addSale(sale);
 
-  // Invalidate tablesProvider to refresh table cards after order submission
-  ref.invalidate(tablesProvider); // <-- Add this line
+  // Invalidate all related providers to refresh data after order submission
+  ref.invalidate(tablesProvider);
+  ref.invalidate(recentSalesNotifierProvider);
+  ref.invalidate(salesSummaryProvider(DateTime.now().subtract(const Duration(days: 7)), DateTime.now()));
+  
+  // Force refresh of all table data by invalidating the provider family
+  // This will cause all table-related data to be refetched
+  ref.invalidate(tablesByStatusProvider(waiter_table.TableStatus.occupied));
+  ref.invalidate(myAssignedTablesProvider);
+  
+  // Add a small delay to ensure the backend has processed the order
+  // before refreshing table data
+  await Future.delayed(const Duration(milliseconds: 500));
 
   return sale;
   } catch (e) {
@@ -284,23 +297,20 @@ Future<List<MenuItem>> menuItems(MenuItemsRef ref) async {
   try {
     final repository = await ref.read(posRepositoryProvider.future);
     
-    // Fetch all available menu items
-    final response = await repository.searchItems(''); // Empty query to get all items
-    
-    // Get business ID from auth state
-    final authState = ref.read(authNotifierProvider);
-    final businessId = authState.business?.id ?? 1;
+    // Fetch all available menu items using searchItems which uses _safeMenuItemFromJson
+    final cartItems = await repository.searchItems(''); // Empty query to get all items
     
     // Convert CartItem results to MenuItem for display
-    final menuItems = response.map((item) => MenuItem(
+    // The CartItem objects already have proper image URLs from _safeMenuItemFromJson
+    final menuItems = cartItems.map((item) => MenuItem(
       id: int.parse(item.id),
-      businessId: businessId,
+      businessId: ref.read(authNotifierProvider).business?.id ?? 1,
       categoryId: int.tryParse(item.category ?? '1') ?? 1,
       name: item.name,
       description: '', // CartItem doesn't have description, use empty string
       price: item.price,
       cost: 0.0,
-      image: item.imageUrl,
+      image: item.imageUrl, // This should now have the sample image URL
       allergens: null,
       nutritionalInfo: null,
       preparationTime: 0,
@@ -310,8 +320,14 @@ Future<List<MenuItem>> menuItems(MenuItemsRef ref) async {
       updatedAt: DateTime.now(),
     )).toList();
     
+    print('POS menuItems provider: Created ${menuItems.length} menu items');
+    for (final item in menuItems.take(3)) {
+      print('  - ${item.name}: image = ${item.image}');
+    }
+    
     return menuItems;
   } catch (e) {
+    print('Error in menuItems provider: $e');
     // Return empty list on error - NO FALLBACK ITEMS
     return [];
   }

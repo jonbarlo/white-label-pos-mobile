@@ -10,7 +10,7 @@ import 'package:white_label_pos_mobile/src/features/pos/split_payment_dialog.dar
 import 'package:white_label_pos_mobile/src/features/auth/auth_provider.dart';
 import 'package:white_label_pos_mobile/src/features/auth/models/user.dart';
 import '../../core/theme/app_theme.dart';
-import '../../shared/widgets/theme_toggle_button.dart';
+
 import '../../shared/widgets/app_image.dart';
 import '../../core/services/navigation_service.dart';
 
@@ -29,17 +29,60 @@ class _PosScreenState extends ConsumerState<PosScreen>
   PaymentMethod _selectedPaymentMethod = PaymentMethod.cash;
   String _selectedCategory = 'all';
   bool _isSearching = false;
+  int _currentOrderNumber = 14; // Mock order number
 
-  // Mock categories for better UX
+  // Square-style categories with colors and icons
   final List<Map<String, dynamic>> _categories = [
-    {'id': 'all', 'name': 'All', 'icon': Icons.all_inclusive},
-    {'id': 'appetizers', 'name': 'Appetizers', 'icon': Icons.restaurant_menu},
-    {'id': 'main', 'name': 'Main Course', 'icon': Icons.dinner_dining},
-    {'id': 'desserts', 'name': 'Desserts', 'icon': Icons.cake},
-    {'id': 'drinks', 'name': 'Drinks', 'icon': Icons.local_drink},
+    {
+      'id': 'all',
+      'name': 'All',
+      'icon': Icons.all_inclusive,
+      'color': Colors.grey,
+      'itemCount': 0
+    },
+    {
+      'id': 'burgers',
+      'name': 'Burgers',
+      'icon': Icons.lunch_dining,
+      'color': Colors.orange,
+      'itemCount': 9
+    },
+    {
+      'id': 'sides',
+      'name': 'Sides',
+      'icon': Icons.fastfood,
+      'color': Colors.orange.shade300,
+      'itemCount': 4
+    },
+    {
+      'id': 'salads',
+      'name': 'Salads',
+      'icon': Icons.eco,
+      'color': Colors.red.shade700,
+      'itemCount': 3
+    },
+    {
+      'id': 'drinks',
+      'name': 'Wine & Beer',
+      'icon': Icons.local_bar,
+      'color': Colors.red.shade800,
+      'itemCount': 5
+    },
+    {
+      'id': 'beverages',
+      'name': 'Drinks',
+      'icon': Icons.local_drink,
+      'color': Colors.blue,
+      'itemCount': 6
+    },
+    {
+      'id': 'desserts',
+      'name': 'Desserts',
+      'icon': Icons.cake,
+      'color': Colors.pink,
+      'itemCount': 3
+    },
   ];
-
-  // No hardcoded items - only real data from backend
 
   @override
   void initState() {
@@ -150,7 +193,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
       await ref.read(createSaleProvider(_selectedPaymentMethod, customerName: customerName, customerEmail: customerEmail).future);
       
       // Refresh sales summary/report
-      ref.refresh(salesSummaryProvider(DateTime.now().subtract(const Duration(days: 7)), DateTime.now()));
+      ref.invalidate(salesSummaryProvider(DateTime.now().subtract(const Duration(days: 7)), DateTime.now()));
       
       // Switch to Recent Sales tab if user can access reports
       final authState = ref.read(authNotifierProvider);
@@ -162,6 +205,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
       
       setState(() {
         _selectedPaymentMethod = PaymentMethod.cash;
+        _currentOrderNumber++; // Increment order number
       });
       
       // Close dialog safely
@@ -206,7 +250,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
       await ref.read(createSplitSaleProvider(request).future);
       
       // Refresh sales summary/report
-      ref.refresh(salesSummaryProvider(DateTime.now().subtract(const Duration(days: 7)), DateTime.now()));
+      ref.invalidate(salesSummaryProvider(DateTime.now().subtract(const Duration(days: 7)), DateTime.now()));
       
       // Switch to Recent Sales tab if user can access reports
       final authState = ref.read(authNotifierProvider);
@@ -215,6 +259,10 @@ class _PosScreenState extends ConsumerState<PosScreen>
       if (mounted && canSeeReportsTab) {
         _tabController.animateTo(1);
       }
+      
+      setState(() {
+        _currentOrderNumber++; // Increment order number
+      });
       
       // Close dialog safely
       if (mounted) {
@@ -265,155 +313,597 @@ class _PosScreenState extends ConsumerState<PosScreen>
     final canSeeReportsTab = userRole == UserRole.admin || userRole == UserRole.manager;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Point of Sale'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
-        elevation: 2,
-        actions: const [
-          ThemeToggleButton(),
-        ],
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: [
-            const Tab(
-              icon: Icon(Icons.point_of_sale),
-              text: 'Sales',
-            ),
-            if (canSeeReportsTab)
-              const Tab(
-                icon: Icon(Icons.history),
-                text: 'Recent Sales',
-              ),
-          ],
-          indicatorColor: Theme.of(context).colorScheme.onPrimary,
-        ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
+      backgroundColor: const Color(0xFFF8F9FA),
+      body: Column(
         children: [
-          menuItemsAsync.when(
-            data: (menuItems) {
-              for (int i = 0; i < menuItems.length; i++) {
-                final item = menuItems[i];
-              }
-              return LayoutBuilder(
-                builder: (context, constraints) {
-                  // Responsive: if width < 700, stack vertically
-                  final isWide = constraints.maxWidth >= 700;
-                  return isWide
-                      ? Row(
-                          children: [
-                            Expanded(
-                              flex: 3,
-                              child: _SalesTab(
-                                cart: cart,
-                                cartTotal: cartTotal,
-                                searchResults: searchResults,
-                                searchController: _searchController,
-                                onSearchChanged: _onSearchChanged,
-                                onAddToCart: _addToCart,
-                                onRemoveFromCart: _removeFromCart,
-                                onUpdateQuantity: _updateQuantity,
-                                onCheckout: _showCheckoutDialog,
-                                categories: _categories,
-                                selectedCategory: _selectedCategory,
-                                onCategorySelected: _onCategorySelected,
-                                                            popularItems: menuItems,
-                            isSearching: _isSearching,
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: _CartSection(
-                            cart: cart,
-                            cartTotal: cartTotal,
-                            onRemoveFromCart: _removeFromCart,
-                            onUpdateQuantity: _updateQuantity,
-                            onCheckout: _showCheckoutDialog,
-                          ),
-                        ),
-                      ],
-                    )
-                  : Column(
-                      children: [
-                        Expanded(
-                          flex: 2,
-                          child: _SalesTab(
-                            cart: cart,
-                            cartTotal: cartTotal,
-                            searchResults: searchResults,
-                            searchController: _searchController,
-                            onSearchChanged: _onSearchChanged,
-                            onAddToCart: _addToCart,
-                            onRemoveFromCart: _removeFromCart,
-                            onUpdateQuantity: _updateQuantity,
-                            onCheckout: _showCheckoutDialog,
-                            categories: _categories,
-                            selectedCategory: _selectedCategory,
-                            onCategorySelected: _onCategorySelected,
-                            popularItems: menuItems,
-                                isSearching: _isSearching,
-                              ),
-                            ),
-                            const Divider(height: 1),
-                            SizedBox(
-                              height: 320,
-                              child: _CartSection(
-                                cart: cart,
-                                cartTotal: cartTotal,
-                                onRemoveFromCart: _removeFromCart,
-                                onUpdateQuantity: _updateQuantity,
-                                onCheckout: _showCheckoutDialog,
-                              ),
-                            ),
-                          ],
-                        );
-                },
-              );
-            },
-            loading: () => const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text('Loading menu items...'),
-                ],
-              ),
+          // Top Bar - Square style
+          _buildTopBar(),
+          
+          // Main Content
+          Expanded(
+            child: Row(
+              children: [
+                // Left Panel - Menu Items
+                Expanded(
+                  flex: 3,
+                  child: _buildLeftPanel(
+                    menuItemsAsync: menuItemsAsync,
+                    searchResults: searchResults,
+                    searchController: _searchController,
+                    onSearchChanged: _onSearchChanged,
+                    onAddToCart: _addToCart,
+                    categories: _categories,
+                    selectedCategory: _selectedCategory,
+                    onCategorySelected: _onCategorySelected,
+                    isSearching: _isSearching,
+                  ),
+                ),
+                
+                // Right Panel - Order Summary
+                Expanded(
+                  flex: 1,
+                  child: _buildRightPanel(
+                    cart: cart,
+                    cartTotal: cartTotal,
+                    onRemoveFromCart: _removeFromCart,
+                    onUpdateQuantity: _updateQuantity,
+                    onCheckout: _showCheckoutDialog,
+                  ),
+                ),
+              ],
             ),
-            error: (error, stack) => Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.error_outline,
-                    size: 64,
-                    color: Colors.red,
+          ),
+          
+          // Bottom Navigation - Square style
+          _buildBottomNavigation(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTopBar() {
+    return Container(
+      height: 60,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          bottom: BorderSide(color: Colors.grey.shade200, width: 1),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Left side
+          Row(
+            children: [
+              Text(
+                'Lunch',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey.shade800,
+                ),
+              ),
+              const SizedBox(width: 20),
+              IconButton(
+                onPressed: () {
+                  // Search functionality
+                },
+                icon: Icon(Icons.search, color: Colors.grey.shade600),
+                tooltip: 'Search',
+              ),
+              IconButton(
+                onPressed: () {
+                  // History functionality
+                },
+                icon: Icon(Icons.history, color: Colors.grey.shade600),
+                tooltip: 'History',
+              ),
+            ],
+          ),
+          
+          const Spacer(),
+          
+          // Right side
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Text(
+                  '#$_currentOrderNumber',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey.shade700,
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Error loading menu items',
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    error.toString(),
-                    style: Theme.of(context).textTheme.bodyMedium,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      ref.invalidate(menuItemsProvider);
-                    },
-                    child: const Text('Retry'),
-                  ),
-                ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              IconButton(
+                onPressed: () {
+                  // New order functionality
+                  ref.read(cartNotifierProvider.notifier).clearCart();
+                  setState(() {
+                    _currentOrderNumber++;
+                  });
+                },
+                icon: Icon(Icons.add, color: Colors.grey.shade600),
+                tooltip: 'New Order',
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLeftPanel({
+    required AsyncValue<List<MenuItem>> menuItemsAsync,
+    required List<MenuItem> searchResults,
+    required TextEditingController searchController,
+    required Function(String) onSearchChanged,
+    required Function(CartItem) onAddToCart,
+    required List<Map<String, dynamic>> categories,
+    required String selectedCategory,
+    required Function(String) onCategorySelected,
+    required bool isSearching,
+  }) {
+    return Container(
+      color: Colors.white,
+      child: Column(
+        children: [
+          // Search bar
+          Container(
+            padding: const EdgeInsets.all(16),
+            child: TextField(
+              controller: searchController,
+              onChanged: onSearchChanged,
+              decoration: InputDecoration(
+                hintText: 'Search menu items...',
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          searchController.clear();
+                          onSearchChanged('');
+                        },
+                      )
+                    : null,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: Colors.grey.shade300),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: Colors.blue.shade400, width: 2),
+                ),
+                filled: true,
+                fillColor: Colors.grey.shade50,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),
             ),
           ),
-          if (canSeeReportsTab) _RecentSalesTab(sales: recentSales),
+          
+          // Categories
+          if (!isSearching) ...[
+            Container(
+              height: 100,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: categories.length,
+                itemBuilder: (context, index) {
+                  final category = categories[index];
+                  final isSelected = selectedCategory == category['id'];
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: _CategoryButton(
+                      category: category,
+                      isSelected: isSelected,
+                      onTap: () => onCategorySelected(category['id']),
+                    ),
+                  );
+                },
+              ),
+            ),
+            
+            // Action buttons
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _ActionButton(
+                      label: '% Discounts',
+                      icon: Icons.discount,
+                      color: Colors.green,
+                      onTap: () {
+                        // Discount functionality
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _ActionButton(
+                      label: 'Scan',
+                      icon: Icons.qr_code_scanner,
+                      color: Colors.orange,
+                      onTap: () {
+                        // Scan functionality
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          
+          // Menu items grid
+          Expanded(
+            child: menuItemsAsync.when(
+              data: (menuItems) {
+                final itemsToShow = isSearching ? searchResults : menuItems;
+                
+                if (isSearching && searchResults.isEmpty) {
+                  return const Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.search_off, size: 64, color: Colors.grey),
+                        SizedBox(height: 16),
+                        Text(
+                          'No items found',
+                          style: TextStyle(fontSize: 18, color: Colors.grey),
+                        ),
+                        Text(
+                          'Try a different search term',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                
+                return GridView.builder(
+                  padding: const EdgeInsets.all(16),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    childAspectRatio: 0.85,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                  ),
+                  itemCount: itemsToShow.length,
+                  itemBuilder: (context, index) {
+                    final item = itemsToShow[index];
+                    return _MenuItemCard(
+                      item: item,
+                      onAddToCart: onAddToCart,
+                    );
+                  },
+                );
+              },
+              loading: () => const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 16),
+                    Text('Loading menu items...'),
+                  ],
+                ),
+              ),
+              error: (error, stack) => Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.error_outline,
+                      size: 64,
+                      color: Colors.red,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Error loading menu items',
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      error.toString(),
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () {
+                        ref.invalidate(menuItemsProvider);
+                      },
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRightPanel({
+    required List<CartItem> cart,
+    required double cartTotal,
+    required Function(String) onRemoveFromCart,
+    required Function(String, int) onUpdateQuantity,
+    required VoidCallback onCheckout,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          left: BorderSide(color: Colors.grey.shade200, width: 1),
+        ),
+      ),
+      child: Column(
+        children: [
+          // Tabs
+          Container(
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(color: Colors.grey.shade200, width: 1),
+              ),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: _TabButton(
+                    label: 'Check',
+                    isSelected: true,
+                    onTap: () {},
+                  ),
+                ),
+                Expanded(
+                  child: _TabButton(
+                    label: 'Actions',
+                    isSelected: false,
+                    onTap: () {},
+                  ),
+                ),
+                Expanded(
+                  child: _TabButton(
+                    label: 'Guest',
+                    isSelected: false,
+                    onTap: () {},
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          // Order items
+          Expanded(
+            child: cart.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.shopping_cart_outlined,
+                          size: 80,
+                          color: Colors.grey.shade400,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Your cart is empty',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Add items to get started',
+                          style: TextStyle(
+                            color: Colors.grey.shade500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: cart.length,
+                    itemBuilder: (context, index) {
+                      final item = cart[index];
+                      return _OrderItemTile(
+                        item: item,
+                        onRemove: onRemoveFromCart,
+                        onUpdateQuantity: onUpdateQuantity,
+                      );
+                    },
+                  ),
+          ),
+          
+          // Totals and Pay button
+          if (cart.isNotEmpty) ...[
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade50,
+                border: Border(
+                  top: BorderSide(color: Colors.grey.shade200, width: 1),
+                ),
+              ),
+              child: Column(
+                children: [
+                  // Totals
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Subtotal:',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                      Text(
+                        '\$${cartTotal.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Tax:',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                      Text(
+                        '\$${(cartTotal * 0.095).toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Divider(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Total:',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey.shade800,
+                        ),
+                      ),
+                      Text(
+                        '\$${(cartTotal * 1.095).toStringAsFixed(2)}',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  // Pay button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: onCheckout,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue.shade600,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        textStyle: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      child: const Text('PAY'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBottomNavigation() {
+    return Container(
+      height: 60,
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          top: BorderSide(color: Colors.grey.shade200, width: 1),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 4,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _BottomNavItem(
+            icon: Icons.person,
+            label: 'LN',
+            onTap: () {
+              // Profile/logout functionality
+            },
+          ),
+          _BottomNavItem(
+            icon: Icons.menu,
+            label: 'Menu',
+            onTap: () {
+              // Menu functionality
+            },
+          ),
+          _BottomNavItem(
+            icon: Icons.receipt_long,
+            label: 'Orders',
+            badge: '2',
+            onTap: () {
+              // Orders functionality
+            },
+          ),
+          _BottomNavItem(
+            icon: Icons.swap_horiz,
+            label: 'Transactions',
+            onTap: () {
+              // Transactions functionality
+            },
+          ),
+          _BottomNavItem(
+            icon: Icons.local_offer,
+            label: 'Items',
+            onTap: () {
+              // Items functionality
+            },
+          ),
+          _BottomNavItem(
+            icon: Icons.more_horiz,
+            label: 'More',
+            onTap: () {
+              // More functionality
+            },
+          ),
         ],
       ),
     );
@@ -611,6 +1101,11 @@ class _MenuSection extends StatelessWidget {
   }
 
   Widget _buildPopularItems() {
+    print('Building popular items grid with ${popularItems.length} items');
+    for (final item in popularItems.take(3)) {
+      print('  Popular item: ${item.name} - image: ${item.image}');
+    }
+    
     return GridView.builder(
       padding: const EdgeInsets.all(16),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -728,15 +1223,13 @@ class _MenuItemCard extends StatelessWidget {
                 ),
                 child: ClipRRect(
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                  child: item.image != null && item.image!.isNotEmpty
-                      ? AppImage(
-                          imageUrl: item.image,
-                          fit: BoxFit.cover,
-                          placeholder: _buildImagePlaceholder(theme, item),
-                          errorWidget: _buildImagePlaceholder(theme, item),
-                          backgroundColor: theme.colorScheme.surfaceContainerHighest,
-                        )
-                      : _buildImagePlaceholder(theme, item),
+                  child: AppImage(
+                    imageUrl: item.image,
+                    fit: BoxFit.cover,
+                    placeholder: _buildImagePlaceholder(theme, item),
+                    errorWidget: _buildImagePlaceholder(theme, item),
+                    backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                  ),
                 ),
               ),
             ),
@@ -823,7 +1316,7 @@ class _MenuItemCard extends StatelessWidget {
   }
 
   Widget _buildImagePlaceholder(ThemeData theme, MenuItem item) {
-    // Create a gradient background based on the item category
+    // Create a subtle placeholder with category-based styling
     final colors = _getCategoryColors(item.categoryId);
     
     return Container(
@@ -833,7 +1326,10 @@ class _MenuItemCard extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: colors,
+          colors: [
+            colors[0].withValues(alpha: 0.3),
+            colors[1].withValues(alpha: 0.5),
+          ],
         ),
       ),
       child: Center(
@@ -842,16 +1338,16 @@ class _MenuItemCard extends StatelessWidget {
           children: [
             Icon(
               _getCategoryIcon(item.categoryId),
-              size: 32,
-              color: Colors.white.withValues(alpha: 0.8),
+              size: 24,
+              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             Text(
               item.name,
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.9),
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
               ),
               textAlign: TextAlign.center,
               maxLines: 2,
@@ -864,18 +1360,18 @@ class _MenuItemCard extends StatelessWidget {
   }
 
   List<Color> _getCategoryColors(int categoryId) {
-    // Define colors for different categories
+    // Define subtle colors for different categories
     switch (categoryId) {
       case 1: // Appetizers
-        return [Colors.orange.shade400, Colors.orange.shade600];
+        return [Colors.orange.shade200, Colors.orange.shade300];
       case 2: // Main Course
-        return [Colors.red.shade400, Colors.red.shade600];
+        return [Colors.red.shade200, Colors.red.shade300];
       case 3: // Desserts
-        return [Colors.pink.shade400, Colors.pink.shade600];
+        return [Colors.pink.shade200, Colors.pink.shade300];
       case 4: // Drinks
-        return [Colors.blue.shade400, Colors.blue.shade600];
+        return [Colors.blue.shade200, Colors.blue.shade300];
       default:
-        return [Colors.grey.shade400, Colors.grey.shade600];
+        return [Colors.grey.shade200, Colors.grey.shade300];
     }
   }
 
@@ -893,6 +1389,369 @@ class _MenuItemCard extends StatelessWidget {
       default:
         return Icons.restaurant;
     }
+  }
+}
+
+class _CategoryButton extends StatelessWidget {
+  final Map<String, dynamic> category;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _CategoryButton({
+    required this.category,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final color = category['color'] as Color;
+    final itemCount = category['itemCount'] as int;
+    
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 120,
+        height: 80,
+        decoration: BoxDecoration(
+          color: isSelected ? color : color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? color : Colors.grey.shade300,
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              category['icon'],
+              size: 24,
+              color: isSelected ? Colors.white : color,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              category['name'],
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: isSelected ? Colors.white : color,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            if (itemCount > 0) ...[
+              const SizedBox(height: 2),
+              Text(
+                '($itemCount)',
+                style: TextStyle(
+                  fontSize: 10,
+                  color: isSelected ? Colors.white.withValues(alpha: 0.8) : color.withValues(alpha: 0.7),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+
+class _ActionButton extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _ActionButton({
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 40,
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 16, color: color),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TabButton extends StatelessWidget {
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _TabButton({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              color: isSelected ? Colors.blue.shade600 : Colors.transparent,
+              width: 2,
+            ),
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            color: isSelected ? Colors.blue.shade600 : Colors.grey.shade600,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+}
+
+class _OrderItemTile extends StatelessWidget {
+  final CartItem item;
+  final Function(String) onRemove;
+  final Function(String, int) onUpdateQuantity;
+
+  const _OrderItemTile({
+    required this.item,
+    required this.onRemove,
+    required this.onUpdateQuantity,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              // Item image
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(6),
+                  color: Colors.grey.shade200,
+                ),
+                child: item.imageUrl != null && item.imageUrl!.isNotEmpty
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(6),
+                        child: AppImage(
+                          imageUrl: item.imageUrl,
+                          fit: BoxFit.cover,
+                          placeholder: Icon(Icons.restaurant, color: Colors.grey.shade400),
+                          errorWidget: Icon(Icons.restaurant, color: Colors.grey.shade400),
+                        ),
+                      )
+                    : Icon(Icons.restaurant, color: Colors.grey.shade400),
+              ),
+              const SizedBox(width: 12),
+              
+              // Item details
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item.name,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '\$${item.price.toStringAsFixed(2)} each',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Quantity controls
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      if (item.quantity > 1) {
+                        onUpdateQuantity(item.id, item.quantity - 1);
+                      } else {
+                        onRemove(item.id);
+                      }
+                    },
+                    icon: Icon(
+                      item.quantity > 1 ? Icons.remove : Icons.delete,
+                      size: 16,
+                      color: item.quantity > 1 
+                          ? Colors.blue.shade600 
+                          : Colors.red.shade600,
+                    ),
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.grey.shade100,
+                      minimumSize: const Size(28, 28),
+                      padding: EdgeInsets.zero,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade100,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '${item.quantity}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue.shade700,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  IconButton(
+                    onPressed: () => onUpdateQuantity(item.id, item.quantity + 1),
+                    icon: Icon(
+                      Icons.add,
+                      size: 16,
+                      color: Colors.blue.shade600,
+                    ),
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.grey.shade100,
+                      minimumSize: const Size(28, 28),
+                      padding: EdgeInsets.zero,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          
+          // Item total
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text(
+                '\$${item.total.toStringAsFixed(2)}',
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BottomNavItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String? badge;
+  final VoidCallback onTap;
+
+  const _BottomNavItem({
+    required this.icon,
+    required this.label,
+    this.badge,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Stack(
+            children: [
+              Icon(
+                icon,
+                size: 24,
+                color: Colors.grey.shade600,
+              ),
+              if (badge != null)
+                Positioned(
+                  right: -2,
+                  top: -2,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      badge!,
+                      style: const TextStyle(
+                        fontSize: 10,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10,
+              color: Colors.grey.shade600,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -1373,7 +2232,7 @@ class _CheckoutDialogState extends State<_CheckoutDialog> {
     }
   }
 
-  void _completeSale() {
+  void _completeSale() async {
     if (_selectedCustomerName == null || _selectedCustomerName!.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -1388,7 +2247,15 @@ class _CheckoutDialogState extends State<_CheckoutDialog> {
       _isLoading = true;
     });
 
-    widget.onCompleteSale(_selectedCustomerName!, _selectedCustomerEmail ?? '');
+    try {
+      await widget.onCompleteSale(_selectedCustomerName!, _selectedCustomerEmail ?? '');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   void _showSplitPaymentDialog() {
