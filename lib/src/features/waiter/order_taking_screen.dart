@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'models/table.dart' as waiter_table;
 import '../../shared/widgets/theme_toggle_button.dart';
+import '../../shared/widgets/app_image.dart';
 import '../pos/models/cart_item.dart';
 import '../pos/models/menu_item.dart';
 import '../pos/pos_provider.dart';
@@ -10,6 +11,7 @@ import '../auth/auth_provider.dart';
 import 'waiter_order_provider.dart' as waiter_order;
 import 'package:another_flushbar/flushbar.dart';
 import '../../core/services/navigation_service.dart';
+
 
 class OrderTakingScreen extends ConsumerStatefulWidget {
   final waiter_table.Table table;
@@ -378,14 +380,25 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
     final description = item['description'] ?? '';
     final price = (item['price'] ?? 0.0).toDouble();
     final isAvailable = item['isAvailable'] ?? true;
+    final imageUrl = item['image'] ?? item['imageUrl'];
     
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
+        leading: AppThumbnail(
+          imageUrl: imageUrl,
+          size: 80,
+          borderRadius: 8,
+          fallbackIcon: Icons.restaurant,
+          backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+        ),
         contentPadding: const EdgeInsets.all(16),
         title: Text(
           name,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -393,7 +406,10 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
             const SizedBox(height: 4),
             Text(
               description,
-              style: TextStyle(color: Colors.grey[600]),
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 14,
+              ),
             ),
             const SizedBox(height: 8),
             Row(
@@ -410,25 +426,34 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
                 if (isAvailable) ...[
                   ElevatedButton.icon(
                     onPressed: () => _addToCartFromMap(item),
-                    icon: const Icon(Icons.add, size: 16),
-                    label: const Text('Add'),
+                    icon: Icon(Icons.add, size: 20),
+                    label: Text('Add', style: TextStyle(
+                      fontSize: 16, 
+                      fontWeight: FontWeight.bold
+                    )),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).colorScheme.primary,
                       foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      minimumSize: const Size(80, 48),
                     ),
                   ),
                 ] else ...[
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     decoration: BoxDecoration(
                       color: Colors.grey.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Unavailable',
                       style: TextStyle(
                         color: Colors.grey,
-                        fontSize: 12,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -446,10 +471,20 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
+        leading: AppThumbnail(
+          imageUrl: item.image,
+          size: 80,
+          borderRadius: 8,
+          fallbackIcon: Icons.restaurant,
+          backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+        ),
         contentPadding: const EdgeInsets.all(16),
         title: Text(
           item.name,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -457,7 +492,10 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
             const SizedBox(height: 4),
             Text(
               item.description,
-              style: TextStyle(color: Colors.grey[600]),
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 14,
+              ),
             ),
             const SizedBox(height: 8),
             Row(
@@ -474,25 +512,34 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
                 if (item.isAvailable) ...[
                   ElevatedButton.icon(
                     onPressed: () => _addToCartFromPosItem(item),
-                    icon: const Icon(Icons.add, size: 16),
-                    label: const Text('Add'),
+                    icon: Icon(Icons.add, size: 20),
+                    label: Text('Add', style: TextStyle(
+                      fontSize: 16, 
+                      fontWeight: FontWeight.bold
+                    )),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).colorScheme.primary,
                       foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      minimumSize: const Size(80, 48),
                     ),
                   ),
                 ] else ...[
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     decoration: BoxDecoration(
                       color: Colors.grey.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Unavailable',
                       style: TextStyle(
                         color: Colors.grey,
-                        fontSize: 12,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -647,43 +694,97 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
-        contentPadding: const EdgeInsets.all(12),
+        leading: AppThumbnail(
+          imageUrl: item.imageUrl,
+          size: 40,
+          borderRadius: 6,
+          fallbackIcon: Icons.restaurant,
+          backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+        ),
+        contentPadding: const EdgeInsets.all(16),
         title: Text(
           item.name,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
         ),
         subtitle: Text(
           '\$${item.price.toStringAsFixed(2)} each',
-          style: TextStyle(color: Colors.grey[600]),
+          style: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14,
+          ),
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            IconButton(
-              onPressed: () => _decreaseQuantity(item),
-              icon: const Icon(Icons.remove, size: 16),
-              style: IconButton.styleFrom(
-                backgroundColor: Colors.grey[200],
-                minimumSize: const Size(32, 32),
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(6),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 2,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
+              ),
+              child: IconButton(
+                onPressed: () => _decreaseQuantity(item),
+                icon: const Icon(Icons.remove, size: 18, color: Colors.grey),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Text(
-                '${item.quantity}',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
+            Container(
+              width: 36,
+              height: 36,
+              margin: const EdgeInsets.symmetric(horizontal: 6),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary,
+                borderRadius: BorderRadius.circular(6),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 2,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
+              ),
+              child: Center(
+                child: Text(
+                  '${item.quantity}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
-            IconButton(
-              onPressed: () => _increaseQuantity(item),
-              icon: const Icon(Icons.add, size: 16),
-              style: IconButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                foregroundColor: Colors.white,
-                minimumSize: const Size(32, 32),
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary,
+                borderRadius: BorderRadius.circular(6),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 2,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
+              ),
+              child: IconButton(
+                onPressed: () => _increaseQuantity(item),
+                icon: const Icon(Icons.add, size: 18, color: Colors.white),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
               ),
             ),
           ],
@@ -712,10 +813,18 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
                   NavigationService.goBack(context);
                 }
               },
-              icon: const Icon(Icons.cancel),
-              label: const Text('Cancel'),
+              icon: Icon(Icons.cancel, size: 24),
+              label: Text('Cancel', style: TextStyle(
+                fontSize: 16, 
+                fontWeight: FontWeight.bold
+              )),
               style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                side: BorderSide(color: Colors.grey[400]!),
+                minimumSize: const Size(120, 56),
               ),
             ),
           ),
@@ -725,17 +834,27 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
             child: ElevatedButton.icon(
               onPressed: _isSubmitting || _cartItems.isEmpty ? null : _submitOrder,
               icon: _isSubmitting
-                  ? const SizedBox(
-                      width: 16,
-                      height: 16,
+                  ? SizedBox(
+                      width: 20,
+                      height: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : const Icon(Icons.send),
-              label: Text(_isSubmitting ? 'Submitting...' : 'Submit Order'),
+                  : Icon(Icons.send, size: 24),
+              label: Text(
+                _isSubmitting ? 'Submitting...' : 'Submit Order',
+                style: TextStyle(
+                  fontSize: 16, 
+                  fontWeight: FontWeight.bold
+                ),
+              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                minimumSize: const Size(120, 56),
               ),
             ),
           ),
@@ -754,12 +873,19 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
                   ),
                 );
               },
-              icon: const Icon(Icons.call_split),
-              label: const Text('Split Bill'),
+              icon: Icon(Icons.call_split, size: 24),
+              label: Text('Split Bill', style: TextStyle(
+                fontSize: 16, 
+                fontWeight: FontWeight.bold
+              )),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.secondary,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                minimumSize: const Size(120, 56),
               ),
             ),
           ),

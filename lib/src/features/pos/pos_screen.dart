@@ -11,7 +11,9 @@ import 'package:white_label_pos_mobile/src/features/auth/auth_provider.dart';
 import 'package:white_label_pos_mobile/src/features/auth/models/user.dart';
 import '../../core/theme/app_theme.dart';
 import '../../shared/widgets/theme_toggle_button.dart';
+import '../../shared/widgets/app_image.dart';
 import '../../core/services/navigation_service.dart';
+
 
 class PosScreen extends ConsumerStatefulWidget {
   const PosScreen({super.key});
@@ -707,48 +709,44 @@ class _MenuItemCard extends StatelessWidget {
         )),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: EdgeInsets.all(16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Item image placeholder (fixed height)
-              Container(
-                height: 40,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  Icons.restaurant,
-                  size: 32,
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
+              // Item image
+              AppThumbnail(
+                imageUrl: item.image,
+                size: 80,
+                borderRadius: 8,
+                fallbackIcon: Icons.restaurant,
+                backgroundColor: theme.colorScheme.surfaceContainerHighest,
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               // Item name
               Text(
                 item.name,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
               // Item description
               if (item.description.isNotEmpty) ...[
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 Text(
                   item.description,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
+                    fontSize: 14,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               // Price and add button
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -758,6 +756,7 @@ class _MenuItemCard extends StatelessWidget {
                     style: theme.textTheme.titleMedium?.copyWith(
                       color: theme.colorScheme.primary,
                       fontWeight: FontWeight.bold,
+                      fontSize: 16,
                     ),
                   ),
                   ElevatedButton.icon(
@@ -769,15 +768,19 @@ class _MenuItemCard extends StatelessWidget {
                       imageUrl: item.image,
                       category: item.categoryId.toString(),
                     )),
-                    icon: const Icon(Icons.add_circle, size: 20),
-                    label: const Text('Add to Cart', style: TextStyle(fontSize: 16)),
+                    icon: Icon(Icons.add_circle, size: 20),
+                    label: Text('Add to Cart', style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold
+                    )),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.orange,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      minimumSize: Size(120, 48),
                       textStyle: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -1002,18 +1005,13 @@ class _CartItemTile extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         child: Row(
           children: [
-            // Item image placeholder
-            Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                Icons.restaurant,
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+            // Item image
+            AppThumbnail(
+              imageUrl: item.imageUrl,
+              size: 50,
+              borderRadius: 8,
+              fallbackIcon: Icons.restaurant,
+              backgroundColor: theme.colorScheme.surfaceContainerHighest,
             ),
             const SizedBox(width: 12),
             

@@ -4,6 +4,7 @@ import 'package:white_label_pos_mobile/src/features/inventory/inventory_provider
 import 'package:white_label_pos_mobile/src/features/inventory/models/inventory_item.dart';
 import '../../core/theme/app_theme.dart';
 import '../../shared/widgets/theme_toggle_button.dart';
+import '../../shared/widgets/app_image.dart';
 
 class InventoryScreen extends ConsumerStatefulWidget {
   const InventoryScreen({super.key});
@@ -265,12 +266,12 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: ListTile(
-        leading: CircleAvatar(
+        leading: AppAvatar(
+          imageUrl: item.imageUrl,
+          size: 40,
           backgroundColor: _getStockColor(item),
-          child: Text(
-            item.name[0].toUpperCase(),
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          ),
+          fallbackIcon: Icons.inventory,
+          fallbackIconColor: Colors.white,
         ),
         title: Text(
           item.name,

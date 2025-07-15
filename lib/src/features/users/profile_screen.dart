@@ -7,6 +7,7 @@ import 'package:white_label_pos_mobile/src/shared/widgets/loading_widget.dart';
 import 'package:white_label_pos_mobile/src/shared/widgets/error_widget.dart';
 import 'package:white_label_pos_mobile/src/core/config/env_config.dart';
 import '../../shared/widgets/theme_toggle_button.dart';
+import '../../shared/widgets/app_image.dart';
 
 
 class ProfileScreen extends ConsumerStatefulWidget {
@@ -140,10 +141,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                CircleAvatar(
-                  radius: 40,
+                AppAvatar(
+                  imageUrl: null, // Auth user model doesn't have avatarUrl
+                  size: 80,
                   backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
-                  child: Icon(Icons.person, size: 48, color: theme.colorScheme.primary),
+                  fallbackIcon: Icons.person,
+                  fallbackIconColor: theme.colorScheme.primary,
                 ),
                 const SizedBox(height: 16),
                 if (!_editing) ...[

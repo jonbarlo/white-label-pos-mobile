@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'business_provider.dart';
 import 'models/business.dart';
 import '../../shared/widgets/theme_toggle_button.dart';
+import '../../shared/widgets/app_image.dart';
 
 class BusinessListScreen extends ConsumerWidget {
   const BusinessListScreen({super.key});
@@ -94,12 +95,12 @@ class BusinessListScreen extends ConsumerWidget {
         return Card(
           margin: const EdgeInsets.only(bottom: 12),
           child: ListTile(
-            leading: CircleAvatar(
+            leading: AppAvatar(
+              imageUrl: business.logo,
+              size: 40,
               backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-              child: Text(
-                businessType.icon,
-                style: const TextStyle(fontSize: 20),
-              ),
+              fallbackIcon: Icons.business,
+              fallbackIconColor: Theme.of(context).colorScheme.onPrimaryContainer,
             ),
             title: Text(
               business.name,
