@@ -44,6 +44,13 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
         foregroundColor: Colors.white,
         elevation: 0,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              ref.invalidate(tablesProvider);
+            },
+            tooltip: 'Refresh Tables',
+          ),
           Consumer(
             builder: (context, ref, child) {
               final themeMode = ref.watch(themeModeProvider);
@@ -882,20 +889,25 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
         );
         
       case waiter_table.TableStatus.occupied:
+        // Check if table has orders to determine button text and color
+        final hasOrders = table.currentOrderId != null;
         return SizedBox(
           width: double.infinity,
           height: 24,
           child: ElevatedButton(
             onPressed: () => _onTableSelected(table),
             style: ElevatedButton.styleFrom(
-              backgroundColor: statusColor,
+              backgroundColor: hasOrders ? Colors.orange : Colors.green,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(4),
               ),
               padding: EdgeInsets.zero,
             ),
-            child: const Text('View', style: TextStyle(fontSize: 10)),
+            child: Text(
+              hasOrders ? 'Add Items' : 'Start',
+              style: const TextStyle(fontSize: 10),
+            ),
           ),
         );
         

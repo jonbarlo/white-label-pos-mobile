@@ -9,6 +9,7 @@ import '../pos/pos_provider.dart';
 import '../pos/split_payment_dialog.dart';
 import '../auth/auth_provider.dart';
 import 'waiter_order_provider.dart' as waiter_order;
+import 'table_provider.dart';
 import 'package:another_flushbar/flushbar.dart';
 import '../../core/services/navigation_service.dart';
 
@@ -56,8 +57,16 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
         elevation: 2,
         backgroundColor: theme.colorScheme.primary,
         foregroundColor: theme.colorScheme.onPrimary,
-        actions: const [
-          ThemeToggleButton(),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              ref.invalidate(waiter_order.tableOrdersProvider(widget.table.id));
+              ref.invalidate(waiter_order.mergedTableOrdersProvider(widget.table.id));
+            },
+            tooltip: 'Refresh Orders',
+          ),
+          const ThemeToggleButton(),
         ],
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -1004,6 +1013,14 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
           items: _cartItems,
         )).future);
         
+        // Refresh the order data after adding items
+        await Future.delayed(const Duration(milliseconds: 500)); // Give backend time to process
+        ref.invalidate(waiter_order.tableOrdersProvider(widget.table.id));
+        ref.invalidate(waiter_order.mergedTableOrdersProvider(widget.table.id));
+        // Refresh table data to update status and order info
+        ref.invalidate(tableProvider);
+        ref.invalidate(tablesProvider);
+        
       } else {
         // Create new order
         
@@ -1017,11 +1034,19 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
           total: _getTotal(),
         )).future);
 
+        // Refresh the order data after creating new order
+        await Future.delayed(const Duration(milliseconds: 500)); // Give backend time to process
+        ref.invalidate(waiter_order.tableOrdersProvider(widget.table.id));
+        ref.invalidate(waiter_order.mergedTableOrdersProvider(widget.table.id));
+        // Refresh table data to update status and order info
+        ref.invalidate(tableProvider);
+        ref.invalidate(tablesProvider);
       }
 
-      // Reset loading state
+      // Reset loading state and clear cart
       setState(() {
         _isSubmitting = false;
+        _cartItems.clear(); // Clear the cart after successful submission
       });
 
       // Show success message (Flutter convention)
