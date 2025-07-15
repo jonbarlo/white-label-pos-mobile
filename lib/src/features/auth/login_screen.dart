@@ -106,6 +106,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
+    final isWideScreen = MediaQuery.of(context).size.width > 800;
 
     // Show error dialog when login fails
     if (authState.status == AuthStatus.error && authState.errorMessage != null) {
@@ -118,7 +119,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                // Clear the error state after showing dialog
                 ref.read(authNotifierProvider.notifier).clearError();
               },
               child: const Text('OK'),
@@ -129,6 +129,187 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
 
     return Scaffold(
+      body: isWideScreen ? _buildWideLayout(context) : _buildMobileLayout(context),
+    );
+  }
+
+  Widget _buildWideLayout(BuildContext context) {
+    return Row(
+      children: [
+        // Left side - Illustration
+        Expanded(
+          flex: 1,
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                  Theme.of(context).colorScheme.secondary.withValues(alpha: 0.05),
+                ],
+              ),
+            ),
+            child: Stack(
+              children: [
+                // Background decorative elements
+                Positioned(
+                  top: 50,
+                  right: 50,
+                  child: Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  bottom: 100,
+                  left: 30,
+                  child: Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
+                    ),
+                  ),
+                ),
+                // Main illustration
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // POS illustration
+                      Container(
+                        width: 300,
+                        height: 200,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.1),
+                              blurRadius: 20,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                        ),
+                        child: Stack(
+                          children: [
+                            // Counter/desk
+                            Positioned(
+                              bottom: 40,
+                              left: 20,
+                              right: 20,
+                              child: Container(
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              ),
+                            ),
+                            // Staff figure
+                            Positioned(
+                              bottom: 50,
+                              left: 50,
+                              child: Container(
+                                width: 40,
+                                height: 60,
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.secondary,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: const Icon(
+                                  Icons.person,
+                                  color: Colors.white,
+                                  size: 24,
+                                ),
+                              ),
+                            ),
+                            // Customer figure
+                            Positioned(
+                              bottom: 50,
+                              right: 50,
+                              child: Container(
+                                width: 40,
+                                height: 60,
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: const Icon(
+                                  Icons.person_outline,
+                                  color: Colors.white,
+                                  size: 24,
+                                ),
+                              ),
+                            ),
+                            // Plant decoration
+                            Positioned(
+                              top: 20,
+                              right: 20,
+                              child: Container(
+                                width: 30,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: Colors.green.withValues(alpha: 0.3),
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                child: const Icon(
+                                  Icons.local_florist,
+                                  color: Colors.green,
+                                  size: 20,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 40),
+                      Text(
+                        'Welcome to White Label POS',
+                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Your complete point of sale solution\nfor modern businesses',
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+                // Theme toggle in top right
+                Positioned(
+                  top: 20,
+                  right: 20,
+                  child: const ThemeToggleButton(),
+                ),
+              ],
+            ),
+          ),
+        ),
+        // Right side - Login form
+        Expanded(
+          flex: 1,
+          child: _buildLoginForm(context),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMobileLayout(BuildContext context) {
+    return Scaffold(
       appBar: AppBar(
         title: const Text('Login'),
         centerTitle: true,
@@ -136,54 +317,119 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ThemeToggleButton(),
         ],
       ),
-      body: Semantics(
-        label: 'Login form',
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
+      body: _buildLoginForm(context),
+    );
+  }
+
+  Widget _buildLoginForm(BuildContext context) {
+    final authState = ref.watch(authNotifierProvider);
+    
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24.0),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 400),
           child: Form(
             key: _formKey,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Logo or Brand
-                Semantics(
-                  label: 'Point of sale system logo',
-                  excludeSemantics: true,
-                  child: Icon(
-                    Icons.point_of_sale,
-                    size: 80,
-                    color: Theme.of(context).colorScheme.primary,
+                // Logo
+                Icon(
+                  Icons.point_of_sale,
+                  size: 60,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(height: 24),
+                
+                // Welcome text
+                Text(
+                  'Welcome Back :)',
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
                   ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'To keep connected with us please login with your personal information',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
+                  textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 32),
                 
                 // Business Slug Field
-                Semantics(
-                  label: 'Business slug input field',
-                  textField: true,
-                  child: TextFormField(
-                    key: const Key('business_slug_field'),
-                    controller: _businessSlugController,
-                    decoration: const InputDecoration(
-                      labelText: 'Business Slug',
-                      hintText: 'Enter your business slug',
-                      prefixIcon: Icon(Icons.business),
+                TextFormField(
+                  controller: _businessSlugController,
+                  decoration: InputDecoration(
+                    labelText: 'Business Slug',
+                    hintText: 'Enter your business slug',
+                    prefixIcon: const Icon(Icons.business),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    validator: AuthValidators.validateBusinessSlug,
-                    textInputAction: TextInputAction.next,
-                    autofillHints: const [AutofillHints.organizationName],
+                    filled: true,
+                    fillColor: Theme.of(context).colorScheme.surface,
                   ),
+                  validator: AuthValidators.validateBusinessSlug,
+                  textInputAction: TextInputAction.next,
                 ),
                 const SizedBox(height: 16),
+
+                // Email Field
+                TextFormField(
+                  controller: _emailController,
+                  decoration: InputDecoration(
+                    labelText: 'Email Address',
+                    hintText: 'Enter your email',
+                    prefixIcon: const Icon(Icons.email),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    filled: true,
+                    fillColor: Theme.of(context).colorScheme.surface,
+                  ),
+                  validator: AuthValidators.validateEmail,
+                  textInputAction: TextInputAction.next,
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                const SizedBox(height: 16),
+
+                // Password Field
+                TextFormField(
+                  controller: _passwordController,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    hintText: 'Enter your password',
+                    prefixIcon: const Icon(Icons.lock),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    filled: true,
+                    fillColor: Theme.of(context).colorScheme.surface,
+                  ),
+                  validator: AuthValidators.validatePassword,
+                  textInputAction: TextInputAction.done,
+                  obscureText: true,
+                  onFieldSubmitted: (_) => _handleLogin(),
+                ),
+                const SizedBox(height: 24),
 
                 // Test User Dropdown (for prototype, only in debug mode)
                 if (EnvConfig.isDebugMode) ...[
                   DropdownButtonFormField<String>(
                     value: _selectedTestUserLabel,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Quick Login (Test User)',
-                      prefixIcon: Icon(Icons.person),
+                      prefixIcon: const Icon(Icons.person),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      filled: true,
+                      fillColor: Theme.of(context).colorScheme.surface,
                     ),
                     items: _testUsers.map((user) => DropdownMenuItem<String>(
                       value: user['label'],
@@ -203,72 +449,37 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const SizedBox(height: 16),
                 ],
 
-                // Email Field
-                Semantics(
-                  label: 'Email address input field',
-                  textField: true,
-                  child: TextFormField(
-                    key: const Key('email_field'),
-                    controller: _emailController,
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                      hintText: 'Enter your email',
-                      prefixIcon: Icon(Icons.email),
-                    ),
-                    keyboardType: TextInputType.emailAddress,
-                    validator: AuthValidators.validateEmail,
-                    textInputAction: TextInputAction.next,
-                    autofillHints: const [AutofillHints.email],
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Password Field
-                Semantics(
-                  label: 'Password input field',
-                  textField: true,
-                  child: TextFormField(
-                    key: const Key('password_field'),
-                    controller: _passwordController,
-                    decoration: const InputDecoration(
-                      labelText: 'Password',
-                      hintText: 'Enter your password',
-                      prefixIcon: Icon(Icons.lock),
-                    ),
-                    obscureText: true,
-                    validator: AuthValidators.validatePassword,
-                    textInputAction: TextInputAction.done,
-                    onFieldSubmitted: (_) => _handleLogin(),
-                    autofillHints: const [AutofillHints.password],
-                  ),
-                ),
-                const SizedBox(height: 24),
-
                 // Login Button
-                Semantics(
-                  label: authState.status == AuthStatus.loading 
-                      ? 'Logging in, please wait'
-                      : 'Login to your account',
-                  button: true,
-                  enabled: authState.status != AuthStatus.loading,
-                  child: ElevatedButton(
-                    onPressed: authState.status == AuthStatus.loading ? null : () {
-                      debugPrint('🔵 LoginScreen: Login button pressed');
-                      _handleLogin();
-                    },
-                    style: AppTheme.neutralButtonStyle,
-                    child: authState.status == AuthStatus.loading
-                        ? Semantics(
-                            label: 'Loading indicator',
-                            excludeSemantics: true,
-                            child: const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            ),
-                          )
-                        : const Text('Login'),
+                ElevatedButton(
+                  onPressed: authState.status == AuthStatus.loading ? null : () {
+                    debugPrint('🔵 LoginScreen: Login button pressed');
+                    _handleLogin();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 2,
                   ),
+                  child: authState.status == AuthStatus.loading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : const Text(
+                          'Login Now',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                 ),
               ],
             ),
