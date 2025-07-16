@@ -5,6 +5,7 @@ import 'models/cart_item.dart';
 import 'models/sale.dart';
 import 'models/menu_item.dart';
 import 'models/split_payment.dart';
+import 'models/analytics.dart';
 import '../../core/network/dio_client.dart';
 import '../auth/auth_provider.dart';
 import '../waiter/table_provider.dart';
@@ -134,9 +135,31 @@ class RecentSalesNotifier extends _$RecentSalesNotifier {
   Future<void> loadRecentSales({int limit = 10}) async {
     try {
       final repository = await ref.read(posRepositoryProvider.future);
+      
+      // First get the basic sales list
       final sales = await repository.getRecentSales(limit: limit);
-      state = sales;
+      
+      // Then fetch each sale with its items
+      final salesWithItems = <Sale>[];
+      for (final sale in sales) {
+        try {
+          final saleWithItems = await repository.getSaleWithItems(sale.id);
+          if (saleWithItems != null) {
+            salesWithItems.add(saleWithItems);
+          } else {
+            // Fallback to the original sale if fetching with items fails
+            salesWithItems.add(sale);
+          }
+        } catch (e) {
+          print('Error fetching sale ${sale.id} with items: $e');
+          // Fallback to the original sale
+          salesWithItems.add(sale);
+        }
+      }
+      
+      state = salesWithItems;
     } catch (e) {
+      print('Error loading recent sales: $e');
       // Handle error silently for now
       state = [];
     }
@@ -295,6 +318,18 @@ Future<SplitBillingStats> getSplitBillingStats(GetSplitBillingStatsRef ref) asyn
 Future<List<MenuItem>> menuItems(MenuItemsRef ref) async {
   
   try {
+    // Check auth state first
+    final authState = ref.read(authNotifierProvider);
+    if (authState.status != AuthStatus.authenticated) {
+      print('🔍 menuItems provider: User not authenticated');
+      return [];
+    }
+    
+    if (authState.business?.id == null) {
+      print('🔍 menuItems provider: No business ID found');
+      return [];
+    }
+    
     final repository = await ref.read(posRepositoryProvider.future);
     
     // Fetch all available menu items using searchItems which uses _safeMenuItemFromJson
@@ -304,7 +339,7 @@ Future<List<MenuItem>> menuItems(MenuItemsRef ref) async {
     // The CartItem objects already have proper image URLs from _safeMenuItemFromJson
     final menuItems = cartItems.map((item) => MenuItem(
       id: int.parse(item.id),
-      businessId: ref.read(authNotifierProvider).business?.id ?? 1,
+      businessId: authState.business?.id ?? 1,
       categoryId: int.tryParse(item.category ?? '1') ?? 1,
       name: item.name,
       description: '', // CartItem doesn't have description, use empty string
@@ -320,15 +355,110 @@ Future<List<MenuItem>> menuItems(MenuItemsRef ref) async {
       updatedAt: DateTime.now(),
     )).toList();
     
-    print('POS menuItems provider: Created ${menuItems.length} menu items');
+    print('🔍 POS menuItems provider: Created ${menuItems.length} menu items');
     for (final item in menuItems.take(3)) {
       print('  - ${item.name}: image = ${item.image}');
     }
     
     return menuItems;
   } catch (e) {
-    print('Error in menuItems provider: $e');
+    print('🔍 Error in menuItems provider: $e');
     // Return empty list on error - NO FALLBACK ITEMS
     return [];
+  }
+}
+
+// Analytics Providers
+@riverpod
+Future<ItemAnalytics> itemAnalytics(
+  ItemAnalyticsRef ref, {
+  DateTime? startDate,
+  DateTime? endDate,
+  int? limit,
+}) async {
+  try {
+    final repository = await ref.read(posRepositoryProvider.future);
+    return await repository.getItemAnalytics(
+      startDate: startDate,
+      endDate: endDate,
+      limit: limit,
+    );
+  } catch (e) {
+    print('Error fetching item analytics: $e');
+    rethrow;
+  }
+}
+
+@riverpod
+Future<RevenueAnalytics> revenueAnalytics(
+  RevenueAnalyticsRef ref, {
+  DateTime? startDate,
+  DateTime? endDate,
+  String? period,
+}) async {
+  try {
+    final repository = await ref.read(posRepositoryProvider.future);
+    return await repository.getRevenueAnalytics(
+      startDate: startDate,
+      endDate: endDate,
+      period: period,
+    );
+  } catch (e) {
+    print('Error fetching revenue analytics: $e');
+    rethrow;
+  }
+}
+
+@riverpod
+Future<StaffAnalytics> staffAnalytics(
+  StaffAnalyticsRef ref, {
+  DateTime? startDate,
+  DateTime? endDate,
+  int? limit,
+}) async {
+  try {
+    final repository = await ref.read(posRepositoryProvider.future);
+    return await repository.getStaffAnalytics(
+      startDate: startDate,
+      endDate: endDate,
+      limit: limit,
+    );
+  } catch (e) {
+    print('Error fetching staff analytics: $e');
+    rethrow;
+  }
+}
+
+@riverpod
+Future<CustomerAnalytics> customerAnalytics(
+  CustomerAnalyticsRef ref, {
+  DateTime? startDate,
+  DateTime? endDate,
+  int? limit,
+}) async {
+  try {
+    final repository = await ref.read(posRepositoryProvider.future);
+    return await repository.getCustomerAnalytics(
+      startDate: startDate,
+      endDate: endDate,
+      limit: limit,
+    );
+  } catch (e) {
+    print('Error fetching customer analytics: $e');
+    rethrow;
+  }
+}
+
+@riverpod
+Future<InventoryAnalytics> inventoryAnalytics(
+  InventoryAnalyticsRef ref, {
+  int? limit,
+}) async {
+  try {
+    final repository = await ref.read(posRepositoryProvider.future);
+    return await repository.getInventoryAnalytics(limit: limit);
+  } catch (e) {
+    print('Error fetching inventory analytics: $e');
+    rethrow;
   }
 } 

@@ -56,6 +56,17 @@ Future<List<Map<String, dynamic>>> detailedTransactions(
 }
 
 @riverpod
+Future<Map<String, dynamic>> saleWithItems(
+  SaleWithItemsRef ref, {
+  required String saleId,
+}) async {
+  final repository = ref.watch(reportsRepositoryProvider);
+  return await repository.getSaleWithItems(
+    saleId: saleId,
+  );
+}
+
+@riverpod
 Future<Map<String, dynamic>> inventoryReport(InventoryReportRef ref) async {
   final repository = ref.watch(reportsRepositoryProvider);
   return await repository.getInventoryReport();
@@ -102,6 +113,33 @@ Future<Map<String, dynamic>> customerAnalytics(
     startDate: startDate,
     endDate: endDate,
   );
+}
+
+@riverpod
+Future<Map<String, dynamic>> salesSummary(
+  SalesSummaryRef ref, {
+  required DateTime startDate,
+  required DateTime endDate,
+}) async {
+  final repository = ref.watch(reportsRepositoryProvider);
+  final transactions = await repository.getDetailedTransactions(
+    startDate: startDate,
+    endDate: endDate,
+    status: 'completed',
+  );
+  
+  double totalSales = 0.0;
+  int totalTransactions = transactions.length;
+  
+  for (final transaction in transactions) {
+    totalSales += (transaction['totalAmount'] as num?)?.toDouble() ?? 0.0;
+  }
+  
+  return {
+    'totalSales': totalSales,
+    'totalTransactions': totalTransactions,
+    'averageTransaction': totalTransactions > 0 ? totalSales / totalTransactions : 0.0,
+  };
 }
 
 @riverpod

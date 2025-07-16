@@ -312,6 +312,30 @@ class _PosScreenState extends ConsumerState<PosScreen>
     final userRole = authState.user?.role;
     final canSeeReportsTab = userRole == UserRole.admin || userRole == UserRole.manager;
 
+    // Debug: Print auth state to help identify issues
+    print('🔍 POS Screen Build - Auth State: ${authState.status}');
+    print('🔍 POS Screen Build - User: ${authState.user?.id}');
+    print('🔍 POS Screen Build - Business: ${authState.business?.id}');
+    print('🔍 POS Screen Build - Menu Items Async: ${menuItemsAsync.toString()}');
+
+    // Handle error states gracefully
+    if (authState.status == AuthStatus.unauthenticated) {
+      return const Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.error_outline, size: 64, color: Colors.red),
+              SizedBox(height: 16),
+              Text('Authentication Error', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              SizedBox(height: 8),
+              Text('Please log in again'),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       body: Column(
@@ -2190,11 +2214,14 @@ class _CheckoutDialog extends StatefulWidget {
 }
 
 class _CheckoutDialogState extends State<_CheckoutDialog> {
-  late PaymentMethod _selectedMethod;
+  PaymentMethod _selectedMethod;
+  String? _selectedCustomerId;
   String? _selectedCustomerName;
   String? _selectedCustomerEmail;
-  int? _selectedCustomerId;
   bool _isLoading = false;
+  bool _dialogClosed = false; // Add flag to prevent multiple closes
+
+  _CheckoutDialogState() : _selectedMethod = PaymentMethod.cash;
 
   @override
   void initState() {
@@ -2243,12 +2270,20 @@ class _CheckoutDialogState extends State<_CheckoutDialog> {
       return;
     }
 
+    if (_dialogClosed) return; // Prevent multiple calls
+
     setState(() {
       _isLoading = true;
     });
 
     try {
       await widget.onCompleteSale(_selectedCustomerName!, _selectedCustomerEmail ?? '');
+      
+      // Close dialog only once
+      if (mounted && !_dialogClosed) {
+        _dialogClosed = true;
+        NavigationService.goBack(context);
+      }
     } finally {
       if (mounted) {
         setState(() {

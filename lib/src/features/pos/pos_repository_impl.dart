@@ -5,6 +5,7 @@ import 'models/cart_item.dart';
 import 'models/sale.dart';
 import 'models/menu_item.dart';
 import 'models/split_payment.dart';
+import 'models/analytics.dart';
 
 import '../../core/config/env_config.dart';
 import '../auth/auth_provider.dart';
@@ -32,9 +33,17 @@ class PosRepositoryImpl implements PosRepository {
         handler.next(options);
       },
       onError: (error, handler) {
+        // Only logout on 401 errors for specific endpoints that require authentication
+        // Don't logout for sales creation as it might be a temporary issue
         if (error.response?.statusCode == 401) {
-          // Handle unauthorized - could trigger logout
-          _ref.read(authNotifierProvider.notifier).logout();
+          final requestPath = error.requestOptions.path;
+          // Only logout for sensitive operations, not for sales creation
+          if (!requestPath.contains('/sales/') && !requestPath.contains('/menu/')) {
+            print('🔍 POS Repository: 401 error on $requestPath, logging out');
+            _ref.read(authNotifierProvider.notifier).logout();
+          } else {
+            print('🔍 POS Repository: 401 error on $requestPath, but not logging out (sales/menu operation)');
+          }
         }
         handler.next(error);
       },
@@ -131,7 +140,10 @@ class PosRepositoryImpl implements PosRepository {
     String? customerEmail,
   }) async {
     try {
+      print('🔍 POS Repository: Creating sale with ${items.length} items');
       final authState = _ref.read(authNotifierProvider);
+      
+      print('🔍 POS Repository: Auth state - Status: ${authState.status}, User: ${authState.user?.id}, Business: ${authState.business?.id}');
       
       final businessId = authState.business?.id;
       if (businessId == null) {
@@ -186,6 +198,7 @@ class PosRepositoryImpl implements PosRepository {
             receiptNumber: saleObj['orderNumber'] ?? 'SALE-${DateTime.now().millisecondsSinceEpoch}',
           );
           
+          print('🔍 POS Repository: Sale created successfully - ID: ${sale.id}, Total: ${sale.total}');
           return sale;
         } else {
           throw Exception(responseData['message'] ?? 'Failed to create sale');
@@ -207,8 +220,19 @@ class PosRepositoryImpl implements PosRepository {
         'order': 'desc',
       });
 
-      if (response.statusCode == 200 && response.data['success'] == true) {
-        final List<dynamic> sales = response.data['data'] ?? [];
+      if (response.statusCode == 200) {
+        // Handle both response formats: direct array or wrapped response
+        List<dynamic> sales;
+        if (response.data is List) {
+          // Direct array format as per API docs
+          sales = response.data as List<dynamic>;
+        } else if (response.data is Map && response.data['success'] == true) {
+          // Wrapped response format
+          sales = response.data['data'] ?? [];
+        } else {
+          sales = [];
+        }
+        
         return sales.map((sale) => _convertApiSaleToSale(sale)).toList();
       }
       
@@ -219,22 +243,136 @@ class PosRepositoryImpl implements PosRepository {
   }
 
   @override
+  Future<Sale?> getSaleWithItems(String saleId) async {
+    try {
+      final response = await _dio.get('/sales/$saleId/with-items');
+
+      if (response.statusCode == 200) {
+        final saleData = response.data;
+        
+        // Convert saleItems to CartItems
+        List<CartItem> items = [];
+        if (saleData['saleItems'] != null) {
+          final saleItems = saleData['saleItems'] as List<dynamic>;
+          items = saleItems.map((item) {
+            final itemData = item['item'] as Map<String, dynamic>;
+            return CartItem(
+              id: itemData['id'].toString(),
+              name: itemData['name'] ?? 'Unknown Item',
+              price: (item['unitPrice'] as num?)?.toDouble() ?? 0.0,
+              quantity: item['quantity'] as int? ?? 1,
+              imageUrl: itemData['imageUrl'],
+              category: itemData['category']?.toString() ?? '1',
+            );
+          }).toList();
+        }
+
+        // Handle receipt number - try different possible field names
+        final receiptNumber = saleData['saleNumber'] ?? 
+                             saleData['orderNumber'] ?? 
+                             saleData['receiptNumber'] ?? 
+                             'SALE-$saleId';
+        
+        // Handle payment method mapping
+        final paymentMethodStr = saleData['paymentMethod']?.toString().toLowerCase() ?? 'cash';
+        PaymentMethod paymentMethod;
+        switch (paymentMethodStr) {
+          case 'card':
+          case 'credit_card':
+            paymentMethod = PaymentMethod.card;
+            break;
+          case 'mobile':
+          case 'mobile_payment':
+            paymentMethod = PaymentMethod.mobile;
+            break;
+          case 'check':
+            paymentMethod = PaymentMethod.check;
+            break;
+          default:
+            paymentMethod = PaymentMethod.cash;
+        }
+
+        return Sale(
+          id: saleData['id'].toString(),
+          items: items,
+          total: (saleData['totalAmount'] as num?)?.toDouble() ?? 0.0,
+          paymentMethod: paymentMethod,
+          createdAt: DateTime.parse(saleData['createdAt']),
+          customerName: saleData['customerName'] ?? 'Guest',
+          customerEmail: saleData['customerEmail'] ?? 'guest@pos.com',
+          receiptNumber: receiptNumber,
+          status: saleData['status'],
+        );
+      }
+      
+      return null;
+    } catch (e) {
+      print('Error fetching sale with items: $e');
+      return null;
+    }
+  }
+
+  @override
   Future<Map<String, dynamic>> getSalesSummary({
     required DateTime startDate,
     required DateTime endDate,
   }) async {
     try {
-      final response = await _dio.get('/sales/summary', queryParameters: {
-        'startDate': startDate.toIso8601String(),
-        'endDate': endDate.toIso8601String(),
+      // Use /sales endpoint with date filters to get sales for the period
+      final startDateStr = startDate.toIso8601String().split('T')[0]; // YYYY-MM-DD format
+      final endDateStr = endDate.toIso8601String().split('T')[0]; // YYYY-MM-DD format
+      
+      print('🔵 POS Repository: Getting sales summary from $startDateStr to $endDateStr');
+      
+      final response = await _dio.get('/sales', queryParameters: {
+        'startDate': startDateStr,
+        'endDate': endDateStr,
+        'status': 'completed',
+        'limit': 1000, // Get all sales for the period
       });
 
-      if (response.statusCode == 200 && response.data['success'] == true) {
-        return response.data['data'] ?? {};
+      print('🔵 POS Repository: Sales summary API response status: ${response.statusCode}');
+      print('🔵 POS Repository: Sales summary API response data length: ${response.data is List ? (response.data as List).length : 'not a list'}');
+
+      if (response.statusCode == 200) {
+        // Handle both response formats: direct array or wrapped response
+        List<dynamic> sales;
+        if (response.data is List) {
+          // Direct array format as per API docs
+          sales = response.data as List<dynamic>;
+        } else if (response.data is Map && response.data['success'] == true) {
+          // Wrapped response format
+          sales = response.data['data'] ?? [];
+        } else {
+          sales = [];
+        }
+        
+        print('🔵 POS Repository: Found ${sales.length} sales for the period');
+        
+        // Calculate summary from sales data
+        double totalSales = 0.0;
+        int totalTransactions = sales.length;
+        
+        for (final sale in sales) {
+          final saleAmount = (sale['totalAmount'] as num?)?.toDouble() ?? 0.0;
+          totalSales += saleAmount;
+          print('🔵 POS Repository: Sale ${sale['id']} amount: $saleAmount');
+        }
+        
+        final summary = {
+          'totalSales': totalSales,
+          'totalTransactions': totalTransactions,
+          'averageOrderValue': totalTransactions > 0 ? totalSales / totalTransactions : 0.0,
+        };
+        
+        print('🔵 POS Repository: Calculated summary: $summary');
+        return summary;
       }
       
-      return {};
+      print('🔵 POS Repository: API error, returning default summary');
+      return {'totalSales': 0.0, 'totalTransactions': 0, 'averageOrderValue': 0.0};
     } catch (e) {
+      print('🔵 POS Repository: Error getting sales summary: $e');
       throw Exception('Failed to get sales summary: $e');
     }
   }
@@ -393,19 +531,41 @@ class PosRepositoryImpl implements PosRepository {
     // Debug output for total fields
     final totalValue = (apiSale['finalAmount'] ?? apiSale['totalAmount'] ?? apiSale['total'] ?? 0.0);
     final total = (totalValue is num) ? totalValue.toDouble() : double.tryParse(totalValue.toString()) ?? 0.0;
-    // This is a simplified conversion - you might need to fetch order items separately
+    
+    // Handle receipt number - try different possible field names
+    final receiptNumber = apiSale['orderNumber'] ?? 
+                         apiSale['receiptNumber'] ?? 
+                         apiSale['saleNumber'] ?? 
+                         'SALE-${apiSale['id']}';
+    
+    // Handle payment method mapping
+    final paymentMethodStr = apiSale['paymentMethod']?.toString().toLowerCase() ?? 'cash';
+    PaymentMethod paymentMethod;
+    switch (paymentMethodStr) {
+      case 'card':
+      case 'credit_card':
+        paymentMethod = PaymentMethod.card;
+        break;
+      case 'mobile':
+      case 'mobile_payment':
+        paymentMethod = PaymentMethod.mobile;
+        break;
+      case 'check':
+        paymentMethod = PaymentMethod.check;
+        break;
+      default:
+        paymentMethod = PaymentMethod.cash;
+    }
+    
     return Sale(
       id: apiSale['id'].toString(),
-      items: [], // Would need to fetch order items
+      items: null, // Items will be fetched separately using getSaleWithItems
       total: total,
-      paymentMethod: PaymentMethod.values.firstWhere(
-        (e) => e.name == apiSale['paymentMethod'],
-        orElse: () => PaymentMethod.cash,
-      ),
+      paymentMethod: paymentMethod,
       createdAt: DateTime.parse(apiSale['createdAt']),
-      customerName: apiSale['customerName'],
-      customerEmail: apiSale['customerEmail'],
-      receiptNumber: apiSale['orderNumber'],
+      customerName: apiSale['customerName'] ?? 'Guest',
+      customerEmail: apiSale['customerEmail'] ?? 'guest@pos.com',
+      receiptNumber: receiptNumber,
     );
   }
 
@@ -470,6 +630,354 @@ class PosRepositoryImpl implements PosRepository {
       }
     } catch (e) {
       throw Exception('Failed to get split billing stats: $e');
+    }
+  }
+
+  // Analytics implementations
+  @override
+  Future<ItemAnalytics> getItemAnalytics({
+    DateTime? startDate,
+    DateTime? endDate,
+    int? limit,
+  }) async {
+    try {
+      final queryParams = <String, dynamic>{};
+      if (startDate != null) {
+        queryParams['startDate'] = startDate.toIso8601String().split('T')[0];
+      }
+      if (endDate != null) {
+        queryParams['endDate'] = endDate.toIso8601String().split('T')[0];
+      }
+      if (limit != null) {
+        queryParams['limit'] = limit;
+      }
+
+      print('🔍 ANALYTICS DEBUG: Calling item analytics endpoint');
+      print('🔍 ANALYTICS DEBUG: Base URL: ${_dio.options.baseUrl}');
+      print('🔍 ANALYTICS DEBUG: Full URL: ${_dio.options.baseUrl}/sales/analytics/items');
+      print('🔍 ANALYTICS DEBUG: Query parameters: $queryParams');
+      print('🔍 ANALYTICS DEBUG: Headers: ${_dio.options.headers}');
+      
+      final response = await _dio.get('/sales/analytics/items', queryParameters: queryParams);
+      
+      print('🔍 ANALYTICS DEBUG: Response status: ${response.statusCode}');
+      print('🔍 ANALYTICS DEBUG: Response headers: ${response.headers}');
+      print('🔍 ANALYTICS DEBUG: Response data: ${response.data}');
+
+      if (response.statusCode == 200) {
+        final responseData = response.data;
+        print('🔍 ANALYTICS DEBUG: Raw item analytics response: $responseData');
+        
+        // The API returns a different structure than expected
+        // It has topSellers, worstSellers, and summary directly
+        if (responseData != null) {
+          final topSellers = responseData['topSellers'] as List<dynamic>? ?? [];
+          final worstSellers = responseData['worstSellers'] as List<dynamic>? ?? [];
+          final summary = responseData['summary'] as Map<String, dynamic>? ?? {};
+          
+          final transformedData = {
+            'topSellers': topSellers.map((item) => {
+              'itemId': item['itemId'] ?? 0,
+              'itemName': item['itemName'] ?? '',
+              'quantitySold': item['totalQuantity'] ?? 0,
+              'totalRevenue': (item['totalRevenue'] ?? 0.0).toDouble(),
+              'averagePrice': (item['averagePrice'] ?? 0.0).toDouble(),
+            }).toList(),
+            'worstSellers': worstSellers.map((item) => {
+              'itemId': item['itemId'] ?? 0,
+              'itemName': item['itemName'] ?? '',
+              'quantitySold': item['totalQuantity'] ?? 0,
+              'totalRevenue': (item['totalRevenue'] ?? 0.0).toDouble(),
+              'averagePrice': (item['averagePrice'] ?? 0.0).toDouble(),
+            }).toList(),
+            'profitMargins': topSellers.map((item) => {
+              'itemId': item['itemId'] ?? 0,
+              'itemName': item['itemName'] ?? '',
+              'cost': 0.0, // API doesn't provide cost
+              'revenue': (item['totalRevenue'] ?? 0.0).toDouble(),
+              'profitMargin': (item['profitMargin'] ?? 0.0).toDouble(),
+            }).toList(),
+            'totalItemsSold': summary['totalItemsSold'] ?? 0,
+            'totalRevenue': (summary['totalRevenue'] ?? 0.0).toDouble(),
+          };
+          
+          print('🔍 ANALYTICS DEBUG: Item analytics transformed data: $transformedData');
+          return ItemAnalytics.fromJson(transformedData);
+        }
+        print('🔍 ANALYTICS DEBUG: Item analytics response data is null');
+        return ItemAnalytics.fromJson({});
+      } else {
+        print('🔍 ANALYTICS DEBUG: Error response: ${response.statusCode} - ${response.data}');
+        throw Exception(response.data['message'] ?? 'Failed to get item analytics');
+      }
+    } catch (e) {
+      print('🔍 ANALYTICS DEBUG: Exception caught: $e');
+      print('🔍 ANALYTICS DEBUG: Exception type: ${e.runtimeType}');
+      if (e is DioException) {
+        print('🔍 ANALYTICS DEBUG: DioException details:');
+        print('  - Type: ${e.type}');
+        print('  - Message: ${e.message}');
+        print('  - Response: ${e.response?.data}');
+        print('  - Status code: ${e.response?.statusCode}');
+      }
+      throw Exception('Failed to get item analytics: $e');
+    }
+  }
+
+  @override
+  Future<RevenueAnalytics> getRevenueAnalytics({
+    DateTime? startDate,
+    DateTime? endDate,
+    String? period,
+  }) async {
+    try {
+      final queryParams = <String, dynamic>{};
+      if (startDate != null) {
+        queryParams['startDate'] = startDate.toIso8601String().split('T')[0];
+      }
+      if (endDate != null) {
+        queryParams['endDate'] = endDate.toIso8601String().split('T')[0];
+      }
+      if (period != null) {
+        queryParams['period'] = period;
+      }
+
+      print('🔍 ANALYTICS DEBUG: Calling revenue analytics endpoint');
+      print('🔍 ANALYTICS DEBUG: Base URL: ${_dio.options.baseUrl}');
+      print('🔍 ANALYTICS DEBUG: Full URL: ${_dio.options.baseUrl}/sales/analytics/revenue');
+      print('🔍 ANALYTICS DEBUG: Query parameters: $queryParams');
+      
+      final response = await _dio.get('/sales/analytics/revenue', queryParameters: queryParams);
+      
+      print('🔍 ANALYTICS DEBUG: Revenue response status: ${response.statusCode}');
+      print('🔍 ANALYTICS DEBUG: Revenue response data: ${response.data}');
+
+      if (response.statusCode == 200) {
+        final responseData = response.data;
+        print('🔍 ANALYTICS DEBUG: Raw revenue analytics response: $responseData');
+        
+        // The API returns periodData and summary directly
+        if (responseData != null) {
+          final periodData = responseData['periodData'] as List<dynamic>? ?? [];
+          final summary = responseData['summary'] as Map<String, dynamic>? ?? {};
+          
+          final transformedData = {
+            'dailyTrends': periodData.map((trend) => {
+              'period': trend['period'] ?? '',
+              'revenue': (trend['revenue'] ?? 0.0).toDouble(),
+              'orders': trend['transactions'] ?? 0,
+              'averageOrderValue': (trend['averageOrderValue'] ?? 0.0).toDouble(),
+            }).toList(),
+            'weeklyTrends': [], // API doesn't provide weekly trends separately
+            'monthlyTrends': [], // API doesn't provide monthly trends separately
+            'yearlyTrends': [], // API doesn't provide yearly trends separately
+            'totalRevenue': (summary['totalRevenue'] ?? 0.0).toDouble(),
+            'averageOrderValue': (summary['averageOrderValue'] ?? 0.0).toDouble(),
+            'totalOrders': summary['totalTransactions'] ?? 0,
+          };
+          
+          print('🔍 ANALYTICS DEBUG: Revenue analytics transformed data: $transformedData');
+          return RevenueAnalytics.fromJson(transformedData);
+        }
+        print('🔍 ANALYTICS DEBUG: Revenue analytics response data is null');
+        return RevenueAnalytics.fromJson({});
+      } else {
+        print('🔍 ANALYTICS DEBUG: Revenue error response: ${response.statusCode} - ${response.data}');
+        throw Exception(response.data['message'] ?? 'Failed to get revenue analytics');
+      }
+    } catch (e) {
+      print('🔍 ANALYTICS DEBUG: Revenue exception caught: $e');
+      if (e is DioException) {
+        print('🔍 ANALYTICS DEBUG: Revenue DioException details:');
+        print('  - Type: ${e.type}');
+        print('  - Message: ${e.message}');
+        print('  - Response: ${e.response?.data}');
+        print('  - Status code: ${e.response?.statusCode}');
+      }
+      throw Exception('Failed to get revenue analytics: $e');
+    }
+  }
+
+  @override
+  Future<StaffAnalytics> getStaffAnalytics({
+    DateTime? startDate,
+    DateTime? endDate,
+    int? limit,
+  }) async {
+    try {
+      final queryParams = <String, dynamic>{};
+      if (startDate != null) {
+        queryParams['startDate'] = startDate.toIso8601String().split('T')[0];
+      }
+      if (endDate != null) {
+        queryParams['endDate'] = endDate.toIso8601String().split('T')[0];
+      }
+      if (limit != null) {
+        queryParams['limit'] = limit;
+      }
+
+      print('🔍 ANALYTICS DEBUG: Calling staff analytics endpoint');
+      print('🔍 ANALYTICS DEBUG: Base URL: ${_dio.options.baseUrl}');
+      print('🔍 ANALYTICS DEBUG: Full URL: ${_dio.options.baseUrl}/sales/analytics/staff');
+      print('🔍 ANALYTICS DEBUG: Query parameters: $queryParams');
+      
+      final response = await _dio.get('/sales/analytics/staff', queryParameters: queryParams);
+      
+      print('🔍 ANALYTICS DEBUG: Staff response status: ${response.statusCode}');
+      print('🔍 ANALYTICS DEBUG: Staff response data: ${response.data}');
+
+      if (response.statusCode == 200) {
+        final responseData = response.data;
+        print('🔍 ANALYTICS DEBUG: Raw staff analytics response: $responseData');
+        
+        // For now, return empty data until we see the actual response structure
+        if (responseData != null) {
+          final transformedData = {
+            'topPerformers': [],
+            'allStaff': [],
+            'averageSalesPerStaff': 0.0,
+            'totalStaff': 0,
+          };
+          
+          print('🔍 ANALYTICS DEBUG: Staff analytics transformed data: $transformedData');
+          return StaffAnalytics.fromJson(transformedData);
+        }
+        print('🔍 ANALYTICS DEBUG: Staff analytics response data is null');
+        return StaffAnalytics.fromJson({});
+      } else {
+        print('🔍 ANALYTICS DEBUG: Staff error response: ${response.statusCode} - ${response.data}');
+        throw Exception(response.data['message'] ?? 'Failed to get staff analytics');
+      }
+    } catch (e) {
+      print('🔍 ANALYTICS DEBUG: Staff exception caught: $e');
+      if (e is DioException) {
+        print('🔍 ANALYTICS DEBUG: Staff DioException details:');
+        print('  - Type: ${e.type}');
+        print('  - Message: ${e.message}');
+        print('  - Response: ${e.response?.data}');
+        print('  - Status code: ${e.response?.statusCode}');
+      }
+      throw Exception('Failed to get staff analytics: $e');
+    }
+  }
+
+  @override
+  Future<CustomerAnalytics> getCustomerAnalytics({
+    DateTime? startDate,
+    DateTime? endDate,
+    int? limit,
+  }) async {
+    try {
+      final queryParams = <String, dynamic>{};
+      if (startDate != null) {
+        queryParams['startDate'] = startDate.toIso8601String().split('T')[0];
+      }
+      if (endDate != null) {
+        queryParams['endDate'] = endDate.toIso8601String().split('T')[0];
+      }
+      if (limit != null) {
+        queryParams['limit'] = limit;
+      }
+
+      print('🔍 ANALYTICS DEBUG: Calling customer analytics endpoint');
+      print('🔍 ANALYTICS DEBUG: Base URL: ${_dio.options.baseUrl}');
+      print('🔍 ANALYTICS DEBUG: Full URL: ${_dio.options.baseUrl}/sales/analytics/customers');
+      print('🔍 ANALYTICS DEBUG: Query parameters: $queryParams');
+      
+      final response = await _dio.get('/sales/analytics/customers', queryParameters: queryParams);
+      
+      print('🔍 ANALYTICS DEBUG: Customer response status: ${response.statusCode}');
+      print('🔍 ANALYTICS DEBUG: Customer response data: ${response.data}');
+
+      if (response.statusCode == 200) {
+        final responseData = response.data;
+        print('🔍 ANALYTICS DEBUG: Raw customer analytics response: $responseData');
+        
+        // For now, return empty data until we see the actual response structure
+        if (responseData != null) {
+          final transformedData = {
+            'topCustomers': [],
+            'allCustomers': [],
+            'averageCustomerSpend': 0.0,
+            'totalCustomers': 0,
+            'retentionRate': 0.0,
+          };
+          
+          print('🔍 ANALYTICS DEBUG: Customer analytics transformed data: $transformedData');
+          return CustomerAnalytics.fromJson(transformedData);
+        }
+        print('🔍 ANALYTICS DEBUG: Customer analytics response data is null');
+        return CustomerAnalytics.fromJson({});
+      } else {
+        print('🔍 ANALYTICS DEBUG: Customer error response: ${response.statusCode} - ${response.data}');
+        throw Exception(response.data['message'] ?? 'Failed to get customer analytics');
+      }
+    } catch (e) {
+      print('🔍 ANALYTICS DEBUG: Customer exception caught: $e');
+      if (e is DioException) {
+        print('🔍 ANALYTICS DEBUG: Customer DioException details:');
+        print('  - Type: ${e.type}');
+        print('  - Message: ${e.message}');
+        print('  - Response: ${e.response?.data}');
+        print('  - Status code: ${e.response?.statusCode}');
+      }
+      throw Exception('Failed to get customer analytics: $e');
+    }
+  }
+
+  @override
+  Future<InventoryAnalytics> getInventoryAnalytics({
+    int? limit,
+  }) async {
+    try {
+      final queryParams = <String, dynamic>{};
+      if (limit != null) {
+        queryParams['limit'] = limit;
+      }
+
+      print('🔍 ANALYTICS DEBUG: Calling inventory analytics endpoint');
+      print('🔍 ANALYTICS DEBUG: Base URL: ${_dio.options.baseUrl}');
+      print('🔍 ANALYTICS DEBUG: Full URL: ${_dio.options.baseUrl}/sales/analytics/inventory');
+      print('🔍 ANALYTICS DEBUG: Query parameters: $queryParams');
+      
+      final response = await _dio.get('/sales/analytics/inventory', queryParameters: queryParams);
+      
+      print('🔍 ANALYTICS DEBUG: Inventory response status: ${response.statusCode}');
+      print('🔍 ANALYTICS DEBUG: Inventory response data: ${response.data}');
+
+      if (response.statusCode == 200) {
+        final responseData = response.data;
+        print('🔍 ANALYTICS DEBUG: Raw inventory analytics response: $responseData');
+        
+        // For now, return empty data until we see the actual response structure
+        if (responseData != null) {
+          final transformedData = {
+            'lowStockItems': [],
+            'outOfStockItems': [],
+            'turnoverRates': [],
+            'totalInventoryValue': 0.0,
+            'totalItems': 0,
+          };
+          
+          print('🔍 ANALYTICS DEBUG: Inventory analytics transformed data: $transformedData');
+          return InventoryAnalytics.fromJson(transformedData);
+        }
+        print('🔍 ANALYTICS DEBUG: Inventory analytics response data is null');
+        return InventoryAnalytics.fromJson({});
+      } else {
+        print('🔍 ANALYTICS DEBUG: Inventory error response: ${response.statusCode} - ${response.data}');
+        throw Exception(response.data['message'] ?? 'Failed to get inventory analytics');
+      }
+    } catch (e) {
+      print('🔍 ANALYTICS DEBUG: Inventory exception caught: $e');
+      if (e is DioException) {
+        print('🔍 ANALYTICS DEBUG: Inventory DioException details:');
+        print('  - Type: ${e.type}');
+        print('  - Message: ${e.message}');
+        print('  - Response: ${e.response?.data}');
+        print('  - Status code: ${e.response?.statusCode}');
+      }
+      throw Exception('Failed to get inventory analytics: $e');
     }
   }
 } 

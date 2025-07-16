@@ -1,6 +1,7 @@
 import 'models/cart_item.dart';
 import 'models/sale.dart';
 import 'models/split_payment.dart';
+import 'models/analytics.dart';
 
 abstract class PosRepository {
   /// Search for items by name, SKU, or description
@@ -20,6 +21,9 @@ abstract class PosRepository {
   /// Get recent sales for the current business
   Future<List<Sale>> getRecentSales({int limit = 50});
 
+  /// Get a specific sale with its items
+  Future<Sale?> getSaleWithItems(String saleId);
+
   /// Get sales summary for a specific date range
   Future<Map<String, dynamic>> getSalesSummary({
     required DateTime startDate,
@@ -31,6 +35,40 @@ abstract class PosRepository {
 
   /// Update item stock levels after sale
   Future<void> updateStockLevels(List<CartItem> items);
+
+  // Analytics methods
+  /// Get item performance analytics
+  Future<ItemAnalytics> getItemAnalytics({
+    DateTime? startDate,
+    DateTime? endDate,
+    int? limit,
+  });
+
+  /// Get revenue analytics
+  Future<RevenueAnalytics> getRevenueAnalytics({
+    DateTime? startDate,
+    DateTime? endDate,
+    String? period,
+  });
+
+  /// Get staff performance analytics
+  Future<StaffAnalytics> getStaffAnalytics({
+    DateTime? startDate,
+    DateTime? endDate,
+    int? limit,
+  });
+
+  /// Get customer analytics
+  Future<CustomerAnalytics> getCustomerAnalytics({
+    DateTime? startDate,
+    DateTime? endDate,
+    int? limit,
+  });
+
+  /// Get inventory analytics
+  Future<InventoryAnalytics> getInventoryAnalytics({
+    int? limit,
+  });
 
   // Split payment methods
   /// Create a sale with split payments

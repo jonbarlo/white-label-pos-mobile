@@ -52,6 +52,8 @@ class AuthState {
   bool get canAccessKitchen => userRole?.canAccessKitchen ?? false;
   bool get canAccessWaiterDashboard => userRole?.canAccessWaiterDashboard ?? false;
   bool get canAccessReports => userRole?.canAccessReports ?? false;
+  bool get canAccessAnalytics => userRole?.canAccessAnalytics ?? false;
+  bool get canAccessBasicAnalytics => userRole?.canAccessBasicAnalytics ?? false;
   bool get canManageUsers => userRole?.canManageUsers ?? false;
   bool get canViewOnly => userRole == UserRole.viewer;
 }

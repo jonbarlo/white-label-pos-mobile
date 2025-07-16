@@ -227,6 +227,27 @@ class MockTableRepository extends _i1.Mock implements _i4.TableRepository {
         ),
         returnValue: _i5.Future<List<_i3.Table>>.value(<_i3.Table>[]),
       ) as _i5.Future<List<_i3.Table>>);
+
+  @override
+  _i5.Future<void> seatCustomer(
+    int? tableId,
+    String? customerName,
+    int? partySize,
+    String? notes,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #seatCustomer,
+          [
+            tableId,
+            customerName,
+            partySize,
+            notes,
+          ],
+        ),
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
 }
 
 /// A class which mocks [Dio].

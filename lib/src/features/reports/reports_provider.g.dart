@@ -541,6 +541,138 @@ class _DetailedTransactionsProviderElement
       (origin as DetailedTransactionsProvider).paymentMethod;
 }
 
+String _$saleWithItemsHash() => r'97c42b7fce09d4edf06c4619830fe4ae236caa3b';
+
+/// See also [saleWithItems].
+@ProviderFor(saleWithItems)
+const saleWithItemsProvider = SaleWithItemsFamily();
+
+/// See also [saleWithItems].
+class SaleWithItemsFamily extends Family<AsyncValue<Map<String, dynamic>>> {
+  /// See also [saleWithItems].
+  const SaleWithItemsFamily();
+
+  /// See also [saleWithItems].
+  SaleWithItemsProvider call({
+    required String saleId,
+  }) {
+    return SaleWithItemsProvider(
+      saleId: saleId,
+    );
+  }
+
+  @override
+  SaleWithItemsProvider getProviderOverride(
+    covariant SaleWithItemsProvider provider,
+  ) {
+    return call(
+      saleId: provider.saleId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'saleWithItemsProvider';
+}
+
+/// See also [saleWithItems].
+class SaleWithItemsProvider
+    extends AutoDisposeFutureProvider<Map<String, dynamic>> {
+  /// See also [saleWithItems].
+  SaleWithItemsProvider({
+    required String saleId,
+  }) : this._internal(
+          (ref) => saleWithItems(
+            ref as SaleWithItemsRef,
+            saleId: saleId,
+          ),
+          from: saleWithItemsProvider,
+          name: r'saleWithItemsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$saleWithItemsHash,
+          dependencies: SaleWithItemsFamily._dependencies,
+          allTransitiveDependencies:
+              SaleWithItemsFamily._allTransitiveDependencies,
+          saleId: saleId,
+        );
+
+  SaleWithItemsProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.saleId,
+  }) : super.internal();
+
+  final String saleId;
+
+  @override
+  Override overrideWith(
+    FutureOr<Map<String, dynamic>> Function(SaleWithItemsRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: SaleWithItemsProvider._internal(
+        (ref) => create(ref as SaleWithItemsRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        saleId: saleId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<Map<String, dynamic>> createElement() {
+    return _SaleWithItemsProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is SaleWithItemsProvider && other.saleId == saleId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, saleId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin SaleWithItemsRef on AutoDisposeFutureProviderRef<Map<String, dynamic>> {
+  /// The parameter `saleId` of this provider.
+  String get saleId;
+}
+
+class _SaleWithItemsProviderElement
+    extends AutoDisposeFutureProviderElement<Map<String, dynamic>>
+    with SaleWithItemsRef {
+  _SaleWithItemsProviderElement(super.provider);
+
+  @override
+  String get saleId => (origin as SaleWithItemsProvider).saleId;
+}
+
 String _$inventoryReportHash() => r'55af2ca19c08561a692ba1e69c049909da56b9a0';
 
 /// See also [inventoryReport].
@@ -1041,6 +1173,155 @@ class _CustomerAnalyticsProviderElement
   DateTime? get startDate => (origin as CustomerAnalyticsProvider).startDate;
   @override
   DateTime? get endDate => (origin as CustomerAnalyticsProvider).endDate;
+}
+
+String _$salesSummaryHash() => r'ae5ac93777d77821a11fd049892cd11a1467ce65';
+
+/// See also [salesSummary].
+@ProviderFor(salesSummary)
+const salesSummaryProvider = SalesSummaryFamily();
+
+/// See also [salesSummary].
+class SalesSummaryFamily extends Family<AsyncValue<Map<String, dynamic>>> {
+  /// See also [salesSummary].
+  const SalesSummaryFamily();
+
+  /// See also [salesSummary].
+  SalesSummaryProvider call({
+    required DateTime startDate,
+    required DateTime endDate,
+  }) {
+    return SalesSummaryProvider(
+      startDate: startDate,
+      endDate: endDate,
+    );
+  }
+
+  @override
+  SalesSummaryProvider getProviderOverride(
+    covariant SalesSummaryProvider provider,
+  ) {
+    return call(
+      startDate: provider.startDate,
+      endDate: provider.endDate,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'salesSummaryProvider';
+}
+
+/// See also [salesSummary].
+class SalesSummaryProvider
+    extends AutoDisposeFutureProvider<Map<String, dynamic>> {
+  /// See also [salesSummary].
+  SalesSummaryProvider({
+    required DateTime startDate,
+    required DateTime endDate,
+  }) : this._internal(
+          (ref) => salesSummary(
+            ref as SalesSummaryRef,
+            startDate: startDate,
+            endDate: endDate,
+          ),
+          from: salesSummaryProvider,
+          name: r'salesSummaryProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$salesSummaryHash,
+          dependencies: SalesSummaryFamily._dependencies,
+          allTransitiveDependencies:
+              SalesSummaryFamily._allTransitiveDependencies,
+          startDate: startDate,
+          endDate: endDate,
+        );
+
+  SalesSummaryProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.startDate,
+    required this.endDate,
+  }) : super.internal();
+
+  final DateTime startDate;
+  final DateTime endDate;
+
+  @override
+  Override overrideWith(
+    FutureOr<Map<String, dynamic>> Function(SalesSummaryRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: SalesSummaryProvider._internal(
+        (ref) => create(ref as SalesSummaryRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        startDate: startDate,
+        endDate: endDate,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<Map<String, dynamic>> createElement() {
+    return _SalesSummaryProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is SalesSummaryProvider &&
+        other.startDate == startDate &&
+        other.endDate == endDate;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, startDate.hashCode);
+    hash = _SystemHash.combine(hash, endDate.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin SalesSummaryRef on AutoDisposeFutureProviderRef<Map<String, dynamic>> {
+  /// The parameter `startDate` of this provider.
+  DateTime get startDate;
+
+  /// The parameter `endDate` of this provider.
+  DateTime get endDate;
+}
+
+class _SalesSummaryProviderElement
+    extends AutoDisposeFutureProviderElement<Map<String, dynamic>>
+    with SalesSummaryRef {
+  _SalesSummaryProviderElement(super.provider);
+
+  @override
+  DateTime get startDate => (origin as SalesSummaryProvider).startDate;
+  @override
+  DateTime get endDate => (origin as SalesSummaryProvider).endDate;
 }
 
 String _$reportsNotifierHash() => r'6b5d4fb6fd0f7e067bf482560100ea099d218d00';

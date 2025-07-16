@@ -177,6 +177,36 @@ class ReportsRepositoryImpl implements ReportsRepository {
   }
 
   @override
+  Future<Map<String, dynamic>> getSaleWithItems({
+    required String saleId,
+  }) async {
+    try {
+      print('🔍 Reports Repository: Fetching sale with items for ID: $saleId');
+      
+      final response = await _dio.get('/sales/$saleId/with-items');
+      
+      // Handle the response format from the API documentation
+      final responseData = response.data;
+      Map<String, dynamic> saleData;
+      
+      if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
+        saleData = responseData['data'] as Map<String, dynamic>;
+      } else if (responseData is Map<String, dynamic>) {
+        saleData = responseData;
+      } else {
+        throw Exception('Unexpected response format from /sales/$saleId/with-items');
+      }
+      
+      print('🔍 Reports Repository: Sale with items response: $saleData');
+      
+      return saleData;
+    } on DioException catch (e) {
+      print('🔍 Reports Repository: Error fetching sale with items: ${e.message}');
+      throw Exception('Failed to get sale with items: ${e.message}');
+    }
+  }
+
+  @override
   Future<Map<String, dynamic>> getInventoryReport() async {
     try {
       final response = await _dio.get('/items');

@@ -137,6 +137,19 @@ class MockReportsRepository extends _i1.Mock implements _i4.ReportsRepository {
       ) as _i5.Future<List<Map<String, dynamic>>>);
 
   @override
+  _i5.Future<Map<String, dynamic>> getSaleWithItems(
+          {required String? saleId}) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getSaleWithItems,
+          [],
+          {#saleId: saleId},
+        ),
+        returnValue:
+            _i5.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
+      ) as _i5.Future<Map<String, dynamic>>);
+
+  @override
   _i5.Future<Map<String, dynamic>> getInventoryReport() => (super.noSuchMethod(
         Invocation.method(
           #getInventoryReport,

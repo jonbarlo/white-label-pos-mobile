@@ -110,7 +110,9 @@ extension UserRoleExtension on UserRole {
   bool get canAccessPOS => this != UserRole.admin && this != UserRole.viewer;
   bool get canAccessKitchen => this == UserRole.viewer;
   bool get canAccessWaiterDashboard => this == UserRole.waiter || this == UserRole.waitstaff;
-  bool get canAccessReports => this == UserRole.admin || this == UserRole.manager;
+  bool get canAccessReports => this == UserRole.admin || this == UserRole.owner || this == UserRole.manager;
+  bool get canAccessAnalytics => this == UserRole.admin || this == UserRole.owner || this == UserRole.manager;
+  bool get canAccessBasicAnalytics => this == UserRole.admin || this == UserRole.owner || this == UserRole.manager || this == UserRole.cashier;
   bool get canManageUsers => this == UserRole.admin;
   bool get canViewOnly => this == UserRole.viewer;
 } 

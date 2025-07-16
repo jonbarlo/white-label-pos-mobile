@@ -39,7 +39,7 @@ final cartTotalProvider = AutoDisposeProvider<double>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CartTotalRef = AutoDisposeProviderRef<double>;
-String _$createSaleHash() => r'90b662c0a580f63dc3e8513be529acc83f41331f';
+String _$createSaleHash() => r'fc6a28f6822b485d62617d96ae5c63c270c19d07';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -635,7 +635,7 @@ class _TopSellingItemsProviderElement
   int get limit => (origin as TopSellingItemsProvider).limit;
 }
 
-String _$createSplitSaleHash() => r'c3feeae84a705864e01358ae1f842773c6709c25';
+String _$createSplitSaleHash() => r'2dd7b2a9d79940d20f873a726859e97f7fc9d373';
 
 /// See also [createSplitSale].
 @ProviderFor(createSplitSale)
@@ -1084,7 +1084,7 @@ final getSplitBillingStatsProvider =
 // ignore: unused_element
 typedef GetSplitBillingStatsRef
     = AutoDisposeFutureProviderRef<SplitBillingStats>;
-String _$menuItemsHash() => r'0b0644ceb06e4ce841cdc13e36b928baf12c66fc';
+String _$menuItemsHash() => r'e9edb21f968f924b8cab89c4230215032fa17261';
 
 /// See also [menuItems].
 @ProviderFor(menuItems)
@@ -1100,6 +1100,799 @@ final menuItemsProvider = AutoDisposeFutureProvider<List<MenuItem>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef MenuItemsRef = AutoDisposeFutureProviderRef<List<MenuItem>>;
+String _$itemAnalyticsHash() => r'8dc998c701ab0aa953d09465be2d2265d056f9d1';
+
+/// See also [itemAnalytics].
+@ProviderFor(itemAnalytics)
+const itemAnalyticsProvider = ItemAnalyticsFamily();
+
+/// See also [itemAnalytics].
+class ItemAnalyticsFamily extends Family<AsyncValue<ItemAnalytics>> {
+  /// See also [itemAnalytics].
+  const ItemAnalyticsFamily();
+
+  /// See also [itemAnalytics].
+  ItemAnalyticsProvider call({
+    DateTime? startDate,
+    DateTime? endDate,
+    int? limit,
+  }) {
+    return ItemAnalyticsProvider(
+      startDate: startDate,
+      endDate: endDate,
+      limit: limit,
+    );
+  }
+
+  @override
+  ItemAnalyticsProvider getProviderOverride(
+    covariant ItemAnalyticsProvider provider,
+  ) {
+    return call(
+      startDate: provider.startDate,
+      endDate: provider.endDate,
+      limit: provider.limit,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'itemAnalyticsProvider';
+}
+
+/// See also [itemAnalytics].
+class ItemAnalyticsProvider extends AutoDisposeFutureProvider<ItemAnalytics> {
+  /// See also [itemAnalytics].
+  ItemAnalyticsProvider({
+    DateTime? startDate,
+    DateTime? endDate,
+    int? limit,
+  }) : this._internal(
+          (ref) => itemAnalytics(
+            ref as ItemAnalyticsRef,
+            startDate: startDate,
+            endDate: endDate,
+            limit: limit,
+          ),
+          from: itemAnalyticsProvider,
+          name: r'itemAnalyticsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$itemAnalyticsHash,
+          dependencies: ItemAnalyticsFamily._dependencies,
+          allTransitiveDependencies:
+              ItemAnalyticsFamily._allTransitiveDependencies,
+          startDate: startDate,
+          endDate: endDate,
+          limit: limit,
+        );
+
+  ItemAnalyticsProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.startDate,
+    required this.endDate,
+    required this.limit,
+  }) : super.internal();
+
+  final DateTime? startDate;
+  final DateTime? endDate;
+  final int? limit;
+
+  @override
+  Override overrideWith(
+    FutureOr<ItemAnalytics> Function(ItemAnalyticsRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: ItemAnalyticsProvider._internal(
+        (ref) => create(ref as ItemAnalyticsRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        startDate: startDate,
+        endDate: endDate,
+        limit: limit,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<ItemAnalytics> createElement() {
+    return _ItemAnalyticsProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is ItemAnalyticsProvider &&
+        other.startDate == startDate &&
+        other.endDate == endDate &&
+        other.limit == limit;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, startDate.hashCode);
+    hash = _SystemHash.combine(hash, endDate.hashCode);
+    hash = _SystemHash.combine(hash, limit.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin ItemAnalyticsRef on AutoDisposeFutureProviderRef<ItemAnalytics> {
+  /// The parameter `startDate` of this provider.
+  DateTime? get startDate;
+
+  /// The parameter `endDate` of this provider.
+  DateTime? get endDate;
+
+  /// The parameter `limit` of this provider.
+  int? get limit;
+}
+
+class _ItemAnalyticsProviderElement
+    extends AutoDisposeFutureProviderElement<ItemAnalytics>
+    with ItemAnalyticsRef {
+  _ItemAnalyticsProviderElement(super.provider);
+
+  @override
+  DateTime? get startDate => (origin as ItemAnalyticsProvider).startDate;
+  @override
+  DateTime? get endDate => (origin as ItemAnalyticsProvider).endDate;
+  @override
+  int? get limit => (origin as ItemAnalyticsProvider).limit;
+}
+
+String _$revenueAnalyticsHash() => r'557d3a3eda5396e6be718340a43d567bb89bc7a5';
+
+/// See also [revenueAnalytics].
+@ProviderFor(revenueAnalytics)
+const revenueAnalyticsProvider = RevenueAnalyticsFamily();
+
+/// See also [revenueAnalytics].
+class RevenueAnalyticsFamily extends Family<AsyncValue<RevenueAnalytics>> {
+  /// See also [revenueAnalytics].
+  const RevenueAnalyticsFamily();
+
+  /// See also [revenueAnalytics].
+  RevenueAnalyticsProvider call({
+    DateTime? startDate,
+    DateTime? endDate,
+    String? period,
+  }) {
+    return RevenueAnalyticsProvider(
+      startDate: startDate,
+      endDate: endDate,
+      period: period,
+    );
+  }
+
+  @override
+  RevenueAnalyticsProvider getProviderOverride(
+    covariant RevenueAnalyticsProvider provider,
+  ) {
+    return call(
+      startDate: provider.startDate,
+      endDate: provider.endDate,
+      period: provider.period,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'revenueAnalyticsProvider';
+}
+
+/// See also [revenueAnalytics].
+class RevenueAnalyticsProvider
+    extends AutoDisposeFutureProvider<RevenueAnalytics> {
+  /// See also [revenueAnalytics].
+  RevenueAnalyticsProvider({
+    DateTime? startDate,
+    DateTime? endDate,
+    String? period,
+  }) : this._internal(
+          (ref) => revenueAnalytics(
+            ref as RevenueAnalyticsRef,
+            startDate: startDate,
+            endDate: endDate,
+            period: period,
+          ),
+          from: revenueAnalyticsProvider,
+          name: r'revenueAnalyticsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$revenueAnalyticsHash,
+          dependencies: RevenueAnalyticsFamily._dependencies,
+          allTransitiveDependencies:
+              RevenueAnalyticsFamily._allTransitiveDependencies,
+          startDate: startDate,
+          endDate: endDate,
+          period: period,
+        );
+
+  RevenueAnalyticsProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.startDate,
+    required this.endDate,
+    required this.period,
+  }) : super.internal();
+
+  final DateTime? startDate;
+  final DateTime? endDate;
+  final String? period;
+
+  @override
+  Override overrideWith(
+    FutureOr<RevenueAnalytics> Function(RevenueAnalyticsRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: RevenueAnalyticsProvider._internal(
+        (ref) => create(ref as RevenueAnalyticsRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        startDate: startDate,
+        endDate: endDate,
+        period: period,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<RevenueAnalytics> createElement() {
+    return _RevenueAnalyticsProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is RevenueAnalyticsProvider &&
+        other.startDate == startDate &&
+        other.endDate == endDate &&
+        other.period == period;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, startDate.hashCode);
+    hash = _SystemHash.combine(hash, endDate.hashCode);
+    hash = _SystemHash.combine(hash, period.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin RevenueAnalyticsRef on AutoDisposeFutureProviderRef<RevenueAnalytics> {
+  /// The parameter `startDate` of this provider.
+  DateTime? get startDate;
+
+  /// The parameter `endDate` of this provider.
+  DateTime? get endDate;
+
+  /// The parameter `period` of this provider.
+  String? get period;
+}
+
+class _RevenueAnalyticsProviderElement
+    extends AutoDisposeFutureProviderElement<RevenueAnalytics>
+    with RevenueAnalyticsRef {
+  _RevenueAnalyticsProviderElement(super.provider);
+
+  @override
+  DateTime? get startDate => (origin as RevenueAnalyticsProvider).startDate;
+  @override
+  DateTime? get endDate => (origin as RevenueAnalyticsProvider).endDate;
+  @override
+  String? get period => (origin as RevenueAnalyticsProvider).period;
+}
+
+String _$staffAnalyticsHash() => r'acc309e0af4a289dea6ae98d108de407e93e02b0';
+
+/// See also [staffAnalytics].
+@ProviderFor(staffAnalytics)
+const staffAnalyticsProvider = StaffAnalyticsFamily();
+
+/// See also [staffAnalytics].
+class StaffAnalyticsFamily extends Family<AsyncValue<StaffAnalytics>> {
+  /// See also [staffAnalytics].
+  const StaffAnalyticsFamily();
+
+  /// See also [staffAnalytics].
+  StaffAnalyticsProvider call({
+    DateTime? startDate,
+    DateTime? endDate,
+    int? limit,
+  }) {
+    return StaffAnalyticsProvider(
+      startDate: startDate,
+      endDate: endDate,
+      limit: limit,
+    );
+  }
+
+  @override
+  StaffAnalyticsProvider getProviderOverride(
+    covariant StaffAnalyticsProvider provider,
+  ) {
+    return call(
+      startDate: provider.startDate,
+      endDate: provider.endDate,
+      limit: provider.limit,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'staffAnalyticsProvider';
+}
+
+/// See also [staffAnalytics].
+class StaffAnalyticsProvider extends AutoDisposeFutureProvider<StaffAnalytics> {
+  /// See also [staffAnalytics].
+  StaffAnalyticsProvider({
+    DateTime? startDate,
+    DateTime? endDate,
+    int? limit,
+  }) : this._internal(
+          (ref) => staffAnalytics(
+            ref as StaffAnalyticsRef,
+            startDate: startDate,
+            endDate: endDate,
+            limit: limit,
+          ),
+          from: staffAnalyticsProvider,
+          name: r'staffAnalyticsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$staffAnalyticsHash,
+          dependencies: StaffAnalyticsFamily._dependencies,
+          allTransitiveDependencies:
+              StaffAnalyticsFamily._allTransitiveDependencies,
+          startDate: startDate,
+          endDate: endDate,
+          limit: limit,
+        );
+
+  StaffAnalyticsProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.startDate,
+    required this.endDate,
+    required this.limit,
+  }) : super.internal();
+
+  final DateTime? startDate;
+  final DateTime? endDate;
+  final int? limit;
+
+  @override
+  Override overrideWith(
+    FutureOr<StaffAnalytics> Function(StaffAnalyticsRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: StaffAnalyticsProvider._internal(
+        (ref) => create(ref as StaffAnalyticsRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        startDate: startDate,
+        endDate: endDate,
+        limit: limit,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<StaffAnalytics> createElement() {
+    return _StaffAnalyticsProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is StaffAnalyticsProvider &&
+        other.startDate == startDate &&
+        other.endDate == endDate &&
+        other.limit == limit;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, startDate.hashCode);
+    hash = _SystemHash.combine(hash, endDate.hashCode);
+    hash = _SystemHash.combine(hash, limit.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin StaffAnalyticsRef on AutoDisposeFutureProviderRef<StaffAnalytics> {
+  /// The parameter `startDate` of this provider.
+  DateTime? get startDate;
+
+  /// The parameter `endDate` of this provider.
+  DateTime? get endDate;
+
+  /// The parameter `limit` of this provider.
+  int? get limit;
+}
+
+class _StaffAnalyticsProviderElement
+    extends AutoDisposeFutureProviderElement<StaffAnalytics>
+    with StaffAnalyticsRef {
+  _StaffAnalyticsProviderElement(super.provider);
+
+  @override
+  DateTime? get startDate => (origin as StaffAnalyticsProvider).startDate;
+  @override
+  DateTime? get endDate => (origin as StaffAnalyticsProvider).endDate;
+  @override
+  int? get limit => (origin as StaffAnalyticsProvider).limit;
+}
+
+String _$customerAnalyticsHash() => r'2c1b59c4a33a4a5ae4ec99d48440133152b66ed0';
+
+/// See also [customerAnalytics].
+@ProviderFor(customerAnalytics)
+const customerAnalyticsProvider = CustomerAnalyticsFamily();
+
+/// See also [customerAnalytics].
+class CustomerAnalyticsFamily extends Family<AsyncValue<CustomerAnalytics>> {
+  /// See also [customerAnalytics].
+  const CustomerAnalyticsFamily();
+
+  /// See also [customerAnalytics].
+  CustomerAnalyticsProvider call({
+    DateTime? startDate,
+    DateTime? endDate,
+    int? limit,
+  }) {
+    return CustomerAnalyticsProvider(
+      startDate: startDate,
+      endDate: endDate,
+      limit: limit,
+    );
+  }
+
+  @override
+  CustomerAnalyticsProvider getProviderOverride(
+    covariant CustomerAnalyticsProvider provider,
+  ) {
+    return call(
+      startDate: provider.startDate,
+      endDate: provider.endDate,
+      limit: provider.limit,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'customerAnalyticsProvider';
+}
+
+/// See also [customerAnalytics].
+class CustomerAnalyticsProvider
+    extends AutoDisposeFutureProvider<CustomerAnalytics> {
+  /// See also [customerAnalytics].
+  CustomerAnalyticsProvider({
+    DateTime? startDate,
+    DateTime? endDate,
+    int? limit,
+  }) : this._internal(
+          (ref) => customerAnalytics(
+            ref as CustomerAnalyticsRef,
+            startDate: startDate,
+            endDate: endDate,
+            limit: limit,
+          ),
+          from: customerAnalyticsProvider,
+          name: r'customerAnalyticsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$customerAnalyticsHash,
+          dependencies: CustomerAnalyticsFamily._dependencies,
+          allTransitiveDependencies:
+              CustomerAnalyticsFamily._allTransitiveDependencies,
+          startDate: startDate,
+          endDate: endDate,
+          limit: limit,
+        );
+
+  CustomerAnalyticsProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.startDate,
+    required this.endDate,
+    required this.limit,
+  }) : super.internal();
+
+  final DateTime? startDate;
+  final DateTime? endDate;
+  final int? limit;
+
+  @override
+  Override overrideWith(
+    FutureOr<CustomerAnalytics> Function(CustomerAnalyticsRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: CustomerAnalyticsProvider._internal(
+        (ref) => create(ref as CustomerAnalyticsRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        startDate: startDate,
+        endDate: endDate,
+        limit: limit,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<CustomerAnalytics> createElement() {
+    return _CustomerAnalyticsProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is CustomerAnalyticsProvider &&
+        other.startDate == startDate &&
+        other.endDate == endDate &&
+        other.limit == limit;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, startDate.hashCode);
+    hash = _SystemHash.combine(hash, endDate.hashCode);
+    hash = _SystemHash.combine(hash, limit.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin CustomerAnalyticsRef on AutoDisposeFutureProviderRef<CustomerAnalytics> {
+  /// The parameter `startDate` of this provider.
+  DateTime? get startDate;
+
+  /// The parameter `endDate` of this provider.
+  DateTime? get endDate;
+
+  /// The parameter `limit` of this provider.
+  int? get limit;
+}
+
+class _CustomerAnalyticsProviderElement
+    extends AutoDisposeFutureProviderElement<CustomerAnalytics>
+    with CustomerAnalyticsRef {
+  _CustomerAnalyticsProviderElement(super.provider);
+
+  @override
+  DateTime? get startDate => (origin as CustomerAnalyticsProvider).startDate;
+  @override
+  DateTime? get endDate => (origin as CustomerAnalyticsProvider).endDate;
+  @override
+  int? get limit => (origin as CustomerAnalyticsProvider).limit;
+}
+
+String _$inventoryAnalyticsHash() =>
+    r'8da59ca779e9f21c095c0796d92600ea0f40a2b5';
+
+/// See also [inventoryAnalytics].
+@ProviderFor(inventoryAnalytics)
+const inventoryAnalyticsProvider = InventoryAnalyticsFamily();
+
+/// See also [inventoryAnalytics].
+class InventoryAnalyticsFamily extends Family<AsyncValue<InventoryAnalytics>> {
+  /// See also [inventoryAnalytics].
+  const InventoryAnalyticsFamily();
+
+  /// See also [inventoryAnalytics].
+  InventoryAnalyticsProvider call({
+    int? limit,
+  }) {
+    return InventoryAnalyticsProvider(
+      limit: limit,
+    );
+  }
+
+  @override
+  InventoryAnalyticsProvider getProviderOverride(
+    covariant InventoryAnalyticsProvider provider,
+  ) {
+    return call(
+      limit: provider.limit,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'inventoryAnalyticsProvider';
+}
+
+/// See also [inventoryAnalytics].
+class InventoryAnalyticsProvider
+    extends AutoDisposeFutureProvider<InventoryAnalytics> {
+  /// See also [inventoryAnalytics].
+  InventoryAnalyticsProvider({
+    int? limit,
+  }) : this._internal(
+          (ref) => inventoryAnalytics(
+            ref as InventoryAnalyticsRef,
+            limit: limit,
+          ),
+          from: inventoryAnalyticsProvider,
+          name: r'inventoryAnalyticsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$inventoryAnalyticsHash,
+          dependencies: InventoryAnalyticsFamily._dependencies,
+          allTransitiveDependencies:
+              InventoryAnalyticsFamily._allTransitiveDependencies,
+          limit: limit,
+        );
+
+  InventoryAnalyticsProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.limit,
+  }) : super.internal();
+
+  final int? limit;
+
+  @override
+  Override overrideWith(
+    FutureOr<InventoryAnalytics> Function(InventoryAnalyticsRef provider)
+        create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: InventoryAnalyticsProvider._internal(
+        (ref) => create(ref as InventoryAnalyticsRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        limit: limit,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<InventoryAnalytics> createElement() {
+    return _InventoryAnalyticsProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is InventoryAnalyticsProvider && other.limit == limit;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, limit.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin InventoryAnalyticsRef
+    on AutoDisposeFutureProviderRef<InventoryAnalytics> {
+  /// The parameter `limit` of this provider.
+  int? get limit;
+}
+
+class _InventoryAnalyticsProviderElement
+    extends AutoDisposeFutureProviderElement<InventoryAnalytics>
+    with InventoryAnalyticsRef {
+  _InventoryAnalyticsProviderElement(super.provider);
+
+  @override
+  int? get limit => (origin as InventoryAnalyticsProvider).limit;
+}
+
 String _$cartNotifierHash() => r'3c7b3606d59f8a0be1ed390808870100bf6e87c1';
 
 /// See also [CartNotifier].
@@ -1132,7 +1925,7 @@ final searchNotifierProvider =
 
 typedef _$SearchNotifier = AutoDisposeNotifier<List<MenuItem>>;
 String _$recentSalesNotifierHash() =>
-    r'77db73cc5b4e3ea79aa34a9d380d534248b2bb2f';
+    r'61fcab2dd3cb843d826273cc0fd9a7017b5d9034';
 
 /// See also [RecentSalesNotifier].
 @ProviderFor(RecentSalesNotifier)

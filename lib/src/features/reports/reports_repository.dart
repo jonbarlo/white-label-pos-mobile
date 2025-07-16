@@ -24,6 +24,11 @@ abstract class ReportsRepository {
     String? paymentMethod,
   });
 
+  /// Get sale details with complete item information
+  Future<Map<String, dynamic>> getSaleWithItems({
+    required String saleId,
+  });
+
   /// Get inventory summary report
   Future<Map<String, dynamic>> getInventoryReport();
 

@@ -7,6 +7,7 @@ import '../../features/auth/auth_provider.dart';
 import '../../features/auth/login_screen.dart';
 import '../../features/onboarding/onboarding_screen.dart';
 import '../../features/dashboard/dashboard_screen.dart';
+import '../../features/dashboard/analytics_dashboard_screen.dart';
 import '../../features/pos/pos_screen.dart';
 import '../../features/inventory/inventory_screen.dart';
 import '../../features/reports/reports_screen.dart';
@@ -53,6 +54,7 @@ class AppRouter {
   static const String loginRoute = '/login';
   static const String onboardingRoute = '/onboarding';
   static const String dashboardRoute = '/dashboard';
+  static const String analyticsRoute = '/analytics';
   static const String posRoute = '/pos';
   static const String inventoryRoute = '/inventory';
   static const String reportsRoute = '/reports';
@@ -110,6 +112,13 @@ class AppRouter {
               path: dashboardRoute,
               name: 'dashboard',
               builder: (context, state) => const DashboardScreen(),
+            ),
+            
+            // Analytics Dashboard
+            GoRoute(
+              path: analyticsRoute,
+              name: 'analytics',
+              builder: (context, state) => const AnalyticsDashboardScreen(),
             ),
             
             // POS
@@ -265,6 +274,7 @@ class AppRouter {
   /// Check if a route is protected (requires authentication)
   static bool _isProtectedRoute(String location) {
     return location == dashboardRoute ||
+           location == analyticsRoute ||
            location == posRoute ||
            location == inventoryRoute ||
            location == reportsRoute ||
@@ -342,6 +352,15 @@ class _MainAppShell extends ConsumerWidget {
     ));
     navigationRoutes.add(AppRouter.dashboardRoute);
     
+    // Analytics - available to admin, manager, and owner
+    if (authState.canAccessAnalytics) {
+      navigationItems.add(const BottomNavigationBarItem(
+        icon: Icon(Icons.analytics),
+        label: 'Analytics',
+      ));
+      navigationRoutes.add(AppRouter.analyticsRoute);
+    }
+    
     // POS - available to non-admin, non-viewer users
     if (authState.canAccessPOS) {
       navigationItems.add(const BottomNavigationBarItem(
@@ -363,7 +382,7 @@ class _MainAppShell extends ConsumerWidget {
     // Reports - available to admin and manager
     if (authState.canAccessReports) {
       navigationItems.add(const BottomNavigationBarItem(
-        icon: Icon(Icons.analytics),
+        icon: Icon(Icons.assessment),
         label: 'Reports',
       ));
       navigationRoutes.add(AppRouter.reportsRoute);

@@ -1172,7 +1172,7 @@ class _TransactionCard extends StatelessWidget {
   }
 }
 
-class _TransactionDetailsSheet extends StatelessWidget {
+class _TransactionDetailsSheet extends ConsumerWidget {
   final Map<String, dynamic> transaction;
 
   const _TransactionDetailsSheet({
@@ -1180,7 +1180,7 @@ class _TransactionDetailsSheet extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final totalValue = transaction['finalAmount'] as num? ?? 0.0;
     final amount = (totalValue is num) ? totalValue.toDouble() : double.tryParse(totalValue.toString()) ?? 0.0;
@@ -1189,6 +1189,9 @@ class _TransactionDetailsSheet extends StatelessWidget {
     final createdAt = DateTime.tryParse(transaction['createdAt'] as String? ?? '') ?? DateTime.now();
     final id = transaction['id']?.toString() ?? 'N/A';
     final notes = transaction['notes'] as String? ?? '';
+
+    // Fetch sale with items using the new provider
+    final saleWithItemsAsync = ref.watch(saleWithItemsProvider(saleId: id));
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.7,
@@ -1294,7 +1297,7 @@ class _TransactionDetailsSheet extends StatelessWidget {
                   ],
                   const SizedBox(height: 20),
                   
-                  // Items section (if available)
+                  // Items section with actual data
                   Text(
                     'Items',
                     style: theme.textTheme.titleSmall?.copyWith(
@@ -1302,16 +1305,137 @@ class _TransactionDetailsSheet extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(8),
+                  saleWithItemsAsync.when(
+                    data: (saleData) {
+                      final saleItems = saleData['saleItems'] as List<dynamic>? ?? [];
+                      if (saleItems.isEmpty) {
+                        return Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surfaceContainerHighest,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            'No items found for this sale',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        );
+                      }
+                      
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surfaceContainerHighest,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Column(
+                          children: saleItems.map<Widget>((saleItem) {
+                            final saleItemMap = saleItem as Map<String, dynamic>;
+                            final item = saleItemMap['item'] as Map<String, dynamic>? ?? {};
+                            final itemName = item['name']?.toString() ?? 'Unknown Item';
+                            final quantity = (saleItemMap['quantity'] as num?)?.toInt() ?? 0;
+                            final unitPrice = (saleItemMap['unitPrice'] as num?)?.toDouble() ?? 0.0;
+                            final totalPrice = (saleItemMap['totalPrice'] as num?)?.toDouble() ?? 0.0;
+                            final notes = saleItemMap['notes']?.toString() ?? '';
+                            
+                            return Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    flex: 3,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          itemName,
+                                          style: theme.textTheme.bodyMedium?.copyWith(
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        if (notes.isNotEmpty) ...[
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            notes,
+                                            style: theme.textTheme.bodySmall?.copyWith(
+                                              color: theme.colorScheme.onSurfaceVariant,
+                                              fontStyle: FontStyle.italic,
+                                            ),
+                                          ),
+                                        ],
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'x$quantity',
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      fontWeight: FontWeight.w500,
+                                      color: theme.colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    '\$${unitPrice.toStringAsFixed(2)}',
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      fontWeight: FontWeight.w500,
+                                      color: theme.colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    '\$${totalPrice.toStringAsFixed(2)}',
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: theme.colorScheme.primary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      );
+                    },
+                    loading: () => Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: theme.colorScheme.primary,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            'Loading items...',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    child: Text(
-                      'Item details not available in this view',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
+                    error: (error, stackTrace) => Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        'Error loading items: ${error.toString()}',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.error,
+                        ),
                       ),
                     ),
                   ),

@@ -61,7 +61,7 @@ final lowStockItemsProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef LowStockItemsRef = AutoDisposeFutureProviderRef<List<InventoryItem>>;
-String _$categoriesHash() => r'1fe8f22f0c3d5e4a4e46c33b04eba92f9ad96b41';
+String _$categoriesHash() => r'd1c2ae04413a070bed22daeffa7f3314b04af9bf';
 
 /// See also [categories].
 @ProviderFor(categories)
