@@ -6,6 +6,7 @@ import 'models/floor_plan.dart';
 import '../../core/theme/app_theme.dart';
 import '../../shared/models/result.dart';
 import '../waiter/table_provider.dart';
+import '../waiter/models/table.dart' as waiter_table;
 import 'package:flutter/foundation.dart';
 
 class FloorPlanViewerScreen extends ConsumerStatefulWidget {
@@ -519,6 +520,103 @@ class _FloorPlanViewerScreenState extends ConsumerState<FloorPlanViewerScreen>
               ),
             ],
           ),
+          
+          // Reservation Information (if table is reserved and has reservation data)
+          if (table.tableStatus.toLowerCase() == 'reserved' && table.reservation != null) ...[
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.orange.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.orange.withOpacity(0.3)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.schedule, color: Colors.orange, size: 16),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Reservation Details',
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          color: Colors.orange,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  // Real reservation details from API
+                  _buildReservationDetailRow(Icons.person, 'Customer', table.reservation!.customerName),
+                  if (table.reservation!.customerPhone != null && table.reservation!.customerPhone!.isNotEmpty)
+                    _buildReservationDetailRow(Icons.phone, 'Phone', table.reservation!.customerPhone!),
+                  _buildReservationDetailRow(Icons.people, 'Party Size', '${table.reservation!.partySize} guests'),
+                  _buildReservationDetailRow(Icons.calendar_today, 'Date', table.reservation!.formattedDate),
+                  _buildReservationDetailRow(Icons.access_time, 'Time', table.reservation!.formattedTime),
+                  if (table.reservation!.notes != null && table.reservation!.notes!.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    _buildReservationDetailRow(Icons.note, 'Notes', table.reservation!.notes!),
+                  ],
+                ],
+              ),
+            ),
+          ] else if (table.tableStatus.toLowerCase() == 'reserved') ...[
+            // Show placeholder when table is reserved but no reservation data available
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.orange.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.orange.withOpacity(0.3)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.schedule, color: Colors.orange, size: 16),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Reservation Details',
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          color: Colors.orange,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.shade50,
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(color: Colors.orange.shade200),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.info_outline, color: Colors.orange.shade600, size: 14),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            'Table is reserved but no reservation details available. This may be a legacy reservation or the reservation data has expired.',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Colors.orange.shade600,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          
           const SizedBox(height: 24),
           
           // Action Buttons
@@ -544,11 +642,18 @@ class _FloorPlanViewerScreenState extends ConsumerState<FloorPlanViewerScreen>
             isEnabled: table.tableStatus.toLowerCase() == 'available',
           ),
           _buildActionButton(
+            'Check-in Reservation',
+            Icons.login,
+            Colors.teal,
+            () => _checkInReservation(table),
+            isEnabled: table.tableStatus.toLowerCase() == 'reserved',
+          ),
+          _buildActionButton(
             'Clear Table',
             Icons.cleaning_services,
             Colors.purple,
             () => _clearTable(table),
-            isEnabled: table.tableStatus.toLowerCase() == 'occupied',
+            isEnabled: table.tableStatus.toLowerCase() == 'occupied' || table.tableStatus.toLowerCase() == 'reserved',
           ),
           _buildActionButton(
             'View Order Details',
@@ -610,6 +715,33 @@ class _FloorPlanViewerScreenState extends ConsumerState<FloorPlanViewerScreen>
     }
   }
 
+  Widget _buildReservationDetailRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.orange.shade600, size: 16),
+          const SizedBox(width: 8),
+          Text(
+            '$label: ',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Colors.orange.shade700,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Colors.orange.shade800,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   // Action Methods
   void _seatCustomers(TablePosition table) {
     Navigator.of(context).pop();
@@ -629,6 +761,11 @@ class _FloorPlanViewerScreenState extends ConsumerState<FloorPlanViewerScreen>
   void _clearTable(TablePosition table) {
     Navigator.of(context).pop();
     _showClearTableDialog(table);
+  }
+
+  void _checkInReservation(TablePosition table) {
+    Navigator.of(context).pop();
+    _showCheckInReservationDialog(table);
   }
 
   void _viewOrderDetails(TablePosition table) {
@@ -726,6 +863,7 @@ class _FloorPlanViewerScreenState extends ConsumerState<FloorPlanViewerScreen>
                       'status': 'occupied',
                     },
                     'prefillOrder': {
+                      'customerName': customerName,
                       'partySize': partySize,
                       'notes': notes,
                       'items': [],
@@ -818,21 +956,69 @@ class _FloorPlanViewerScreenState extends ConsumerState<FloorPlanViewerScreen>
             Row(
               children: [
                 Expanded(
-                  child: TextField(
-                    controller: dateController,
-                    decoration: const InputDecoration(
-                      labelText: 'Date',
-                      hintText: 'MM/DD/YYYY',
+                  child: InkWell(
+                    onTap: () async {
+                      final date = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime.now().add(const Duration(days: 365)),
+                      );
+                      if (date != null) {
+                        dateController.text = '${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}/${date.year}';
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade400),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.calendar_today, size: 20, color: Colors.grey.shade600),
+                          const SizedBox(width: 8),
+                          Text(
+                            dateController.text.isEmpty ? 'Select Date' : dateController.text,
+                            style: TextStyle(
+                              color: dateController.text.isEmpty ? Colors.grey.shade500 : Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: TextField(
-                    controller: timeController,
-                    decoration: const InputDecoration(
-                      labelText: 'Time',
-                      hintText: 'HH:MM',
+                  child: InkWell(
+                    onTap: () async {
+                      final time = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.now(),
+                      );
+                      if (time != null) {
+                        timeController.text = '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade400),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.access_time, size: 20, color: Colors.grey.shade600),
+                          const SizedBox(width: 8),
+                          Text(
+                            timeController.text.isEmpty ? 'Select Time' : timeController.text,
+                            style: TextStyle(
+                              color: timeController.text.isEmpty ? Colors.grey.shade500 : Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -846,15 +1032,94 @@ class _FloorPlanViewerScreenState extends ConsumerState<FloorPlanViewerScreen>
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
-              // TODO: Implement reservation logic
+            onPressed: () async {
+              print('🔍 DEBUG: Make reservation button tapped for table ${table.tableNumber}');
+              
+              // Validate inputs
+              final customerName = customerNameController.text.trim();
+              final partySize = int.tryParse(partySizeController.text.trim());
+              final date = dateController.text.trim();
+              final time = timeController.text.trim();
+              
+              if (customerName.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Please enter a customer name'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                return;
+              }
+              
+              if (partySize == null || partySize < 1) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Please enter a valid party size'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                return;
+              }
+              
               Navigator.of(context).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Reservation made for Table ${table.tableNumber}'),
-                  backgroundColor: Colors.orange,
-                ),
-              );
+              
+              try {
+                final container = ProviderScope.containerOf(context, listen: false);
+                
+                // Show loading indicator
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Row(
+                      children: [
+                        const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        const SizedBox(width: 16),
+                        Text('Making reservation for table ${table.tableNumber}...'),
+                      ],
+                    ),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+
+                // Update table status to reserved
+                await container.read(updateTableStatusProvider((
+                  tableId: table.tableId,
+                  status: waiter_table.TableStatus.reserved,
+                )).future);
+                
+                print('🔍 DEBUG: Reservation successful for table ${table.tableNumber}');
+
+                // Show success message
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Reservation made successfully for Table ${table.tableNumber}!'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+                
+                // Refresh the floor plan data to update table statuses
+                print('🔍 DEBUG: Invalidating floorPlansWithTablesProvider to refresh table statuses');
+                ref.invalidate(floorPlansWithTablesProvider);
+                print('🔍 DEBUG: Provider invalidated, UI should refresh automatically');
+                
+              } catch (e) {
+                print('🔍 DEBUG: Reservation failed for table ${table.tableNumber}: $e');
+                
+                // Show error message
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Failed to make reservation: ${e.toString()}'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
             },
             child: const Text('Make Reservation'),
           ),
@@ -875,18 +1140,223 @@ class _FloorPlanViewerScreenState extends ConsumerState<FloorPlanViewerScreen>
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
-              // TODO: Implement clear table logic
+            onPressed: () async {
+              print('🔍 DEBUG: Clear table button tapped for table ${table.tableNumber}');
               Navigator.of(context).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Table ${table.tableNumber} cleared'),
-                  backgroundColor: Colors.purple,
-                ),
-              );
+              
+              try {
+                final container = ProviderScope.containerOf(context, listen: false);
+                
+                // Show loading indicator
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Row(
+                      children: [
+                        const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        const SizedBox(width: 16),
+                        Text('Clearing table ${table.tableNumber}...'),
+                      ],
+                    ),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+
+                // Call the clear table provider
+                await container.read(clearTableProvider(table.tableId).future);
+                
+                print('🔍 DEBUG: Clear table successful for table ${table.tableNumber}');
+
+                // Show success message
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Table ${table.tableNumber} cleared successfully!'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+                
+                // Refresh the floor plan data to update table statuses
+                print('🔍 DEBUG: Invalidating floorPlansWithTablesProvider to refresh table statuses');
+                ref.invalidate(floorPlansWithTablesProvider);
+                print('🔍 DEBUG: Provider invalidated, UI should refresh automatically');
+                
+              } catch (e) {
+                print('🔍 DEBUG: Clear table failed for table ${table.tableNumber}: $e');
+                
+                // Show error message
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Failed to clear table: ${e.toString()}'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.purple),
             child: const Text('Clear Table'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showCheckInReservationDialog(TablePosition table) {
+    final customerNameController = TextEditingController();
+    final partySizeController = TextEditingController();
+    final notesController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Check-in Reservation - Table ${table.tableNumber}'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: customerNameController,
+              decoration: const InputDecoration(
+                labelText: 'Customer Name',
+                hintText: 'Customer name or party name',
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: partySizeController,
+              decoration: const InputDecoration(
+                labelText: 'Party Size',
+                hintText: 'Number of customers',
+              ),
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: notesController,
+              decoration: const InputDecoration(
+                labelText: 'Notes',
+                hintText: 'Special requests, etc.',
+              ),
+              maxLines: 3,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              print('🔍 DEBUG: Check-in reservation button tapped for table ${table.tableNumber}');
+              
+              final customerName = customerNameController.text.trim();
+              final partySize = int.tryParse(partySizeController.text.trim()) ?? 0;
+              final notes = notesController.text.trim();
+              
+              if (customerName.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Please enter a customer name'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                return;
+              }
+              
+              if (partySize <= 0) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Please enter a valid party size'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                return;
+              }
+              
+              Navigator.of(context).pop();
+              
+              try {
+                final container = ProviderScope.containerOf(context, listen: false);
+                
+                // Show loading indicator
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Row(
+                      children: [
+                        const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        const SizedBox(width: 16),
+                        Text('Checking in reservation for table ${table.tableNumber}...'),
+                      ],
+                    ),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+
+                // Seat the customer (this will change status from reserved to occupied)
+                await container.read(seatCustomerProvider((table.tableId, customerName, partySize, notes)).future);
+                
+                print('🔍 DEBUG: Check-in reservation successful for table ${table.tableNumber}');
+
+                // Show success message
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Reservation checked in successfully for Table ${table.tableNumber}!'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+                
+                // Refresh the floor plan data to update table statuses
+                print('🔍 DEBUG: Invalidating floorPlansWithTablesProvider to refresh table statuses');
+                ref.invalidate(floorPlansWithTablesProvider);
+                print('🔍 DEBUG: Provider invalidated, UI should refresh automatically');
+                
+                // Navigate to order taking screen with captured data
+                context.push(
+                  '/waiter/order/${table.tableId}',
+                  extra: {
+                    'table': {
+                      'id': table.tableId,
+                      'tableNumber': table.tableNumber,
+                      'capacity': table.tableCapacity,
+                      'section': table.tableSection,
+                      'status': 'occupied',
+                    },
+                    'prefillOrder': {
+                      'customerName': customerName,
+                      'partySize': partySize,
+                      'notes': notes,
+                      'items': [],
+                    },
+                  },
+                );
+                
+              } catch (e) {
+                print('🔍 DEBUG: Check-in reservation failed for table ${table.tableNumber}: $e');
+                
+                // Show error message
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Failed to check-in reservation: ${e.toString()}'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+            child: const Text('Check-in'),
           ),
         ],
       ),

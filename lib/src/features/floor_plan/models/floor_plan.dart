@@ -3,6 +3,87 @@ import 'package:json_annotation/json_annotation.dart';
 part 'floor_plan.g.dart';
 
 @JsonSerializable()
+class Reservation {
+  final String customerName;
+  final String? customerPhone;
+  final int partySize;
+  final String reservationDate;
+  final String reservationTime;
+  final String? notes;
+
+  const Reservation({
+    required this.customerName,
+    this.customerPhone,
+    required this.partySize,
+    required this.reservationDate,
+    required this.reservationTime,
+    this.notes,
+  });
+
+  factory Reservation.fromJson(Map<String, dynamic> json) => Reservation(
+    customerName: json['customerName'] as String,
+    customerPhone: json['customerPhone'] as String?,
+    partySize: (json['partySize'] as num).toInt(),
+    reservationDate: json['reservationDate'] as String,
+    reservationTime: json['reservationTime'] as String,
+    notes: json['notes'] as String? ?? json['specialRequests'] as String?,
+  );
+
+  Map<String, dynamic> toJson() => {
+    'customerName': customerName,
+    'customerPhone': customerPhone,
+    'partySize': partySize,
+    'reservationDate': reservationDate,
+    'reservationTime': reservationTime,
+    'notes': notes,
+  };
+
+  // Format date for display (e.g., "Today, Jan 15")
+  String get formattedDate {
+    try {
+      final date = DateTime.parse(reservationDate);
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      final reservationDay = DateTime(date.year, date.month, date.day);
+      
+      if (reservationDay == today) {
+        return 'Today, ${_formatDate(date)}';
+      } else if (reservationDay == today.add(const Duration(days: 1))) {
+        return 'Tomorrow, ${_formatDate(date)}';
+      } else {
+        return _formatDate(date);
+      }
+    } catch (e) {
+      return reservationDate;
+    }
+  }
+
+  // Format time for display (e.g., "7:00 PM")
+  String get formattedTime {
+    try {
+      final timeParts = reservationTime.split(':');
+      final hour = int.parse(timeParts[0]);
+      final minute = int.parse(timeParts[1]);
+      
+      final period = hour >= 12 ? 'PM' : 'AM';
+      final displayHour = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
+      
+      return '${displayHour}:${minute.toString().padLeft(2, '0')} $period';
+    } catch (e) {
+      return reservationTime;
+    }
+  }
+
+  String _formatDate(DateTime date) {
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+    return '${months[date.month - 1]} ${date.day}';
+  }
+}
+
+@JsonSerializable()
 class FloorPlan {
   final int id;
   final int businessId;
@@ -102,6 +183,7 @@ class TablePosition {
   final int height;
   final DateTime? createdAt;
   final DateTime? updatedAt;
+  final Reservation? reservation;
 
   const TablePosition({
     required this.id,
@@ -117,6 +199,7 @@ class TablePosition {
     required this.height,
     this.createdAt,
     this.updatedAt,
+    this.reservation,
   });
 
   // Custom fromJson to handle type mismatches and missing fields
@@ -124,16 +207,32 @@ class TablePosition {
     // Debug logging for table status
     print('🔍 DEBUG: TablePosition.fromJson: Processing table ${json['tableNumber']}');
     print('🔍 DEBUG: TablePosition.fromJson: Raw tableStatus from JSON: ${json['tableStatus']}');
+    print('🔍 DEBUG: TablePosition.fromJson: Available fields: ${json.keys.toList()}');
     final tableStatus = json['tableStatus'] as String;
     print('🔍 DEBUG: TablePosition.fromJson: Final tableStatus: $tableStatus');
+    
+    // Parse reservation data if present
+    Reservation? reservation;
+    if (json['reservation'] != null && json['reservation'] is Map<String, dynamic>) {
+      try {
+        reservation = Reservation.fromJson(json['reservation'] as Map<String, dynamic>);
+        print('🔍 DEBUG: TablePosition.fromJson: Parsed reservation for table ${json['tableNumber']}: ${reservation.customerName}');
+      } catch (e) {
+        print('🔍 DEBUG: TablePosition.fromJson: Error parsing reservation for table ${json['tableNumber']}: $e');
+      }
+    }
+    
+    // Handle missing fields with defaults
+    final tableCapacity = json['tableCapacity'] ?? json['capacity'] ?? 4; // Default to 4 seats
+    final tableSection = json['tableSection'] ?? json['section'] ?? 'Main Floor'; // Default section
     
     return TablePosition(
       id: (json['id'] as num).toInt(),
       tableId: (json['tableId'] as num).toInt(),
       tableNumber: json['tableNumber'] as String,
-      tableCapacity: (json['tableCapacity'] as num).toInt(),
+      tableCapacity: (tableCapacity is num) ? tableCapacity.toInt() : int.tryParse(tableCapacity.toString()) ?? 4,
       tableStatus: tableStatus,
-      tableSection: json['tableSection'] as String,
+      tableSection: tableSection.toString(),
       x: (json['x'] as num).toInt(),
       y: (json['y'] as num).toInt(),
       rotation: (json['rotation'] as num).toInt(),
@@ -145,6 +244,7 @@ class TablePosition {
       updatedAt: json['updatedAt'] == null
           ? null
           : DateTime.tryParse(json['updatedAt'].toString()),
+      reservation: reservation,
     );
   }
 
@@ -181,6 +281,7 @@ class TablePosition {
     int? height,
     DateTime? createdAt,
     DateTime? updatedAt,
+    Reservation? reservation,
   }) {
     return TablePosition(
       id: id ?? this.id,
@@ -196,6 +297,7 @@ class TablePosition {
       height: height ?? this.height,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      reservation: reservation ?? this.reservation,
     );
   }
 } 

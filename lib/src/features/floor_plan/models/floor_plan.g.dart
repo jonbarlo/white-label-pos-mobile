@@ -6,6 +6,25 @@ part of 'floor_plan.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+Reservation _$ReservationFromJson(Map<String, dynamic> json) => Reservation(
+      customerName: json['customerName'] as String,
+      customerPhone: json['customerPhone'] as String?,
+      partySize: (json['partySize'] as num).toInt(),
+      reservationDate: json['reservationDate'] as String,
+      reservationTime: json['reservationTime'] as String,
+      notes: json['notes'] as String?,
+    );
+
+Map<String, dynamic> _$ReservationToJson(Reservation instance) =>
+    <String, dynamic>{
+      'customerName': instance.customerName,
+      'customerPhone': instance.customerPhone,
+      'partySize': instance.partySize,
+      'reservationDate': instance.reservationDate,
+      'reservationTime': instance.reservationTime,
+      'notes': instance.notes,
+    };
+
 FloorPlan _$FloorPlanFromJson(Map<String, dynamic> json) => FloorPlan(
       id: (json['id'] as num).toInt(),
       businessId: (json['businessId'] as num).toInt(),
@@ -59,6 +78,9 @@ TablePosition _$TablePositionFromJson(Map<String, dynamic> json) =>
       updatedAt: json['updatedAt'] == null
           ? null
           : DateTime.parse(json['updatedAt'] as String),
+      reservation: json['reservation'] == null
+          ? null
+          : Reservation.fromJson(json['reservation'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$TablePositionToJson(TablePosition instance) =>
@@ -76,4 +98,5 @@ Map<String, dynamic> _$TablePositionToJson(TablePosition instance) =>
       'height': instance.height,
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
+      'reservation': instance.reservation,
     };
