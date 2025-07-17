@@ -108,7 +108,6 @@ class WaiterOrderRepository {
     final orderItems = items.map((cartItem) => {
       'itemId': int.parse(cartItem.id),
       'quantity': cartItem.quantity,
-      'price': cartItem.price,
       'notes': cartItem.category ?? '',
     }).toList();
 

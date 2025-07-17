@@ -8,7 +8,9 @@ import 'interceptors/error_interceptor.dart';
 
 /// Centralized Dio client provider
 final dioClientProvider = Provider<Dio>((ref) {
+  print('🔍 DEBUG: dioClientProvider: Creating Dio client');
   final baseUrl = EnvConfig.apiBaseUrl;
+  print('🔍 DEBUG: dioClientProvider: Base URL = $baseUrl');
   
   // Base headers that work across all platforms
   final headers = <String, String>{
@@ -38,5 +40,6 @@ final dioClientProvider = Provider<Dio>((ref) {
     ErrorInterceptor(),
   ]);
 
+  print('🔍 DEBUG: dioClientProvider: Dio client created successfully');
   return dio;
 }); 

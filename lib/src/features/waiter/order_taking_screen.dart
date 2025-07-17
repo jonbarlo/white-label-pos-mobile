@@ -12,6 +12,7 @@ import 'waiter_order_provider.dart' as waiter_order;
 import 'table_provider.dart';
 import 'package:another_flushbar/flushbar.dart';
 import '../../core/services/navigation_service.dart';
+Rimport '../floor_plan/floor_plan_provider.dart';
 
 
 class OrderTakingScreen extends ConsumerStatefulWidget {
@@ -1020,6 +1021,8 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
         // Refresh table data to update status and order info
         ref.invalidate(tableProvider);
         ref.invalidate(tablesProvider);
+        // Refresh floor plan data to update table statuses in floor plan viewer
+        ref.invalidate(floorPlansWithTablesProvider);
         
       } else {
         // Create new order
@@ -1041,6 +1044,8 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
         // Refresh table data to update status and order info
         ref.invalidate(tableProvider);
         ref.invalidate(tablesProvider);
+        // Refresh floor plan data to update table statuses in floor plan viewer
+        ref.invalidate(floorPlansWithTablesProvider);
       }
 
       // Reset loading state and clear cart

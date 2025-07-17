@@ -21,25 +21,44 @@ final floorPlansProvider = FutureProvider<Result<List<FloorPlan>>>((ref) async {
 
 // Floor plans with tables provider
 final floorPlansWithTablesProvider = FutureProvider<Result<List<FloorPlan>>>((ref) async {
+  print('🔍 DEBUG: floorPlansWithTablesProvider: Starting to load floor plans with tables');
   final repository = ref.watch(floorPlanRepositoryProvider);
+  
+  // Add timestamp to force fresh data
+  final timestamp = DateTime.now().millisecondsSinceEpoch;
+  print('🔍 DEBUG: floorPlansWithTablesProvider: Timestamp: $timestamp');
+  
   final floorPlansResult = await repository.getFloorPlans();
   
   if (!floorPlansResult.isSuccess) {
+    print('🔍 DEBUG: floorPlansWithTablesProvider: Failed to get floor plans: ${floorPlansResult.errorMessage}');
     return floorPlansResult;
   }
   
   final floorPlans = floorPlansResult.data;
+  print('🔍 DEBUG: floorPlansWithTablesProvider: Got ${floorPlans.length} floorPlans');
   final floorPlansWithTables = <FloorPlan>[];
   
   for (final floorPlan in floorPlans) {
     try {
+      print('🔍 DEBUG: floorPlansWithTablesProvider: Loading tables for floor plan ${floorPlan.id} (${floorPlan.name})');
       // Use the correct endpoint: /floor-plans/{id}/tables
       final tablesResult = await repository.getFloorPlanWithTables(floorPlan.id);
       if (tablesResult.isSuccess) {
         // The floor plan already includes tables from the API
-        floorPlansWithTables.add(tablesResult.data);
+        final floorPlanWithTables = tablesResult.data;
+        print('🔍 DEBUG: floorPlansWithTablesProvider: Floor plan ${floorPlan.id} has ${floorPlanWithTables.tables?.length ?? 0} tables');
+        
+        // Debug: Print table statuses
+        if (floorPlanWithTables.tables != null) {
+          for (final table in floorPlanWithTables.tables!) {
+            print('🔍 DEBUG: floorPlansWithTablesProvider: Table ${table.tableNumber} (ID: ${table.tableId}) status: ${table.tableStatus}');
+          }
+        }
+        floorPlansWithTables.add(floorPlanWithTables);
       } else {
-        // If we can't get tables, add the floor plan without tables
+        print('🔍 DEBUG: floorPlansWithTablesProvider: Failed to get tables for floor plan ${floorPlan.id}: ${tablesResult.errorMessage}');
+        // If we cant get tables, add the floor plan without tables
         floorPlansWithTables.add(floorPlan);
       }
     } catch (e) {

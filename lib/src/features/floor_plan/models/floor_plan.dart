@@ -121,12 +121,18 @@ class TablePosition {
 
   // Custom fromJson to handle type mismatches and missing fields
   factory TablePosition.fromJson(Map<String, dynamic> json) {
+    // Debug logging for table status
+    print('🔍 DEBUG: TablePosition.fromJson: Processing table ${json['tableNumber']}');
+    print('🔍 DEBUG: TablePosition.fromJson: Raw tableStatus from JSON: ${json['tableStatus']}');
+    final tableStatus = json['tableStatus'] as String;
+    print('🔍 DEBUG: TablePosition.fromJson: Final tableStatus: $tableStatus');
+    
     return TablePosition(
       id: (json['id'] as num).toInt(),
       tableId: (json['tableId'] as num).toInt(),
       tableNumber: json['tableNumber'] as String,
       tableCapacity: (json['tableCapacity'] as num).toInt(),
-      tableStatus: json['tableStatus'] as String,
+      tableStatus: tableStatus,
       tableSection: json['tableSection'] as String,
       x: (json['x'] as num).toInt(),
       y: (json['y'] as num).toInt(),

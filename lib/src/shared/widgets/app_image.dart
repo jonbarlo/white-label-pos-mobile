@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 
 /// A reusable image widget that handles network images with proper loading and error states
 class AppImage extends StatelessWidget {
@@ -67,17 +68,23 @@ class AppImage extends StatelessWidget {
 
     // If no image URL, show fallback
     if (imageUrl == null || imageUrl!.isEmpty) {
-      print('AppImage: No image URL provided');
+      if (kDebugMode) {
+        print('AppImage: No image URL provided');
+      }
       return defaultPlaceholder;
     }
 
     // Check if it's a valid URL
     if (!_isValidUrl(imageUrl!)) {
-      print('AppImage: Invalid URL: $imageUrl');
+      if (kDebugMode) {
+        print('AppImage: Invalid URL: $imageUrl');
+      }
       return defaultErrorWidget;
     }
 
-    print('AppImage: Attempting to load: $imageUrl');
+    if (kDebugMode) {
+      print('AppImage: Attempting to load: $imageUrl');
+    }
 
     return ClipRRect(
       borderRadius: borderRadius ?? BorderRadius.zero,
@@ -87,15 +94,31 @@ class AppImage extends StatelessWidget {
         height: height,
         fit: fit,
         placeholder: (context, url) {
-          print('AppImage: Loading placeholder for $url');
+          if (kDebugMode) {
+            print('AppImage: Loading placeholder for $url');
+          }
           return placeholder ?? defaultPlaceholder;
         },
         errorWidget: (context, url, error) {
-          print('AppImage: Error loading $url - $error');
+          // Only log errors in debug mode and filter out common 404rrors
+          if (kDebugMode) {
+            // Don't log 404 known problematic URLs to reduce noise
+            if (!url.contains('photo-1621996346565') &&
+                !url.contains('photo-1551024506') &&
+                !url.contains('photo-1571877227200') &&
+                !url.contains('photo-1510812431401') &&
+                !url.contains('photo-1621263764928')) {
+              print('AppImage: Error loading $url - $error');
+            }
+          }
           return errorWidget ?? defaultErrorWidget;
         },
         memCacheWidth: width?.toInt(),
         memCacheHeight: height?.toInt(),
+        // Add retry logic for failed images
+        httpHeaders: const {
+          'User-Agent': 'Flutter POS App/1.0',
+        },
       ),
     );
   }

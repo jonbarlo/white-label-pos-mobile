@@ -4,19 +4,26 @@ import 'package:dio/dio.dart';
 class LoggingInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    // Log request details without print statements
+    print('🔍 DEBUG: Dio Request: ${options.method} ${options.uri}');
+    print('🔍 DEBUG: Dio Request Headers: ${options.headers}');
+    if (options.data != null) {
+      print('🔍 DEBUG: Dio Request Data: ${options.data}');
+    }
     handler.next(options);
   }
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-    // Log response details without print statements
+    print('🔍 DEBUG: Dio Response: ${response.statusCode} ${response.requestOptions.uri}');
+    print('🔍 DEBUG: Dio Response Data: ${response.data}');
     handler.next(response);
   }
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    // Log error details without print statements
+    print('🔍 DEBUG: Dio Error: ${err.type} ${err.message}');
+    print('🔍 DEBUG: Dio Error URL: ${err.requestOptions.uri}');
+    print('🔍 DEBUG: Dio Error Response: ${err.response?.data}');
     handler.next(err);
   }
 } 

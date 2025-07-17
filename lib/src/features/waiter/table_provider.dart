@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/network/dio_client.dart';
 import '../auth/auth_provider.dart';
+import '../floor_plan/floor_plan_provider.dart';
 import 'table_repository.dart';
 import 'models/table.dart' as waiter_table;
 
@@ -104,8 +105,18 @@ final seatCustomerProvider = FutureProvider.family<void, (int tableId, String cu
   final (tableId, customerName, partySize, notes) = params;
   await repo.seatCustomer(tableId, customerName, partySize, notes);
 
-  // Invalidate tables provider to refresh the list
+  // Invalidate all related providers to force refresh
   ref.invalidate(tablesProvider);
+  ref.invalidate(floorPlansWithTablesProvider);
+  ref.invalidate(floorPlanNotifierProvider);
+  
+  // Force refresh of all table-related data
+  ref.invalidate(tableProvider);
+  ref.invalidate(tablesByStatusProvider);
+  ref.invalidate(myAssignedTablesProvider);
+  
+  // Add a small delay to ensure the API has processed the change
+  await Future.delayed(const Duration(milliseconds: 500));
 });
 
 // Computed providers for filtered views

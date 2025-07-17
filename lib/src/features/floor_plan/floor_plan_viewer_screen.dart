@@ -5,6 +5,8 @@ import 'floor_plan_provider.dart';
 import 'models/floor_plan.dart';
 import '../../core/theme/app_theme.dart';
 import '../../shared/models/result.dart';
+import '../waiter/table_provider.dart';
+import 'package:flutter/foundation.dart';
 
 class FloorPlanViewerScreen extends ConsumerStatefulWidget {
   const FloorPlanViewerScreen({super.key});
@@ -17,7 +19,7 @@ class _FloorPlanViewerScreenState extends ConsumerState<FloorPlanViewerScreen>
     with TickerProviderStateMixin {
   late TabController _tabController;
   String? _selectedFloorPlanId;
-  FloorPlan? _selectedFloorPlan;
+  bool _isRefreshing = false;
 
   @override
   void initState() {
@@ -25,8 +27,46 @@ class _FloorPlanViewerScreenState extends ConsumerState<FloorPlanViewerScreen>
     _tabController = TabController(length: 2, vsync: this);
     // Load floor plans when screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.invalidate(floorPlansWithTablesProvider);
+      _refreshFloorPlans();
     });
+  }
+
+  Future<void> _refreshFloorPlans() async {
+    if (_isRefreshing) return;
+    
+    setState(() {
+      _isRefreshing = true;
+    });
+    
+    try {
+      // Force clear all provider caches
+      ref.invalidate(floorPlansWithTablesProvider);
+      ref.invalidate(tableProvider);
+      ref.invalidate(tablesProvider);
+      ref.invalidate(floorPlanNotifierProvider);
+      ref.invalidate(seatCustomerProvider);
+      ref.invalidate(tablesByStatusProvider);
+      ref.invalidate(myAssignedTablesProvider);
+      
+      // Force clear all floor plan related providers
+      ref.invalidate(floorPlansProvider);
+      ref.invalidate(floorPlanProvider);
+      ref.invalidate(floorPlanWithTablesProvider);
+      ref.invalidate(tablePositionsProvider);
+      ref.invalidate(allTablesProvider);
+      
+      // Wait longer for the API to process changes
+      await Future.delayed(const Duration(milliseconds: 100));
+      
+      // Force a complete widget rebuild
+      if (mounted) {
+        setState(() {});
+      }
+    } finally {
+      setState(() {
+        _isRefreshing = false;
+      });
+    }
   }
 
   @override
@@ -38,7 +78,7 @@ class _FloorPlanViewerScreenState extends ConsumerState<FloorPlanViewerScreen>
   @override
   Widget build(BuildContext context) {
     final floorPlanState = ref.watch(floorPlansWithTablesProvider);
-
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text('Floor Plan Viewer'),
@@ -57,8 +97,14 @@ class _FloorPlanViewerScreenState extends ConsumerState<FloorPlanViewerScreen>
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => ref.invalidate(floorPlansWithTablesProvider),
+            icon: _isRefreshing 
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.refresh),
+            onPressed: _isRefreshing ? null : _refreshFloorPlans,
             tooltip: 'Refresh',
           ),
         ],
@@ -66,6 +112,7 @@ class _FloorPlanViewerScreenState extends ConsumerState<FloorPlanViewerScreen>
       body: TabBarView(
         controller: _tabController,
         children: [
+          // Force rebuild with fresh data
           _buildFloorPlansTab(floorPlanState),
           _buildAllTablesTab(floorPlanState),
         ],
@@ -109,9 +156,6 @@ class _FloorPlanViewerScreenState extends ConsumerState<FloorPlanViewerScreen>
             onChanged: (value) {
               setState(() {
                 _selectedFloorPlanId = value;
-                _selectedFloorPlan = floorPlans.firstWhere(
-                  (fp) => fp.id.toString() == value,
-                );
               });
             },
           ),
@@ -119,8 +163,10 @@ class _FloorPlanViewerScreenState extends ConsumerState<FloorPlanViewerScreen>
         
         // Floor Plan Viewer
         Expanded(
-          child: _selectedFloorPlan != null
-              ? _buildFloorPlanView(_selectedFloorPlan!)
+          child: _selectedFloorPlanId != null
+              ? _buildFloorPlanView(
+                  floorPlans.firstWhere((fp) => fp.id.toString() == _selectedFloorPlanId)
+                )
               : _buildNoFloorPlanSelected(),
         ),
       ],
@@ -172,6 +218,12 @@ class _FloorPlanViewerScreenState extends ConsumerState<FloorPlanViewerScreen>
   }
 
   Widget _buildTableWidget(TablePosition table) {
+    // Debug logging for table status
+    if (kDebugMode) {
+      print('🔍 DEBUG: _buildTableWidget: Table ${table.tableNumber} (ID: ${table.tableId}) status: ${table.tableStatus}');
+      print('🔍 DEBUG: _buildTableWidget: Timestamp: ${DateTime.now().millisecondsSinceEpoch}');
+    }
+    
     Color statusColor;
     IconData statusIcon;
     
@@ -586,6 +638,7 @@ class _FloorPlanViewerScreenState extends ConsumerState<FloorPlanViewerScreen>
 
   // Dialog Methods
   void _showSeatCustomersDialog(TablePosition table) {
+    final customerNameController = TextEditingController();
     final partySizeController = TextEditingController();
     final notesController = TextEditingController();
 
@@ -596,6 +649,14 @@ class _FloorPlanViewerScreenState extends ConsumerState<FloorPlanViewerScreen>
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            TextField(
+              controller: customerNameController,
+              decoration: const InputDecoration(
+                labelText: 'Customer Name',
+                hintText: 'Customer name or party name',
+              ),
+            ),
+            const SizedBox(height: 16),
             TextField(
               controller: partySizeController,
               decoration: const InputDecoration(
@@ -620,23 +681,39 @@ class _FloorPlanViewerScreenState extends ConsumerState<FloorPlanViewerScreen>
             onPressed: () => Navigator.of(context).pop(),
             child: const Text('Cancel'),
           ),
-                      ElevatedButton(
-              onPressed: () {
-                final partySize = int.tryParse(partySizeController.text.trim()) ?? 0;
-                final notes = notesController.text.trim();
-                
-                if (partySize <= 0) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Please enter a valid party size'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                  return;
-                }
-                
-                Navigator.of(context).pop();
-                
+          ElevatedButton(
+            onPressed: () async {
+              final customerName = customerNameController.text.trim();
+              final partySize = int.tryParse(partySizeController.text.trim()) ?? 0;
+              final notes = notesController.text.trim();
+              
+              if (customerName.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Please enter a customer name'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                return;
+              }
+              
+              if (partySize <= 0) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Please enter a valid party size'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                return;
+              }
+              
+              Navigator.of(context).pop();
+              
+              try {
+                // Actually seat the customer using the provider
+                await ref.read(seatCustomerProvider((table.tableId, customerName, partySize, notes)).future);
+                // Invalidate floorPlansWithTablesProvider to force UI update
+                ref.invalidate(floorPlansWithTablesProvider);
                 // Navigate to order taking screen
                 context.push(
                   '/waiter/order/${table.tableId}',
@@ -655,16 +732,23 @@ class _FloorPlanViewerScreenState extends ConsumerState<FloorPlanViewerScreen>
                     },
                   },
                 );
-                
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Customers seated at Table ${table.tableNumber}'),
                     backgroundColor: Colors.green,
                   ),
                 );
-              },
-              child: const Text('Seat Customers'),
-            ),
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Error seating customers: ${e.toString()}'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+            child: const Text('Seat Customers'),
+          ),
         ],
       ),
     );
@@ -905,7 +989,7 @@ class _FloorPlanViewerScreenState extends ConsumerState<FloorPlanViewerScreen>
           Text(error),
           const SizedBox(height: 16),
           ElevatedButton(
-            onPressed: () => ref.invalidate(floorPlansWithTablesProvider),
+            onPressed: () => _refreshFloorPlans(),
             child: const Text('Retry'),
           ),
         ],
