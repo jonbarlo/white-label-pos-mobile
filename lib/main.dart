@@ -8,6 +8,8 @@ import 'src/features/auth/data/repositories/auth_repository_impl.dart';
 import 'src/features/business/data/repositories/business_repository_impl.dart';
 import 'src/features/inventory/inventory_repository_impl.dart';
 import 'src/features/inventory/inventory_provider.dart';
+import 'src/features/floor_plan/floor_plan_repository_impl.dart';
+import 'src/features/floor_plan/floor_plan_provider.dart';
 
 
 void main() async {
@@ -36,6 +38,11 @@ void main() async {
         // Inventory repository (using real implementation)
         inventoryRepositoryProvider.overrideWith(
           (ref) => InventoryRepositoryImpl(ref.watch(dioClientProvider)),
+        ),
+        
+        // Floor plan repository (using real implementation)
+        floorPlanRepositoryProvider.overrideWith(
+          (ref) => FloorPlanRepositoryImpl(ref.watch(dioClientProvider)),
         ),
       ],
       child: const WhiteLabelPOSApp(),

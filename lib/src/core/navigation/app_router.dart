@@ -16,9 +16,12 @@ import '../../features/business/business_list_screen.dart';
 import '../../features/waiter/table_selection_screen.dart';
 import '../../features/waiter/waiter_dashboard_screen.dart';
 import '../../features/waiter/order_taking_screen.dart';
+import '../../features/waiter/models/table.dart' as waiter_table;
 import '../../features/viewer/kitchen_screen.dart';
 import '../../features/viewer/bar_screen.dart';
 import '../../features/pos/split_billing_screen.dart';
+import '../../features/floor_plan/floor_plan_viewer_screen.dart';
+import '../../features/floor_plan/floor_plan_management_screen.dart';
 import '../../features/auth/models/user.dart';
 
 
@@ -66,6 +69,8 @@ class AppRouter {
   static const String kitchenRoute = '/kitchen';
   static const String barRoute = '/bar';
   static const String splitBillingRoute = '/split-billing';
+  static const String floorPlanViewerRoute = '/floor-plan-viewer';
+  static const String floorPlanManagementRoute = '/floor-plan-management';
 
   /// Create the main router configuration
   static GoRouter createRouter(Ref ref) {
@@ -142,6 +147,13 @@ class AppRouter {
               builder: (context, state) => const ReportsScreen(),
             ),
             
+            // Floor Plan Management
+            GoRoute(
+              path: floorPlanManagementRoute,
+              name: 'floor-plan-management',
+              builder: (context, state) => const FloorPlanManagementScreen(),
+            ),
+            
             // Profile
             GoRoute(
               path: profileRoute,
@@ -174,10 +186,31 @@ class AppRouter {
               name: 'order-taking',
               builder: (context, state) {
                 final tableId = int.tryParse(state.pathParameters['tableId'] ?? '') ?? 0;
-                final table = state.extra as Map<String, dynamic>?;
+                final extra = state.extra as Map<String, dynamic>?;
+                final tableData = extra?['table'] as Map<String, dynamic>?;
+                
+                // Convert JSON map to Table object
+                final table = tableData != null ? waiter_table.Table.fromJson({
+                  'id': tableData['id'] ?? tableId,
+                  'businessId': 1, // Default business ID
+                  'name': tableData['tableNumber'] ?? tableData['name'] ?? 'Table $tableId',
+                  'status': tableData['status'] ?? 'available',
+                  'capacity': tableData['capacity'] ?? 4,
+                  'location': tableData['section'] ?? tableData['location'] ?? 'Main Floor',
+                  'isActive': true,
+                }) : waiter_table.Table(
+                  id: tableId,
+                  businessId: 1,
+                  name: 'Table $tableId',
+                  status: waiter_table.TableStatus.available,
+                  capacity: 4,
+                  location: 'Main Floor',
+                  isActive: true,
+                );
+                
                 return OrderTakingScreen(
-                  table: table?['table'],
-                  prefillOrder: table?['prefillOrder'],
+                  table: table,
+                  prefillOrder: extra?['prefillOrder'],
                 );
               },
             ),
@@ -208,6 +241,13 @@ class AppRouter {
               cartItems: args?['cartItems'] ?? [],
             );
           },
+        ),
+        
+        // Floor plan viewer route (waitstaff view)
+        GoRoute(
+          path: floorPlanViewerRoute,
+          name: 'floor-plan-viewer',
+          builder: (context, state) => const FloorPlanViewerScreen(),
         ),
       ],
     );
@@ -278,6 +318,8 @@ class AppRouter {
            location == posRoute ||
            location == inventoryRoute ||
            location == reportsRoute ||
+           location == floorPlanViewerRoute ||
+           location == floorPlanManagementRoute ||
            location == profileRoute ||
            location == businessRoute ||
            location == waiterRoute ||
@@ -304,7 +346,7 @@ class AppRouter {
         }
       case UserRole.waiter:
       case UserRole.waitstaff:
-        return waiterRoute;
+        return floorPlanViewerRoute;
       case UserRole.admin:
       case UserRole.owner:
       case UserRole.manager:
@@ -379,13 +421,31 @@ class _MainAppShell extends ConsumerWidget {
       navigationRoutes.add(AppRouter.inventoryRoute);
     }
     
-    // Reports - available to admin and manager
+        // Reports - available to admin and manager
     if (authState.canAccessReports) {
       navigationItems.add(const BottomNavigationBarItem(
         icon: Icon(Icons.assessment),
         label: 'Reports',
       ));
       navigationRoutes.add(AppRouter.reportsRoute);
+    }
+    
+    // Floor Plans - available to admin, owner, and manager
+    if (authState.canAccessFloorPlans) {
+      navigationItems.add(const BottomNavigationBarItem(
+        icon: Icon(Icons.map),
+        label: 'Floor Plans',
+      ));
+      navigationRoutes.add(AppRouter.floorPlanManagementRoute);
+    }
+    
+    // Floor Plan Viewer - available to waitstaff
+    if (authState.user?.role == UserRole.waiter || authState.user?.role == UserRole.waitstaff) {
+      navigationItems.add(const BottomNavigationBarItem(
+        icon: Icon(Icons.table_restaurant),
+        label: 'Tables',
+      ));
+      navigationRoutes.add(AppRouter.floorPlanViewerRoute);
     }
     
     // Profile - available to all authenticated users

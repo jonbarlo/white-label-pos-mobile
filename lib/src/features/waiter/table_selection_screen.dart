@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'table_provider.dart';
 import 'models/table.dart' as waiter_table;
 import 'order_taking_screen.dart';
+import '../../features/floor_plan/floor_plan_viewer_screen.dart';
+import '../../features/floor_plan/models/floor_plan.dart';
+import '../../features/floor_plan/floor_plan_provider.dart';
+import '../../features/auth/auth_provider.dart';
+import '../../core/navigation/app_router.dart';
 
 import 'waiter_order_provider.dart';
 import '../../core/services/navigation_service.dart';
@@ -23,7 +29,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 5, vsync: this);
+    _tabController = TabController(length: 6, vsync: this); // Added floor plan view tab
   }
 
   @override
@@ -68,6 +74,47 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
                 },
               );
             },
+          ),
+          IconButton(
+            icon: const Icon(Icons.map),
+            onPressed: () async {
+              // Get floor plans from API
+              final floorPlanState = ref.read(floorPlanNotifierProvider);
+              
+              final floorPlans = floorPlanState.when(
+                data: (result) => result.isSuccess ? result.data : [],
+                loading: () => [],
+                error: (_, __) => [],
+              );
+
+              if (floorPlans.isEmpty) {
+                // Show error if no floor plans available
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('No floor plans available. Please create a floor plan first.'),
+                      backgroundColor: Colors.orange,
+                    ),
+                  );
+                }
+                return;
+              }
+
+              // Use the first active floor plan, or the first one if none are active
+              final selectedFloorPlan = floorPlans.firstWhere(
+                (fp) => fp.isActive,
+                orElse: () => floorPlans.first,
+              );
+
+              // Navigate to floor plan viewer with actual floor plan ID
+              if (mounted) {
+                context.push(AppRouter.floorPlanViewerRoute, extra: {
+                  'floorPlanId': selectedFloorPlan.id,
+                  'isEditMode': false,
+                });
+              }
+            },
+            tooltip: 'Floor Plan View',
           ),
           IconButton(
             icon: const Icon(Icons.person),
@@ -964,6 +1011,23 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
             child: const Text('Details', style: TextStyle(fontSize: 10)),
           ),
         );
+    }
+  }
+
+  waiter_table.TableStatus _convertStatus(String status) {
+    switch (status.toLowerCase()) {
+      case 'available':
+        return waiter_table.TableStatus.available;
+      case 'occupied':
+        return waiter_table.TableStatus.occupied;
+      case 'reserved':
+        return waiter_table.TableStatus.reserved;
+      case 'cleaning':
+        return waiter_table.TableStatus.cleaning;
+      case 'out_of_service':
+        return waiter_table.TableStatus.outOfService;
+      default:
+        return waiter_table.TableStatus.available;
     }
   }
 } 

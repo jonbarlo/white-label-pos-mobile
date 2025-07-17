@@ -6,6 +6,8 @@ import '../../features/auth/data/repositories/auth_repository_impl.dart';
 import '../../features/business/data/repositories/business_repository_impl.dart';
 import '../../features/inventory/inventory_repository_impl.dart';
 import '../../features/inventory/inventory_provider.dart';
+import '../../features/floor_plan/floor_plan_repository_impl.dart';
+import '../../features/floor_plan/floor_plan_provider.dart';
 import '../../core/config/env_config.dart';
 
 /// Global providers for dependency injection
@@ -44,10 +46,15 @@ class DependencyInjection {
           (ref) => BusinessRepositoryImpl(ref.watch(dioClientProvider)),
         ),
         
-        // Inventory repository (uses Dio from provider)
-        inventoryRepositoryProvider.overrideWith(
-          (ref) => InventoryRepositoryImpl(ref.watch(dioClientProvider)),
-        ),
+          // Inventory repository (uses Dio from provider)
+  inventoryRepositoryProvider.overrideWith(
+    (ref) => InventoryRepositoryImpl(ref.watch(dioClientProvider)),
+  ),
+  
+    // Floor plan repository (uses Dio from provider)
+  floorPlanRepositoryProvider.overrideWith(
+    (ref) => FloorPlanRepositoryImpl(ref.watch(dioClientProvider)),
+  ),
       ],
     );
   }
@@ -85,5 +92,10 @@ final testOverrides = [
   // Inventory repository (uses Dio from provider)
   inventoryRepositoryProvider.overrideWith(
     (ref) => InventoryRepositoryImpl(ref.watch(dioClientProvider)),
+  ),
+  
+  // Floor plan repository (uses Dio from provider)
+  floorPlanRepositoryProvider.overrideWith(
+    (ref) => FloorPlanRepositoryImpl(ref.watch(dioClientProvider)),
   ),
 ]; 

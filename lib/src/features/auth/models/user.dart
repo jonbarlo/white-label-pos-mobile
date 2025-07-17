@@ -114,5 +114,6 @@ extension UserRoleExtension on UserRole {
   bool get canAccessAnalytics => this == UserRole.admin || this == UserRole.owner || this == UserRole.manager;
   bool get canAccessBasicAnalytics => this == UserRole.admin || this == UserRole.owner || this == UserRole.manager || this == UserRole.cashier;
   bool get canManageUsers => this == UserRole.admin;
+  bool get canAccessFloorPlans => this == UserRole.admin || this == UserRole.owner || this == UserRole.manager;
   bool get canViewOnly => this == UserRole.viewer;
 } 

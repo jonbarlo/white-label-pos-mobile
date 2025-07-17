@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../features/auth/auth_provider.dart';
+import '../features/floor_plan/floor_plan_provider.dart';
 import 'navigation/app_router.dart';
 import 'theme/theme_provider.dart';
 
@@ -24,6 +25,14 @@ class MainApp extends ConsumerWidget {
     final themeData = ref.watch(themeDataProvider);
     final themeMode = ref.watch(themeModeProvider);
     final initializationState = ref.watch(appInitializationProvider);
+    
+    // Test floor plan provider initialization
+    try {
+      final floorPlanState = ref.watch(floorPlanNotifierProvider);
+      print('🔍 DEBUG: MainApp: Floor plan state = $floorPlanState');
+    } catch (e) {
+      print('🔍 DEBUG: MainApp: Error watching floor plan provider: $e');
+    }
     
     print('MainApp build - Theme mode: $themeMode');
 
