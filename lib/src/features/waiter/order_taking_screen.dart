@@ -12,7 +12,7 @@ import 'waiter_order_provider.dart' as waiter_order;
 import 'table_provider.dart';
 import 'package:another_flushbar/flushbar.dart';
 import '../../core/services/navigation_service.dart';
-Rimport '../floor_plan/floor_plan_provider.dart';
+import '../floor_plan/floor_plan_provider.dart';
 
 
 class OrderTakingScreen extends ConsumerStatefulWidget {
