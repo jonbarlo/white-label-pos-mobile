@@ -27,8 +27,10 @@ class EnvConfig {
   static String get apiBaseUrl {
     try {
       final url = dotenv.env['API_BASE_URL'] ?? _defaultApiUrl;
+      print('🔍 DEBUG: EnvConfig.apiBaseUrl = $url');
       return url;
     } catch (e) {
+      print('🔍 DEBUG: EnvConfig.apiBaseUrl error: $e, using default: $_defaultApiUrl');
       return _defaultApiUrl;
     }
   }
@@ -118,6 +120,20 @@ class EnvConfig {
       return enabled != null ? enabled.toLowerCase() == 'true' : true;
     } catch (e) {
       return true;
+    }
+  }
+
+  /// Get analytics rate limit threshold (for development mode)
+  static int get analyticsRateLimitThreshold {
+    try {
+      if (isDebugMode) {
+        // In development mode, set a very high threshold to bypass rate limiting
+        return 100000000000;
+      }
+      final threshold = dotenv.env['ANALYTICS_RATE_LIMIT_THRESHOLD'];
+      return threshold != null ? int.tryParse(threshold) ?? 1000 : 1000;
+    } catch (e) {
+      return isDebugMode ? 100000000000 : 1000;
     }
   }
 

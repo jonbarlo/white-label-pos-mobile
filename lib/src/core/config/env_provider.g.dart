@@ -117,7 +117,27 @@ final isBarcodeScanningEnabledProvider = AutoDisposeProvider<bool>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef IsBarcodeScanningEnabledRef = AutoDisposeProviderRef<bool>;
-String _$environmentConfigHash() => r'f79163b4049c59c73925057d94e0859a425765e0';
+String _$analyticsRateLimitThresholdHash() =>
+    r'99019eed0f7da211295eb5a8f18dd7f2575aefff';
+
+/// Provider for analytics rate limit threshold
+///
+/// Copied from [analyticsRateLimitThreshold].
+@ProviderFor(analyticsRateLimitThreshold)
+final analyticsRateLimitThresholdProvider = AutoDisposeProvider<int>.internal(
+  analyticsRateLimitThreshold,
+  name: r'analyticsRateLimitThresholdProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$analyticsRateLimitThresholdHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef AnalyticsRateLimitThresholdRef = AutoDisposeProviderRef<int>;
+String _$environmentConfigHash() => r'1f9f0787373405a2ec9ba577784ffd86ee87bbd0';
 
 /// Provider for environment configuration
 ///

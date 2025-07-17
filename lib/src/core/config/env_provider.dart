@@ -29,6 +29,7 @@ class EnvironmentConfig extends _$EnvironmentConfig {
       'isPushNotificationsEnabled': EnvConfig.isPushNotificationsEnabled,
       'isAnalyticsEnabled': EnvConfig.isAnalyticsEnabled,
       'isCrashReportingEnabled': EnvConfig.isCrashReportingEnabled,
+      'analyticsRateLimitThreshold': EnvConfig.analyticsRateLimitThreshold,
     };
   }
 }
@@ -96,5 +97,16 @@ bool isBarcodeScanningEnabled(IsBarcodeScanningEnabledRef ref) {
     data: (data) => data['isBarcodeScanningEnabled'] as bool,
     loading: () => EnvConfig.isBarcodeScanningEnabled,
     error: (error, stack) => EnvConfig.isBarcodeScanningEnabled,
+  );
+}
+
+/// Provider for analytics rate limit threshold
+@riverpod
+int analyticsRateLimitThreshold(AnalyticsRateLimitThresholdRef ref) {
+  final config = ref.watch(environmentConfigProvider);
+  return config.when(
+    data: (data) => data['analyticsRateLimitThreshold'] as int,
+    loading: () => EnvConfig.analyticsRateLimitThreshold,
+    error: (error, stack) => EnvConfig.analyticsRateLimitThreshold,
   );
 } 
