@@ -218,12 +218,6 @@ class _FloorPlanViewerScreenState extends ConsumerState<FloorPlanViewerScreen>
   }
 
   Widget _buildTableWidget(TablePosition table) {
-    // Debug logging for table status
-    if (kDebugMode) {
-      print('🔍 DEBUG: _buildTableWidget: Table ${table.tableNumber} (ID: ${table.tableId}) status: ${table.tableStatus}');
-      print('🔍 DEBUG: _buildTableWidget: Timestamp: ${DateTime.now().millisecondsSinceEpoch}');
-    }
-    
     Color statusColor;
     IconData statusIcon;
     
@@ -255,7 +249,9 @@ class _FloorPlanViewerScreenState extends ConsumerState<FloorPlanViewerScreen>
       child: Transform.rotate(
         angle: table.rotation * 3.14159 / 180,
         child: GestureDetector(
-          onTap: () => _showTableActions(table),
+          onTap: () {
+            _showTableActions(table);
+          },
           child: Container(
             width: table.width.toDouble(),
             height: table.height.toDouble(),
@@ -450,12 +446,16 @@ class _FloorPlanViewerScreenState extends ConsumerState<FloorPlanViewerScreen>
             const SizedBox(width: 8),
             IconButton(
               icon: const Icon(Icons.more_vert),
-              onPressed: () => _showTableActions(table),
+              onPressed: () {
+                _showTableActions(table);
+              },
               tooltip: 'Table Actions',
             ),
           ],
         ),
-        onTap: () => _showTableActions(table),
+        onTap: () {
+          _showTableActions(table);
+        },
       ),
     );
   }
@@ -522,13 +522,13 @@ class _FloorPlanViewerScreenState extends ConsumerState<FloorPlanViewerScreen>
           const SizedBox(height: 24),
           
           // Action Buttons
-                     _buildActionButton(
-             'Seat Customers',
-             Icons.person_add,
-             Colors.blue,
-             () => _seatCustomers(table),
-             isEnabled: table.tableStatus.toLowerCase() == 'available',
-           ),
+          _buildActionButton(
+            'Seat Customers',
+            Icons.person_add,
+            Colors.blue,
+            () => _seatCustomers(table),
+            isEnabled: table.tableStatus.toLowerCase() == 'available',
+          ),
           _buildActionButton(
             'Add Items to Order',
             Icons.add_shopping_cart,

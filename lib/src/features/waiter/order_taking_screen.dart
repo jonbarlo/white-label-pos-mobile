@@ -62,6 +62,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () {
+              print('🔍 DEBUG: Refresh button pressed');
               ref.invalidate(waiter_order.tableOrdersProvider(widget.table.id));
               ref.invalidate(waiter_order.mergedTableOrdersProvider(widget.table.id));
             },
@@ -158,16 +159,14 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
   }
 
   void _updateCartFromMergedData(Map<String, dynamic> mergedData) {
-    // Only update if we haven't already processed this data
-    if (_cartItems.isEmpty && mergedData['items'] != null) {
+    // Only update with server data if cart is empty (initial load)
+    // This prevents server data from overwriting local cart changes
+    if (mergedData['items'] != null && _cartItems.isEmpty) {
       final items = mergedData['items'] as List<dynamic>;
-      
       setState(() {
-        _cartItems.clear();
         _customerName = mergedData['customerName'] ?? _customerName;
         _customerNotes = mergedData['customerNotes'] ?? _customerNotes;
         _customerNameEditable = false;
-        
         for (final item in items) {
           _cartItems.add(CartItem(
             id: item['itemId']?.toString() ?? item['id']?.toString() ?? '',
@@ -179,7 +178,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
           ));
         }
       });
-      
+      print('🔍 DEBUG: Updated cart from server data with ${_cartItems.length} items');
     }
   }
 
@@ -435,7 +434,10 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
                 const Spacer(),
                 if (isAvailable) ...[
                   ElevatedButton.icon(
-                    onPressed: () => _addToCartFromMap(item),
+                    onPressed: () {
+                      print('🔍 DEBUG: Add button tapped for item: ${item['name']}');
+                      _addToCartFromMap(item);
+                    },
                     icon: Icon(Icons.add, size: 20),
                     label: Text('Add', style: TextStyle(
                       fontSize: 16, 
@@ -521,7 +523,10 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
                 const Spacer(),
                 if (item.isAvailable) ...[
                   ElevatedButton.icon(
-                    onPressed: () => _addToCartFromPosItem(item),
+                    onPressed: () {
+                      print('🔍 DEBUG: Add button tapped for item: ${item.name}');
+                      _addToCartFromPosItem(item);
+                    },
                     icon: Icon(Icons.add, size: 20),
                     label: Text('Add', style: TextStyle(
                       fontSize: 16, 
@@ -564,15 +569,18 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
   }
 
   void _addToCartFromPosItem(MenuItem item) {
+    print('🔍 DEBUG: _addToCartFromPosItem called with item: ${item.name}');
     final existingIndex = _cartItems.indexWhere((cartItem) => cartItem.id == item.id.toString());
     
     if (existingIndex >= 0) {
+      print('🔍 DEBUG: Updating existing item quantity');
       setState(() {
         _cartItems[existingIndex] = _cartItems[existingIndex].copyWith(
           quantity: _cartItems[existingIndex].quantity + 1,
         );
       });
     } else {
+      print('🔍 DEBUG: Adding new item to cart');
       setState(() {
         _cartItems.add(CartItem(
           id: item.id.toString(),
@@ -584,6 +592,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
         ));
       });
     }
+    print('🔍 DEBUG: Cart now has ${_cartItems.length} items');
   }
 
   Widget _buildCart() {
@@ -819,6 +828,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
           Expanded(
             child: OutlinedButton.icon(
               onPressed: _isSubmitting ? null : () {
+                print('🔍 DEBUG: Cancel button pressed');
                 if (mounted) {
                   NavigationService.goBack(context);
                 }
@@ -842,7 +852,10 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
           Expanded(
             flex: 2,
             child: ElevatedButton.icon(
-              onPressed: _isSubmitting || _cartItems.isEmpty ? null : _submitOrder,
+              onPressed: _isSubmitting || _cartItems.isEmpty ? null : () {
+                print('🔍 DEBUG: Submit order button pressed');
+                _submitOrder();
+              },
               icon: _isSubmitting
                   ? SizedBox(
                       width: 20,
@@ -873,6 +886,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
             flex: 2,
             child: ElevatedButton.icon(
               onPressed: _cartItems.isEmpty ? null : () {
+                print('🔍 DEBUG: Split bill button pressed');
                 // Show split billing dialog instead of navigation
                 showDialog(
                   context: context,
@@ -926,17 +940,20 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
   }
 
   void _addToCartFromMap(Map<String, dynamic> item) {
+    print('🔍 DEBUG: _addToCartFromMap called with item: ${item['name']}');
     // Use the menu item ID that the backend expects
     final menuItemId = item['id']?.toString() ?? '';
     final existingIndex = _cartItems.indexWhere((cartItem) => cartItem.id == menuItemId);
     
     if (existingIndex >= 0) {
+      print('🔍 DEBUG: Updating existing item quantity');
       setState(() {
         _cartItems[existingIndex] = _cartItems[existingIndex].copyWith(
           quantity: _cartItems[existingIndex].quantity + 1,
         );
       });
     } else {
+      print('🔍 DEBUG: Adding new item to cart');
       setState(() {
         _cartItems.add(CartItem(
           id: menuItemId,
@@ -948,6 +965,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
         ));
       });
     }
+    print('🔍 DEBUG: Cart now has ${_cartItems.length} items');
   }
 
   void _increaseQuantity(CartItem item) {
@@ -1006,11 +1024,13 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
       final container = ProviderScope.containerOf(context, listen: false);
       final tableOrders = await container.read(waiter_order.tableOrdersProvider(widget.table.id).future);
       
-      if (tableOrders.isNotEmpty && widget.prefillOrder != null) {
+      if (tableOrders.isNotEmpty) {
         // Add items to existing order
+        // Get the order ID from the first order in the table
+        final orderId = tableOrders.first['id'].toString();
         
         final result = await ref.read(waiter_order.addItemsToOrderProvider((
-          orderId: widget.prefillOrder!['id'].toString(),
+          orderId: orderId,
           items: _cartItems,
         )).future);
         
