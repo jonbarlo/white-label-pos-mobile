@@ -5,6 +5,7 @@ import 'package:white_label_pos_mobile/src/features/auth/auth_provider.dart';
 import 'floor_plan_repository.dart';
 import 'floor_plan_repository_impl.dart';
 import 'models/floor_plan.dart';
+import 'dart:async'; // Added for Timer
 
 
 // Repository provider
@@ -543,4 +544,111 @@ final authenticatedFloorPlanNotifierProvider = StateNotifierProvider<FloorPlanNo
   }
   
   return notifier;
+});
+
+// Progressive loading provider for floor plans with tables
+class ProgressiveFloorPlanNotifier extends StateNotifier<AsyncValue<Result<List<FloorPlan>>>> {
+  final FloorPlanRepository _repository;
+  Timer? _refreshTimer;
+
+  ProgressiveFloorPlanNotifier(this._repository) : super(AsyncValue.data(Result.success([]))) {
+    print('🔍 DEBUG: ProgressiveFloorPlanNotifier: Created');
+    _startAutoRefresh();
+  }
+
+  void _startAutoRefresh() {
+    _refreshTimer?.cancel();
+    _refreshTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (state.value?.isSuccess == true) {
+        print('🔍 DEBUG: ProgressiveFloorPlanNotifier: Auto-refreshing floor plans');
+        loadFloorPlansProgressive();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
+  }
+
+  Future<void> loadFloorPlansProgressive() async {
+    print('🔍 DEBUG: ProgressiveFloorPlanNotifier: Starting progressive load');
+    state = const AsyncValue.loading();
+    
+    try {
+      // First, get the list of floor plans
+      final floorPlansResult = await _repository.getFloorPlans();
+      
+      if (!floorPlansResult.isSuccess) {
+        print('🔍 DEBUG: ProgressiveFloorPlanNotifier: Failed to get floor plans: ${floorPlansResult.errorMessage}');
+        state = AsyncValue.data(floorPlansResult);
+        return;
+      }
+      
+      final floorPlans = floorPlansResult.data;
+      print('🔍 DEBUG: ProgressiveFloorPlanNotifier: Found ${floorPlans.length} floor plans to load');
+      
+      final floorPlansWithTables = <FloorPlan>[];
+      
+      // Load each floor plan with tables progressively
+      for (int i = 0; i < floorPlans.length; i++) {
+        final floorPlan = floorPlans[i];
+        print('🔍 DEBUG: ProgressiveFloorPlanNotifier: Loading floor plan ${i + 1}/${floorPlans.length}: ${floorPlan.name}');
+        
+        try {
+          // Load tables for this floor plan
+          final tablesResult = await _repository.getFloorPlanWithTables(floorPlan.id);
+          
+          if (tablesResult.isSuccess) {
+            final floorPlanWithTables = tablesResult.data;
+            print('🔍 DEBUG: ProgressiveFloorPlanNotifier: Floor plan ${floorPlan.name} has ${floorPlanWithTables.tables?.length ?? 0} tables');
+            
+            // Debug: Print table statuses
+            if (floorPlanWithTables.tables != null) {
+              for (final table in floorPlanWithTables.tables!) {
+                print('🔍 DEBUG: ProgressiveFloorPlanNotifier: Table ${table.tableNumber} (ID: ${table.tableId}) status: ${table.tableStatus}');
+              }
+            }
+            
+            floorPlansWithTables.add(floorPlanWithTables);
+          } else {
+            print('🔍 DEBUG: ProgressiveFloorPlanNotifier: Failed to get tables for ${floorPlan.name}: ${tablesResult.errorMessage}');
+            floorPlansWithTables.add(floorPlan);
+          }
+        } catch (e) {
+          print('🔍 DEBUG: ProgressiveFloorPlanNotifier: Error loading tables for ${floorPlan.name}: $e');
+          floorPlansWithTables.add(floorPlan);
+        }
+        
+        // Update state with current progress (partial results)
+        final currentResult = Result.success(floorPlansWithTables);
+        state = AsyncValue.data(currentResult);
+        
+        // Add a small delay to make the progressive loading visible
+        if (i < floorPlans.length - 1) {
+          await Future.delayed(const Duration(milliseconds: 300));
+        }
+      }
+      
+      print('🔍 DEBUG: ProgressiveFloorPlanNotifier: Completed loading ${floorPlansWithTables.length} floor plans');
+      final finalResult = Result.success(floorPlansWithTables);
+      state = AsyncValue.data(finalResult);
+      
+    } catch (e, stack) {
+      print('🔍 DEBUG: ProgressiveFloorPlanNotifier: Error in progressive load: $e');
+      state = AsyncValue.error(e, stack);
+    }
+  }
+
+  Future<void> refresh() async {
+    print('🔍 DEBUG: ProgressiveFloorPlanNotifier: Manual refresh requested');
+    await loadFloorPlansProgressive();
+  }
+}
+
+final progressiveFloorPlansProvider = StateNotifierProvider<ProgressiveFloorPlanNotifier, AsyncValue<Result<List<FloorPlan>>>>((ref) {
+  print('🔍 DEBUG: progressiveFloorPlansProvider: Creating ProgressiveFloorPlanNotifier');
+  final repository = ref.watch(floorPlanRepositoryProvider);
+  return ProgressiveFloorPlanNotifier(repository);
 });

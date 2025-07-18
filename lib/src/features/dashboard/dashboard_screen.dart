@@ -6,6 +6,9 @@ import '../../shared/widgets/theme_toggle_button.dart';
 import '../pos/pos_provider.dart';
 import '../pos/models/sale.dart';
 import '../../core/navigation/app_router.dart';
+import '../auth/auth_provider.dart';
+import '../auth/models/user.dart';
+import 'waitstaff_dashboard_screen.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -26,6 +29,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authNotifierProvider);
+    
+    // Show waitstaff dashboard for waitstaff users
+    if (authState.user?.role == UserRole.waiter || authState.user?.role == UserRole.waitstaff) {
+      return const WaitstaffDashboardScreen();
+    }
+    
     final theme = Theme.of(context);
     
     // Get today's sales summary - use today's date only

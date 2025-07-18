@@ -77,11 +77,8 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
     
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Waiter Dashboard'),
+        title: const Text('Dashboard'),
         centerTitle: true,
-        elevation: 2,
-        backgroundColor: theme.colorScheme.primary,
-        foregroundColor: theme.colorScheme.onPrimary,
         actions: const [
           ThemeToggleButton(),
         ],
@@ -92,35 +89,34 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Welcome section
-            _buildWelcomeSection(user),
+            _buildWelcomeSection(user, theme),
             const SizedBox(height: 24),
             
             // Quick stats
-            _buildQuickStats(),
+            _buildQuickStats(theme),
             const SizedBox(height: 24),
             
             // Main actions
-            _buildMainActions(),
+            _buildMainActions(theme),
             const SizedBox(height: 24),
             
             // Recent activity
-            _buildRecentActivity(),
+            _buildRecentActivity(theme),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildWelcomeSection(user) {
+  Widget _buildWelcomeSection(user, ThemeData theme) {
     return Card(
-      elevation: 4,
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Theme.of(context).colorScheme.primary,
-              Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
+              theme.colorScheme.primary,
+              theme.colorScheme.primary.withValues(alpha: 0.8),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -158,7 +154,7 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 24,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
@@ -180,7 +176,7 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
     );
   }
 
-  Widget _buildQuickStats() {
+  Widget _buildQuickStats(ThemeData theme) {
     return Row(
       children: [
         Expanded(
@@ -188,7 +184,8 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
             'Active Tables',
             '3',
             Icons.table_restaurant,
-            Colors.green,
+            theme.colorScheme.secondary,
+            theme,
           ),
         ),
         const SizedBox(width: 12),
@@ -197,7 +194,8 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
             'Pending Orders',
             '2',
             Icons.pending_actions,
-            Colors.orange,
+            theme.colorScheme.tertiary,
+            theme,
           ),
         ),
         const SizedBox(width: 12),
@@ -206,16 +204,16 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
             'Today\'s Tips',
             '\$45',
             Icons.attach_money,
-            Colors.blue,
+            theme.colorScheme.primary,
+            theme,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+  Widget _buildStatCard(String title, String value, IconData icon, Color color, ThemeData theme) {
     return Card(
-      elevation: 2,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -230,7 +228,7 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
               value,
               style: TextStyle(
                 fontSize: 24,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
                 color: color,
               ),
             ),
@@ -239,7 +237,7 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
               title,
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.grey[600],
+                color: theme.colorScheme.onSurfaceVariant,
                 fontSize: 12,
               ),
             ),
@@ -249,15 +247,13 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
     );
   }
 
-  Widget _buildMainActions() {
+  Widget _buildMainActions(ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Quick Actions',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+          style: theme.textTheme.titleLarge,
         ),
         const SizedBox(height: 16),
         GridView.count(
@@ -271,30 +267,34 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
             _buildActionCard(
               'Order History',
               Icons.history,
-              Colors.purple,
+              theme.colorScheme.primary,
               'View past orders',
               () => _showComingSoon('Order History'),
+              theme,
             ),
             _buildActionCard(
               'Customer Info',
               Icons.people,
-              Colors.orange,
+              theme.colorScheme.secondary,
               'Manage customer details',
               () => _showComingSoon('Customer Information'),
+              theme,
             ),
             _buildActionCard(
               'Inventory Check',
               Icons.inventory,
-              Colors.teal,
+              theme.colorScheme.tertiary,
               'Check item availability',
               () => _showComingSoon('Inventory Check'),
+              theme,
             ),
             _buildActionCard(
               'Daily Report',
               Icons.assessment,
-              Colors.indigo,
+              theme.colorScheme.primary,
               'View daily summary',
               () => _showComingSoon('Daily Report'),
+              theme,
             ),
           ],
         ),
@@ -302,9 +302,8 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
     );
   }
 
-  Widget _buildActionCard(String title, IconData icon, Color color, String subtitle, VoidCallback onTap) {
+  Widget _buildActionCard(String title, IconData icon, Color color, String subtitle, VoidCallback onTap, ThemeData theme) {
     return Card(
-      elevation: 2,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
@@ -322,9 +321,10 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
               Text(
                 title,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
                   fontSize: 14,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 4),
@@ -332,7 +332,7 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
                 subtitle,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Colors.grey[600],
+                  color: theme.colorScheme.onSurfaceVariant,
                   fontSize: 11,
                 ),
               ),
@@ -343,47 +343,48 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
     );
   }
 
-  Widget _buildRecentActivity() {
+  Widget _buildRecentActivity(ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Recent Activity',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+          style: theme.textTheme.titleLarge,
         ),
         const SizedBox(height: 16),
         Card(
-          elevation: 2,
           child: Column(
             children: [
               _buildActivityItem(
                 'Table 3 order completed',
                 '2 minutes ago',
                 Icons.check_circle,
-                Colors.green,
+                theme.colorScheme.secondary,
+                theme,
               ),
-              const Divider(height: 1),
+              Divider(height: 1, color: theme.colorScheme.outline),
               _buildActivityItem(
                 'New customer at Table 5',
                 '15 minutes ago',
                 Icons.person_add,
-                Colors.blue,
+                theme.colorScheme.primary,
+                theme,
               ),
-              const Divider(height: 1),
+              Divider(height: 1, color: theme.colorScheme.outline),
               _buildActivityItem(
                 'Kitchen notification: Table 2 ready',
                 '25 minutes ago',
                 Icons.restaurant,
-                Colors.orange,
+                theme.colorScheme.tertiary,
+                theme,
               ),
-              const Divider(height: 1),
+              Divider(height: 1, color: theme.colorScheme.outline),
               _buildActivityItem(
                 'Promotion updated: Happy Hour Special',
                 '1 hour ago',
                 Icons.local_offer,
-                Colors.purple,
+                theme.colorScheme.primary,
+                theme,
               ),
             ],
           ),
@@ -392,10 +393,10 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
     );
   }
 
-  Widget _buildActivityItem(String title, String time, IconData icon, Color color) {
+  Widget _buildActivityItem(String title, String time, IconData icon, Color color, ThemeData theme) {
     return ListTile(
       leading: CircleAvatar(
-                          backgroundColor: color.withValues(alpha: 0.1),
+        backgroundColor: color.withValues(alpha: 0.1),
         child: Icon(
           icon,
           color: color,
@@ -404,21 +405,22 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
       ),
       title: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontWeight: FontWeight.w500,
           fontSize: 14,
+          color: theme.colorScheme.onSurface,
         ),
       ),
       subtitle: Text(
         time,
         style: TextStyle(
-          color: Colors.grey[600],
+          color: theme.colorScheme.onSurfaceVariant,
           fontSize: 12,
         ),
       ),
       trailing: Icon(
         Icons.chevron_right,
-        color: Colors.grey[400],
+        color: theme.colorScheme.onSurfaceVariant,
         size: 20,
       ),
     );
@@ -428,7 +430,6 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('$feature - Coming Soon!'),
-        backgroundColor: Colors.blue,
         duration: const Duration(seconds: 2),
       ),
     );

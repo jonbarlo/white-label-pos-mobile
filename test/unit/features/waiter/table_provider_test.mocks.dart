@@ -229,12 +229,39 @@ class MockTableRepository extends _i1.Mock implements _i4.TableRepository {
       ) as _i5.Future<List<_i3.Table>>);
 
   @override
+  _i5.Future<void> createReservation(
+    int? tableId,
+    String? customerName,
+    String? customerPhone,
+    int? partySize,
+    String? reservationDate,
+    String? reservationTime,
+    String? notes,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #createReservation,
+          [
+            tableId,
+            customerName,
+            customerPhone,
+            partySize,
+            reservationDate,
+            reservationTime,
+            notes,
+          ],
+        ),
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
+
+  @override
   _i5.Future<void> seatCustomer(
     int? tableId,
     String? customerName,
     int? partySize,
     String? notes, {
-    required int? serverId,
+    int? serverId,
   }) =>
       (super.noSuchMethod(
         Invocation.method(

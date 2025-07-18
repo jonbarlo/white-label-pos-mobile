@@ -16,6 +16,9 @@ import '../../features/business/business_list_screen.dart';
 import '../../features/waiter/table_selection_screen.dart';
 import '../../features/waiter/waiter_dashboard_screen.dart';
 import '../../features/waiter/order_taking_screen.dart';
+import '../../features/waiter/tables_screen.dart';
+import '../../features/waiter/messages_screen.dart';
+import '../../features/dashboard/waitstaff_dashboard_screen.dart';
 import '../../features/waiter/models/table.dart' as waiter_table;
 import '../../features/viewer/kitchen_screen.dart';
 import '../../features/viewer/bar_screen.dart';
@@ -66,6 +69,8 @@ class AppRouter {
   static const String waiterRoute = '/waiter';
   static const String tableSelectionRoute = '/waiter/tables';
   static const String orderTakingRoute = '/waiter/order';
+  static const String tablesRoute = '/tables';
+  static const String messagesRoute = '/messages';
   static const String kitchenRoute = '/kitchen';
   static const String barRoute = '/bar';
   static const String splitBillingRoute = '/split-billing';
@@ -249,6 +254,20 @@ class AppRouter {
           name: 'floor-plan-viewer',
           builder: (context, state) => const FloorPlanViewerScreen(),
         ),
+        
+        // Tables route (waitstaff view)
+        GoRoute(
+          path: tablesRoute,
+          name: 'tables',
+          builder: (context, state) => const TablesScreen(),
+        ),
+        
+        // Messages route (waitstaff view)
+        GoRoute(
+          path: messagesRoute,
+          name: 'messages',
+          builder: (context, state) => const MessagesScreen(),
+        ),
       ],
     );
   }
@@ -320,6 +339,8 @@ class AppRouter {
            location == reportsRoute ||
            location == floorPlanViewerRoute ||
            location == floorPlanManagementRoute ||
+           location == tablesRoute ||
+           location == messagesRoute ||
            location == profileRoute ||
            location == businessRoute ||
            location == waiterRoute ||
@@ -346,7 +367,7 @@ class AppRouter {
         }
       case UserRole.waiter:
       case UserRole.waitstaff:
-        return floorPlanViewerRoute;
+        return dashboardRoute; // Use dashboard for waitstaff
       case UserRole.admin:
       case UserRole.owner:
       case UserRole.manager:
@@ -403,8 +424,10 @@ class _MainAppShell extends ConsumerWidget {
       navigationRoutes.add(AppRouter.analyticsRoute);
     }
     
-    // POS - available to non-admin, non-viewer users
-    if (authState.canAccessPOS) {
+    // POS - available to non-admin, non-viewer, non-waitstaff users
+    if (authState.canAccessPOS && 
+        authState.user?.role != UserRole.waiter && 
+        authState.user?.role != UserRole.waitstaff) {
       navigationItems.add(const BottomNavigationBarItem(
         icon: Icon(Icons.point_of_sale),
         label: 'POS',
@@ -412,8 +435,10 @@ class _MainAppShell extends ConsumerWidget {
       navigationRoutes.add(AppRouter.posRoute);
     }
     
-    // Inventory - available to non-viewer users
-    if (!authState.canViewOnly) {
+    // Inventory - available to non-viewer, non-waitstaff users
+    if (!authState.canViewOnly && 
+        authState.user?.role != UserRole.waiter && 
+        authState.user?.role != UserRole.waitstaff) {
       navigationItems.add(const BottomNavigationBarItem(
         icon: Icon(Icons.inventory),
         label: 'Inventory',
@@ -439,13 +464,19 @@ class _MainAppShell extends ConsumerWidget {
       navigationRoutes.add(AppRouter.floorPlanManagementRoute);
     }
     
-    // Floor Plan Viewer - available to waitstaff
+    // Waitstaff-specific navigation
     if (authState.user?.role == UserRole.waiter || authState.user?.role == UserRole.waitstaff) {
       navigationItems.add(const BottomNavigationBarItem(
-        icon: Icon(Icons.table_restaurant),
-        label: 'Tables',
+        icon: Icon(Icons.map),
+        label: 'Floor Plan',
       ));
       navigationRoutes.add(AppRouter.floorPlanViewerRoute);
+      
+      navigationItems.add(const BottomNavigationBarItem(
+        icon: Icon(Icons.message),
+        label: 'Messages',
+      ));
+      navigationRoutes.add(AppRouter.messagesRoute);
     }
     
     // Profile - available to all authenticated users

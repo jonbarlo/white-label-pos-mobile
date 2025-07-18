@@ -1,222 +1,234 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  static ThemeData get lightTheme {
-    const Color primaryColor = Color(0xFF0176d3); // Salesforce/Stripe blue
-    const Color backgroundColor = Color(0xFFF3F3F3); // App background
-    const Color cardColor = Color(0xFFFFFFFF); // Card/surface
-    const Color cardBorderColor = Color(0xFFE5E5E5); // Card border
-    const Color successColor = Color(0xFF2e844a); // Green
-    const Color warningColor = Color(0xFFfe9339); // Orange
-    const Color errorColor = Color(0xFFea001e); // Red
-    const Color textColor = Color(0xFF181818); // Main text
-    const Color secondaryTextColor = Color(0xFF747474); // Secondary text
+  // Apple HIG & Square-inspired color palette
+  static const Color _appleBlue = Color(0xFF007AFF);
+  static const Color _appleGreen = Color(0xFF34C759);
+  static const Color _appleOrange = Color(0xFFFF9500);
+  static const Color _appleRed = Color(0xFFFF3B30);
+  
+  // Light theme colors
+  static const Color _lightBackground = Color(0xFFF2F2F7);
+  static const Color _lightCard = Color(0xFFFFFFFF);
+  static const Color _lightBorder = Color(0xFFE5E5EA);
+  static const Color _lightText = Color(0xFF000000);
+  static const Color _lightSecondaryText = Color(0xFF8E8E93);
+  static const Color _lightTertiaryText = Color(0xFFC7C7CC);
+  
+  // Dark theme colors
+  static const Color _darkBackground = Color(0xFF18191A);
+  static const Color _darkCard = Color(0xFF232325);
+  static const Color _darkBorder = Color(0xFF2C2C2E);
+  static const Color _darkText = Color(0xFFF2F2F7);
+  static const Color _darkSecondaryText = Color(0xFFB0B0B0);
+  static const Color _darkTertiaryText = Color(0xFF8E8E93);
 
+  static ThemeData get lightTheme {
     return ThemeData(
-      fontFamily: 'SF Pro Display', // Apple HIG/modern look
+      fontFamily: 'SF Pro Display',
       colorScheme: const ColorScheme.light(
-        primary: primaryColor,
+        primary: _appleBlue,
         onPrimary: Colors.white,
-        surface: cardColor,
-        onSurface: textColor,
-        error: errorColor,
-        onError: Colors.white,
-        secondary: primaryColor,
+        secondary: _appleGreen,
         onSecondary: Colors.white,
-        tertiary: warningColor,
+        tertiary: _appleOrange,
         onTertiary: Colors.white,
+        error: _appleRed,
+        onError: Colors.white,
+        background: _lightBackground,
+        onBackground: _lightText,
+        surface: _lightCard,
+        onSurface: _lightText,
+        surfaceVariant: _lightBackground,
+        onSurfaceVariant: _lightSecondaryText,
       ),
-      scaffoldBackgroundColor: backgroundColor,
-      cardColor: cardColor,
+      scaffoldBackgroundColor: _lightBackground,
+      cardColor: _lightCard,
       cardTheme: CardThemeData(
-        color: cardColor,
-        elevation: 2,
+        color: _lightCard,
+        elevation: 0, // Apple HIG: flat design
         margin: const EdgeInsets.all(8),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: cardBorderColor, width: 1),
+          borderRadius: BorderRadius.circular(12), // Apple HIG: 12px radius
+          side: const BorderSide(color: _lightBorder, width: 0.5), // Subtle border
         ),
       ),
       appBarTheme: const AppBarTheme(
-        backgroundColor: primaryColor,
-        foregroundColor: Colors.white,
-        elevation: 1,
+        backgroundColor: _lightCard, // Apple HIG: white app bar
+        foregroundColor: _lightText, // Apple HIG: dark text
+        elevation: 0, // Apple HIG: flat design
         centerTitle: true,
         titleTextStyle: TextStyle(
           fontFamily: 'SF Pro Display',
-          fontWeight: FontWeight.bold,
-          fontSize: 20,
-          color: Colors.white,
+          fontWeight: FontWeight.w600, // Apple HIG: semibold
+          fontSize: 17, // Apple HIG: standard size
+          color: _lightText,
         ),
       ),
       textTheme: const TextTheme(
-        displayLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: textColor),
-        displayMedium: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: textColor),
-        displaySmall: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: textColor),
-        headlineMedium: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: textColor),
-        headlineSmall: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: textColor),
-        titleLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: textColor),
-        titleMedium: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: textColor),
-        titleSmall: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: textColor),
-        bodyLarge: TextStyle(fontSize: 16, color: textColor),
-        bodyMedium: TextStyle(fontSize: 15, color: textColor),
-        bodySmall: TextStyle(fontSize: 14, color: secondaryTextColor),
-        labelLarge: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: textColor),
-        labelMedium: TextStyle(fontSize: 13, color: secondaryTextColor),
-        labelSmall: TextStyle(fontSize: 12, color: secondaryTextColor),
+        displayLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: _lightText),
+        displayMedium: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: _lightText),
+        displaySmall: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: _lightText),
+        headlineMedium: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: _lightText),
+        headlineSmall: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: _lightText),
+        titleLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: _lightText),
+        titleMedium: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: _lightText),
+        titleSmall: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: _lightText),
+        bodyLarge: TextStyle(fontSize: 16, color: _lightText),
+        bodyMedium: TextStyle(fontSize: 15, color: _lightText),
+        bodySmall: TextStyle(fontSize: 14, color: _lightSecondaryText),
+        labelLarge: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: _lightText),
+        labelMedium: TextStyle(fontSize: 13, color: _lightSecondaryText),
+        labelSmall: TextStyle(fontSize: 12, color: _lightSecondaryText),
       ),
       inputDecorationTheme: const InputDecorationTheme(
         border: OutlineInputBorder(
-          borderSide: BorderSide(color: cardBorderColor),
+          borderSide: BorderSide(color: _lightBorder),
           borderRadius: BorderRadius.all(Radius.circular(8)),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: primaryColor, width: 2),
+          borderSide: BorderSide(color: _appleBlue, width: 2),
           borderRadius: BorderRadius.all(Radius.circular(8)),
         ),
         contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: primaryColor,
+          backgroundColor: _appleBlue,
           foregroundColor: Colors.white,
-          textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+          elevation: 0, // Apple HIG: flat design
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: primaryColor,
-          side: const BorderSide(color: primaryColor),
-          textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          foregroundColor: _appleBlue,
+          side: const BorderSide(color: _appleBlue),
+          textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
         ),
       ),
       snackBarTheme: const SnackBarThemeData(
-        backgroundColor: primaryColor,
+        backgroundColor: _appleBlue,
         contentTextStyle: TextStyle(color: Colors.white, fontSize: 15),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8))),
       ),
-      dividerColor: cardBorderColor,
-      iconTheme: const IconThemeData(color: primaryColor),
+      dividerColor: _lightBorder,
+      iconTheme: const IconThemeData(color: _appleBlue),
       useMaterial3: true,
     );
   }
 
   static ThemeData get darkTheme {
-    const Color primaryColor = Color(0xFF0176d3); // Salesforce/Stripe blue (same as light)
-    const Color backgroundColor = Color(0xFF121212); // Dark app background
-    const Color cardColor = Color(0xFF1E1E1E); // Dark card/surface
-    const Color cardBorderColor = Color(0xFF2E2E2E); // Dark card border
-    const Color successColor = Color(0xFF2e844a); // Green (same as light)
-    const Color warningColor = Color(0xFFfe9339); // Orange (same as light)
-    const Color errorColor = Color(0xFFea001e); // Red (same as light)
-    const Color textColor = Color(0xFFE0E0E0); // Light text for dark background
-    const Color secondaryTextColor = Color(0xFFB0B0B0); // Secondary text for dark background
-
     return ThemeData(
-      fontFamily: 'SF Pro Display', // Apple HIG/modern look
+      fontFamily: 'SF Pro Display',
       colorScheme: const ColorScheme.dark(
-        primary: primaryColor,
+        primary: _appleBlue,
         onPrimary: Colors.white,
-        surface: cardColor,
-        onSurface: textColor,
-        error: errorColor,
-        onError: Colors.white,
-        secondary: primaryColor,
+        secondary: _appleGreen,
         onSecondary: Colors.white,
-        tertiary: warningColor,
+        tertiary: _appleOrange,
         onTertiary: Colors.white,
+        error: _appleRed,
+        onError: Colors.white,
+        background: _darkBackground,
+        onBackground: _darkText,
+        surface: _darkCard,
+        onSurface: _darkText,
+        surfaceVariant: _darkBackground,
+        onSurfaceVariant: _darkSecondaryText,
       ),
-      scaffoldBackgroundColor: backgroundColor,
-      cardColor: cardColor,
+      scaffoldBackgroundColor: _darkBackground,
+      cardColor: _darkCard,
       cardTheme: CardThemeData(
-        color: cardColor,
-        elevation: 2,
+        color: _darkCard,
+        elevation: 0, // Apple HIG: flat design
         margin: const EdgeInsets.all(8),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: cardBorderColor, width: 1),
+          borderRadius: BorderRadius.circular(12), // Apple HIG: 12px radius
+          side: const BorderSide(color: _darkBorder, width: 0.5), // Subtle border
         ),
       ),
       appBarTheme: const AppBarTheme(
-        backgroundColor: primaryColor,
-        foregroundColor: Colors.white,
-        elevation: 1,
+        backgroundColor: _darkCard, // Apple HIG: dark app bar
+        foregroundColor: _darkText, // Apple HIG: light text
+        elevation: 0, // Apple HIG: flat design
         centerTitle: true,
         titleTextStyle: TextStyle(
           fontFamily: 'SF Pro Display',
-          fontWeight: FontWeight.bold,
-          fontSize: 20,
-          color: Colors.white,
+          fontWeight: FontWeight.w600, // Apple HIG: semibold
+          fontSize: 17, // Apple HIG: standard size
+          color: _darkText,
         ),
       ),
       textTheme: const TextTheme(
-        displayLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: textColor),
-        displayMedium: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: textColor),
-        displaySmall: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: textColor),
-        headlineMedium: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: textColor),
-        headlineSmall: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: textColor),
-        titleLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: textColor),
-        titleMedium: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: textColor),
-        titleSmall: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: textColor),
-        bodyLarge: TextStyle(fontSize: 16, color: textColor),
-        bodyMedium: TextStyle(fontSize: 15, color: textColor),
-        bodySmall: TextStyle(fontSize: 14, color: secondaryTextColor),
-        labelLarge: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: textColor),
-        labelMedium: TextStyle(fontSize: 13, color: secondaryTextColor),
-        labelSmall: TextStyle(fontSize: 12, color: secondaryTextColor),
+        displayLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: _darkText),
+        displayMedium: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: _darkText),
+        displaySmall: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: _darkText),
+        headlineMedium: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: _darkText),
+        headlineSmall: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: _darkText),
+        titleLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: _darkText),
+        titleMedium: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: _darkText),
+        titleSmall: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: _darkText),
+        bodyLarge: TextStyle(fontSize: 16, color: _darkText),
+        bodyMedium: TextStyle(fontSize: 15, color: _darkText),
+        bodySmall: TextStyle(fontSize: 14, color: _darkSecondaryText),
+        labelLarge: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: _darkText),
+        labelMedium: TextStyle(fontSize: 13, color: _darkSecondaryText),
+        labelSmall: TextStyle(fontSize: 12, color: _darkSecondaryText),
       ),
       inputDecorationTheme: const InputDecorationTheme(
         border: OutlineInputBorder(
-          borderSide: BorderSide(color: cardBorderColor),
+          borderSide: BorderSide(color: _darkBorder),
           borderRadius: BorderRadius.all(Radius.circular(8)),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: primaryColor, width: 2),
+          borderSide: BorderSide(color: _appleBlue, width: 2),
           borderRadius: BorderRadius.all(Radius.circular(8)),
         ),
         contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: primaryColor,
+          backgroundColor: _appleBlue,
           foregroundColor: Colors.white,
-          textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+          elevation: 0, // Apple HIG: flat design
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: primaryColor,
-          side: const BorderSide(color: primaryColor),
-          textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          foregroundColor: _appleBlue,
+          side: const BorderSide(color: _appleBlue),
+          textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
         ),
       ),
       snackBarTheme: const SnackBarThemeData(
-        backgroundColor: primaryColor,
+        backgroundColor: _appleBlue,
         contentTextStyle: TextStyle(color: Colors.white, fontSize: 15),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8))),
       ),
-      dividerColor: cardBorderColor,
-      iconTheme: const IconThemeData(color: primaryColor),
+      dividerColor: _darkBorder,
+      iconTheme: const IconThemeData(color: _appleBlue),
       useMaterial3: true,
     );
   }
 
-  /// Standard neutral/secondary button style (Apple/Salesforce/Stripe/Material3 conventions)
+  /// Apple HIG & Square-inspired button styles
   static final ButtonStyle neutralButtonStyle = ElevatedButton.styleFrom(
-    backgroundColor: const Color(0xFFF3F3F3),
-    foregroundColor: const Color(0xFF181818),
+    backgroundColor: _lightBackground,
+    foregroundColor: _lightText,
     elevation: 0,
-    side: const BorderSide(color: Color(0xFFE5E5E5)),
+    side: const BorderSide(color: _lightBorder),
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(8),
     ),
@@ -226,4 +238,10 @@ class AppTheme {
     ),
     padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
   );
+
+  /// Status colors for semantic meaning (not backgrounds)
+  static const Color successColor = _appleGreen;
+  static const Color warningColor = _appleOrange;
+  static const Color errorColor = _appleRed;
+  static const Color infoColor = _appleBlue;
 } 
