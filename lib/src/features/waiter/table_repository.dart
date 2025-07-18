@@ -132,23 +132,95 @@ class TableRepository {
     return tables;
   }
 
-  Future<void> seatCustomer(int tableId, String customerName, int partySize, String notes) async {
+  Future<void> createReservation(int tableId, String customerName, String customerPhone, int partySize, String reservationDate, String reservationTime, String notes) async {
     try {
+      print('🔍 DEBUG: Creating reservation for table $tableId');
+      print('🔍 DEBUG: customerName: $customerName, partySize: $partySize, date: $reservationDate, time: $reservationTime');
+      
       final response = await dio.post(
-        '/tables/$tableId/seat',
+        '/tables/$tableId/reservations',
         data: {
           'customerName': customerName,
+          'customerPhone': customerPhone,
           'partySize': partySize,
-          'notes': notes,
-          'status': 'occupied',
+          'reservationDate': reservationDate,
+          'reservationTime': reservationTime,
+          'specialRequests': notes,
         },
       );
+      
+      print('🔍 DEBUG: Reservation response: ${response.data}');
+      
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Exception('Failed to create reservation: ${response.statusMessage}');
+      }
+    } on DioException catch (e) {
+      print('🔍 DEBUG: DioException in createReservation: ${e.message}');
+      print('🔍 DEBUG: Response data: ${e.response?.data}');
+      final msg = e.response?.data?['message'] ?? e.message ?? 'Unknown error';
+      throw Exception('Failed to create reservation: $msg');
+    } catch (e) {
+      print('🔍 DEBUG: General exception in createReservation: $e');
+      throw Exception('Failed to create reservation: $e');
+    }
+  }
+
+  Future<void> seatCustomer(int tableId, String customerName, int partySize, String notes, {int? serverId}) async {
+    try {
+      print('🔍 DEBUG: Seating customer at table $tableId');
+      print('🔍 DEBUG: customerName: $customerName, partySize: $partySize, notes: $notes');
+      print('🔍 DEBUG: Using serverId: $serverId');
+      
+      final requestData = {
+        'partySize': partySize,
+        'serverId': serverId,
+        'notes': notes,
+        'customerName': customerName,
+        'customerPhone': '',
+        'customerEmail': '',
+      };
+      
+      final response = await dio.post(
+        '/tables/$tableId/seat',
+        data: requestData,
+      );
+      
+      print('🔍 DEBUG: Seating response: ${response.data}');
+      
       if (response.statusCode != 200 && response.statusCode != 201) {
         throw Exception('Failed to seat customer: ${response.statusMessage}');
       }
     } on DioException catch (e) {
-      final msg = e.response?.data['message'] ?? e.message;
+      print('🔍 DEBUG: DioException in seatCustomer: ${e.message}');
+      print('🔍 DEBUG: Response data: ${e.response?.data}');
+      final msg = e.response?.data?['message'] ?? e.message ?? 'Unknown error';
       throw Exception('Failed to seat customer: $msg');
+    } catch (e) {
+      print('🔍 DEBUG: General exception in seatCustomer: $e');
+      throw Exception('Failed to seat customer: $e');
     }
+  }
+
+  Future<List<waiter_table.Table>> getTablesWithOrders({int? businessId}) async {
+    final queryParams = <String, dynamic>{};
+    if (businessId != null) queryParams['businessId'] = businessId;
+
+    final response = await dio.get('/tables/tables-with-orders', queryParameters: queryParams);
+
+    // Handle the new response format with success/data structure
+    final responseData = response.data;
+    List<dynamic> data;
+    
+    if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
+      data = responseData['data'] as List<dynamic>;
+    } else if (responseData is List<dynamic>) {
+      data = responseData;
+    } else {
+      throw Exception('Unexpected response format');
+    }
+    
+    final tables = data.map((json) => waiter_table.Table.fromJson(json)).toList();
+
+    return tables;
   }
 } 

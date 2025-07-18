@@ -3,39 +3,117 @@ import 'package:json_annotation/json_annotation.dart';
 part 'floor_plan.g.dart';
 
 @JsonSerializable()
+class Customer {
+  final int id;
+  final String firstName;
+  final String lastName;
+  final String email;
+  final String phone;
+  final String? preferences;
+
+  const Customer({
+    required this.id,
+    required this.firstName,
+    required this.lastName,
+    required this.email,
+    required this.phone,
+    this.preferences,
+  });
+
+  factory Customer.fromJson(Map<String, dynamic> json) => Customer(
+    id: (json['id'] as num).toInt(),
+    firstName: json['firstName'] as String,
+    lastName: json['lastName'] as String,
+    email: json['email'] as String,
+    phone: json['phone'] as String,
+    preferences: json['preferences'] as String?,
+  );
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'firstName': firstName,
+    'lastName': lastName,
+    'email': email,
+    'phone': phone,
+    'preferences': preferences,
+  };
+
+  String get fullName => '$firstName $lastName';
+}
+
+@JsonSerializable()
 class Reservation {
+  final int? id;
+  final int? customerId;
   final String customerName;
   final String? customerPhone;
+  final String? customerEmail;
   final int partySize;
   final String reservationDate;
   final String reservationTime;
   final String? notes;
+  final String? status;
+  final Customer? customer;
 
   const Reservation({
+    this.id,
+    this.customerId,
     required this.customerName,
     this.customerPhone,
+    this.customerEmail,
     required this.partySize,
     required this.reservationDate,
     required this.reservationTime,
     this.notes,
+    this.status,
+    this.customer,
   });
 
-  factory Reservation.fromJson(Map<String, dynamic> json) => Reservation(
-    customerName: json['customerName'] as String,
-    customerPhone: json['customerPhone'] as String?,
-    partySize: (json['partySize'] as num).toInt(),
-    reservationDate: json['reservationDate'] as String,
-    reservationTime: json['reservationTime'] as String,
-    notes: json['notes'] as String? ?? json['specialRequests'] as String?,
-  );
+  factory Reservation.fromJson(Map<String, dynamic> json) {
+    // Handle both old and new API structures
+    final customerName = json['customerName'] as String? ?? 
+                        (json['customer'] != null ? 
+                          '${json['customer']['firstName']} ${json['customer']['lastName']}' : 
+                          'Unknown Customer');
+    
+    final customerPhone = json['customerPhone'] as String? ?? 
+                         (json['customer'] != null ? json['customer']['phone'] as String? : null);
+    
+    final customerEmail = json['customerEmail'] as String? ?? 
+                         (json['customer'] != null ? json['customer']['email'] as String? : null);
+
+    Customer? customer;
+    if (json['customer'] != null && json['customer'] is Map<String, dynamic>) {
+      customer = Customer.fromJson(json['customer'] as Map<String, dynamic>);
+    }
+
+    return Reservation(
+      id: json['id'] != null ? (json['id'] as num).toInt() : null,
+      customerId: json['customerId'] != null ? (json['customerId'] as num).toInt() : null,
+      customerName: customerName,
+      customerPhone: customerPhone,
+      customerEmail: customerEmail,
+      partySize: (json['partySize'] as num).toInt(),
+      reservationDate: json['reservationDate'] as String,
+      reservationTime: json['reservationTime'] as String,
+      notes: json['notes'] as String? ?? json['specialRequests'] as String?,
+      status: json['status'] as String?,
+      customer: customer,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
+    'id': id,
+    'customerId': customerId,
     'customerName': customerName,
     'customerPhone': customerPhone,
+    'customerEmail': customerEmail,
     'partySize': partySize,
     'reservationDate': reservationDate,
     'reservationTime': reservationTime,
     'notes': notes,
+    'status': status,
+    'customer': customer?.toJson(),
   };
 
   // Format date for display (e.g., "Today, Jan 15")

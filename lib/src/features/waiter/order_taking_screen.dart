@@ -9,10 +9,10 @@ import '../pos/pos_provider.dart';
 import '../pos/split_payment_dialog.dart';
 import '../auth/auth_provider.dart';
 import 'waiter_order_provider.dart' as waiter_order;
-import 'table_provider.dart';
+import 'table_provider.dart' as waiter;
 import 'package:another_flushbar/flushbar.dart';
 import '../../core/services/navigation_service.dart';
-import '../floor_plan/floor_plan_provider.dart';
+import '../floor_plan/floor_plan_provider.dart' as fp;
 
 
 class OrderTakingScreen extends ConsumerStatefulWidget {
@@ -31,17 +31,47 @@ class OrderTakingScreen extends ConsumerStatefulWidget {
 
 class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
   final List<CartItem> _cartItems = [];
+  final Set<String> _existingItemIds = {}; // Track existing items from server
   String _customerName = '';
   String _customerNotes = '';
   bool _customerNameEditable = true;
   bool _isSubmitting = false;
+  
+  // Persistent controllers for customer details
+  late TextEditingController _customerNameController;
+  late TextEditingController _customerNotesController;
 
   @override
   void initState() {
     super.initState();
-    // Initialize with table data
-    _customerName = widget.table.customerName ?? '';
-    _customerNotes = widget.table.notes ?? '';
+    
+    print('🔍 DEBUG: OrderTakingScreen initState called');
+    print('🔍 DEBUG: widget.prefillOrder: ${widget.prefillOrder}');
+    print('🔍 DEBUG: widget.table: ${widget.table.name}, customerName: ${widget.table.customerName}, notes: ${widget.table.notes}');
+    
+    // Initialize with prefillOrder data first, then fallback to table data
+    if (widget.prefillOrder != null) {
+      _customerName = widget.prefillOrder!['customerName'] ?? widget.table.customerName ?? '';
+      _customerNotes = widget.prefillOrder!['notes'] ?? widget.table.notes ?? '';
+      print('🔍 DEBUG: Initialized with prefillOrder - customerName: "$_customerName", notes: "$_customerNotes"');
+    } else {
+      _customerName = widget.table.customerName ?? '';
+      _customerNotes = widget.table.notes ?? '';
+      print('🔍 DEBUG: Initialized with table data - customerName: "$_customerName", notes: "$_customerNotes"');
+    }
+    
+    // Initialize the controllers with the pre-filled values
+    _customerNameController = TextEditingController(text: _customerName);
+    _customerNotesController = TextEditingController(text: _customerNotes);
+    
+    print('🔍 DEBUG: Controllers initialized - customerNameController.text: "${_customerNameController.text}", customerNotesController.text: "${_customerNotesController.text}"');
+  }
+
+  @override
+  void dispose() {
+    _customerNameController.dispose();
+    _customerNotesController.dispose();
+    super.dispose();
   }
 
   @override
@@ -159,17 +189,44 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
   }
 
   void _updateCartFromMergedData(Map<String, dynamic> mergedData) {
-    // Only update with server data if cart is empty (initial load)
+    print('🔍 DEBUG: _updateCartFromMergedData called with mergedData: $mergedData');
+    print('🔍 DEBUG: Current _customerName: "$_customerName", _customerNotes: "$_customerNotes"');
+    print('🔍 DEBUG: Current _cartItems.length: ${_cartItems.length}');
+    
+    // Always update customer data from server if available (this fixes the corruption issue)
+    if (mergedData['customerName'] != null || mergedData['customerNotes'] != null) {
+      setState(() {
+        // Update customer name if we have it from server and it's not empty
+        if (mergedData['customerName'] != null && mergedData['customerName'].toString().isNotEmpty) {
+          _customerName = mergedData['customerName'] ?? '';
+          _customerNameController.text = _customerName;
+          print('🔍 DEBUG: Updated _customerName from server: "$_customerName"');
+        }
+        
+        // Update customer notes if we have it from server
+        if (mergedData['customerNotes'] != null) {
+          _customerNotes = mergedData['customerNotes'] ?? '';
+          _customerNotesController.text = _customerNotes;
+          print('🔍 DEBUG: Updated _customerNotes from server: "$_customerNotes"');
+        }
+        
+        _customerNameEditable = false;
+      });
+    }
+    
+    // Only update cart items if cart is empty (initial load)
     // This prevents server data from overwriting local cart changes
     if (mergedData['items'] != null && _cartItems.isEmpty) {
       final items = mergedData['items'] as List<dynamic>;
+      print('🔍 DEBUG: Updating cart from server data with ${items.length} items');
+      
       setState(() {
-        _customerName = mergedData['customerName'] ?? _customerName;
-        _customerNotes = mergedData['customerNotes'] ?? _customerNotes;
-        _customerNameEditable = false;
+        _existingItemIds.clear(); // Clear existing items tracking
         for (final item in items) {
+          final itemId = item['itemId']?.toString() ?? item['id']?.toString() ?? '';
+          _existingItemIds.add(itemId); // Track this as an existing item
           _cartItems.add(CartItem(
-            id: item['itemId']?.toString() ?? item['id']?.toString() ?? '',
+            id: itemId,
             name: item['itemName'] ?? item['name'] ?? '',
             price: (item['unitPrice'] ?? item['price'] ?? 0).toDouble(),
             quantity: (item['quantity'] ?? 1) as int,
@@ -179,6 +236,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
         }
       });
       print('🔍 DEBUG: Updated cart from server data with ${_cartItems.length} items');
+      print('🔍 DEBUG: Tracked existing item IDs: $_existingItemIds');
     }
   }
 
@@ -241,6 +299,11 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
   }
 
   Widget _buildCustomerDetails() {
+    print('🔍 DEBUG: _buildCustomerDetails called');
+    print('🔍 DEBUG: _customerNameController.text: "${_customerNameController.text}"');
+    print('🔍 DEBUG: _customerNotesController.text: "${_customerNotesController.text}"');
+    print('🔍 DEBUG: _customerName: "$_customerName", _customerNotes: "$_customerNotes"');
+    
     return Container(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -263,7 +326,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
                     border: OutlineInputBorder(),
                   ),
                   onChanged: (value) => _customerName = value,
-                  controller: TextEditingController(text: _customerName),
+                  controller: _customerNameController,
                   enabled: _customerNameEditable,
                 ),
               ),
@@ -278,7 +341,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
             ),
             maxLines: 2,
             onChanged: (value) => _customerNotes = value,
-            controller: TextEditingController(text: _customerNotes),
+            controller: _customerNotesController,
           ),
         ],
       ),
@@ -1029,20 +1092,29 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
         // Get the order ID from the first order in the table
         final orderId = tableOrders.first['id'].toString();
         
-        final result = await ref.read(waiter_order.addItemsToOrderProvider((
-          orderId: orderId,
-          items: _cartItems,
-        )).future);
+        // Only send new items (not existing ones) to avoid incrementing quantities
+        final newItems = _cartItems.where((item) => !_existingItemIds.contains(item.id)).toList();
+        print('🔍 DEBUG: Sending ${newItems.length} new items to addItemsToOrder (${_cartItems.length} total in cart)');
+        print('🔍 DEBUG: New items: ${newItems.map((item) => '${item.name} (qty: ${item.quantity})').join(', ')}');
+        
+        if (newItems.isNotEmpty) {
+          final result = await ref.read(waiter_order.addItemsToOrderProvider((
+            orderId: orderId,
+            items: newItems,
+          )).future);
+        } else {
+          print('🔍 DEBUG: No new items to add, skipping addItemsToOrder call');
+        }
         
         // Refresh the order data after adding items
         await Future.delayed(const Duration(milliseconds: 500)); // Give backend time to process
         ref.invalidate(waiter_order.tableOrdersProvider(widget.table.id));
         ref.invalidate(waiter_order.mergedTableOrdersProvider(widget.table.id));
         // Refresh table data to update status and order info
-        ref.invalidate(tableProvider);
-        ref.invalidate(tablesProvider);
+        ref.invalidate(waiter.tableProvider);
+        ref.invalidate(waiter.tablesProvider);
         // Refresh floor plan data to update table statuses in floor plan viewer
-        ref.invalidate(floorPlansWithTablesProvider);
+        ref.invalidate(fp.floorPlansWithTablesProvider);
         
       } else {
         // Create new order
@@ -1062,10 +1134,10 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
         ref.invalidate(waiter_order.tableOrdersProvider(widget.table.id));
         ref.invalidate(waiter_order.mergedTableOrdersProvider(widget.table.id));
         // Refresh table data to update status and order info
-        ref.invalidate(tableProvider);
-        ref.invalidate(tablesProvider);
+        ref.invalidate(waiter.tableProvider);
+        ref.invalidate(waiter.tablesProvider);
         // Refresh floor plan data to update table statuses in floor plan viewer
-        ref.invalidate(floorPlansWithTablesProvider);
+        ref.invalidate(fp.floorPlansWithTablesProvider);
       }
 
       // Reset loading state and clear cart

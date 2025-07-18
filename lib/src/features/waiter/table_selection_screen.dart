@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'table_provider.dart';
+import 'table_provider.dart' as waiter;
 import 'models/table.dart' as waiter_table;
 import 'order_taking_screen.dart';
 import '../../features/floor_plan/floor_plan_viewer_screen.dart';
 import '../../features/floor_plan/models/floor_plan.dart';
-import '../../features/floor_plan/floor_plan_provider.dart';
+import '../../features/floor_plan/floor_plan_provider.dart' as fp;
 import '../../features/auth/auth_provider.dart';
 import '../../core/navigation/app_router.dart';
 
@@ -40,8 +40,8 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
 
   @override
   Widget build(BuildContext context) {
-    final tablesAsync = ref.watch(tablesProvider);
-    final tableStatsAsync = ref.watch(tableStatsProvider);
+    final tablesAsync = ref.watch(waiter.tablesProvider);
+    final tableStatsAsync = ref.watch(waiter.tableStatsProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -53,7 +53,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () {
-              ref.invalidate(tablesProvider);
+              ref.invalidate(waiter.tablesProvider);
             },
             tooltip: 'Refresh Tables',
           ),
@@ -79,7 +79,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
             icon: const Icon(Icons.map),
             onPressed: () async {
               // Get floor plans from API
-              final floorPlanState = ref.read(floorPlanNotifierProvider);
+              final floorPlanState = ref.read(fp.floorPlanNotifierProvider);
               
               final floorPlans = floorPlanState.when(
                 data: (result) => result.isSuccess ? result.data : [],
@@ -136,7 +136,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
           Expanded(
             child: RefreshIndicator(
               onRefresh: () async {
-                ref.invalidate(tablesProvider);
+                ref.invalidate(waiter.tablesProvider);
               },
               child: TabBarView(
                 controller: _tabController,
@@ -315,7 +315,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                ref.invalidate(tablesProvider);
+                ref.invalidate(waiter.tablesProvider);
               },
               child: const Text('Retry'),
             ),
@@ -504,6 +504,13 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
   }
 
   void _onTableSelected(waiter_table.Table table) async {
+    print('🔍 DEBUG: _onTableSelected called for table ${table.name} (ID: ${table.id})');
+    print('🔍 DEBUG: Table status: ${table.status}');
+    print('🔍 DEBUG: Table customerName: "${table.customerName}"');
+    print('🔍 DEBUG: Table notes: "${table.notes}"');
+    print('🔍 DEBUG: Table partySize: ${table.partySize}');
+    print('🔍 DEBUG: Table currentOrderId: ${table.currentOrderId}');
+    
     if (table.status == waiter_table.TableStatus.occupied && table.currentOrderId != null) {
       // Fetch all orders for this table
       final container = ProviderScope.containerOf(context, listen: false);
@@ -556,9 +563,31 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
       }
     } else {
       // Default: start new order
+      // Pass customer data from table metadata if available
+      Map<String, dynamic>? prefillOrder;
+      print('🔍 DEBUG: Table has no current order, checking for customer data...');
+      print('🔍 DEBUG: table.customerName: "${table.customerName}"');
+      print('🔍 DEBUG: table.customerName != null: ${table.customerName != null}');
+      print('🔍 DEBUG: table.customerName!.isNotEmpty: ${table.customerName != null ? table.customerName!.isNotEmpty : "N/A"}');
+      
+      if (table.customerName != null && table.customerName!.isNotEmpty) {
+        prefillOrder = {
+          'customerName': table.customerName,
+          'partySize': table.partySize ?? 0,
+          'notes': table.notes ?? '',
+          'items': [],
+        };
+        print('🔍 DEBUG: Created prefillOrder with customer data - customerName: "${table.customerName}", notes: "${table.notes}", partySize: ${table.partySize}');
+      } else {
+        print('🔍 DEBUG: No customer data available, prefillOrder will be null');
+      }
+      
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => OrderTakingScreen(table: table),
+          builder: (context) => OrderTakingScreen(
+            table: table,
+            prefillOrder: prefillOrder,
+          ),
         ),
       );
     }
@@ -738,7 +767,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
                   }
                   final container = ProviderScope.containerOf(context, listen: false);
                   try {
-                    await container.read(seatCustomerProvider((table.id, name, partySize, notes)).future);
+                    await container.read(waiter.seatCustomerProvider((table.id, name, partySize, notes)).future);
                     if (mounted) {
                       WidgetsBinding.instance.addPostFrameCallback((_) {
                         NavigationService.goBack(context);
@@ -785,7 +814,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
       );
 
       // Call the clear table provider
-      await container.read(clearTableProvider(table.id).future);
+      await container.read(waiter.clearTableProvider(table.id).future);
 
       // Show success message
       if (mounted) {
@@ -857,7 +886,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
                   }
                   final container = ProviderScope.containerOf(context, listen: false);
                   try {
-                    await container.read(seatCustomerProvider((table.id, name, partySize, notes)).future);
+                    await container.read(waiter.seatCustomerProvider((table.id, name, partySize, notes)).future);
                     if (mounted) {
                       WidgetsBinding.instance.addPostFrameCallback((_) {
                         NavigationService.goBack(context);

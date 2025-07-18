@@ -284,6 +284,19 @@ final mergedTableOrdersProvider = FutureProvider.family<Map<String, dynamic>, in
       final customerData = order['customer'] ?? order['customerData'];
       customerName = customerData?['name'] ?? '';
       customerNotes = order['notes'] ?? '';
+      
+      // If customer name is not in customerData, try to extract it from notes
+      if (customerName.isEmpty && customerNotes.isNotEmpty) {
+        final lines = customerNotes.split('\n');
+        for (final line in lines) {
+          if (line.trim().startsWith('Customer: ')) {
+            customerName = line.trim().substring('Customer: '.length);
+            // Remove the customer line from notes
+            customerNotes = lines.where((l) => !l.trim().startsWith('Customer: ')).join('\n').trim();
+            break;
+          }
+        }
+      }
     }
     
     // Get items from this order

@@ -96,6 +96,33 @@ final clearTableProvider = FutureProvider.family<void, int>((ref, tableId) async
   ref.invalidate(myAssignedTablesProvider);
 });
 
+// Create reservation
+final createReservationProvider = FutureProvider.family<void, (int tableId, String customerName, String customerPhone, int partySize, String reservationDate, String reservationTime, String notes)>((ref, params) async {
+  final repo = ref.watch(tableRepositoryProvider);
+  final user = ref.watch(authNotifierProvider).user;
+  if (user == null) throw Exception('Not authenticated');
+
+  final (tableId, customerName, customerPhone, partySize, reservationDate, reservationTime, notes) = params;
+  
+  print('🔍 DEBUG: Creating reservation for table $tableId');
+  print('🔍 DEBUG: customerName: $customerName, partySize: $partySize, date: $reservationDate, time: $reservationTime');
+  
+  await repo.createReservation(tableId, customerName, customerPhone, partySize, reservationDate, reservationTime, notes);
+
+  // Invalidate all related providers to force refresh
+  ref.invalidate(tablesProvider);
+  ref.invalidate(floorPlansWithTablesProvider);
+  ref.invalidate(floorPlanNotifierProvider);
+  
+  // Force refresh of all table-related data
+  ref.invalidate(tableProvider);
+  ref.invalidate(tablesByStatusProvider);
+  ref.invalidate(myAssignedTablesProvider);
+  
+  // Add a small delay to ensure the API has processed the change
+  await Future.delayed(const Duration(milliseconds: 500));
+});
+
 // Seat customer at table
 final seatCustomerProvider = FutureProvider.family<void, (int tableId, String customerName, int partySize, String notes)>((ref, params) async {
   final repo = ref.watch(tableRepositoryProvider);
@@ -103,7 +130,12 @@ final seatCustomerProvider = FutureProvider.family<void, (int tableId, String cu
   if (user == null) throw Exception('Not authenticated');
 
   final (tableId, customerName, partySize, notes) = params;
-  await repo.seatCustomer(tableId, customerName, partySize, notes);
+  
+  print('🔍 DEBUG: User ID from auth state: ${user.id}');
+  print('🔍 DEBUG: User name: ${user.name}');
+  print('🔍 DEBUG: User role: ${user.role}');
+  
+  await repo.seatCustomer(tableId, customerName, partySize, notes, serverId: user.id);
 
   // Invalidate all related providers to force refresh
   ref.invalidate(tablesProvider);
@@ -155,4 +187,15 @@ final tableStatsProvider = Provider<AsyncValue<Map<String, int>>>((ref) {
     loading: () => const AsyncValue.loading(),
     error: (error, stack) => AsyncValue.error(error, stack),
   );
+});
+
+// Get tables with orders
+final tablesWithOrdersProvider = FutureProvider.autoDispose<List<waiter_table.Table>>((ref) async {
+  final repo = ref.watch(tableRepositoryProvider);
+  final user = ref.watch(authNotifierProvider).user;
+  if (user == null) throw Exception('Not authenticated');
+  
+  final tables = await repo.getTablesWithOrders(businessId: user.businessId);
+  
+  return tables;
 }); 

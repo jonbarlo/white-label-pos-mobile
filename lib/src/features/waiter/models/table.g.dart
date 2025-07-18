@@ -6,6 +6,24 @@ part of 'table.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+_$CustomerImpl _$$CustomerImplFromJson(Map<String, dynamic> json) =>
+    _$CustomerImpl(
+      id: (json['id'] as num).toInt(),
+      name: json['name'] as String,
+      phone: json['phone'] as String?,
+      email: json['email'] as String?,
+      notes: json['notes'] as String?,
+    );
+
+Map<String, dynamic> _$$CustomerImplToJson(_$CustomerImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'phone': instance.phone,
+      'email': instance.email,
+      'notes': instance.notes,
+    };
+
 _$TableImpl _$$TableImplFromJson(Map<String, dynamic> json) => _$TableImpl(
       id: (json['id'] as num).toInt(),
       businessId: (json['businessId'] as num).toInt(),
@@ -22,6 +40,9 @@ _$TableImpl _$$TableImplFromJson(Map<String, dynamic> json) => _$TableImpl(
       updatedAt: json['updatedAt'] == null
           ? null
           : DateTime.parse(json['updatedAt'] as String),
+      customer: json['customer'] == null
+          ? null
+          : Customer.fromJson(json['customer'] as Map<String, dynamic>),
       currentOrderNumber: json['currentOrderNumber'] as String?,
       currentOrderTotal: (json['currentOrderTotal'] as num?)?.toDouble(),
       currentOrderItemCount: (json['currentOrderItemCount'] as num?)?.toInt(),
@@ -52,6 +73,7 @@ Map<String, dynamic> _$$TableImplToJson(_$TableImpl instance) =>
       'isActive': instance.isActive,
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
+      'customer': instance.customer,
       'currentOrderNumber': instance.currentOrderNumber,
       'currentOrderTotal': instance.currentOrderTotal,
       'currentOrderItemCount': instance.currentOrderItemCount,

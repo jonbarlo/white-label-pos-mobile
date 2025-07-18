@@ -17,6 +17,25 @@ enum TableStatus {
 }
 
 @freezed
+class Customer with _$Customer {
+  const factory Customer({
+    required int id,
+    required String name,
+    String? phone,
+    String? email,
+    String? notes,
+  }) = _Customer;
+
+  factory Customer.fromJson(Map<String, dynamic> json) => Customer(
+        id: (json['id'] as num).toInt(),
+        name: json['name'] as String,
+        phone: json['phone'] as String?,
+        email: json['email'] as String?,
+        notes: json['notes'] as String?,
+      );
+}
+
+@freezed
 class Table with _$Table {
   const factory Table({
     required int id,
@@ -30,6 +49,8 @@ class Table with _$Table {
     bool? isActive,
     DateTime? createdAt,
     DateTime? updatedAt,
+    // Customer data (nested as per API)
+    Customer? customer,
     // Legacy fields for backward compatibility
     String? currentOrderNumber,
     double? currentOrderTotal,
@@ -56,6 +77,8 @@ class Table with _$Table {
         isActive: json['isActive'] as bool?,
         createdAt: json['createdAt'] == null ? null : DateTime.parse(json['createdAt'] as String),
         updatedAt: json['updatedAt'] == null ? null : DateTime.parse(json['updatedAt'] as String),
+        // Customer data (nested as per API)
+        customer: json['customer'] != null ? Customer.fromJson(json['customer'] as Map<String, dynamic>) : null,
         // Legacy fields for backward compatibility
         currentOrderNumber: json['currentOrderNumber'] as String?,
         currentOrderTotal: (json['currentOrderTotal'] as num?)?.toDouble(),

@@ -6,23 +6,53 @@ part of 'floor_plan.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+Customer _$CustomerFromJson(Map<String, dynamic> json) => Customer(
+      id: (json['id'] as num).toInt(),
+      firstName: json['firstName'] as String,
+      lastName: json['lastName'] as String,
+      email: json['email'] as String,
+      phone: json['phone'] as String,
+      preferences: json['preferences'] as String?,
+    );
+
+Map<String, dynamic> _$CustomerToJson(Customer instance) => <String, dynamic>{
+      'id': instance.id,
+      'firstName': instance.firstName,
+      'lastName': instance.lastName,
+      'email': instance.email,
+      'phone': instance.phone,
+      'preferences': instance.preferences,
+    };
+
 Reservation _$ReservationFromJson(Map<String, dynamic> json) => Reservation(
+      id: (json['id'] as num?)?.toInt(),
+      customerId: (json['customerId'] as num?)?.toInt(),
       customerName: json['customerName'] as String,
       customerPhone: json['customerPhone'] as String?,
+      customerEmail: json['customerEmail'] as String?,
       partySize: (json['partySize'] as num).toInt(),
       reservationDate: json['reservationDate'] as String,
       reservationTime: json['reservationTime'] as String,
       notes: json['notes'] as String?,
+      status: json['status'] as String?,
+      customer: json['customer'] == null
+          ? null
+          : Customer.fromJson(json['customer'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$ReservationToJson(Reservation instance) =>
     <String, dynamic>{
+      'id': instance.id,
+      'customerId': instance.customerId,
       'customerName': instance.customerName,
       'customerPhone': instance.customerPhone,
+      'customerEmail': instance.customerEmail,
       'partySize': instance.partySize,
       'reservationDate': instance.reservationDate,
       'reservationTime': instance.reservationTime,
       'notes': instance.notes,
+      'status': instance.status,
+      'customer': instance.customer,
     };
 
 FloorPlan _$FloorPlanFromJson(Map<String, dynamic> json) => FloorPlan(

@@ -233,8 +233,9 @@ class MockTableRepository extends _i1.Mock implements _i4.TableRepository {
     int? tableId,
     String? customerName,
     int? partySize,
-    String? notes,
-  ) =>
+    String? notes, {
+    required int? serverId,
+  }) =>
       (super.noSuchMethod(
         Invocation.method(
           #seatCustomer,
@@ -244,10 +245,22 @@ class MockTableRepository extends _i1.Mock implements _i4.TableRepository {
             partySize,
             notes,
           ],
+          {#serverId: serverId},
         ),
         returnValue: _i5.Future<void>.value(),
         returnValueForMissingStub: _i5.Future<void>.value(),
       ) as _i5.Future<void>);
+
+  @override
+  _i5.Future<List<_i3.Table>> getTablesWithOrders({int? businessId}) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getTablesWithOrders,
+          [],
+          {#businessId: businessId},
+        ),
+        returnValue: _i5.Future<List<_i3.Table>>.value(<_i3.Table>[]),
+      ) as _i5.Future<List<_i3.Table>>);
 }
 
 /// A class which mocks [Dio].

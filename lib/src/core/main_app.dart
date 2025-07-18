@@ -28,7 +28,7 @@ class MainApp extends ConsumerWidget {
     
     // Test floor plan provider initialization
     try {
-      final floorPlanState = ref.watch(floorPlanNotifierProvider);
+      final floorPlanState = ref.watch(authenticatedFloorPlanNotifierProvider);
       print('🔍 DEBUG: MainApp: Floor plan state = $floorPlanState');
     } catch (e) {
       print('🔍 DEBUG: MainApp: Error watching floor plan provider: $e');
