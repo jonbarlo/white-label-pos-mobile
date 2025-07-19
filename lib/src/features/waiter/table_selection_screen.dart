@@ -767,7 +767,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
                   }
                   final container = ProviderScope.containerOf(context, listen: false);
                   try {
-                    await container.read(waiter.seatCustomerProvider((table.id, name, partySize, notes)).future);
+                    await container.read(waiter.seatCustomerProvider((table.id, name, partySize, notes, null, null)).future);
                     if (mounted) {
                       WidgetsBinding.instance.addPostFrameCallback((_) {
                         NavigationService.goBack(context);
@@ -886,7 +886,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
                   }
                   final container = ProviderScope.containerOf(context, listen: false);
                   try {
-                    await container.read(waiter.seatCustomerProvider((table.id, name, partySize, notes)).future);
+                    await container.read(waiter.seatCustomerProvider((table.id, name, partySize, notes, null, null)).future);
                     if (mounted) {
                       WidgetsBinding.instance.addPostFrameCallback((_) {
                         NavigationService.goBack(context);
