@@ -192,26 +192,51 @@ class AppRouter {
               builder: (context, state) {
                 final tableId = int.tryParse(state.pathParameters['tableId'] ?? '') ?? 0;
                 final extra = state.extra as Map<String, dynamic>?;
-                final tableData = extra?['table'] as Map<String, dynamic>?;
                 
-                // Convert JSON map to Table object
-                final table = tableData != null ? waiter_table.Table.fromJson({
-                  'id': tableData['id'] ?? tableId,
-                  'businessId': 1, // Default business ID
-                  'name': tableData['tableNumber'] ?? tableData['name'] ?? 'Table $tableId',
-                  'status': tableData['status'] ?? 'available',
-                  'capacity': tableData['capacity'] ?? 4,
-                  'location': tableData['section'] ?? tableData['location'] ?? 'Main Floor',
-                  'isActive': true,
-                }) : waiter_table.Table(
-                  id: tableId,
-                  businessId: 1,
-                  name: 'Table $tableId',
-                  status: waiter_table.TableStatus.available,
-                  capacity: 4,
-                  location: 'Main Floor',
-                  isActive: true,
-                );
+                print('🔍 DEBUG: Waiter order route builder called');
+                print('🔍 DEBUG: tableId from path: $tableId');
+                print('🔍 DEBUG: extra: $extra');
+                print('🔍 DEBUG: extra table type: ${extra?['table']?.runtimeType}');
+                
+                // Check if we have a complete Table object
+                waiter_table.Table? table;
+                if (extra != null && extra['table'] is waiter_table.Table) {
+                  table = extra['table'] as waiter_table.Table;
+                  print('🔍 DEBUG: Using complete Table object');
+                  print('🔍 DEBUG: Table customer: ${table.customer}');
+                  print('🔍 DEBUG: Table customerName: ${table.customerName}');
+                  print('🔍 DEBUG: Table notes: ${table.notes}');
+                } else {
+                  print('🔍 DEBUG: Using fallback map data');
+                  // Fallback to map data
+                  final tableData = extra?['table'] as Map<String, dynamic>?;
+                  
+                  // Convert JSON map to Table object
+                  table = tableData != null ? waiter_table.Table.fromJson({
+                    'id': tableData['id'] ?? tableId,
+                    'businessId': 1, // Default business ID
+                    'name': tableData['tableNumber'] ?? tableData['name'] ?? 'Table $tableId',
+                    'status': tableData['status'] ?? 'available',
+                    'capacity': tableData['capacity'] ?? 4,
+                    'location': tableData['section'] ?? tableData['location'] ?? 'Main Floor',
+                    'isActive': true,
+                  }) : waiter_table.Table(
+                    id: tableId,
+                    businessId: 1,
+                    name: 'Table $tableId',
+                    status: waiter_table.TableStatus.available,
+                    capacity: 4,
+                    location: 'Main Floor',
+                    isActive: true,
+                  );
+                }
+                
+                print('🔍 DEBUG: Final table object:');
+                print('🔍 DEBUG: - ID: ${table.id}');
+                print('🔍 DEBUG: - Name: ${table.name}');
+                print('🔍 DEBUG: - Customer: ${table.customer}');
+                print('🔍 DEBUG: - Customer Name: ${table.customerName}');
+                print('🔍 DEBUG: - Notes: ${table.notes}');
                 
                 return OrderTakingScreen(
                   table: table,

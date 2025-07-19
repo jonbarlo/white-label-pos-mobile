@@ -165,10 +165,11 @@ class TableRepository {
     }
   }
 
-  Future<void> seatCustomer(int tableId, String customerName, int partySize, String notes, {int? serverId}) async {
+  Future<void> seatCustomer(int tableId, String customerName, int partySize, String notes, {int? serverId, String? customerPhone, String? customerEmail}) async {
     try {
       print('🔍 DEBUG: Seating customer at table $tableId');
       print('🔍 DEBUG: customerName: $customerName, partySize: $partySize, notes: $notes');
+      print('🔍 DEBUG: customerPhone: $customerPhone, customerEmail: $customerEmail');
       print('🔍 DEBUG: Using serverId: $serverId');
       
       final requestData = {
@@ -176,8 +177,8 @@ class TableRepository {
         'serverId': serverId,
         'notes': notes,
         'customerName': customerName,
-        'customerPhone': '',
-        'customerEmail': '',
+        'customerPhone': customerPhone ?? '',
+        'customerEmail': customerEmail ?? '',
       };
       
       final response = await dio.post(

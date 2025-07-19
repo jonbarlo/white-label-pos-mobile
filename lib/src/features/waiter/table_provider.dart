@@ -124,18 +124,18 @@ final createReservationProvider = FutureProvider.family<void, (int tableId, Stri
 });
 
 // Seat customer at table
-final seatCustomerProvider = FutureProvider.family<void, (int tableId, String customerName, int partySize, String notes)>((ref, params) async {
+final seatCustomerProvider = FutureProvider.family<void, (int tableId, String customerName, int partySize, String notes, String? customerPhone, String? customerEmail)>((ref, params) async {
   final repo = ref.watch(tableRepositoryProvider);
   final user = ref.watch(authNotifierProvider).user;
   if (user == null) throw Exception('Not authenticated');
 
-  final (tableId, customerName, partySize, notes) = params;
+  final (tableId, customerName, partySize, notes, customerPhone, customerEmail) = params;
   
   print('🔍 DEBUG: User ID from auth state: ${user.id}');
   print('🔍 DEBUG: User name: ${user.name}');
   print('🔍 DEBUG: User role: ${user.role}');
   
-  await repo.seatCustomer(tableId, customerName, partySize, notes, serverId: user.id);
+  await repo.seatCustomer(tableId, customerName, partySize, notes, serverId: user.id, customerPhone: customerPhone, customerEmail: customerEmail);
 
   // Invalidate all related providers to force refresh
   ref.invalidate(tablesProvider);

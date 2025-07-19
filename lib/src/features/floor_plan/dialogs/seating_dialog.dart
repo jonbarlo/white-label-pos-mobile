@@ -18,6 +18,8 @@ class SeatingDialog extends ConsumerStatefulWidget {
 
 class _SeatingDialogState extends ConsumerState<SeatingDialog> {
   late TextEditingController customerNameController;
+  late TextEditingController customerPhoneController;
+  late TextEditingController customerEmailController;
   late TextEditingController customerNotesController;
   late TextEditingController partySizeController;
   bool isSeatingCustomer = false;
@@ -26,6 +28,8 @@ class _SeatingDialogState extends ConsumerState<SeatingDialog> {
   void initState() {
     super.initState();
     customerNameController = TextEditingController();
+    customerPhoneController = TextEditingController();
+    customerEmailController = TextEditingController();
     customerNotesController = TextEditingController();
     partySizeController = TextEditingController();
   }
@@ -33,6 +37,8 @@ class _SeatingDialogState extends ConsumerState<SeatingDialog> {
   @override
   void dispose() {
     customerNameController.dispose();
+    customerPhoneController.dispose();
+    customerEmailController.dispose();
     customerNotesController.dispose();
     partySizeController.dispose();
     super.dispose();
@@ -43,35 +49,55 @@ class _SeatingDialogState extends ConsumerState<SeatingDialog> {
     return StatefulBuilder(
       builder: (context, setDialogState) => AlertDialog(
         title: Text('Seat Customer - Table ${widget.table.tableNumber}'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: customerNameController,
-              decoration: const InputDecoration(
-                labelText: 'Customer Name',
-                hintText: 'Enter customer name',
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: customerNameController,
+                decoration: const InputDecoration(
+                  labelText: 'Customer Name *',
+                  hintText: 'Enter customer name',
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: partySizeController,
-              decoration: const InputDecoration(
-                labelText: 'Party Size',
-                hintText: 'Number of guests',
+              const SizedBox(height: 16),
+              TextField(
+                controller: customerPhoneController,
+                decoration: const InputDecoration(
+                  labelText: 'Phone Number',
+                  hintText: 'Enter phone number (optional)',
+                ),
+                keyboardType: TextInputType.phone,
               ),
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: customerNotesController,
-              decoration: const InputDecoration(
-                labelText: 'Special Instructions',
-                hintText: 'Any special requests or notes',
+              const SizedBox(height: 16),
+              TextField(
+                controller: customerEmailController,
+                decoration: const InputDecoration(
+                  labelText: 'Email Address',
+                  hintText: 'Enter email address (optional)',
+                ),
+                keyboardType: TextInputType.emailAddress,
               ),
-              maxLines: 3,
-            ),
-          ],
+              const SizedBox(height: 16),
+              TextField(
+                controller: partySizeController,
+                decoration: const InputDecoration(
+                  labelText: 'Party Size *',
+                  hintText: 'Number of guests',
+                ),
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: customerNotesController,
+                decoration: const InputDecoration(
+                  labelText: 'Special Instructions',
+                  hintText: 'Any special requests or notes',
+                ),
+                maxLines: 3,
+              ),
+            ],
+          ),
         ),
         actions: [
           TextButton(
@@ -104,6 +130,8 @@ class _SeatingDialogState extends ConsumerState<SeatingDialog> {
     print('🔍 DEBUG: Seat customer button tapped for table ${widget.table.tableNumber}');
     
     final customerName = customerNameController.text.trim();
+    final customerPhone = customerPhoneController.text.trim();
+    final customerEmail = customerEmailController.text.trim();
     final partySize = int.tryParse(partySizeController.text.trim());
     final customerNotes = customerNotesController.text.trim();
     
@@ -133,12 +161,26 @@ class _SeatingDialogState extends ConsumerState<SeatingDialog> {
     });
     
     try {
+      // Format notes to include customer name for later extraction
+      // Since the backend doesn't store customer data in the table record,
+      // we store it in the notes in a format that can be parsed later
+      String formattedNotes = 'Customer: $customerName';
+      if (customerNotes.isNotEmpty) {
+        formattedNotes += '\n$customerNotes';
+      }
+      
+      print('🔍 DEBUG: Formatted notes for seating: "$formattedNotes"');
+      print('🔍 DEBUG: Customer phone: "$customerPhone"');
+      print('🔍 DEBUG: Customer email: "$customerEmail"');
+      
       // Seat the customer using the provider
       await ref.read(waiter.seatCustomerProvider((
         widget.table.tableId,
         customerName,
         partySize,
-        customerNotes,
+        formattedNotes,
+        customerPhone.isNotEmpty ? customerPhone : null,
+        customerEmail.isNotEmpty ? customerEmail : null,
       )).future);
       
       print('🔍 DEBUG: Customer seated successfully for table ${widget.table.tableNumber}');

@@ -114,6 +114,7 @@ class _FloorPlanViewerScreenState extends ConsumerState<FloorPlanViewerScreen>
 
   Widget _buildTableActionsSheet(TablePosition table) {
     final theme = Theme.of(context);
+    final isOccupied = table.tableStatus.toLowerCase() == 'occupied';
     
     return Container(
       padding: const EdgeInsets.all(16),
@@ -169,20 +170,40 @@ class _FloorPlanViewerScreenState extends ConsumerState<FloorPlanViewerScreen>
           const SizedBox(height: 24),
           
           // Action Buttons
-          _buildActionButton(
-            'Seat Customers',
-            Icons.person_add,
-            theme.colorScheme.primary,
-            () => _seatCustomers(table),
-            isEnabled: table.tableStatus.toLowerCase() == 'available',
-          ),
-          _buildActionButton(
-            'Make Reservation',
-            Icons.schedule,
-            theme.colorScheme.tertiary,
-            () => _makeReservation(table),
-            isEnabled: table.tableStatus.toLowerCase() == 'available',
-          ),
+          if (!isOccupied) ...[
+            _buildActionButton(
+              'Seat Customers',
+              Icons.person_add,
+              theme.colorScheme.primary,
+              () => _seatCustomers(table),
+              isEnabled: table.tableStatus.toLowerCase() == 'available',
+            ),
+            _buildActionButton(
+              'Make Reservation',
+              Icons.schedule,
+              theme.colorScheme.tertiary,
+              () => _makeReservation(table),
+              isEnabled: table.tableStatus.toLowerCase() == 'available',
+            ),
+          ],
+          
+          if (isOccupied) ...[
+            _buildActionButton(
+              'Add Items',
+              Icons.add_shopping_cart,
+              theme.colorScheme.secondary,
+              () => _addItems(table),
+              isEnabled: true,
+            ),
+            _buildActionButton(
+              'View Order',
+              Icons.receipt_long,
+              theme.colorScheme.primary,
+              () => _viewOrder(table),
+              isEnabled: true,
+            ),
+          ],
+          
           _buildActionButton(
             'Clear Table',
             Icons.cleaning_services,
@@ -254,6 +275,56 @@ class _FloorPlanViewerScreenState extends ConsumerState<FloorPlanViewerScreen>
   void _makeReservation(TablePosition table) {
     Navigator.of(context).pop();
     showReservationDialog(context, table);
+  }
+
+  void _addItems(TablePosition table) {
+    Navigator.of(context).pop();
+    _navigateToPosWithTable(table);
+  }
+
+  void _viewOrder(TablePosition table) {
+    Navigator.of(context).pop();
+    _navigateToPosWithTable(table);
+  }
+
+  void _navigateToPosWithTable(TablePosition table) async {
+    try {
+      print('🔍 DEBUG: Fetching complete table data for table ${table.tableId}');
+      
+      // Fetch the complete table information with customer data
+      final completeTable = await ref.read(waiter.tableProvider(table.tableId).future);
+      
+      print('🔍 DEBUG: Complete table data fetched:');
+      print('🔍 DEBUG: - Table ID: ${completeTable.id}');
+      print('🔍 DEBUG: - Table Name: ${completeTable.name}');
+      print('🔍 DEBUG: - Table Status: ${completeTable.status}');
+      print('🔍 DEBUG: - Customer: ${completeTable.customer}');
+      print('🔍 DEBUG: - Customer Name (legacy): ${completeTable.customerName}');
+      print('🔍 DEBUG: - Notes (legacy): ${completeTable.notes}');
+      
+      // Navigate to Order Taking screen with complete table context
+      if (mounted) {
+        print('🔍 DEBUG: Navigating to Order Taking Screen with complete table data');
+        context.push('/waiter/order/${table.tableId}', extra: {
+          'table': completeTable,
+        });
+      }
+    } catch (e) {
+      print('🔍 DEBUG: Error fetching complete table data: $e');
+      // Fallback to basic table info if fetching fails
+      if (mounted) {
+        print('🔍 DEBUG: Using fallback table data');
+        context.push('/waiter/order/${table.tableId}', extra: {
+          'table': {
+            'id': table.tableId,
+            'name': table.tableNumber,
+            'section': table.tableSection,
+            'capacity': table.tableCapacity,
+            'status': table.tableStatus,
+          },
+        });
+      }
+    }
   }
 
   void _clearTable(TablePosition table) {

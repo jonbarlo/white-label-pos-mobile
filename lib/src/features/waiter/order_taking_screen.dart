@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'models/table.dart' as waiter_table;
 import '../../shared/widgets/theme_toggle_button.dart';
 import '../../shared/widgets/app_image.dart';
@@ -11,7 +12,6 @@ import '../auth/auth_provider.dart';
 import 'waiter_order_provider.dart' as waiter_order;
 import 'table_provider.dart' as waiter;
 import 'package:another_flushbar/flushbar.dart';
-import '../../core/services/navigation_service.dart';
 import '../floor_plan/floor_plan_provider.dart' as fp;
 
 
@@ -47,17 +47,28 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
     
     print('🔍 DEBUG: OrderTakingScreen initState called');
     print('🔍 DEBUG: widget.prefillOrder: ${widget.prefillOrder}');
-    print('🔍 DEBUG: widget.table: ${widget.table.name}, customerName: ${widget.table.customerName}, notes: ${widget.table.notes}');
+    print('🔍 DEBUG: widget.table: ${widget.table.name}');
+    print('🔍 DEBUG: widget.table.customer: ${widget.table.customer}');
+    print('🔍 DEBUG: widget.table.customerName: ${widget.table.customerName}');
+    print('🔍 DEBUG: widget.table.notes: ${widget.table.notes}');
     
     // Initialize with prefillOrder data first, then fallback to table data
     if (widget.prefillOrder != null) {
-      _customerName = widget.prefillOrder!['customerName'] ?? widget.table.customerName ?? '';
-      _customerNotes = widget.prefillOrder!['notes'] ?? widget.table.notes ?? '';
+      _customerName = widget.prefillOrder!['customerName'] ?? '';
+      _customerNotes = widget.prefillOrder!['notes'] ?? '';
       print('🔍 DEBUG: Initialized with prefillOrder - customerName: "$_customerName", notes: "$_customerNotes"');
     } else {
-      _customerName = widget.table.customerName ?? '';
-      _customerNotes = widget.table.notes ?? '';
-      print('🔍 DEBUG: Initialized with table data - customerName: "$_customerName", notes: "$_customerNotes"');
+      // Try to get customer data from the table's customer field first
+      if (widget.table.customer != null) {
+        _customerName = widget.table.customer!.name;
+        _customerNotes = widget.table.customer!.notes ?? '';
+        print('🔍 DEBUG: Initialized with table.customer - customerName: "$_customerName", notes: "$_customerNotes"');
+      } else {
+        // Fallback to legacy fields
+        _customerName = widget.table.customerName ?? '';
+        _customerNotes = widget.table.notes ?? '';
+        print('🔍 DEBUG: Initialized with legacy table fields - customerName: "$_customerName", notes: "$_customerNotes"');
+      }
     }
     
     // Initialize the controllers with the pre-filled values
@@ -104,7 +115,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             if (mounted) {
-              NavigationService.goBack(context);
+              _navigateBack();
             }
           },
         ),
@@ -193,21 +204,60 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
     print('🔍 DEBUG: Current _customerName: "$_customerName", _customerNotes: "$_customerNotes"');
     print('🔍 DEBUG: Current _cartItems.length: ${_cartItems.length}');
     
-    // Always update customer data from server if available (this fixes the corruption issue)
-    if (mergedData['customerName'] != null || mergedData['customerNotes'] != null) {
+    // Extract customer information from order notes if we don't have it from the table
+    // The backend stores customer info in order notes since it doesn't store it in the table record
+    if (_customerName.isEmpty && mergedData['customerNotes'] != null) {
+      final notes = mergedData['customerNotes'] as String;
+      print('🔍 DEBUG: Analyzing order notes for customer info: "$notes"');
+      
+      // Try to extract customer name from notes
+      // Look for patterns like "Customer: [name]" or "[name] - [notes]"
+      if (notes.contains('Customer: ')) {
+        final customerMatch = RegExp(r'Customer:\s*([^\n]+)').firstMatch(notes);
+        if (customerMatch != null) {
+          final extractedName = customerMatch.group(1)?.trim() ?? '';
+          if (extractedName.isNotEmpty) {
+            setState(() {
+              _customerName = extractedName;
+              _customerNameController.text = _customerName;
+              print('🔍 DEBUG: Extracted customer name from notes: "$_customerName"');
+            });
+          }
+        }
+      } else if (notes.contains(' - ')) {
+        // Try to extract from "name - notes" pattern
+        final parts = notes.split(' - ');
+        if (parts.length >= 2) {
+          final potentialName = parts[0].trim();
+          if (potentialName.isNotEmpty && !potentialName.toLowerCase().contains('table')) {
+            setState(() {
+              _customerName = potentialName;
+              _customerNameController.text = _customerName;
+              print('🔍 DEBUG: Extracted customer name from notes pattern: "$_customerName"');
+            });
+          }
+        }
+      }
+    }
+    
+    // Only update customer data from merged orders if we don't have it from the table
+    // The table data should be the source of truth for customer information
+    if ((_customerName.isEmpty || _customerNotes.isEmpty) && 
+        (mergedData['customerName'] != null || mergedData['customerNotes'] != null)) {
       setState(() {
-        // Update customer name if we have it from server and it's not empty
-        if (mergedData['customerName'] != null && mergedData['customerName'].toString().isNotEmpty) {
+        // Only update customer name if we don't have it and server has it
+        if (_customerName.isEmpty && mergedData['customerName'] != null && 
+            mergedData['customerName'].toString().isNotEmpty) {
           _customerName = mergedData['customerName'] ?? '';
           _customerNameController.text = _customerName;
-          print('🔍 DEBUG: Updated _customerName from server: "$_customerName"');
+          print('🔍 DEBUG: Updated _customerName from server (fallback): "$_customerName"');
         }
         
-        // Update customer notes if we have it from server
-        if (mergedData['customerNotes'] != null) {
+        // Only update customer notes if we don't have it and server has it
+        if (_customerNotes.isEmpty && mergedData['customerNotes'] != null) {
           _customerNotes = mergedData['customerNotes'] ?? '';
           _customerNotesController.text = _customerNotes;
-          print('🔍 DEBUG: Updated _customerNotes from server: "$_customerNotes"');
+          print('🔍 DEBUG: Updated _customerNotes from server (fallback): "$_customerNotes"');
         }
         
         _customerNameEditable = false;
@@ -893,7 +943,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
               onPressed: _isSubmitting ? null : () {
                 print('🔍 DEBUG: Cancel button pressed');
                 if (mounted) {
-                  NavigationService.goBack(context);
+                  _navigateBack();
                 }
               },
               icon: Icon(Icons.cancel, size: 24),
@@ -1163,7 +1213,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
       );
 
       // Navigate back
-      NavigationService.goBack(context);
+      _navigateBack();
     } catch (e) {
       
       // Check if widget is still mounted before showing error
@@ -1202,6 +1252,17 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
         return Colors.grey;
       case waiter_table.TableStatus.outOfService:
         return Colors.red;
+    }
+  }
+
+  void _navigateBack() {
+    if (mounted) {
+      // Refresh floor plan data before navigating back
+      ref.invalidate(fp.progressiveFloorPlansProvider);
+      ref.invalidate(fp.floorPlansWithTablesProvider);
+      
+      // Simply pop back to the previous screen
+      context.pop();
     }
   }
 } 
