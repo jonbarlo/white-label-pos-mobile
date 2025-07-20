@@ -262,6 +262,8 @@ class MockTableRepository extends _i1.Mock implements _i4.TableRepository {
     int? partySize,
     String? notes, {
     int? serverId,
+    String? customerPhone,
+    String? customerEmail,
   }) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -272,7 +274,11 @@ class MockTableRepository extends _i1.Mock implements _i4.TableRepository {
             partySize,
             notes,
           ],
-          {#serverId: serverId},
+          {
+            #serverId: serverId,
+            #customerPhone: customerPhone,
+            #customerEmail: customerEmail,
+          },
         ),
         returnValue: _i5.Future<void>.value(),
         returnValueForMissingStub: _i5.Future<void>.value(),

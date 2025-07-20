@@ -10,6 +10,7 @@ import 'package:white_label_pos_mobile/src/features/pos/split_payment_dialog.dar
 import 'package:white_label_pos_mobile/src/features/auth/auth_provider.dart';
 import 'package:white_label_pos_mobile/src/features/auth/models/user.dart';
 import '../../core/theme/app_theme.dart';
+import '../promotions/widgets/promotion_banner.dart';
 
 import '../../shared/widgets/app_image.dart';
 import '../../core/services/navigation_service.dart';
@@ -343,6 +344,9 @@ class _PosScreenState extends ConsumerState<PosScreen>
           // Top Bar - Square style
           _buildTopBar(),
           
+          // Promotion Banners
+          _buildPromotionBanners(),
+          
           // Main Content
           Expanded(
             child: Row(
@@ -470,6 +474,12 @@ class _PosScreenState extends ConsumerState<PosScreen>
         ],
       ),
     );
+  }
+
+  Widget _buildPromotionBanners() {
+    // For now, return an empty container
+    // TODO: Integrate with promotion provider when available
+    return const SizedBox.shrink();
   }
 
   Widget _buildLeftPanel({

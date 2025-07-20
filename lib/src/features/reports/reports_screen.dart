@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'reports_provider.dart';
 import 'models/sales_report.dart';
@@ -110,6 +111,13 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
               _showExportDialog(context);
             },
             tooltip: 'Export Report',
+          ),
+          IconButton(
+            icon: const Icon(Icons.featured_play_list),
+            onPressed: () {
+              context.go('/feature-dashboard');
+            },
+            tooltip: 'Recipe & Promotion Features',
           ),
           const ThemeToggleButton(),
         ],

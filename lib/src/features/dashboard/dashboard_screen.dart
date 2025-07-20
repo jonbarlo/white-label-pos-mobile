@@ -58,6 +58,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             icon: const Icon(Icons.analytics),
             tooltip: 'Analytics Dashboard',
           ),
+          IconButton(
+            onPressed: () => context.go(AppRouter.featureDashboardRoute),
+            icon: const Icon(Icons.featured_play_list),
+            tooltip: 'Recipe & Promotion Features',
+          ),
           const ThemeToggleButton(),
         ],
       ),
@@ -114,6 +119,64 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                             ),
                           );
                         },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              
+              // Quick Access to New Features
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.featured_play_list, color: theme.colorScheme.primary),
+                          const SizedBox(width: 8),
+                          Text(
+                            'New Features Available',
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Explore our new Recipe & Promotion System with mobile notifications.',
+                        style: theme.textTheme.bodyMedium,
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                print('🔍 DEBUG: Explore Features button pressed');
+                                print('🔍 DEBUG: Navigating to: ${AppRouter.featureDashboardRoute}');
+                                context.go(AppRouter.featureDashboardRoute);
+                              },
+                              icon: const Icon(Icons.explore, size: 18),
+                              label: const Text('Explore Features'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: theme.colorScheme.primary,
+                                foregroundColor: theme.colorScheme.onPrimary,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () => context.go(AppRouter.analyticsRoute),
+                              icon: const Icon(Icons.analytics, size: 18),
+                              label: const Text('View Analytics'),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

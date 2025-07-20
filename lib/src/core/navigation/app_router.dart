@@ -8,6 +8,7 @@ import '../../features/auth/login_screen.dart';
 import '../../features/onboarding/onboarding_screen.dart';
 import '../../features/dashboard/dashboard_screen.dart';
 import '../../features/dashboard/analytics_dashboard_screen.dart';
+import '../../features/dashboard/feature_dashboard_screen.dart';
 import '../../features/pos/pos_screen.dart';
 import '../../features/inventory/inventory_screen.dart';
 import '../../features/reports/reports_screen.dart';
@@ -26,6 +27,8 @@ import '../../features/pos/split_billing_screen.dart';
 import '../../features/floor_plan/floor_plan_viewer_screen.dart';
 import '../../features/floor_plan/floor_plan_management_screen.dart';
 import '../../features/auth/models/user.dart';
+import '../../features/recipes/smart_suggestions_screen.dart';
+import '../../features/recipes/inventory_alerts_screen.dart';
 
 
 /// Provider for SharedPreferences
@@ -61,6 +64,9 @@ class AppRouter {
   static const String onboardingRoute = '/onboarding';
   static const String dashboardRoute = '/dashboard';
   static const String analyticsRoute = '/analytics';
+  static const String featureDashboardRoute = '/feature-dashboard';
+static const String smartSuggestionsRoute = '/smart-suggestions';
+  static const String inventoryAlertsRoute = '/inventory-alerts';
   static const String posRoute = '/pos';
   static const String inventoryRoute = '/inventory';
   static const String reportsRoute = '/reports';
@@ -129,6 +135,30 @@ class AppRouter {
               path: analyticsRoute,
               name: 'analytics',
               builder: (context, state) => const AnalyticsDashboardScreen(),
+            ),
+            
+            // Feature Dashboard
+            GoRoute(
+              path: featureDashboardRoute,
+              name: 'feature-dashboard',
+              builder: (context, state) {
+                print('🔍 DEBUG: FeatureDashboard route builder called');
+                return const FeatureDashboardScreen();
+              },
+            ),
+            
+            // Smart Recipe Suggestions
+            GoRoute(
+              path: smartSuggestionsRoute,
+              name: 'smart-suggestions',
+              builder: (context, state) => const SmartSuggestionsScreen(),
+            ),
+            
+            // Inventory Alerts
+            GoRoute(
+              path: inventoryAlertsRoute,
+              name: 'inventory-alerts',
+              builder: (context, state) => const InventoryAlertsScreen(),
             ),
             
             // POS
@@ -359,6 +389,9 @@ class AppRouter {
   static bool _isProtectedRoute(String location) {
     return location == dashboardRoute ||
            location == analyticsRoute ||
+           location == featureDashboardRoute ||
+           location == smartSuggestionsRoute ||
+           location == inventoryAlertsRoute ||
            location == posRoute ||
            location == inventoryRoute ||
            location == reportsRoute ||
