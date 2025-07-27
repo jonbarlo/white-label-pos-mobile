@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
 import '../../shared/widgets/theme_toggle_button.dart';
+import '../../shared/widgets/loading_indicator.dart';
 import '../pos/pos_provider.dart';
 import '../pos/models/sale.dart';
 import '../../core/navigation/app_router.dart';
@@ -18,13 +19,31 @@ class DashboardScreen extends ConsumerStatefulWidget {
 }
 
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
+  bool _isLoadingRecentSales = false;
+
   @override
   void initState() {
     super.initState();
     // Load recent sales when the dashboard is opened
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(recentSalesNotifierProvider.notifier).loadRecentSales(limit: 10);
+      _loadRecentSales();
     });
+  }
+
+  Future<void> _loadRecentSales() async {
+    setState(() {
+      _isLoadingRecentSales = true;
+    });
+    
+    try {
+      await ref.read(recentSalesNotifierProvider.notifier).loadRecentSales(limit: 10);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoadingRecentSales = false;
+        });
+      }
+    }
   }
 
   @override
@@ -74,7 +93,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             DateTime(today.year, today.month, today.day),
             DateTime(today.year, today.month, today.day, 23, 59, 59),
           ));
-          await ref.read(recentSalesNotifierProvider.notifier).loadRecentSales(limit: 10);
+          await _loadRecentSales();
         },
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
@@ -82,47 +101,88 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Key Metrics Section
               Text(
                 'Sales Overview',
-                style: theme.textTheme.headlineLarge,
+                style: theme.textTheme.headlineLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 16),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Today\'s Sales',
-                        style: theme.textTheme.titleLarge,
-                      ),
-                      const SizedBox(height: 8),
+              
+              // Metrics Cards Row
+              Row(
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: _buildMetricCard(
+                      'Today\'s Sales',
                       todaySalesAsync.when(
                         data: (salesSummary) {
                           final totalSales = salesSummary['totalSales'] as double? ?? 0.0;
-                          return Text(
-                            '\$${NumberFormat('#,##0.00').format(totalSales)}',
-                            style: theme.textTheme.displayMedium?.copyWith(
-                              color: theme.colorScheme.secondary,
-                            ),
-                          );
+                          return '\$${NumberFormat('#,##0.00').format(totalSales)}';
                         },
-                        loading: () => const CircularProgressIndicator(),
+                        loading: () => null,
                         error: (error, stack) {
-                          // Fallback: calculate total from recent sales
-                          final recentTotal = recentSales.fold<double>(0.0, (sum, sale) => sum + sale.total);
-                          return Text(
-                            '\$${NumberFormat('#,##0.00').format(recentTotal)}',
-                            style: theme.textTheme.displayMedium?.copyWith(
-                              color: theme.colorScheme.secondary,
-                            ),
+                          // Fallback: calculate total from recent sales today
+                          final today = DateTime.now();
+                          final todayStart = DateTime(today.year, today.month, today.day);
+                          final todayEnd = DateTime(today.year, today.month, today.day, 23, 59, 59);
+                          
+                          final todaySales = recentSales.where((sale) => 
+                            sale.createdAt.isAfter(todayStart) && 
+                            sale.createdAt.isBefore(todayEnd)
                           );
+                          final recentTotal = todaySales.fold<double>(0.0, (sum, sale) => sum + sale.total);
+                          return '\$${NumberFormat('#,##0.00').format(recentTotal)}';
                         },
                       ),
-                    ],
+                      Icons.attach_money,
+                      theme.colorScheme.primary,
+                      isLoading: todaySalesAsync.isLoading,
+                      theme: theme,
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildMetricCard(
+                      'Transactions',
+                      '${recentSales.where((sale) {
+                        final today = DateTime.now();
+                        final todayStart = DateTime(today.year, today.month, today.day);
+                        final todayEnd = DateTime(today.year, today.month, today.day, 23, 59, 59);
+                        return sale.createdAt.isAfter(todayStart) && sale.createdAt.isBefore(todayEnd);
+                      }).length}',
+                      Icons.receipt,
+                      theme.colorScheme.secondary,
+                      theme: theme,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildMetricCard(
+                      'Avg Order',
+                      () {
+                        final today = DateTime.now();
+                        final todayStart = DateTime(today.year, today.month, today.day);
+                        final todayEnd = DateTime(today.year, today.month, today.day, 23, 59, 59);
+                        
+                        final todaySales = recentSales.where((sale) => 
+                          sale.createdAt.isAfter(todayStart) && 
+                          sale.createdAt.isBefore(todayEnd)
+                        ).toList();
+                        
+                        if (todaySales.isEmpty) return '\$0.00';
+                        
+                        final avgValue = todaySales.fold<double>(0.0, (sum, sale) => sum + sale.total) / todaySales.length;
+                        return '\$${NumberFormat('#,##0.00').format(avgValue)}';
+                      }(),
+                      Icons.trending_up,
+                      theme.colorScheme.tertiary,
+                      theme: theme,
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 16),
               
@@ -182,29 +242,33 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
-              Text(
-                'Recent Activity',
-                style: theme.textTheme.headlineMedium,
-              ),
-              const SizedBox(height: 8),
-              recentSales.isEmpty
-                  ? Card(
-                      child: ListTile(
-                        leading: Icon(Icons.receipt, color: theme.colorScheme.primary),
-                        title: Text(
-                          'No recent transactions',
-                          style: theme.textTheme.bodyLarge,
-                        ),
-                        subtitle: Text(
-                          'Start making sales to see activity here',
-                          style: theme.textTheme.bodySmall,
-                        ),
-                      ),
-                    )
-                  : Column(
-                      children: recentSales.take(5).map((sale) => _buildTransactionCard(sale, theme)).toList(),
+              const SizedBox(height: 24),
+              
+              // Recent Activity Section with Loading
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Recent Activity',
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
                     ),
+                  ),
+                  if (_isLoadingRecentSales)
+                    SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              
+              // Recent Activity Content
+              _buildRecentActivitySection(recentSales, theme),
             ],
           ),
         ),
@@ -252,6 +316,157 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildMetricCard(
+    String title,
+    String? value,
+    IconData icon,
+    Color color, {
+    bool isLoading = false,
+    required ThemeData theme,
+  }) {
+    return Card(
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, color: color, size: 20),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            if (isLoading)
+              const SizedBox(
+                height: 24,
+                width: 60,
+                child: ShimmerLoading(
+                  child: SkeletonLoading(height: 24),
+                ),
+              )
+            else
+              Text(
+                value ?? '\$0.00',
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRecentActivitySection(List<Sale> recentSales, ThemeData theme) {
+    // Show loading skeleton while loading
+    if (_isLoadingRecentSales && recentSales.isEmpty) {
+      return Column(
+        children: List.generate(3, (index) => 
+          Card(
+            margin: const EdgeInsets.only(bottom: 8),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  const ShimmerLoading(
+                    child: CircleAvatar(radius: 20),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const ShimmerLoading(
+                          child: SkeletonLoading(width: 120, height: 16),
+                        ),
+                        const SizedBox(height: 4),
+                        const ShimmerLoading(
+                          child: SkeletonLoading(width: 80, height: 14),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const ShimmerLoading(
+                    child: SkeletonLoading(width: 60, height: 16),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+    
+    // Show empty state if no data
+    if (recentSales.isEmpty) {
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            children: [
+              Icon(
+                Icons.receipt_long,
+                size: 48,
+                color: theme.colorScheme.primary.withValues(alpha: 0.5),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'No recent transactions',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Start making sales to see activity here',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                onPressed: () => context.go(AppRouter.posRoute),
+                icon: const Icon(Icons.point_of_sale, size: 18),
+                label: const Text('Start Selling'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.colorScheme.primary,
+                  foregroundColor: theme.colorScheme.onPrimary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+    
+    return Column(
+      children: [
+        ...recentSales.take(5).map((sale) => _buildTransactionCard(sale, theme)),
+        if (recentSales.length > 5)
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: TextButton(
+              onPressed: () => context.go(AppRouter.reportsRoute),
+              child: const Text('View All Transactions'),
+            ),
+          ),
+      ],
     );
   }
 
