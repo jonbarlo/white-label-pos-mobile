@@ -10,6 +10,7 @@ import 'src/features/inventory/inventory_repository_impl.dart';
 import 'src/features/inventory/inventory_provider.dart';
 import 'src/features/floor_plan/floor_plan_repository_impl.dart';
 import 'src/features/floor_plan/floor_plan_provider.dart';
+import 'src/features/promotions/promotion_repository_impl.dart';
 
 
 void main() async {
@@ -43,6 +44,11 @@ void main() async {
         // Floor plan repository (using real implementation)
         floorPlanRepositoryProvider.overrideWith(
           (ref) => FloorPlanRepositoryImpl(ref.watch(dioClientProvider)),
+        ),
+        
+        // Promotion repository (using real implementation)
+        promotionRepositoryProvider.overrideWith(
+          (ref) => PromotionRepositoryImpl(ref.watch(dioClientProvider), ref),
         ),
       ],
       child: const WhiteLabelPOSApp(),

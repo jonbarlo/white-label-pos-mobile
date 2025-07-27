@@ -19,6 +19,7 @@ Future<List<SmartRecipeSuggestion>> smartRecipeSuggestions(SmartRecipeSuggestion
     includeExpiringItems: true,
     includeUnderperformingItems: true,
     limit: 10,
+    status: 'pending', // Only show pending suggestions by default
   );
 }
 
@@ -98,4 +99,58 @@ Future<List<InventoryItem>> highUrgencyExpiringItems(HighUrgencyExpiringItemsRef
 Future<List<InventoryItem>> mediumUrgencyExpiringItems(MediumUrgencyExpiringItemsRef ref) async {
   final items = await ref.watch(expiringItemsProvider(7).future);
   return items.where((item) => item.daysUntilExpiration > 3 && item.daysUntilExpiration <= 7).toList();
+}
+
+// Status-based suggestion providers
+@riverpod
+Future<List<SmartRecipeSuggestion>> pendingSuggestions(PendingSuggestionsRef ref) async {
+  final repository = ref.watch(smartRecipeRepositoryProvider);
+  return await repository.getSmartRecipeSuggestions(
+    includeExpiringItems: true,
+    includeUnderperformingItems: true,
+    limit: 10,
+    status: 'pending',
+  );
+}
+
+@riverpod
+Future<List<SmartRecipeSuggestion>> cookedSuggestions(CookedSuggestionsRef ref) async {
+  final repository = ref.watch(smartRecipeRepositoryProvider);
+  return await repository.getSmartRecipeSuggestions(
+    includeExpiringItems: true,
+    includeUnderperformingItems: true,
+    limit: 10,
+    status: 'cooked',
+  );
+}
+
+@riverpod
+Future<List<SmartRecipeSuggestion>> allSuggestions(AllSuggestionsRef ref) async {
+  final repository = ref.watch(smartRecipeRepositoryProvider);
+  return await repository.getSmartRecipeSuggestions(
+    includeExpiringItems: true,
+    includeUnderperformingItems: true,
+    limit: 20,
+    status: 'pending',
+    includeCooked: true, // Include both pending and cooked
+  );
+}
+
+// Waste prevention providers
+@riverpod
+Future<Map<String, dynamic>> wastePreventionSuggestions(WastePreventionSuggestionsRef ref) async {
+  final repository = ref.watch(smartRecipeRepositoryProvider);
+  return await repository.getWastePreventionSuggestions(
+    maxDaysToExpiry: 7,
+    limit: 10,
+  );
+}
+
+@riverpod
+Future<Map<String, dynamic>> urgentWastePreventionSuggestions(UrgentWastePreventionSuggestionsRef ref) async {
+  final repository = ref.watch(smartRecipeRepositoryProvider);
+  return await repository.getWastePreventionSuggestions(
+    maxDaysToExpiry: 3,
+    limit: 5,
+  );
 } 

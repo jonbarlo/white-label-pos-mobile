@@ -2,7 +2,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'promotion.g.dart';
 
-enum PromotionType { percentage, fixed, buyOneGetOne, freeItem }
+enum PromotionType { discount, chef_special, buyOneGetOne, freeItem }
 enum PromotionStatus { active, inactive, scheduled, expired }
 
 @JsonSerializable()
@@ -12,18 +12,17 @@ class Promotion {
   final String name;
   final String description;
   final PromotionType type;
-  final PromotionStatus status;
-  final double discountValue; // percentage or fixed amount
+  final String discountType; // percentage, fixed, etc.
+  final double discountValue;
   final DateTime startDate;
   final DateTime endDate;
-  final List<int> applicableItemIds; // menu item IDs
-  final List<String> applicableCategories; // category names
-  final double? minimumOrderAmount;
-  final int? maximumUses;
-  final int currentUses;
-  final String? imageUrl;
-  final String? termsAndConditions;
+  final Map<String, dynamic>? conditions;
   final bool isActive;
+  final String? imageUrl;
+  final int? totalQuantity;
+  final int usedQuantity;
+  final int? maxUsesPerCustomer;
+  final int? recipeId;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -33,18 +32,17 @@ class Promotion {
     required this.name,
     required this.description,
     required this.type,
-    required this.status,
+    required this.discountType,
     required this.discountValue,
     required this.startDate,
     required this.endDate,
-    required this.applicableItemIds,
-    required this.applicableCategories,
-    this.minimumOrderAmount,
-    this.maximumUses,
-    required this.currentUses,
-    this.imageUrl,
-    this.termsAndConditions,
+    this.conditions,
     required this.isActive,
+    this.imageUrl,
+    this.totalQuantity,
+    required this.usedQuantity,
+    this.maxUsesPerCustomer,
+    this.recipeId,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -55,18 +53,17 @@ class Promotion {
   bool get isCurrentlyActive {
     final now = DateTime.now();
     return isActive && 
-           status == PromotionStatus.active && 
            now.isAfter(startDate) && 
            now.isBefore(endDate) &&
-           (maximumUses == null || currentUses < maximumUses!);
+           (maxUsesPerCustomer == null || usedQuantity < maxUsesPerCustomer!);
   }
 
   String get discountDisplay {
     switch (type) {
-      case PromotionType.percentage:
+      case PromotionType.discount:
         return '${discountValue.toInt()}% OFF';
-      case PromotionType.fixed:
-        return '\$${discountValue.toStringAsFixed(2)} OFF';
+      case PromotionType.chef_special:
+        return 'Chef\'s Special';
       case PromotionType.buyOneGetOne:
         return 'Buy 1 Get 1 FREE';
       case PromotionType.freeItem:
@@ -80,18 +77,17 @@ class Promotion {
     String? name,
     String? description,
     PromotionType? type,
-    PromotionStatus? status,
+    String? discountType,
     double? discountValue,
     DateTime? startDate,
     DateTime? endDate,
-    List<int>? applicableItemIds,
-    List<String>? applicableCategories,
-    double? minimumOrderAmount,
-    int? maximumUses,
-    int? currentUses,
-    String? imageUrl,
-    String? termsAndConditions,
+    Map<String, dynamic>? conditions,
     bool? isActive,
+    String? imageUrl,
+    int? totalQuantity,
+    int? usedQuantity,
+    int? maxUsesPerCustomer,
+    int? recipeId,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -101,18 +97,17 @@ class Promotion {
       name: name ?? this.name,
       description: description ?? this.description,
       type: type ?? this.type,
-      status: status ?? this.status,
+      discountType: discountType ?? this.discountType,
       discountValue: discountValue ?? this.discountValue,
       startDate: startDate ?? this.startDate,
       endDate: endDate ?? this.endDate,
-      applicableItemIds: applicableItemIds ?? this.applicableItemIds,
-      applicableCategories: applicableCategories ?? this.applicableCategories,
-      minimumOrderAmount: minimumOrderAmount ?? this.minimumOrderAmount,
-      maximumUses: maximumUses ?? this.maximumUses,
-      currentUses: currentUses ?? this.currentUses,
-      imageUrl: imageUrl ?? this.imageUrl,
-      termsAndConditions: termsAndConditions ?? this.termsAndConditions,
+      conditions: conditions ?? this.conditions,
       isActive: isActive ?? this.isActive,
+      imageUrl: imageUrl ?? this.imageUrl,
+      totalQuantity: totalQuantity ?? this.totalQuantity,
+      usedQuantity: usedQuantity ?? this.usedQuantity,
+      maxUsesPerCustomer: maxUsesPerCustomer ?? this.maxUsesPerCustomer,
+      recipeId: recipeId ?? this.recipeId,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

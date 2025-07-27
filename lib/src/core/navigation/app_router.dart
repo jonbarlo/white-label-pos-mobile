@@ -29,6 +29,7 @@ import '../../features/floor_plan/floor_plan_management_screen.dart';
 import '../../features/auth/models/user.dart';
 import '../../features/recipes/smart_suggestions_screen.dart';
 import '../../features/recipes/inventory_alerts_screen.dart';
+import '../../features/promotions/promotions_screen.dart';
 
 
 /// Provider for SharedPreferences
@@ -65,8 +66,9 @@ class AppRouter {
   static const String dashboardRoute = '/dashboard';
   static const String analyticsRoute = '/analytics';
   static const String featureDashboardRoute = '/feature-dashboard';
-static const String smartSuggestionsRoute = '/smart-suggestions';
+  static const String smartSuggestionsRoute = '/smart-suggestions';
   static const String inventoryAlertsRoute = '/inventory-alerts';
+  static const String promotionsRoute = '/promotions';
   static const String posRoute = '/pos';
   static const String inventoryRoute = '/inventory';
   static const String reportsRoute = '/reports';
@@ -159,6 +161,13 @@ static const String smartSuggestionsRoute = '/smart-suggestions';
               path: inventoryAlertsRoute,
               name: 'inventory-alerts',
               builder: (context, state) => const InventoryAlertsScreen(),
+            ),
+            
+            // Promotions
+            GoRoute(
+              path: promotionsRoute,
+              name: 'promotions',
+              builder: (context, state) => const PromotionsScreen(),
             ),
             
             // POS
@@ -392,6 +401,7 @@ static const String smartSuggestionsRoute = '/smart-suggestions';
            location == featureDashboardRoute ||
            location == smartSuggestionsRoute ||
            location == inventoryAlertsRoute ||
+           location == promotionsRoute ||
            location == posRoute ||
            location == inventoryRoute ||
            location == reportsRoute ||

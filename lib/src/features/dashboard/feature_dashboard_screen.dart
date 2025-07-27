@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../auth/auth_provider.dart';
 import '../auth/models/user.dart';
 import '../recipes/recipes_screen.dart';
@@ -8,6 +9,7 @@ import '../recipes/smart_suggestions_screen.dart';
 import '../recipes/inventory_alerts_screen.dart';
 import '../recipes/smart_recipe_provider.dart';
 import '../promotions/widgets/promotion_banner.dart';
+import '../promotions/promotions_provider.dart';
 import '../notifications/models/notification.dart';
 import '../../core/services/navigation_service.dart';
 
@@ -43,8 +45,6 @@ class _FeatureDashboardScreenState extends ConsumerState<FeatureDashboardScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Feature Dashboard'),
-        backgroundColor: Theme.of(context).primaryColor,
-        foregroundColor: Colors.white,
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
@@ -55,9 +55,7 @@ class _FeatureDashboardScreenState extends ConsumerState<FeatureDashboardScreen>
             Tab(text: 'Promotions'),
             Tab(text: 'Notifications'),
           ],
-          indicatorColor: Colors.white,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white70,
+          indicatorColor: Theme.of(context).colorScheme.primary,
         ),
       ),
       body: TabBarView(
@@ -241,10 +239,23 @@ class _FeatureDashboardScreenState extends ConsumerState<FeatureDashboardScreen>
                     children: [
                       const Icon(Icons.local_offer, color: Colors.orange, size: 32),
                       const SizedBox(width: 12),
-                      Text(
-                        'Promotions Management',
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
+                      Expanded(
+                        child: Text(
+                          'Promotions Management',
+                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          context.go('/promotions');
+                        },
+                        icon: const Icon(Icons.manage_accounts),
+                        label: const Text('Manage Promotions'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          foregroundColor: Colors.white,
                         ),
                       ),
                     ],
@@ -260,19 +271,118 @@ class _FeatureDashboardScreenState extends ConsumerState<FeatureDashboardScreen>
           ),
           const SizedBox(height: 24),
 
-          // Sample promotion banners
+          // Active promotions
           Text(
-            'Sample Promotion Banners',
+            'Active Promotions',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 16),
 
-          // Mock promotions for demonstration
-          _buildMockPromotions(),
+          // Real promotions from provider
+          _buildActivePromotions(),
         ],
       ),
+    );
+  }
+
+  Widget _buildActivePromotions() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final promotionsAsync = ref.watch(activePromotionsProvider);
+        
+        return promotionsAsync.when(
+          data: (promotions) {
+            if (promotions.isEmpty) {
+              return Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.local_offer_outlined,
+                        size: 48,
+                        color: Colors.grey.shade400,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No active promotions',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Create your first promotion to get started',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Colors.grey.shade500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+            
+            return Column(
+              children: promotions.take(3).map((promotion) => Card(
+                margin: const EdgeInsets.only(bottom: 12),
+                child: ListTile(
+                  leading: const Icon(Icons.local_offer, color: Colors.orange),
+                  title: Text(promotion.name),
+                  subtitle: Text(promotion.description),
+                  trailing: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.green.withOpacity(0.3)),
+                    ),
+                    child: Text(
+                      promotion.discountDisplay,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
+                      ),
+                    ),
+                  ),
+                ),
+              )).toList(),
+            );
+          },
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, stack) => Card(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    size: 48,
+                    color: Colors.red.shade400,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Error loading promotions',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: Colors.red.shade600,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    error.toString(),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.red.shade500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 

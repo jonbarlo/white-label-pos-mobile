@@ -1,11 +1,24 @@
 import 'models/promotion.dart';
 
 abstract class PromotionRepository {
-  Future<List<Promotion>> getPromotions({int? businessId});
-  Future<Promotion> getPromotion(int promotionId);
+  /// Get all promotions for the current business
+  Future<List<Promotion>> getPromotions();
+  
+  /// Get a specific promotion by ID
+  Future<Promotion?> getPromotion(int id);
+  
+  /// Create a new promotion
   Future<Promotion> createPromotion(Promotion promotion);
-  Future<Promotion> updatePromotion(int promotionId, Promotion promotion);
-  Future<void> deletePromotion(int promotionId);
-  Future<List<Promotion>> getActivePromotions({int? businessId});
-  Future<PromotionStats> getPromotionStats({int? businessId});
+  
+  /// Update an existing promotion
+  Future<Promotion> updatePromotion(Promotion promotion);
+  
+  /// Delete a promotion
+  Future<void> deletePromotion(int id);
+  
+  /// Get active promotions
+  Future<List<Promotion>> getActivePromotions();
+  
+  /// Get promotions by type
+  Future<List<Promotion>> getPromotionsByType(String type);
 } 

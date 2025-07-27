@@ -35,13 +35,22 @@ class InventoryRepositoryImpl implements InventoryRepository {
     
     return data.map((json) {
       final itemJson = json as Map<String, dynamic>;
-      // Map API field names to model field names
+      // Map API field names to model field names and provide defaults
       return InventoryItem.fromJson({
-        ...itemJson,
-        'stockQuantity': itemJson['stock'] ?? 0, // Map 'stock' to 'stockQuantity'
-        'cost': itemJson['cost'] ?? 0.0, // Ensure cost field exists
-        'minStockLevel': itemJson['minStockLevel'] ?? 0, // Ensure minStockLevel exists
-        'maxStockLevel': itemJson['maxStockLevel'] ?? 100, // Ensure maxStockLevel exists
+        'id': itemJson['id']?.toString() ?? '',
+        'name': itemJson['name']?.toString() ?? 'Unknown Item',
+        'sku': itemJson['sku']?.toString() ?? '',
+        'price': itemJson['price'] ?? 0.0,
+        'cost': itemJson['cost'] ?? 0.0,
+        'stockQuantity': itemJson['stock'] ?? itemJson['stockQuantity'] ?? 0,
+        'category': itemJson['category']?.toString() ?? 'Uncategorized',
+        'barcode': itemJson['barcode']?.toString(),
+        'imageUrl': itemJson['imageUrl']?.toString(),
+        'description': itemJson['description']?.toString(),
+        'minStockLevel': itemJson['minStockLevel'] ?? 0,
+        'maxStockLevel': itemJson['maxStockLevel'] ?? 100,
+        'createdAt': itemJson['createdAt']?.toString(),
+        'updatedAt': itemJson['updatedAt']?.toString(),
       });
     }).toList();
   }

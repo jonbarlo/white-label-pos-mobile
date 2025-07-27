@@ -12,22 +12,17 @@ Promotion _$PromotionFromJson(Map<String, dynamic> json) => Promotion(
       name: json['name'] as String,
       description: json['description'] as String,
       type: $enumDecode(_$PromotionTypeEnumMap, json['type']),
-      status: $enumDecode(_$PromotionStatusEnumMap, json['status']),
+      discountType: json['discountType'] as String,
       discountValue: (json['discountValue'] as num).toDouble(),
       startDate: DateTime.parse(json['startDate'] as String),
       endDate: DateTime.parse(json['endDate'] as String),
-      applicableItemIds: (json['applicableItemIds'] as List<dynamic>)
-          .map((e) => (e as num).toInt())
-          .toList(),
-      applicableCategories: (json['applicableCategories'] as List<dynamic>)
-          .map((e) => e as String)
-          .toList(),
-      minimumOrderAmount: (json['minimumOrderAmount'] as num?)?.toDouble(),
-      maximumUses: (json['maximumUses'] as num?)?.toInt(),
-      currentUses: (json['currentUses'] as num).toInt(),
-      imageUrl: json['imageUrl'] as String?,
-      termsAndConditions: json['termsAndConditions'] as String?,
+      conditions: json['conditions'] as Map<String, dynamic>?,
       isActive: json['isActive'] as bool,
+      imageUrl: json['imageUrl'] as String?,
+      totalQuantity: (json['totalQuantity'] as num?)?.toInt(),
+      usedQuantity: (json['usedQuantity'] as num).toInt(),
+      maxUsesPerCustomer: (json['maxUsesPerCustomer'] as num?)?.toInt(),
+      recipeId: (json['recipeId'] as num?)?.toInt(),
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
     );
@@ -38,34 +33,26 @@ Map<String, dynamic> _$PromotionToJson(Promotion instance) => <String, dynamic>{
       'name': instance.name,
       'description': instance.description,
       'type': _$PromotionTypeEnumMap[instance.type]!,
-      'status': _$PromotionStatusEnumMap[instance.status]!,
+      'discountType': instance.discountType,
       'discountValue': instance.discountValue,
       'startDate': instance.startDate.toIso8601String(),
       'endDate': instance.endDate.toIso8601String(),
-      'applicableItemIds': instance.applicableItemIds,
-      'applicableCategories': instance.applicableCategories,
-      'minimumOrderAmount': instance.minimumOrderAmount,
-      'maximumUses': instance.maximumUses,
-      'currentUses': instance.currentUses,
-      'imageUrl': instance.imageUrl,
-      'termsAndConditions': instance.termsAndConditions,
+      'conditions': instance.conditions,
       'isActive': instance.isActive,
+      'imageUrl': instance.imageUrl,
+      'totalQuantity': instance.totalQuantity,
+      'usedQuantity': instance.usedQuantity,
+      'maxUsesPerCustomer': instance.maxUsesPerCustomer,
+      'recipeId': instance.recipeId,
       'createdAt': instance.createdAt.toIso8601String(),
       'updatedAt': instance.updatedAt.toIso8601String(),
     };
 
 const _$PromotionTypeEnumMap = {
-  PromotionType.percentage: 'percentage',
-  PromotionType.fixed: 'fixed',
+  PromotionType.discount: 'discount',
+  PromotionType.chef_special: 'chef_special',
   PromotionType.buyOneGetOne: 'buyOneGetOne',
   PromotionType.freeItem: 'freeItem',
-};
-
-const _$PromotionStatusEnumMap = {
-  PromotionStatus.active: 'active',
-  PromotionStatus.inactive: 'inactive',
-  PromotionStatus.scheduled: 'scheduled',
-  PromotionStatus.expired: 'expired',
 };
 
 PromotionStats _$PromotionStatsFromJson(Map<String, dynamic> json) =>

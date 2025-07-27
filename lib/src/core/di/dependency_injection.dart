@@ -8,6 +8,7 @@ import '../../features/inventory/inventory_repository_impl.dart';
 import '../../features/inventory/inventory_provider.dart';
 import '../../features/floor_plan/floor_plan_repository_impl.dart';
 import '../../features/floor_plan/floor_plan_provider.dart';
+import '../../features/promotions/promotion_repository_impl.dart';
 import '../../core/config/env_config.dart';
 
 /// Global providers for dependency injection
@@ -54,6 +55,11 @@ class DependencyInjection {
     // Floor plan repository (uses Dio from provider)
   floorPlanRepositoryProvider.overrideWith(
     (ref) => FloorPlanRepositoryImpl(ref.watch(dioClientProvider)),
+  ),
+  
+  // Promotion repository (uses Dio from provider)
+  promotionRepositoryProvider.overrideWith(
+    (ref) => PromotionRepositoryImpl(ref.watch(dioClientProvider), ref),
   ),
       ],
     );

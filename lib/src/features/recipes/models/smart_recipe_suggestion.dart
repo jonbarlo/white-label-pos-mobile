@@ -5,6 +5,7 @@ import 'recipe.dart';
 part 'smart_recipe_suggestion.g.dart';
 
 enum UrgencyLevel { high, medium, low }
+enum SuggestionStatus { pending, cooked, expired, dismissed }
 
 extension UrgencyLevelExtension on UrgencyLevel {
   Color get urgencyColor {
@@ -43,6 +44,7 @@ class SmartRecipeSuggestion {
   final String reasoning;
   final DateTime createdAt;
   final bool isRecommended;
+  final SuggestionStatus status;
 
   const SmartRecipeSuggestion({
     required this.id,
@@ -56,6 +58,7 @@ class SmartRecipeSuggestion {
     required this.reasoning,
     required this.createdAt,
     this.isRecommended = false,
+    this.status = SuggestionStatus.pending,
   });
 
   factory SmartRecipeSuggestion.fromJson(Map<String, dynamic> json) => 
@@ -69,6 +72,10 @@ class SmartRecipeSuggestion {
   bool get isUrgent => urgencyLevel == UrgencyLevel.high;
   bool get hasExpiringIngredients => expiringIngredients.isNotEmpty;
   bool get hasUnderperformingIngredients => underperformingIngredients.isNotEmpty;
+  bool get canBeCooked => status == SuggestionStatus.pending;
+  bool get isCooked => status == SuggestionStatus.cooked;
+  bool get isExpired => status == SuggestionStatus.expired;
+  bool get isDismissed => status == SuggestionStatus.dismissed;
 }
 
 @JsonSerializable()

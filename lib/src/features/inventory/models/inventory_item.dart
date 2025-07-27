@@ -76,34 +76,7 @@ class InventoryItem {
     );
   }
 
-  factory InventoryItem.fromJson(Map<String, dynamic> json) => InventoryItem(
-        id: json['id']?.toString() ?? '',
-        name: json['name']?.toString() ?? '',
-        sku: json['sku']?.toString() ?? '',
-        price: _parseDouble(json['price']),
-        cost: _parseDouble(json['cost']),
-        stockQuantity: _parseInt(json['stockQuantity']),
-        category: json['category']?.toString() ?? '',
-        barcode: json['barcode']?.toString(),
-        imageUrl: json['imageUrl']?.toString(),
-        description: json['description']?.toString(),
-        minStockLevel: _parseInt(json['minStockLevel']),
-        maxStockLevel: _parseInt(json['maxStockLevel']),
-        createdAt: json['createdAt'] == null ? null : DateTime.tryParse(json['createdAt'].toString()),
-        updatedAt: json['updatedAt'] == null ? null : DateTime.tryParse(json['updatedAt'].toString()),
-      );
-
-  static double _parseDouble(dynamic value) {
-    if (value == null) return 0.0;
-    if (value is num) return value.toDouble();
-    return double.tryParse(value.toString()) ?? 0.0;
-  }
-
-  static int _parseInt(dynamic value) {
-    if (value == null) return 0;
-    if (value is num) return value.toInt();
-    return int.tryParse(value.toString()) ?? 0;
-  }
+  factory InventoryItem.fromJson(Map<String, dynamic> json) => _$InventoryItemFromJson(json);
 
   Map<String, dynamic> toJson() => _$InventoryItemToJson(this);
 

@@ -10,17 +10,45 @@ class SmartRecipeRepositoryImpl implements SmartRecipeRepository {
 
   @override
   Future<List<SmartRecipeSuggestion>> getSmartRecipeSuggestions({
-    bool includeExpiringItems = true,
-    bool includeUnderperformingItems = true,
-    int limit = 10,
+    bool? includeExpiringItems,
+    bool? includeUnderperformingItems,
+    int? limit,
+    String? status,
+    bool? includeCooked,
+    int? maxDaysToExpiry,
+    double? minSalesVelocity,
+    int? maxDaysSinceLastSale,
   }) async {
     try {
-      // Use the new smart suggestions endpoint
-      final response = await _dio.get('/smart/smart-suggestions', queryParameters: {
-        'includeExpiringItems': includeExpiringItems,
-        'includeUnderperformingItems': includeUnderperformingItems,
-        'limit': limit,
-      });
+      // Use the new smart suggestions endpoint with status filtering
+      final queryParams = <String, dynamic>{};
+      
+      if (includeExpiringItems != null) {
+        queryParams['includeExpiringItems'] = includeExpiringItems;
+      }
+      if (includeUnderperformingItems != null) {
+        queryParams['includeUnderperformingItems'] = includeUnderperformingItems;
+      }
+      if (limit != null) {
+        queryParams['limit'] = limit;
+      }
+      if (status != null) {
+        queryParams['status'] = status;
+      }
+      if (includeCooked != null) {
+        queryParams['includeCooked'] = includeCooked;
+      }
+      if (maxDaysToExpiry != null) {
+        queryParams['maxDaysToExpiry'] = maxDaysToExpiry;
+      }
+      if (minSalesVelocity != null) {
+        queryParams['minSalesVelocity'] = minSalesVelocity;
+      }
+      if (maxDaysSinceLastSale != null) {
+        queryParams['maxDaysSinceLastSale'] = maxDaysSinceLastSale;
+      }
+      
+      final response = await _dio.get('/smart/smart-suggestions', queryParameters: queryParams);
       
       final responseData = response.data;
       final data = responseData is Map<String, dynamic> && responseData.containsKey('data')
@@ -37,9 +65,9 @@ class SmartRecipeRepositoryImpl implements SmartRecipeRepository {
         final inventoryItems = suggestedItems.map((item) {
           final itemMap = item as Map<String, dynamic>;
           return InventoryItem(
-            id: itemMap['itemId']?.toInt() ?? 0,
-            name: itemMap['itemName']?.toString() ?? 'Unknown Item',
-            currentStock: itemMap['currentStock']?.toDouble() ?? 0.0,
+            id: itemMap['id']?.toInt() ?? 0,
+            name: itemMap['name']?.toString() ?? 'Item ${itemMap['id']?.toString() ?? 'Unknown'}',
+            currentStock: itemMap['stock']?.toDouble() ?? 0.0,
             minimumStock: 0.0, // Not provided in API
             unitCost: 0.0, // Not provided in API
             expirationDate: null, // Parse from daysToExpiry if available
@@ -99,6 +127,7 @@ class SmartRecipeRepositoryImpl implements SmartRecipeRepository {
           reasoning: _generateReasoningFromItems(inventoryItems),
           createdAt: DateTime.now(),
           isRecommended: true,
+          status: _mapSuggestionStatus(suggestionMap['status']?.toString() ?? 'pending'),
         );
       }).toList();
     } catch (e) {
@@ -149,11 +178,11 @@ class SmartRecipeRepositoryImpl implements SmartRecipeRepository {
       return items.map((item) {
         final itemMap = item as Map<String, dynamic>;
         return InventoryItem(
-          id: itemMap['itemId']?.toInt() ?? 0,
-          name: itemMap['itemName']?.toString() ?? 'Unknown Item',
-          currentStock: itemMap['currentStock']?.toDouble() ?? 0.0,
+          id: itemMap['id']?.toInt() ?? 0,
+          name: itemMap['name']?.toString() ?? 'Item ${itemMap['id']?.toString() ?? 'Unknown'}',
+          currentStock: itemMap['stock']?.toDouble() ?? 0.0,
           minimumStock: 0.0,
-          unitCost: 0.0,
+          unitCost: itemMap['cost']?.toDouble() ?? 0.0,
           expirationDate: DateTime.now().add(Duration(days: itemMap['daysToExpiry']?.toInt() ?? 0)),
           manufacturingDate: null,
           shelfLifeDays: null,
@@ -164,7 +193,7 @@ class SmartRecipeRepositoryImpl implements SmartRecipeRepository {
           isUnderperforming: false,
           isExpiringSoon: true,
           totalValue: itemMap['potentialLoss']?.toDouble() ?? 0.0,
-          alertMessage: 'Expires in ${itemMap['daysToExpiry']?.toInt() ?? 0} days',
+          alertMessage: _getExpiryMessage(itemMap['daysToExpiry']?.toInt() ?? 0),
         );
       }).toList();
     } catch (e) {
@@ -187,11 +216,11 @@ class SmartRecipeRepositoryImpl implements SmartRecipeRepository {
       return items.map((item) {
         final itemMap = item as Map<String, dynamic>;
         return InventoryItem(
-          id: itemMap['itemId']?.toInt() ?? 0,
-          name: itemMap['itemName']?.toString() ?? 'Unknown Item',
-          currentStock: itemMap['currentStock']?.toDouble() ?? 0.0,
+          id: itemMap['id']?.toInt() ?? 0,
+          name: itemMap['name']?.toString() ?? 'Item ${itemMap['id']?.toString() ?? 'Unknown'}',
+          currentStock: itemMap['stock']?.toDouble() ?? 0.0,
           minimumStock: 0.0,
-          unitCost: 0.0,
+          unitCost: itemMap['cost']?.toDouble() ?? 0.0,
           expirationDate: null,
           manufacturingDate: null,
           shelfLifeDays: null,
@@ -224,7 +253,7 @@ class SmartRecipeRepositoryImpl implements SmartRecipeRepository {
         alerts.add(InventoryAlert(
           id: item.id,
           title: 'Expiring Soon',
-          message: '${item.name} expires in ${item.daysUntilExpiration} days',
+          message: '${item.name} ${_getExpiryMessage(item.daysUntilExpiration)}',
           urgencyLevel: item.urgencyLevel,
           createdAt: DateTime.now(),
           isRead: false,
@@ -259,6 +288,112 @@ class SmartRecipeRepositoryImpl implements SmartRecipeRepository {
       await _dio.post('/smart/update-tracking');
     } catch (e) {
       throw Exception('Failed to update tracking data: $e');
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> cookRecipe(
+    int recipeId, 
+    int quantity, {
+    String? promotionType,
+    String? promotionName,
+    String? promotionDescription,
+    String? discountType,
+    double? discountValue,
+    int? promotionExpiresInHours,
+  }) async {
+    try {
+      final Map<String, dynamic> requestData = {
+        'recipeId': recipeId,
+        'quantity': quantity,
+      };
+      
+      // Add promotion parameters if provided
+      if (promotionType != null) requestData['type'] = promotionType; // Backend expects 'type' not 'promotionType'
+      if (promotionName != null) requestData['name'] = promotionName; // Backend expects 'name' not 'promotionName'
+      if (promotionDescription != null) requestData['description'] = promotionDescription; // Backend expects 'description' not 'promotionDescription'
+      if (discountType != null) requestData['discountType'] = discountType;
+      if (discountValue != null) requestData['discountValue'] = discountValue;
+      if (promotionExpiresInHours != null) requestData['expiresInHours'] = promotionExpiresInHours; // Backend expects 'expiresInHours' not 'promotionExpiresInHours'
+      
+      final response = await _dio.post('/smart/cook-recipe', data: requestData);
+      
+      final responseData = response.data;
+      final data = responseData is Map<String, dynamic> && responseData.containsKey('data')
+          ? responseData['data'] as Map<String, dynamic>
+          : responseData as Map<String, dynamic>;
+      
+      return data;
+    } catch (e) {
+      throw Exception('Failed to cook recipe: $e');
+    }
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getCookingHistory() async {
+    try {
+      final response = await _dio.get('/smart/cooking-history');
+      
+      final responseData = response.data;
+      final data = responseData is Map<String, dynamic> && responseData.containsKey('data')
+          ? responseData['data'] as Map<String, dynamic>
+          : responseData as Map<String, dynamic>;
+      
+      final history = data['history'] as List<dynamic>? ?? [];
+      return List<Map<String, dynamic>>.from(history);
+    } catch (e) {
+      throw Exception('Failed to get cooking history: $e');
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> getCookingAnalytics() async {
+    try {
+      final response = await _dio.get('/smart/cooking-analytics');
+      
+      final responseData = response.data;
+      final data = responseData is Map<String, dynamic> && responseData.containsKey('data')
+          ? responseData['data'] as Map<String, dynamic>
+          : responseData as Map<String, dynamic>;
+      
+      return data;
+    } catch (e) {
+      throw Exception('Failed to get cooking analytics: $e');
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> createPromotion({
+    required String name,
+    required String type,
+    required String discountType,
+    required double discountValue,
+    required DateTime expiresAt,
+    List<int>? itemIds,
+    String? description,
+  }) async {
+    try {
+      final response = await _dio.post('/promotions', data: {
+        'name': name,
+        'type': type, // Use the provided type parameter
+        'discountType': discountType,
+        'discountValue': discountValue,
+        'startDate': DateTime.now().toIso8601String(), // Backend expects startDate
+        'endDate': expiresAt.toIso8601String(), // Backend expects endDate
+        'status': 'active', // Add status field
+        'isActive': true, // Add isActive field
+        if (itemIds != null) 'itemIds': itemIds,
+        if (description != null) 'description': description,
+      });
+      
+      final responseData = response.data;
+      final data = responseData is Map<String, dynamic> && responseData.containsKey('data')
+          ? responseData['data'] as Map<String, dynamic>
+          : responseData as Map<String, dynamic>;
+      
+      return data;
+    } catch (e) {
+      throw Exception('Failed to create promotion: $e');
     }
   }
 
@@ -302,6 +437,30 @@ class SmartRecipeRepositoryImpl implements SmartRecipeRepository {
     return 100.0 - (expiringPercentage + underperformingPercentage);
   }
 
+  String _getExpiryMessage(int daysToExpiry) {
+    if (daysToExpiry == 0) {
+      return 'Expires Today';
+    } else if (daysToExpiry == 1) {
+      return 'Expires Tomorrow';
+    } else {
+      return 'Expires in $daysToExpiry days';
+    }
+  }
+
+  SuggestionStatus _mapSuggestionStatus(String status) {
+    switch (status.toLowerCase()) {
+      case 'cooked':
+        return SuggestionStatus.cooked;
+      case 'expired':
+        return SuggestionStatus.expired;
+      case 'dismissed':
+        return SuggestionStatus.dismissed;
+      case 'pending':
+      default:
+        return SuggestionStatus.pending;
+    }
+  }
+
   String _generateReasoningFromItems(List<InventoryItem> items) {
     final expiringItems = items.where((item) => item.isExpiringSoon).toList();
     final underperformingItems = items.where((item) => item.isUnderperforming).toList();
@@ -314,6 +473,34 @@ class SmartRecipeRepositoryImpl implements SmartRecipeRepository {
       return 'Recipe uses ${underperformingItems.length} underperforming items to improve turnover.';
     } else {
       return 'Recipe suggestion based on inventory optimization.';
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> getWastePreventionSuggestions({
+    int? maxDaysToExpiry,
+    int? limit,
+  }) async {
+    try {
+      final requestBody = <String, dynamic>{};
+      
+      if (maxDaysToExpiry != null) {
+        requestBody['maxDaysToExpiry'] = maxDaysToExpiry;
+      }
+      if (limit != null) {
+        requestBody['limit'] = limit;
+      }
+      
+      final response = await _dio.post('/smart/waste-prevention-suggestions', data: requestBody);
+      
+      final responseData = response.data;
+      final data = responseData is Map<String, dynamic> && responseData.containsKey('data')
+          ? responseData['data'] as Map<String, dynamic>
+          : responseData as Map<String, dynamic>;
+      
+      return data;
+    } catch (e) {
+      throw Exception('Failed to get waste prevention suggestions: $e');
     }
   }
 } 

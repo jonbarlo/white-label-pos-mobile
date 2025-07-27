@@ -27,7 +27,7 @@ final smartRecipeRepositoryProvider =
 typedef SmartRecipeRepositoryRef
     = AutoDisposeProviderRef<SmartRecipeRepository>;
 String _$smartRecipeSuggestionsHash() =>
-    r'0fc4d41cdb8e475241744519d5d510c13eb51ab2';
+    r'9e48fcd62d0686d577d977c4fa560c9c5f7ada6f';
 
 /// See also [smartRecipeSuggestions].
 @ProviderFor(smartRecipeSuggestions)
@@ -421,5 +421,103 @@ final mediumUrgencyExpiringItemsProvider =
 // ignore: unused_element
 typedef MediumUrgencyExpiringItemsRef
     = AutoDisposeFutureProviderRef<List<InventoryItem>>;
+String _$pendingSuggestionsHash() =>
+    r'4f5855c589dbb2e81b39e0a677453a46b11bcda5';
+
+/// See also [pendingSuggestions].
+@ProviderFor(pendingSuggestions)
+final pendingSuggestionsProvider =
+    AutoDisposeFutureProvider<List<SmartRecipeSuggestion>>.internal(
+  pendingSuggestions,
+  name: r'pendingSuggestionsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$pendingSuggestionsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef PendingSuggestionsRef
+    = AutoDisposeFutureProviderRef<List<SmartRecipeSuggestion>>;
+String _$cookedSuggestionsHash() => r'dff9dcbd864c1701953f37acc10a9486cee0c59b';
+
+/// See also [cookedSuggestions].
+@ProviderFor(cookedSuggestions)
+final cookedSuggestionsProvider =
+    AutoDisposeFutureProvider<List<SmartRecipeSuggestion>>.internal(
+  cookedSuggestions,
+  name: r'cookedSuggestionsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$cookedSuggestionsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef CookedSuggestionsRef
+    = AutoDisposeFutureProviderRef<List<SmartRecipeSuggestion>>;
+String _$allSuggestionsHash() => r'76839cce0e5145f078fcca6f9de8b9642a030b86';
+
+/// See also [allSuggestions].
+@ProviderFor(allSuggestions)
+final allSuggestionsProvider =
+    AutoDisposeFutureProvider<List<SmartRecipeSuggestion>>.internal(
+  allSuggestions,
+  name: r'allSuggestionsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$allSuggestionsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef AllSuggestionsRef
+    = AutoDisposeFutureProviderRef<List<SmartRecipeSuggestion>>;
+String _$wastePreventionSuggestionsHash() =>
+    r'ea8eb59e47cdaf217fbcf2218f16dc28a52cff0e';
+
+/// See also [wastePreventionSuggestions].
+@ProviderFor(wastePreventionSuggestions)
+final wastePreventionSuggestionsProvider =
+    AutoDisposeFutureProvider<Map<String, dynamic>>.internal(
+  wastePreventionSuggestions,
+  name: r'wastePreventionSuggestionsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$wastePreventionSuggestionsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef WastePreventionSuggestionsRef
+    = AutoDisposeFutureProviderRef<Map<String, dynamic>>;
+String _$urgentWastePreventionSuggestionsHash() =>
+    r'48affa213ca0f88ffb914b97daee7e497953b910';
+
+/// See also [urgentWastePreventionSuggestions].
+@ProviderFor(urgentWastePreventionSuggestions)
+final urgentWastePreventionSuggestionsProvider =
+    AutoDisposeFutureProvider<Map<String, dynamic>>.internal(
+  urgentWastePreventionSuggestions,
+  name: r'urgentWastePreventionSuggestionsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$urgentWastePreventionSuggestionsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef UrgentWastePreventionSuggestionsRef
+    = AutoDisposeFutureProviderRef<Map<String, dynamic>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

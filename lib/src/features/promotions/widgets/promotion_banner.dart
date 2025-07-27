@@ -94,7 +94,7 @@ class PromotionBanner extends StatelessWidget {
                         ),
                         const Spacer(),
                         Text(
-                          '${promotion.currentUses} uses',
+                          '${promotion.usedQuantity} uses',
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.grey[600],
@@ -119,10 +119,10 @@ class PromotionBanner extends StatelessWidget {
 
   IconData _getPromotionIcon() {
     switch (promotion.type) {
-      case PromotionType.percentage:
+      case PromotionType.discount:
         return Icons.percent;
-      case PromotionType.fixed:
-        return Icons.attach_money;
+      case PromotionType.chef_special:
+        return Icons.restaurant_menu;
       case PromotionType.buyOneGetOne:
         return Icons.local_offer;
       case PromotionType.freeItem:

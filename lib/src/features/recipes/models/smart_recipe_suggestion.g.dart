@@ -27,6 +27,8 @@ SmartRecipeSuggestion _$SmartRecipeSuggestionFromJson(
       reasoning: json['reasoning'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
       isRecommended: json['isRecommended'] as bool? ?? false,
+      status: $enumDecodeNullable(_$SuggestionStatusEnumMap, json['status']) ??
+          SuggestionStatus.pending,
     );
 
 Map<String, dynamic> _$SmartRecipeSuggestionToJson(
@@ -43,12 +45,20 @@ Map<String, dynamic> _$SmartRecipeSuggestionToJson(
       'reasoning': instance.reasoning,
       'createdAt': instance.createdAt.toIso8601String(),
       'isRecommended': instance.isRecommended,
+      'status': _$SuggestionStatusEnumMap[instance.status]!,
     };
 
 const _$UrgencyLevelEnumMap = {
   UrgencyLevel.high: 'high',
   UrgencyLevel.medium: 'medium',
   UrgencyLevel.low: 'low',
+};
+
+const _$SuggestionStatusEnumMap = {
+  SuggestionStatus.pending: 'pending',
+  SuggestionStatus.cooked: 'cooked',
+  SuggestionStatus.expired: 'expired',
+  SuggestionStatus.dismissed: 'dismissed',
 };
 
 InventoryItem _$InventoryItemFromJson(Map<String, dynamic> json) =>
