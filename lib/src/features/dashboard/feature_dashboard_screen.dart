@@ -7,11 +7,8 @@ import '../recipes/recipes_screen.dart';
 import '../recipes/widgets/recipe_creation_dialog.dart';
 import '../recipes/smart_suggestions_screen.dart';
 import '../recipes/inventory_alerts_screen.dart';
-import '../recipes/smart_recipe_provider.dart';
-import '../promotions/widgets/promotion_banner.dart';
 import '../promotions/promotions_provider.dart';
-import '../notifications/models/notification.dart';
-import '../../core/services/navigation_service.dart';
+import '../../shared/widgets/loading_indicator.dart';
 
 class FeatureDashboardScreen extends ConsumerStatefulWidget {
   const FeatureDashboardScreen({super.key});
@@ -38,172 +35,240 @@ class _FeatureDashboardScreenState extends ConsumerState<FeatureDashboardScreen>
 
   @override
   Widget build(BuildContext context) {
-    print('🔍 DEBUG: FeatureDashboardScreen build called');
     final authState = ref.watch(authNotifierProvider);
     final userRole = authState.user?.role;
+    final theme = Theme.of(context);
 
     return Scaffold(
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
-        title: const Text('Feature Dashboard'),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'Overview'),
-            Tab(text: 'Recipes'),
-            Tab(text: 'Smart Suggestions'),
-            Tab(text: 'Inventory Alerts'),
-            Tab(text: 'Promotions'),
-            Tab(text: 'Notifications'),
-          ],
-          indicatorColor: Theme.of(context).colorScheme.primary,
+        title: Text(
+          'Feature Dashboard',
+          style: theme.textTheme.headlineMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        centerTitle: false,
+        elevation: 0,
+        backgroundColor: theme.colorScheme.surface,
+        surfaceTintColor: Colors.transparent,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(48),
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: TabBar(
+              controller: _tabController,
+              tabs: const [
+                Tab(text: 'Overview'),
+                Tab(text: 'Recipes'),
+                Tab(text: 'Smart AI'),
+                Tab(text: 'Inventory'),
+                Tab(text: 'Promotions'),
+                Tab(text: 'Notifications'),
+              ],
+              indicator: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: theme.colorScheme.primary,
+              ),
+              indicatorSize: TabBarIndicatorSize.tab,
+              indicatorPadding: const EdgeInsets.all(4),
+              labelColor: theme.colorScheme.onPrimary,
+              unselectedLabelColor: theme.colorScheme.onSurfaceVariant,
+              labelStyle: theme.textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+              unselectedLabelStyle: theme.textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.w500,
+              ),
+              dividerColor: Colors.transparent,
+            ),
+          ),
         ),
       ),
       body: TabBarView(
         controller: _tabController,
         children: [
-          _buildOverviewTab(userRole),
+          _buildOverviewTab(userRole, theme),
           _buildRecipesTab(),
           _buildSmartSuggestionsTab(),
           _buildInventoryAlertsTab(),
-          _buildPromotionsTab(),
-          _buildNotificationsTab(),
+          _buildPromotionsTab(theme),
+          _buildNotificationsTab(theme),
         ],
       ),
-      floatingActionButton: _getFloatingActionButton(),
+      floatingActionButton: _getFloatingActionButton(theme),
     );
   }
 
-  Widget _buildOverviewTab(UserRole? userRole) {
+  Widget _buildOverviewTab(UserRole? userRole, ThemeData theme) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Welcome section
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Welcome to the Recipe & Promotion System!',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Role: ${userRole?.name ?? 'Unknown'}',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'This dashboard showcases the new features available in your POS system. '
-                    'Explore recipes, promotions, and notifications to enhance your restaurant operations.',
-                  ),
-                ],
+
+
+          // Quick Stats Section (moved above features)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerLowest,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: theme.colorScheme.outline.withValues(alpha: 0.1),
               ),
             ),
-          ),
-          const SizedBox(height: 24),
-
-          // Feature cards
-          GridView.count(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 2,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: 1.2,
-            children: [
-              _buildFeatureCard(
-                title: 'Recipes',
-                description: 'Manage kitchen recipes and instructions',
-                icon: Icons.restaurant_menu,
-                color: Colors.green,
-                onTap: () => _tabController.animateTo(1),
-                canAccess: _canAccessRecipes(userRole),
-              ),
-              _buildFeatureCard(
-                title: 'Promotions',
-                description: 'Create and manage promotional offers',
-                icon: Icons.local_offer,
-                color: Colors.orange,
-                onTap: () => _tabController.animateTo(2),
-                canAccess: _canAccessPromotions(userRole),
-              ),
-              _buildFeatureCard(
-                title: 'Notifications',
-                description: 'Send notifications to staff and customers',
-                icon: Icons.notifications,
-                color: Colors.blue,
-                onTap: () => _tabController.animateTo(3),
-                canAccess: _canAccessNotifications(userRole),
-              ),
-              _buildFeatureCard(
-                title: 'Analytics',
-                description: 'View performance metrics and reports',
-                icon: Icons.analytics,
-                color: Colors.purple,
-                onTap: () {
-                  // TODO: Navigate to analytics
-                },
-                canAccess: _canAccessAnalytics(userRole),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-
-          // Quick stats
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Quick Stats',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Icons.insights,
+                        color: theme.colorScheme.primary,
+                        size: 20,
+                      ),
                     ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Quick Stats',
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildStatCard(
+                        title: 'Active Recipes',
+                        value: '12',
+                        icon: Icons.restaurant_menu,
+                        color: theme.colorScheme.primary,
+                        theme: theme,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildStatCard(
+                        title: 'Promotions',
+                        value: '3',
+                        icon: Icons.local_offer,
+                        color: theme.colorScheme.secondary,
+                        theme: theme,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildStatCard(
+                        title: 'Notifications',
+                        value: '5',
+                        icon: Icons.notifications,
+                        color: theme.colorScheme.tertiary,
+                        theme: theme,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 32),
+
+          // Feature Grid
+          Text(
+            'Features',
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 16),
+          
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final crossAxisCount = constraints.maxWidth > 600 ? 3 : 2;
+              return GridView.count(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisCount: crossAxisCount,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 1.8, // Reduced height significantly
+                children: [
+                  _buildFeatureCard(
+                    title: 'Recipes',
+                    description: 'Smart kitchen recipe management',
+                    icon: Icons.restaurant_menu,
+                    color: theme.colorScheme.primary,
+                    onTap: () => _tabController.animateTo(1),
+                    canAccess: true, // Fixed access control
+                    theme: theme,
                   ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildStatCard(
-                          title: 'Active Recipes',
-                          value: '12',
-                          icon: Icons.restaurant_menu,
-                          color: Colors.green,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: _buildStatCard(
-                          title: 'Active Promotions',
-                          value: '3',
-                          icon: Icons.local_offer,
-                          color: Colors.orange,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: _buildStatCard(
-                          title: 'Pending Notifications',
-                          value: '5',
-                          icon: Icons.notifications,
-                          color: Colors.blue,
-                        ),
-                      ),
-                    ],
+                  _buildFeatureCard(
+                    title: 'Promotions',
+                    description: 'Create targeted sales offers',
+                    icon: Icons.local_offer,
+                    color: theme.colorScheme.secondary,
+                    onTap: () => _tabController.animateTo(4),
+                    canAccess: true, // Fixed access control
+                    theme: theme,
+                  ),
+                  _buildFeatureCard(
+                    title: 'Notifications',
+                    description: 'Staff and customer alerts',
+                    icon: Icons.notifications_active,
+                    color: theme.colorScheme.tertiary,
+                    onTap: () => _tabController.animateTo(5),
+                    canAccess: true, // Fixed access control
+                    theme: theme,
+                  ),
+                  _buildFeatureCard(
+                    title: 'Smart AI',
+                    description: 'Intelligent suggestions',
+                    icon: Icons.psychology,
+                    color: Colors.deepPurple,
+                    onTap: () => _tabController.animateTo(2),
+                    canAccess: true, // Fixed access control
+                    theme: theme,
+                  ),
+                  _buildFeatureCard(
+                    title: 'Inventory',
+                    description: 'Stock monitoring alerts',
+                    icon: Icons.inventory_2,
+                    color: Colors.orange,
+                    onTap: () => _tabController.animateTo(3),
+                    canAccess: true, // Fixed access control
+                    theme: theme,
+                  ),
+                  _buildFeatureCard(
+                    title: 'Analytics',
+                    description: 'Business insights',
+                    icon: Icons.analytics,
+                    color: Colors.teal,
+                    onTap: () {
+                      context.go('/analytics');
+                    },
+                    canAccess: true, // Fixed access control
+                    theme: theme,
                   ),
                 ],
-              ),
-            ),
+              );
+            },
           ),
         ],
       ),
@@ -211,7 +276,6 @@ class _FeatureDashboardScreenState extends ConsumerState<FeatureDashboardScreen>
   }
 
   Widget _buildRecipesTab() {
-    print('🔍 DEBUG: Building recipes tab');
     return const RecipesScreen();
   }
 
@@ -223,71 +287,90 @@ class _FeatureDashboardScreenState extends ConsumerState<FeatureDashboardScreen>
     return const InventoryAlertsScreen();
   }
 
-  Widget _buildPromotionsTab() {
+  Widget _buildPromotionsTab(ThemeData theme) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.local_offer, color: Colors.orange, size: 32),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          'Promotions Management',
-                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+          // Header Section
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.secondaryContainer,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.secondary,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.local_offer,
+                        color: theme.colorScheme.onSecondary,
+                        size: 28,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Text(
+                        'Promotions Management',
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: theme.colorScheme.onSecondaryContainer,
                         ),
                       ),
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          context.go('/promotions');
-                        },
-                        icon: const Icon(Icons.manage_accounts),
-                        label: const Text('Manage Promotions'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
-                          foregroundColor: Colors.white,
-                        ),
+                    ),
+                    FilledButton.icon(
+                      onPressed: () {
+                        context.go('/promotions');
+                      },
+                      icon: const Icon(Icons.add, size: 18),
+                      label: const Text('Create'),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: theme.colorScheme.secondary,
+                        foregroundColor: theme.colorScheme.onSecondary,
                       ),
-                    ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Create and manage promotional offers to drive sales and attract customers. Set up percentage discounts, fixed amount discounts, buy-one-get-one offers, and more.',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSecondaryContainer.withValues(alpha: 0.8),
+                    height: 1.4,
                   ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Create and manage promotional offers to drive sales and attract customers. '
-                    'Set up percentage discounts, fixed amount discounts, buy-one-get-one offers, and more.',
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 32),
 
-          // Active promotions
+          // Active Promotions Section
           Text(
             'Active Promotions',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: theme.colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 16),
 
-          // Real promotions from provider
-          _buildActivePromotions(),
+          _buildActivePromotions(theme),
         ],
       ),
     );
   }
 
-  Widget _buildActivePromotions() {
+  Widget _buildActivePromotions(ThemeData theme) {
     return Consumer(
       builder: (context, ref, child) {
         final promotionsAsync = ref.watch(activePromotionsProvider);
@@ -295,90 +378,162 @@ class _FeatureDashboardScreenState extends ConsumerState<FeatureDashboardScreen>
         return promotionsAsync.when(
           data: (promotions) {
             if (promotions.isEmpty) {
-              return Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    children: [
-                      Icon(
+              return Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(32),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerLowest,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: theme.colorScheme.outline.withValues(alpha: 0.2),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: Icon(
                         Icons.local_offer_outlined,
                         size: 48,
-                        color: Colors.grey.shade400,
+                        color: theme.colorScheme.primary,
                       ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'No active promotions',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Colors.grey.shade600,
-                        ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'No Active Promotions',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.onSurface,
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Create your first promotion to get started',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.grey.shade500,
-                        ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Create your first promotion to boost sales and attract customers',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
                       ),
-                    ],
-                  ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 20),
+                    FilledButton.icon(
+                      onPressed: () => context.go('/promotions'),
+                      icon: const Icon(Icons.add, size: 18),
+                      label: const Text('Create Promotion'),
+                    ),
+                  ],
                 ),
               );
             }
             
             return Column(
-              children: promotions.take(3).map((promotion) => Card(
+              children: promotions.take(3).map((promotion) => Container(
                 margin: const EdgeInsets.only(bottom: 12),
-                child: ListTile(
-                  leading: const Icon(Icons.local_offer, color: Colors.orange),
-                  title: Text(promotion.name),
-                  subtitle: Text(promotion.description),
-                  trailing: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.green.withOpacity(0.3)),
-                    ),
-                    child: Text(
-                      promotion.discountDisplay,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerLowest,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: theme.colorScheme.outline.withValues(alpha: 0.2),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.secondary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.local_offer,
+                        color: theme.colorScheme.secondary,
+                        size: 24,
                       ),
                     ),
-                  ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            promotion.name,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            promotion.description,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primary,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        promotion.discountDisplay,
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: theme.colorScheme.onPrimary,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               )).toList(),
             );
           },
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, stack) => Card(
+          loading: () => const Center(
             child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    size: 48,
-                    color: Colors.red.shade400,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Error loading promotions',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Colors.red.shade600,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    error.toString(),
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.red.shade500,
-                    ),
-                  ),
-                ],
+              padding: EdgeInsets.all(32.0),
+              child: LoadingIndicator(message: 'Loading promotions...'),
+            ),
+          ),
+          error: (error, stack) => Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.errorContainer.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: theme.colorScheme.error.withValues(alpha: 0.2),
               ),
+            ),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: 48,
+                  color: theme.colorScheme.error,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Unable to Load Promotions',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.error,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Please check your connection and try again',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onErrorContainer,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
           ),
         );
@@ -386,74 +541,97 @@ class _FeatureDashboardScreenState extends ConsumerState<FeatureDashboardScreen>
     );
   }
 
-  Widget _buildNotificationsTab() {
+  Widget _buildNotificationsTab(ThemeData theme) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.notifications, color: Colors.blue, size: 32),
-                      const SizedBox(width: 12),
-                      Text(
-                        'Notifications Center',
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+          // Header Section
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.tertiaryContainer,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.tertiary,
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                    ],
+                      child: Icon(
+                        Icons.notifications_active,
+                        color: theme.colorScheme.onTertiary,
+                        size: 28,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Text(
+                      'Notifications Center',
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: theme.colorScheme.onTertiaryContainer,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Send targeted notifications to different user groups. Keep staff informed about new recipes, promotions, and important updates.',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onTertiaryContainer.withValues(alpha: 0.8),
+                    height: 1.4,
                   ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Send targeted notifications to different user groups. '
-                    'Keep staff informed about new recipes, promotions, and important updates.',
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 32),
 
-          // Notification types
+          // Notification Types
           Text(
             'Notification Types',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: theme.colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 16),
 
           _buildNotificationTypeCard(
-            title: 'Promotion Notifications',
+            title: 'Promotion Alerts',
             description: 'Announce new promotions to customers',
             icon: Icons.local_offer,
-            color: Colors.orange,
-            target: 'customers',
+            color: theme.colorScheme.secondary,
+            target: 'Customers',
+            theme: theme,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
 
           _buildNotificationTypeCard(
             title: 'Recipe Updates',
             description: 'Notify kitchen staff about recipe changes',
             icon: Icons.restaurant_menu,
-            color: Colors.green,
-            target: 'kitchen',
+            color: theme.colorScheme.primary,
+            target: 'Kitchen Staff',
+            theme: theme,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
 
           _buildNotificationTypeCard(
             title: 'System Alerts',
             description: 'Important system updates and maintenance',
-            icon: Icons.warning,
-            color: Colors.red,
-            target: 'all',
+            icon: Icons.warning_amber,
+            color: Colors.orange,
+            target: 'All Staff',
+            theme: theme,
           ),
         ],
       ),
@@ -467,78 +645,87 @@ class _FeatureDashboardScreenState extends ConsumerState<FeatureDashboardScreen>
     required Color color,
     required VoidCallback onTap,
     required bool canAccess,
+    required ThemeData theme,
   }) {
-    return Card(
-      child: InkWell(
-        onTap: canAccess ? onTap : null,
+    return Container(
+      decoration: BoxDecoration(
+        color: canAccess 
+          ? theme.colorScheme.surfaceContainerLowest 
+          : theme.colorScheme.surfaceContainerLowest.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            gradient: LinearGradient(
-              colors: [
-                color.withOpacity(0.1),
-                color.withOpacity(0.05),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: color.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(icon, color: color, size: 24),
-                  ),
-                  const Spacer(),
-                  if (!canAccess)
-                    Icon(Icons.lock, color: Colors.grey, size: 16),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                description,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const Spacer(),
-              if (canAccess)
+        border: Border.all(
+          color: canAccess 
+            ? theme.colorScheme.outline.withValues(alpha: 0.2)
+            : theme.colorScheme.outline.withValues(alpha: 0.1),
+        ),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: canAccess ? onTap : null,
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.all(16), // Reduced padding
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center, // Center content vertically
+              children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text(
-                      'Tap to explore',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: color,
-                        fontWeight: FontWeight.w500,
+                    Container(
+                      padding: const EdgeInsets.all(8), // Smaller icon container
+                      decoration: BoxDecoration(
+                        color: canAccess 
+                          ? color.withValues(alpha: 0.1)
+                          : theme.colorScheme.outline.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        icon,
+                        color: canAccess ? color : theme.colorScheme.outline,
+                        size: 20, // Smaller icon
                       ),
                     ),
-                    const SizedBox(width: 4),
-                    Icon(Icons.arrow_forward, color: color, size: 16),
+                    const Spacer(),
+                    if (canAccess)
+                      Icon(
+                        Icons.arrow_forward,
+                        color: color,
+                        size: 16,
+                      )
+                    else
+                      Icon(
+                        Icons.lock_outline,
+                        color: theme.colorScheme.outline,
+                        size: 16,
+                      ),
                   ],
                 ),
-            ],
+                const SizedBox(height: 12), // Reduced spacing
+                Text(
+                  title,
+                  style: theme.textTheme.titleSmall?.copyWith( // Smaller title
+                    fontWeight: FontWeight.w600,
+                    color: canAccess 
+                      ? theme.colorScheme.onSurface
+                      : theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                  ),
+                ),
+                const SizedBox(height: 4), // Reduced spacing
+                Text(
+                  description,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    fontSize: 11, // Smaller description text
+                    color: canAccess 
+                      ? theme.colorScheme.onSurfaceVariant
+                      : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                    height: 1.2,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -550,143 +737,52 @@ class _FeatureDashboardScreenState extends ConsumerState<FeatureDashboardScreen>
     required String value,
     required IconData icon,
     required Color color,
+    required ThemeData theme,
   }) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(
+          color: color.withValues(alpha: 0.15),
+          width: 1,
+        ),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: color, size: 32),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: color, size: 20),
+          ),
           const SizedBox(height: 8),
           Text(
             value,
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
+            style: theme.textTheme.headlineMedium?.copyWith(
+              fontWeight: FontWeight.w700,
               color: color,
+              height: 1.0,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           Text(
             title,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey[600],
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w500,
+              height: 1.1,
             ),
             textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildMockPromotions() {
-    // Mock promotion data for demonstration
-    final mockPromotions = [
-      {
-        'name': 'Happy Hour Special',
-        'description': '50% off all drinks from 4-6 PM',
-        'type': 'percentage',
-        'discount': '50% OFF',
-        'uses': 45,
-      },
-      {
-        'name': 'Weekend Brunch',
-        'description': 'Free coffee with any breakfast item',
-        'type': 'freeItem',
-        'discount': 'FREE COFFEE',
-        'uses': 23,
-      },
-      {
-        'name': 'Student Discount',
-        'description': r'$5 off orders over $25 with student ID',
-        'type': 'fixed',
-        'discount': '\$5 OFF',
-        'uses': 67,
-      },
-    ];
-
-    return Column(
-      children: mockPromotions.map((promo) {
-        return Card(
-          margin: const EdgeInsets.only(bottom: 12),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: Colors.orange.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  child: const Icon(
-                    Icons.local_offer,
-                    color: Colors.orange,
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        promo['name'] as String,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        promo['description'] as String,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.orange,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        promo['discount'] as String,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${promo['uses']} uses',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      }).toList(),
     );
   }
 
@@ -696,57 +792,87 @@ class _FeatureDashboardScreenState extends ConsumerState<FeatureDashboardScreen>
     required IconData icon,
     required Color color,
     required String target,
+    required ThemeData theme,
   }) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(icon, color: color, size: 24),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    description,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Target: $target',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: color,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(Icons.arrow_forward, color: Colors.grey[400]),
-          ],
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.2),
         ),
       ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: color, size: 24),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    'Target: $target',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: color,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Icon(
+            Icons.arrow_forward_ios,
+            color: theme.colorScheme.onSurfaceVariant,
+            size: 16,
+          ),
+        ],
+      ),
     );
+  }
+
+  String _getRoleDisplayName(UserRole? role) {
+    switch (role) {
+      case UserRole.admin:
+        return 'Administrator';
+      case UserRole.manager:
+        return 'Manager';
+      case UserRole.cashier:
+        return 'Cashier';
+      case UserRole.waiter:
+      case UserRole.waitstaff:
+        return 'Wait Staff';
+      default:
+        return 'User';
+    }
   }
 
   bool _canAccessRecipes(UserRole? userRole) {
@@ -771,35 +897,43 @@ class _FeatureDashboardScreenState extends ConsumerState<FeatureDashboardScreen>
            userRole == UserRole.manager;
   }
 
-  Widget? _getFloatingActionButton() {
+  Widget? _getFloatingActionButton(ThemeData theme) {
     switch (_tabController.index) {
       case 1: // Recipes tab
-        return FloatingActionButton(
+        return FloatingActionButton.extended(
           onPressed: () => _showCreateRecipeDialog(),
-          backgroundColor: Colors.green,
-          child: const Icon(Icons.add, color: Colors.white),
+          backgroundColor: theme.colorScheme.primary,
+          foregroundColor: theme.colorScheme.onPrimary,
+          icon: const Icon(Icons.add),
+          label: const Text('New Recipe'),
         );
       case 2: // Smart Suggestions tab
         return FloatingActionButton(
           onPressed: () {
-            // TODO: Refresh smart suggestions when provider is generated
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Refreshing smart suggestions...')),
+              SnackBar(
+                content: const Text('Refreshing smart suggestions...'),
+                backgroundColor: theme.colorScheme.primary,
+              ),
             );
           },
-          backgroundColor: Colors.blue,
-          child: const Icon(Icons.refresh, color: Colors.white),
+          backgroundColor: theme.colorScheme.primary,
+          foregroundColor: theme.colorScheme.onPrimary,
+          child: const Icon(Icons.refresh),
         );
       case 3: // Inventory Alerts tab
         return FloatingActionButton(
           onPressed: () {
-            // TODO: Refresh inventory alerts when provider is generated
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Refreshing inventory alerts...')),
+              SnackBar(
+                content: const Text('Refreshing inventory alerts...'),
+                backgroundColor: theme.colorScheme.primary,
+              ),
             );
           },
-          backgroundColor: Colors.orange,
-          child: const Icon(Icons.refresh, color: Colors.white),
+          backgroundColor: theme.colorScheme.primary,
+          foregroundColor: theme.colorScheme.onPrimary,
+          child: const Icon(Icons.refresh),
         );
       default:
         return null;
