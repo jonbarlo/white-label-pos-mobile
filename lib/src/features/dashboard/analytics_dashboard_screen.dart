@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../shared/widgets/theme_toggle_button.dart';
+import '../../shared/widgets/loading_indicator.dart';
 import '../pos/pos_provider.dart';
 import '../pos/models/analytics.dart';
 
@@ -49,9 +50,27 @@ class _AnalyticsDashboardScreenState extends ConsumerState<AnalyticsDashboardScr
     final inventoryAnalytics = ref.watch(inventoryAnalyticsProvider(limit: 20));
 
     return Scaffold(
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
-        title: const Text('Business Analytics'),
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        backgroundColor: theme.colorScheme.surface,
+        surfaceTintColor: Colors.transparent,
         centerTitle: true,
+        title: Text(
+          'Business Analytics',
+          style: theme.textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
+        leading: IconButton(
+          onPressed: () => context.pop(),
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
         actions: const [
           ThemeToggleButton(),
         ],
@@ -76,36 +95,129 @@ class _AnalyticsDashboardScreenState extends ConsumerState<AnalyticsDashboardScr
   }
 
   Widget _buildDateRangeSelector(ThemeData theme) {
-    return Card(
-      margin: const EdgeInsets.all(16.0),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+      child: Card(
+        elevation: 2,
+        shadowColor: theme.colorScheme.shadow.withValues(alpha: 0.1),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.date_range,
+                    color: theme.colorScheme.primary,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Analysis Period',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildDateButton(
+                      context: context,
+                      theme: theme,
+                      date: _startDate,
+                      onTap: () => _selectDate(true),
+                      isStartDate: true,
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      'to',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.primary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: _buildDateButton(
+                      context: context,
+                      theme: theme,
+                      date: _endDate,
+                      onTap: () => _selectDate(false),
+                      isStartDate: false,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDateButton({
+    required BuildContext context,
+    required ThemeData theme,
+    required DateTime date,
+    required VoidCallback onTap,
+    required bool isStartDate,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: theme.colorScheme.outline.withValues(alpha: 0.3),
+            width: 1,
+          ),
+          borderRadius: BorderRadius.circular(12),
+          color: theme.colorScheme.surface,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              'Analysis Period',
-              style: theme.textTheme.titleMedium,
+            Icon(
+              Icons.calendar_today_outlined,
+              size: 16,
+              color: theme.colorScheme.primary,
             ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(
-                  child: TextButton.icon(
-                    onPressed: () => _selectDate(true),
-                    icon: const Icon(Icons.calendar_today),
-                    label: Text(DateFormat('MMM dd, yyyy').format(_startDate)),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    isStartDate ? 'Start Date' : 'End Date',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
                   ),
-                ),
-                const Text(' to '),
-                Expanded(
-                  child: TextButton.icon(
-                    onPressed: () => _selectDate(false),
-                    icon: const Icon(Icons.calendar_today),
-                    label: Text(DateFormat('MMM dd, yyyy').format(_endDate)),
+                  const SizedBox(height: 2),
+                  Text(
+                    DateFormat('MMM dd, yyyy').format(date),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w500,
+                      color: theme.colorScheme.onSurface,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
@@ -114,35 +226,51 @@ class _AnalyticsDashboardScreenState extends ConsumerState<AnalyticsDashboardScr
   }
 
   Widget _buildTabBar(ThemeData theme) {
+    final tabs = ['Revenue', 'Menu', 'Features', 'Staff', 'Customers', 'Inventory'];
+    
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16.0),
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainer,
+        borderRadius: BorderRadius.circular(16),
+      ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
-          children: [
-            _buildTabButton('Revenue', 0, theme),
-            _buildTabButton('Menu', 1, theme),
-            _buildTabButton('Features', 2, theme),
-            _buildTabButton('Staff', 3, theme),
-            _buildTabButton('Customers', 4, theme),
-            _buildTabButton('Inventory', 5, theme),
-          ],
+          children: tabs.asMap().entries.map((entry) {
+            final index = entry.key;
+            final label = entry.value;
+            final isSelected = _selectedTabIndex == index;
+            
+            return Padding(
+              padding: const EdgeInsets.only(right: 4.0),
+              child: GestureDetector(
+                onTap: () => setState(() => _selectedTabIndex = index),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeInOut,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isSelected 
+                        ? theme.colorScheme.primary 
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    label,
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: isSelected 
+                          ? theme.colorScheme.onPrimary 
+                          : theme.colorScheme.onSurface,
+                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
         ),
-      ),
-    );
-  }
-
-  Widget _buildTabButton(String label, int index, ThemeData theme) {
-    final isSelected = _selectedTabIndex == index;
-    return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
-      child: ElevatedButton(
-        onPressed: () => setState(() => _selectedTabIndex = index),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: isSelected ? theme.colorScheme.primary : theme.colorScheme.surface,
-          foregroundColor: isSelected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
-        ),
-        child: Text(label),
       ),
     );
   }
@@ -182,70 +310,115 @@ class _AnalyticsDashboardScreenState extends ConsumerState<AnalyticsDashboardScr
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Revenue Performance',
-              style: theme.textTheme.headlineMedium,
+            _buildSectionHeader(
+              title: 'Revenue Performance',
+              subtitle: 'Track your business revenue and trends',
+              icon: Icons.analytics,
+              theme: theme,
             ),
-            const SizedBox(height: 16),
             revenueAnalytics.when(
               data: (analytics) => Column(
                 children: [
                   // Key Metrics
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildMetricCard(
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        _buildMetricCard(
                           'Total Revenue',
                           '\$${NumberFormat('#,##0.00').format(analytics.totalRevenue)}',
                           Icons.attach_money,
                           theme.colorScheme.primary,
                           theme,
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _buildMetricCard(
+                        const SizedBox(width: 12),
+                        _buildMetricCard(
                           'Total Orders',
                           analytics.totalOrders.toString(),
                           Icons.receipt,
                           theme.colorScheme.secondary,
                           theme,
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  _buildMetricCard(
-                    'Average Order Value',
-                    '\$${NumberFormat('#,##0.00').format(analytics.averageOrderValue)}',
-                    Icons.trending_up,
-                    theme.colorScheme.tertiary,
-                    theme,
+                        const SizedBox(width: 12),
+                        _buildMetricCard(
+                          'Average Order Value',
+                          '\$${NumberFormat('#,##0.00').format(analytics.averageOrderValue)}',
+                          Icons.trending_up,
+                          theme.colorScheme.tertiary,
+                          theme,
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 16),
                   
                   // Revenue Trends
-                  Text(
-                    'Revenue Trends',
-                    style: theme.textTheme.titleLarge,
+                  Container(
+                    margin: const EdgeInsets.only(top: 8, bottom: 12),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.timeline,
+                          color: theme.colorScheme.primary,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Revenue Trends',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: theme.colorScheme.onSurface,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 8),
-                  ...analytics.dailyTrends.take(7).map((trend) => Card(
-                    child: ListTile(
-                      title: Text(trend.period),
-                      subtitle: Text('${trend.orders} orders'),
-                      trailing: Text(
-                        '\$${NumberFormat('#,##0.00').format(trend.revenue)}',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: theme.colorScheme.primary,
-                          fontWeight: FontWeight.bold,
+                  ...analytics.dailyTrends.take(7).map((trend) => Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    child: Card(
+                      elevation: 1,
+                      shadowColor: theme.colorScheme.shadow.withValues(alpha: 0.1),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        leading: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            Icons.calendar_today,
+                            color: theme.colorScheme.primary,
+                            size: 16,
+                          ),
+                        ),
+                        title: Text(
+                          trend.period,
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        subtitle: Text(
+                          '${trend.orders} orders',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                          ),
+                        ),
+                        trailing: Text(
+                          '\$${NumberFormat('#,##0.00').format(trend.revenue)}',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: theme.colorScheme.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),
                   )),
                 ],
               ),
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => const Center(child: LoadingIndicator()),
               error: (error, stack) => _buildErrorCard('Revenue data', error.toString(), theme),
             ),
           ],
@@ -263,38 +436,38 @@ class _AnalyticsDashboardScreenState extends ConsumerState<AnalyticsDashboardScr
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Menu Optimization',
-              style: theme.textTheme.headlineMedium,
+            _buildSectionHeader(
+              title: 'Menu Optimization',
+              subtitle: 'Analyze your menu performance and trends',
+              icon: Icons.restaurant_menu,
+              theme: theme,
             ),
-            const SizedBox(height: 16),
             itemAnalytics.when(
               data: (analytics) => Column(
                 children: [
-                  // Summary Metrics
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildMetricCard(
-                          'Total Items Sold',
-                          analytics.totalItemsSold.toString(),
-                          Icons.inventory_2,
-                          theme.colorScheme.primary,
-                          theme,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _buildMetricCard(
-                          'Total Revenue',
-                          '\$${NumberFormat('#,##0.00').format(analytics.totalRevenue)}',
-                          Icons.attach_money,
-                          theme.colorScheme.secondary,
-                          theme,
-                        ),
-                      ),
-                    ],
-                  ),
+                                     // Summary Metrics
+                   SingleChildScrollView(
+                     scrollDirection: Axis.horizontal,
+                     child: Row(
+                       children: [
+                         _buildMetricCard(
+                           'Total Items Sold',
+                           analytics.totalItemsSold.toString(),
+                           Icons.inventory_2,
+                           theme.colorScheme.primary,
+                           theme,
+                         ),
+                         const SizedBox(width: 12),
+                         _buildMetricCard(
+                           'Total Revenue',
+                           '\$${NumberFormat('#,##0.00').format(analytics.totalRevenue)}',
+                           Icons.attach_money,
+                           theme.colorScheme.secondary,
+                           theme,
+                         ),
+                       ],
+                     ),
+                   ),
                   const SizedBox(height: 16),
                   
                   // Top Performers
@@ -380,7 +553,7 @@ class _AnalyticsDashboardScreenState extends ConsumerState<AnalyticsDashboardScr
                   )),
                 ],
               ),
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => const Center(child: LoadingIndicator()),
               error: (error, stack) => _buildErrorCard('Menu data', error.toString(), theme),
             ),
           ],
@@ -398,38 +571,38 @@ class _AnalyticsDashboardScreenState extends ConsumerState<AnalyticsDashboardScr
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Staff Performance',
-              style: theme.textTheme.headlineMedium,
+            _buildSectionHeader(
+              title: 'Staff Performance',
+              subtitle: 'Monitor your team productivity and sales',
+              icon: Icons.people,
+              theme: theme,
             ),
-            const SizedBox(height: 16),
             staffAnalytics.when(
               data: (analytics) => Column(
                 children: [
-                  // Summary Metrics
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildMetricCard(
-                          'Total Staff',
-                          analytics.totalStaff.toString(),
-                          Icons.people,
-                          theme.colorScheme.primary,
-                          theme,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _buildMetricCard(
-                          'Avg Sales/Staff',
-                          '\$${NumberFormat('#,##0.00').format(analytics.averageSalesPerStaff)}',
-                          Icons.trending_up,
-                          theme.colorScheme.secondary,
-                          theme,
-                        ),
-                      ),
-                    ],
-                  ),
+                                     // Summary Metrics
+                   SingleChildScrollView(
+                     scrollDirection: Axis.horizontal,
+                     child: Row(
+                       children: [
+                         _buildMetricCard(
+                           'Total Staff',
+                           analytics.totalStaff.toString(),
+                           Icons.people,
+                           theme.colorScheme.primary,
+                           theme,
+                         ),
+                         const SizedBox(width: 12),
+                         _buildMetricCard(
+                           'Avg Sales/Staff',
+                           '\$${NumberFormat('#,##0.00').format(analytics.averageSalesPerStaff)}',
+                           Icons.trending_up,
+                           theme.colorScheme.secondary,
+                           theme,
+                         ),
+                       ],
+                     ),
+                   ),
                   const SizedBox(height: 16),
                   
                   // Top Performers
@@ -500,7 +673,7 @@ class _AnalyticsDashboardScreenState extends ConsumerState<AnalyticsDashboardScr
                   )),
                 ],
               ),
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => const Center(child: LoadingIndicator()),
               error: (error, stack) => _buildErrorCard('Staff data', error.toString(), theme),
             ),
           ],
@@ -518,46 +691,46 @@ class _AnalyticsDashboardScreenState extends ConsumerState<AnalyticsDashboardScr
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Customer Insights',
-              style: theme.textTheme.headlineMedium,
+            _buildSectionHeader(
+              title: 'Customer Insights',
+              subtitle: 'Understand your customer behavior and loyalty',
+              icon: Icons.insights,
+              theme: theme,
             ),
-            const SizedBox(height: 16),
             customerAnalytics.when(
               data: (analytics) => Column(
                 children: [
-                  // Summary Metrics
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildMetricCard(
-                          'Total Customers',
-                          analytics.totalCustomers.toString(),
-                          Icons.people,
-                          theme.colorScheme.primary,
-                          theme,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _buildMetricCard(
-                          'Avg Customer Spend',
-                          '\$${NumberFormat('#,##0.00').format(analytics.averageCustomerSpend)}',
-                          Icons.attach_money,
-                          theme.colorScheme.secondary,
-                          theme,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  _buildMetricCard(
-                    'Retention Rate',
-                    '${analytics.retentionRate.toStringAsFixed(1)}%',
-                    Icons.loyalty,
-                    theme.colorScheme.tertiary,
-                    theme,
-                  ),
+                                     // Summary Metrics
+                   SingleChildScrollView(
+                     scrollDirection: Axis.horizontal,
+                     child: Row(
+                       children: [
+                         _buildMetricCard(
+                           'Total Customers',
+                           analytics.totalCustomers.toString(),
+                           Icons.people,
+                           theme.colorScheme.primary,
+                           theme,
+                         ),
+                         const SizedBox(width: 12),
+                         _buildMetricCard(
+                           'Avg Customer Spend',
+                           '\$${NumberFormat('#,##0.00').format(analytics.averageCustomerSpend)}',
+                           Icons.attach_money,
+                           theme.colorScheme.secondary,
+                           theme,
+                         ),
+                         const SizedBox(width: 12),
+                         _buildMetricCard(
+                           'Retention Rate',
+                           '${analytics.retentionRate.toStringAsFixed(1)}%',
+                           Icons.loyalty,
+                           theme.colorScheme.tertiary,
+                           theme,
+                         ),
+                       ],
+                     ),
+                   ),
                   const SizedBox(height: 16),
                   
                   // VIP Customers
@@ -608,7 +781,7 @@ class _AnalyticsDashboardScreenState extends ConsumerState<AnalyticsDashboardScr
                   _buildCustomerSegmentCard('Regular', analytics.allCustomers.take(5).toList(), Colors.blue, theme),
                 ],
               ),
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => const Center(child: LoadingIndicator()),
               error: (error, stack) => _buildErrorCard('Customer data', error.toString(), theme),
             ),
           ],
@@ -626,38 +799,38 @@ class _AnalyticsDashboardScreenState extends ConsumerState<AnalyticsDashboardScr
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Inventory Management',
-              style: theme.textTheme.headlineMedium,
+            _buildSectionHeader(
+              title: 'Inventory Management',
+              subtitle: 'Track stock levels and turnover rates',
+              icon: Icons.inventory,
+              theme: theme,
             ),
-            const SizedBox(height: 16),
             inventoryAnalytics.when(
               data: (analytics) => Column(
                 children: [
-                  // Summary Metrics
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildMetricCard(
-                          'Total Items',
-                          analytics.totalItems.toString(),
-                          Icons.inventory,
-                          theme.colorScheme.primary,
-                          theme,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _buildMetricCard(
-                          'Total Value',
-                          '\$${NumberFormat('#,##0.00').format(analytics.totalInventoryValue)}',
-                          Icons.attach_money,
-                          theme.colorScheme.secondary,
-                          theme,
-                        ),
-                      ),
-                    ],
-                  ),
+                                     // Summary Metrics
+                   SingleChildScrollView(
+                     scrollDirection: Axis.horizontal,
+                     child: Row(
+                       children: [
+                         _buildMetricCard(
+                           'Total Items',
+                           analytics.totalItems.toString(),
+                           Icons.inventory,
+                           theme.colorScheme.primary,
+                           theme,
+                         ),
+                         const SizedBox(width: 12),
+                         _buildMetricCard(
+                           'Total Value',
+                           '\$${NumberFormat('#,##0.00').format(analytics.totalInventoryValue)}',
+                           Icons.attach_money,
+                           theme.colorScheme.secondary,
+                           theme,
+                         ),
+                       ],
+                     ),
+                   ),
                   const SizedBox(height: 16),
                   
                   // Critical Alerts
@@ -745,7 +918,7 @@ class _AnalyticsDashboardScreenState extends ConsumerState<AnalyticsDashboardScr
                     ),
                 ],
               ),
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => const Center(child: LoadingIndicator()),
               error: (error, stack) => _buildErrorCard('Inventory data', error.toString(), theme),
             ),
           ],
@@ -765,46 +938,44 @@ class _AnalyticsDashboardScreenState extends ConsumerState<AnalyticsDashboardScr
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Recipe & Promotion Performance',
-              style: theme.textTheme.headlineMedium,
+            _buildSectionHeader(
+              title: 'Recipe & Promotion Performance',
+              subtitle: 'Monitor your features and engagement metrics',
+              icon: Icons.auto_awesome,
+              theme: theme,
             ),
-            const SizedBox(height: 16),
             
-            // Key Metrics Row
-            Row(
-              children: [
-                Expanded(
-                  child: _buildMetricCard(
-                    'Active Recipes',
-                    '12',
-                    Icons.restaurant_menu,
-                    Colors.green,
-                    theme,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _buildMetricCard(
-                    'Active Promotions',
-                    '3',
-                    Icons.local_offer,
-                    Colors.orange,
-                    theme,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _buildMetricCard(
-                    'Notifications Sent',
-                    '45',
-                    Icons.notifications,
-                    Colors.blue,
-                    theme,
-                  ),
-                ),
-              ],
-            ),
+                         // Key Metrics Row
+             SingleChildScrollView(
+               scrollDirection: Axis.horizontal,
+               child: Row(
+                 children: [
+                   _buildMetricCard(
+                     'Active Recipes',
+                     '12',
+                     Icons.restaurant_menu,
+                     Colors.green,
+                     theme,
+                   ),
+                   const SizedBox(width: 12),
+                   _buildMetricCard(
+                     'Active Promotions',
+                     '3',
+                     Icons.local_offer,
+                     Colors.orange,
+                     theme,
+                   ),
+                   const SizedBox(width: 12),
+                   _buildMetricCard(
+                     'Notifications Sent',
+                     '45',
+                     Icons.notifications,
+                     Colors.blue,
+                     theme,
+                   ),
+                 ],
+               ),
+             ),
             const SizedBox(height: 24),
             
             // Recipe Performance
@@ -1105,28 +1276,64 @@ class _AnalyticsDashboardScreenState extends ConsumerState<AnalyticsDashboardScr
 
   Widget _buildMetricCard(String title, String value, IconData icon, Color color, ThemeData theme) {
     return Card(
-      color: color.withValues(alpha: 0.1),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Icon(icon, color: color, size: 32),
-            const SizedBox(height: 8),
-            Text(
-              title,
-              style: theme.textTheme.bodySmall,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              value,
-              style: theme.textTheme.titleLarge?.copyWith(
-                color: color,
-                fontWeight: FontWeight.bold,
+      elevation: 2,
+      shadowColor: theme.colorScheme.shadow.withValues(alpha: 0.08),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              color.withValues(alpha: 0.08),
+              color.withValues(alpha: 0.04),
+            ],
+          ),
+        ),
+        child: IntrinsicWidth(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(icon, color: color, size: 16),
+                  ),
+                  const SizedBox(width: 8),
+                  Icon(
+                    Icons.trending_up,
+                    color: color.withValues(alpha: 0.6),
+                    size: 14,
+                  ),
+                ],
               ),
-              textAlign: TextAlign.center,
-            ),
-          ],
+              const SizedBox(height: 8),
+              Text(
+                title,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                value,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: theme.colorScheme.onSurface,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -1173,25 +1380,89 @@ class _AnalyticsDashboardScreenState extends ConsumerState<AnalyticsDashboardScr
   }
 
   Widget _buildErrorCard(String dataType, String error, ThemeData theme) {
-    return Card(
-      color: theme.colorScheme.error.withValues(alpha: 0.1),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Icon(Icons.error, color: theme.colorScheme.error, size: 48),
-            const SizedBox(height: 8),
-            Text(
-              'Error loading $dataType',
-              style: theme.textTheme.titleMedium?.copyWith(color: theme.colorScheme.error),
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 16),
+      child: Card(
+        elevation: 2,
+        shadowColor: theme.colorScheme.shadow.withValues(alpha: 0.1),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Container(
+          padding: const EdgeInsets.all(24.0),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                theme.colorScheme.error.withValues(alpha: 0.08),
+                theme.colorScheme.error.withValues(alpha: 0.04),
+              ],
             ),
-            const SizedBox(height: 4),
-            Text(
-              error,
-              style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.error),
-              textAlign: TextAlign.center,
-            ),
-          ],
+          ),
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.error.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.error_outline,
+                  color: theme.colorScheme.error,
+                  size: 32,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Unable to Load $dataType',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: theme.colorScheme.onSurface,
+                  fontWeight: FontWeight.w600,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Please check your connection and try again',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              FilledButton.icon(
+                onPressed: () {
+                  // Trigger refresh based on current tab
+                  switch (_selectedTabIndex) {
+                    case 0:
+                      ref.invalidate(revenueAnalyticsProvider);
+                      break;
+                    case 1:
+                      ref.invalidate(itemAnalyticsProvider);
+                      break;
+                    case 3:
+                      ref.invalidate(staffAnalyticsProvider);
+                      break;
+                    case 4:
+                      ref.invalidate(customerAnalyticsProvider);
+                      break;
+                    case 5:
+                      ref.invalidate(inventoryAnalyticsProvider);
+                      break;
+                  }
+                },
+                style: FilledButton.styleFrom(
+                  backgroundColor: theme.colorScheme.primary,
+                  foregroundColor: theme.colorScheme.onPrimary,
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                icon: const Icon(Icons.refresh, size: 18),
+                label: const Text('Try Again'),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -1215,4 +1486,53 @@ class _AnalyticsDashboardScreenState extends ConsumerState<AnalyticsDashboardScr
       });
     }
   }
-} 
+
+  Widget _buildSectionHeader({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required ThemeData theme,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primary.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              icon,
+              color: theme.colorScheme.primary,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
