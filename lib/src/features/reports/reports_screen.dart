@@ -87,9 +87,6 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Reports & Analytics'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
-        elevation: 2,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -137,7 +134,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
               text: 'Revenue',
             ),
           ],
-          indicatorColor: Theme.of(context).colorScheme.onPrimary,
+          indicatorColor: Theme.of(context).colorScheme.primary,
         ),
       ),
       body: Column(

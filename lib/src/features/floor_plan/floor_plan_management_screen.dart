@@ -43,14 +43,9 @@ class _FloorPlanManagementScreenState extends ConsumerState<FloorPlanManagementS
     return Scaffold(
       appBar: AppBar(
         title: const Text('Floor Plan Management'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Colors.white,
-        elevation: 0,
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: Colors.white,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white70,
+          indicatorColor: Theme.of(context).colorScheme.primary,
           tabs: const [
             Tab(text: '📊 Overview'),
             Tab(text: '🗺️ Floor Plans'),
