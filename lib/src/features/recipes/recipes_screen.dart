@@ -7,8 +7,7 @@ import 'widgets/recipe_card.dart';
 import 'widgets/recipe_search_bar.dart';
 import 'widgets/recipe_filter_chips.dart';
 import 'widgets/recipe_creation_dialog.dart';
-import '../../core/theme/app_theme.dart';
-import '../../core/services/navigation_service.dart';
+import '../../shared/widgets/loading_indicator.dart';
 import '../auth/auth_provider.dart';
 
 class RecipesScreen extends ConsumerStatefulWidget {
@@ -42,69 +41,192 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
   Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
     final canManageRecipes = authState.canAccessKitchen || authState.isManager || authState.isAdmin;
+    final theme = Theme.of(context);
 
     return Scaffold(
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
-        title: const Text('Recipes'),
-        backgroundColor: Theme.of(context).primaryColor,
-        foregroundColor: Colors.white,
+        title: Text(
+          'Recipes',
+          style: theme.textTheme.headlineMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        centerTitle: false,
+        elevation: 0,
+        backgroundColor: theme.colorScheme.surface,
+        surfaceTintColor: Colors.transparent,
+        foregroundColor: theme.colorScheme.onSurface,
         actions: [
           if (canManageRecipes)
-            IconButton(
-              icon: const Icon(Icons.add),
+            FilledButton.icon(
               onPressed: () => _showCreateRecipeDialog(),
-              tooltip: 'Create New Recipe',
+              icon: const Icon(Icons.add, size: 18),
+              label: const Text('New'),
+              style: FilledButton.styleFrom(
+                backgroundColor: theme.colorScheme.primary,
+                foregroundColor: theme.colorScheme.onPrimary,
+                minimumSize: const Size(80, 36),
+              ),
             ),
+          const SizedBox(width: 8),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => ref.read(recipeNotifierProvider.notifier).refreshRecipes(),
+            tooltip: 'Refresh Recipes',
           ),
+          const SizedBox(width: 8),
         ],
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'All'),
-            Tab(text: 'Easy'),
-            Tab(text: 'Medium'),
-            Tab(text: 'Hard'),
-          ],
-          indicatorColor: Colors.white,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white70,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(48),
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: TabBar(
+              controller: _tabController,
+              tabs: const [
+                Tab(text: 'All'),
+                Tab(text: 'Easy'),
+                Tab(text: 'Medium'),
+                Tab(text: 'Hard'),
+              ],
+              indicator: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: theme.colorScheme.primary,
+              ),
+              indicatorSize: TabBarIndicatorSize.tab,
+              indicatorPadding: const EdgeInsets.all(4),
+              labelColor: theme.colorScheme.onPrimary,
+              unselectedLabelColor: theme.colorScheme.onSurfaceVariant,
+              labelStyle: theme.textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+              unselectedLabelStyle: theme.textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.w500,
+              ),
+              dividerColor: Colors.transparent,
+            ),
+          ),
         ),
       ),
       body: Column(
         children: [
-          // Search and filter section
+          // Search and filter section with HIG design
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface,
+              border: Border(
+                bottom: BorderSide(
+                  color: theme.colorScheme.outline.withValues(alpha: 0.1),
+                  width: 1,
+                ),
+              ),
+            ),
             child: Column(
               children: [
-                RecipeSearchBar(
-                  controller: _searchController,
-                  onSearchChanged: (query) {
-                    setState(() {});
-                  },
+                // Search Bar with HIG styling
+                Container(
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerHigh,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Search recipes...',
+                      hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: theme.colorScheme.onSurfaceVariant,
+                        size: 20,
+                      ),
+                      suffixIcon: _searchController.text.isNotEmpty
+                          ? IconButton(
+                              icon: Icon(
+                                Icons.clear,
+                                color: theme.colorScheme.onSurfaceVariant,
+                                size: 20,
+                              ),
+                              onPressed: () {
+                                _searchController.clear();
+                                setState(() {});
+                              },
+                            )
+                          : null,
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                    ),
+                    onChanged: (query) {
+                      setState(() {});
+                    },
+                  ),
                 ),
-                const SizedBox(height: 12),
-                RecipeFilterChips(
-                  selectedDifficulty: _selectedDifficulty,
-                  showOnlyActive: _showOnlyActive,
-                  onDifficultyChanged: (difficulty) {
-                    setState(() {
-                      _selectedDifficulty = difficulty;
-                    });
-                  },
-                  onActiveChanged: (showActive) {
-                    setState(() {
-                      _showOnlyActive = showActive;
-                    });
-                  },
+                const SizedBox(height: 16),
+                
+                // Filter Chips with HIG styling
+                Row(
+                  children: [
+                    // Active Only Filter
+                    FilterChip(
+                      label: Text('Active Only'),
+                      selected: _showOnlyActive,
+                      onSelected: (selected) {
+                        setState(() {
+                          _showOnlyActive = selected;
+                        });
+                      },
+                      selectedColor: theme.colorScheme.primary.withValues(alpha: 0.12),
+                      checkmarkColor: theme.colorScheme.primary,
+                      labelStyle: theme.textTheme.labelMedium?.copyWith(
+                        color: _showOnlyActive 
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      side: BorderSide(
+                        color: _showOnlyActive
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.outline.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    
+                    // Difficulty Filter
+                    if (_selectedDifficulty != null)
+                      FilterChip(
+                        label: Text(_selectedDifficulty!.name.toUpperCase()),
+                        selected: true,
+                        onSelected: (_) {
+                          setState(() {
+                            _selectedDifficulty = null;
+                          });
+                        },
+                        selectedColor: theme.colorScheme.secondary.withValues(alpha: 0.12),
+                        checkmarkColor: theme.colorScheme.secondary,
+                        labelStyle: theme.textTheme.labelMedium?.copyWith(
+                          color: theme.colorScheme.secondary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        side: BorderSide(
+                          color: theme.colorScheme.secondary,
+                        ),
+                      ),
+                  ],
                 ),
               ],
             ),
           ),
-          // Recipes list
+          
+          // Recipes content
           Expanded(
             child: TabBarView(
               controller: _tabController,
@@ -136,123 +258,75 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
   }
 
   Widget _buildSearchResults(String query) {
-    return FutureBuilder<List<Recipe>>(
+    final theme = Theme.of(context);
+    
+    return FutureBuilder<List<Recipe>?>(
       future: ref.read(recipeSearchProvider(query).future),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(
+            child: LoadingIndicator(message: 'Searching recipes...'),
+          );
         }
         
         if (snapshot.hasError) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error_outline, size: 64, color: Colors.grey),
-                const SizedBox(height: 16),
-                Text('Error: ${snapshot.error}'),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => setState(() {}),
-                  child: const Text('Retry'),
-                ),
-              ],
-            ),
-          );
+          return _buildErrorState(snapshot.error.toString(), theme);
         }
 
         final recipes = snapshot.data ?? [];
         final filteredRecipes = _filterRecipes(recipes);
 
         if (filteredRecipes.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.search_off, size: 64, color: Colors.grey),
-                const SizedBox(height: 16),
-                Text('No recipes found for "$query"'),
-              ],
-            ),
-          );
+          return _buildEmptySearchState(query, theme);
         }
 
-        return _buildRecipesGrid(filteredRecipes);
+        return _buildRecipesGrid(filteredRecipes, theme);
       },
     );
   }
 
   Widget _buildDifficultyFilteredList(RecipeDifficulty difficulty) {
-    return FutureBuilder<List<Recipe>>(
+    final theme = Theme.of(context);
+    
+    return FutureBuilder<List<Recipe>?>(
       future: ref.read(recipesByDifficultyProvider(difficulty).future),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(
+            child: LoadingIndicator(message: 'Loading recipes...'),
+          );
         }
         
         if (snapshot.hasError) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error_outline, size: 64, color: Colors.grey),
-                const SizedBox(height: 16),
-                Text('Error: ${snapshot.error}'),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => setState(() {}),
-                  child: const Text('Retry'),
-                ),
-              ],
-            ),
-          );
+          return _buildErrorState(snapshot.error.toString(), theme);
         }
 
         final recipes = snapshot.data ?? [];
         final filteredRecipes = _filterRecipes(recipes);
 
         if (filteredRecipes.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.restaurant_menu, size: 64, color: Colors.grey),
-                const SizedBox(height: 16),
-                Text('No ${difficulty.name} recipes found'),
-              ],
-            ),
-          );
+          return _buildEmptyDifficultyState(difficulty, theme);
         }
 
-        return _buildRecipesGrid(filteredRecipes);
+        return _buildRecipesGrid(filteredRecipes, theme);
       },
     );
   }
 
   Widget _buildAllRecipesList() {
-    return FutureBuilder<List<Recipe>>(
+    final theme = Theme.of(context);
+    
+    return FutureBuilder<List<Recipe>?>(
       future: ref.read(recipesProvider.future),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(
+            child: LoadingIndicator(message: 'Loading recipes...'),
+          );
         }
         
         if (snapshot.hasError) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error_outline, size: 64, color: Colors.grey),
-                const SizedBox(height: 16),
-                Text('Error: ${snapshot.error}'),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => setState(() {}),
-                  child: const Text('Retry'),
-                ),
-              ],
-            ),
-          );
+          return _buildErrorState(snapshot.error.toString(), theme);
         }
 
         final recipes = snapshot.data ?? [];
@@ -260,11 +334,143 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
 
         if (filteredRecipes.isEmpty) {
           // Show mock data for demonstration
-          return _buildRecipesGrid(_getMockRecipes());
+          return _buildRecipesGrid(_getMockRecipes(), theme);
         }
 
-        return _buildRecipesGrid(filteredRecipes);
+        return _buildRecipesGrid(filteredRecipes, theme);
       },
+    );
+  }
+
+  Widget _buildErrorState(String error, ThemeData theme) {
+    return Container(
+      padding: const EdgeInsets.all(32),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.error.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(50),
+            ),
+            child: Icon(
+              Icons.error_outline,
+              size: 48,
+              color: theme.colorScheme.error,
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'Unable to Load Recipes',
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Please check your connection and try again',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 24),
+          FilledButton.icon(
+            onPressed: () => setState(() {}),
+            icon: const Icon(Icons.refresh, size: 18),
+            label: const Text('Try Again'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptySearchState(String query, ThemeData theme) {
+    return Container(
+      padding: const EdgeInsets.all(32),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(50),
+            ),
+            child: Icon(
+              Icons.search_off,
+              size: 48,
+              color: theme.colorScheme.primary,
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'No Recipes Found',
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'No recipes found for "$query"',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 24),
+          OutlinedButton.icon(
+            onPressed: () {
+              _searchController.clear();
+              setState(() {});
+            },
+            icon: const Icon(Icons.clear, size: 18),
+            label: const Text('Clear Search'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyDifficultyState(RecipeDifficulty difficulty, ThemeData theme) {
+    return Container(
+      padding: const EdgeInsets.all(32),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.secondary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(50),
+            ),
+            child: Icon(
+              Icons.restaurant_menu,
+              size: 48,
+              color: theme.colorScheme.secondary,
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'No ${difficulty.name.toUpperCase()} Recipes',
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Try a different difficulty level or create a new recipe',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 
@@ -372,11 +578,11 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
     ];
   }
 
-  Widget _buildRecipesGrid(List<Recipe> recipes) {
+  Widget _buildRecipesGrid(List<Recipe> recipes, ThemeData theme) {
     return GridView.builder(
-      padding: const EdgeInsets.all(16),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
+      padding: const EdgeInsets.all(20),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
         childAspectRatio: 0.75,
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
@@ -395,30 +601,68 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
   }
 
   void _showRecipeDetails(Recipe recipe) {
+    final theme = Theme.of(context);
+    
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(recipe.name),
+        backgroundColor: theme.colorScheme.surface,
+        surfaceTintColor: Colors.transparent,
+        title: Text(
+          recipe.name,
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(recipe.description),
-              const SizedBox(height: 16),
-              Text('Difficulty: ${recipe.difficulty.name.toUpperCase()}'),
-              Text('Prep Time: ${recipe.prepTimeMinutes} minutes'),
-              Text('Cook Time: ${recipe.cookTimeMinutes} minutes'),
-              Text('Servings: ${recipe.servings}'),
-              const SizedBox(height: 16),
-              const Text('Ingredients:', style: TextStyle(fontWeight: FontWeight.bold)),
-              ...recipe.ingredients.map((ingredient) => 
-                Text('• ${ingredient.quantity} ${ingredient.unit} ${ingredient.name}'),
+              Text(
+                recipe.description,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
               ),
               const SizedBox(height: 16),
-              const Text('Instructions:', style: TextStyle(fontWeight: FontWeight.bold)),
+              _buildRecipeInfoRow('Difficulty', recipe.difficulty.name.toUpperCase(), theme),
+              _buildRecipeInfoRow('Prep Time', '${recipe.prepTimeMinutes} minutes', theme),
+              _buildRecipeInfoRow('Cook Time', '${recipe.cookTimeMinutes} minutes', theme),
+              _buildRecipeInfoRow('Servings', '${recipe.servings}', theme),
+              const SizedBox(height: 16),
+              Text(
+                'Ingredients:',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 8),
+              ...recipe.ingredients.map((ingredient) => 
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Text(
+                    '• ${ingredient.quantity} ${ingredient.unit} ${ingredient.name}',
+                    style: theme.textTheme.bodyMedium,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Instructions:',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 8),
               ...recipe.steps.map((step) => 
-                Text('${step.stepNumber}. ${step.instruction}'),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Text(
+                    '${step.stepNumber}. ${step.instruction}',
+                    style: theme.textTheme.bodyMedium,
+                  ),
+                ),
               ),
             ],
           ),
@@ -427,6 +671,31 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRecipeInfoRow(String label, String value, ThemeData theme) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '$label: ',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
           ),
         ],
       ),
@@ -450,17 +719,29 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
   }
 
   void _showDeleteRecipeDialog(Recipe recipe) {
+    final theme = Theme.of(context);
+    
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Recipe'),
-        content: Text('Are you sure you want to delete "${recipe.name}"?'),
+        backgroundColor: theme.colorScheme.surface,
+        surfaceTintColor: Colors.transparent,
+        title: Text(
+          'Delete Recipe',
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        content: Text(
+          'Are you sure you want to delete "${recipe.name}"? This action cannot be undone.',
+          style: theme.textTheme.bodyMedium,
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: const Text('Cancel'),
           ),
-          ElevatedButton(
+          FilledButton(
             onPressed: () async {
               Navigator.of(context).pop();
               try {
@@ -468,22 +749,27 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
                 if (mounted) {
                   Flushbar(
                     message: 'Recipe deleted successfully',
-                    backgroundColor: Colors.green,
-                    icon: const Icon(Icons.check_circle, color: Colors.white),
+                    backgroundColor: theme.colorScheme.primary,
+                    icon: Icon(Icons.check_circle, color: theme.colorScheme.onPrimary),
+                    duration: const Duration(seconds: 3),
                   ).show(context);
                 }
               } catch (e) {
                 if (mounted) {
                   Flushbar(
                     message: 'Failed to delete recipe: $e',
-                    backgroundColor: Colors.red,
-                    icon: const Icon(Icons.error, color: Colors.white),
+                    backgroundColor: theme.colorScheme.error,
+                    icon: Icon(Icons.error, color: theme.colorScheme.onError),
+                    duration: const Duration(seconds: 4),
                   ).show(context);
                 }
               }
             },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+            style: FilledButton.styleFrom(backgroundColor: theme.colorScheme.error),
+            child: Text(
+              'Delete',
+              style: TextStyle(color: theme.colorScheme.onError),
+            ),
           ),
         ],
       ),

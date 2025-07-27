@@ -36,7 +36,7 @@ class RecipeRepositoryImpl implements RecipeRepository {
         throw Exception('Unexpected response format');
       }
       
-      return data.map((json) => Recipe.fromJson(json)).toList();
+      return data.map((json) => _mapApiResponseToRecipe(json)).toList();
     } on DioException catch (e) {
       throw Exception('Failed to get recipes: ${e.message}');
     }
@@ -125,7 +125,7 @@ class RecipeRepositoryImpl implements RecipeRepository {
         throw Exception('Unexpected response format');
       }
       
-      return data.map((json) => Recipe.fromJson(json)).toList();
+      return data.map((json) => _mapApiResponseToRecipe(json)).toList();
     } on DioException catch (e) {
       throw Exception('Failed to search recipes: ${e.message}');
     }
@@ -156,7 +156,7 @@ class RecipeRepositoryImpl implements RecipeRepository {
         throw Exception('Unexpected response format');
       }
       
-      return data.map((json) => Recipe.fromJson(json)).toList();
+      return data.map((json) => _mapApiResponseToRecipe(json)).toList();
     } on DioException catch (e) {
       throw Exception('Failed to get recipes by difficulty: ${e.message}');
     }
@@ -185,6 +185,105 @@ class RecipeRepositoryImpl implements RecipeRepository {
       }
     } on DioException catch (e) {
       throw Exception('Failed to get recipe stats: ${e.message}');
+    }
+  }
+
+  /// Maps API response data to Recipe model
+  Recipe _mapApiResponseToRecipe(Map<String, dynamic> json) {
+    try {
+      // Parse difficulty enum
+      RecipeDifficulty difficulty;
+      final difficultyStr = json['difficulty']?.toString().toLowerCase() ?? 'easy';
+      switch (difficultyStr) {
+        case 'easy':
+          difficulty = RecipeDifficulty.easy;
+          break;
+        case 'medium':
+          difficulty = RecipeDifficulty.medium;
+          break;
+        case 'hard':
+          difficulty = RecipeDifficulty.hard;
+          break;
+        default:
+          difficulty = RecipeDifficulty.easy;
+      }
+
+      // Parse times
+      final prepTime = (json['prepTime'] as num?)?.toInt() ?? 0;
+      final cookTime = (json['cookTime'] as num?)?.toInt() ?? 0;
+      final totalTime = prepTime + cookTime;
+
+      // Parse instructions into steps
+      final instructionsStr = json['instructions']?.toString() ?? '';
+      final steps = <RecipeStep>[
+        RecipeStep(
+          stepNumber: 1,
+          instruction: instructionsStr.isNotEmpty ? instructionsStr : 'No instructions provided',
+        ),
+      ];
+
+      // Parse ingredients string into ingredient objects
+      final ingredientsStr = json['ingredients']?.toString() ?? '';
+      final ingredientsList = ingredientsStr.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+      final ingredients = ingredientsList.asMap().entries.map((entry) {
+        return RecipeIngredient(
+          name: entry.value,
+          quantity: 1,
+          unit: 'piece',
+        );
+      }).toList();
+
+      // Parse dates
+      DateTime parseDate(String? dateStr) {
+        if (dateStr == null || dateStr.isEmpty) return DateTime.now();
+        try {
+          return DateTime.parse(dateStr);
+        } catch (e) {
+          return DateTime.now();
+        }
+      }
+
+      return Recipe(
+        id: (json['id'] as num?)?.toInt() ?? 0,
+        businessId: (json['businessId'] as num?)?.toInt() ?? 0,
+        name: json['name']?.toString() ?? 'Untitled Recipe',
+        description: json['description']?.toString() ?? '',
+        difficulty: difficulty,
+        steps: steps,
+        ingredients: ingredients,
+        prepTimeMinutes: prepTime,
+        cookTimeMinutes: cookTime,
+        totalTimeMinutes: totalTime,
+        servings: (json['servings'] as num?)?.toInt() ?? 1,
+        imageUrl: json['imageUrl']?.toString(),
+        tags: [], // API doesn't provide tags, so use empty list
+        isActive: json['isActive'] as bool? ?? true,
+        createdAt: parseDate(json['createdAt']?.toString()),
+        updatedAt: parseDate(json['updatedAt']?.toString()),
+      );
+    } catch (e) {
+      print('Error mapping recipe data: $e');
+      print('Raw JSON: $json');
+      
+      // Return a fallback recipe to prevent crashes
+      return Recipe(
+        id: (json['id'] as num?)?.toInt() ?? 0,
+        businessId: (json['businessId'] as num?)?.toInt() ?? 0,
+        name: json['name']?.toString() ?? 'Untitled Recipe',
+        description: json['description']?.toString() ?? '',
+        difficulty: RecipeDifficulty.easy,
+        steps: [const RecipeStep(stepNumber: 1, instruction: 'No instructions available')],
+        ingredients: [const RecipeIngredient(name: 'No ingredients listed', quantity: 1, unit: 'piece')],
+        prepTimeMinutes: 0,
+        cookTimeMinutes: 0,
+        totalTimeMinutes: 0,
+        servings: 1,
+        imageUrl: json['imageUrl']?.toString(),
+        tags: [],
+        isActive: json['isActive'] as bool? ?? true,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
     }
   }
 } 
