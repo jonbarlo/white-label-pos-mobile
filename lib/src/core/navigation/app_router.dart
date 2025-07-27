@@ -376,14 +376,21 @@ class AppRouter {
       debugPrint('🔵 Router: On root path and authenticated user, redirecting to $targetRoute');
       return targetRoute;
     }
-    // 6. If authenticated and not on a protected route, redirect to appropriate dashboard
+    // 6. POS route protection - only allow cashiers
+    if (state.matchedLocation == posRoute && 
+        authState.status == AuthStatus.authenticated && 
+        authState.user?.role != UserRole.cashier) {
+      debugPrint('🔵 Router: Non-cashier trying to access POS route, redirecting to dashboard');
+      return dashboardRoute;
+    }
+    // 7. If authenticated and not on a protected route, redirect to appropriate dashboard
     if (authState.status == AuthStatus.authenticated && 
         !_isProtectedRoute(state.matchedLocation)) {
       final targetRoute = _getRoleBasedRoute(authState);
       debugPrint('🔵 Router: Authenticated user on unprotected route, redirecting to $targetRoute');
       return targetRoute;
     }
-    // 7. If on root path and onboarding completed but not authenticated, redirect to login
+    // 8. If on root path and onboarding completed but not authenticated, redirect to login
     if (state.matchedLocation == '/' && onboardingCompleted && 
         (authState.status == AuthStatus.unauthenticated || authState.status == AuthStatus.initial)) {
       debugPrint('🔵 Router: On root path, onboarding completed, not authenticated, redirecting to login');
@@ -492,10 +499,8 @@ class _MainAppShell extends ConsumerWidget {
       navigationRoutes.add(AppRouter.analyticsRoute);
     }
     
-    // POS - available to non-admin, non-viewer, non-waitstaff users
-    if (authState.canAccessPOS && 
-        authState.user?.role != UserRole.waiter && 
-        authState.user?.role != UserRole.waitstaff) {
+    // POS - available only to cashier roles
+    if (authState.user?.role == UserRole.cashier) {
       navigationItems.add(const BottomNavigationBarItem(
         icon: Icon(Icons.point_of_sale),
         label: 'POS',
