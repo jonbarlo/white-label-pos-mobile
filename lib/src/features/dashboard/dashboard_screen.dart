@@ -246,7 +246,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               
               // Recent Activity Section with Loading
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     'Recent Activity',
@@ -254,15 +253,17 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  if (_isLoadingRecentSales)
+                  if (_isLoadingRecentSales) ...[
+                    const SizedBox(width: 12),
                     SizedBox(
-                      width: 20,
-                      height: 20,
+                      width: 16,
+                      height: 16,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
                         valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
                       ),
                     ),
+                  ],
                 ],
               ),
               const SizedBox(height: 12),
