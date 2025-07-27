@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:white_label_pos_mobile/src/shared/models/result.dart';
 import 'package:white_label_pos_mobile/src/core/network/dio_client.dart';
@@ -574,7 +575,6 @@ class ProgressiveFloorPlanNotifier extends StateNotifier<AsyncValue<Result<List<
 
   Future<void> loadFloorPlansProgressive() async {
     print('🔍 DEBUG: ProgressiveFloorPlanNotifier: Starting progressive load');
-    state = const AsyncValue.loading();
     
     try {
       // First, get the list of floor plans
@@ -588,6 +588,9 @@ class ProgressiveFloorPlanNotifier extends StateNotifier<AsyncValue<Result<List<
       
       final floorPlans = floorPlansResult.data;
       print('🔍 DEBUG: ProgressiveFloorPlanNotifier: Found ${floorPlans.length} floor plans to load');
+      
+      // Show initial loading state with empty list
+      state = AsyncValue.data(Result.success(<FloorPlan>[]));
       
       final floorPlansWithTables = <FloorPlan>[];
       
@@ -621,19 +624,18 @@ class ProgressiveFloorPlanNotifier extends StateNotifier<AsyncValue<Result<List<
           floorPlansWithTables.add(floorPlan);
         }
         
-        // Update state with current progress (partial results)
-        final currentResult = Result.success(floorPlansWithTables);
-        state = AsyncValue.data(currentResult);
+        // Immediately update state with current progress (this enables lazy loading)
+        print('🔍 DEBUG: ProgressiveFloorPlanNotifier: Emitting update with ${floorPlansWithTables.length} floor plans loaded');
+        final progressResult = Result.success(List<FloorPlan>.from(floorPlansWithTables));
+        state = AsyncValue.data(progressResult);
         
-        // Add a small delay to make the progressive loading visible
+        // Small delay to allow UI to render the new floor plan before loading the next one
         if (i < floorPlans.length - 1) {
-          await Future.delayed(const Duration(milliseconds: 300));
+          await Future.delayed(const Duration(milliseconds: 100));
         }
       }
       
       print('🔍 DEBUG: ProgressiveFloorPlanNotifier: Completed loading ${floorPlansWithTables.length} floor plans');
-      final finalResult = Result.success(floorPlansWithTables);
-      state = AsyncValue.data(finalResult);
       
     } catch (e, stack) {
       print('🔍 DEBUG: ProgressiveFloorPlanNotifier: Error in progressive load: $e');
@@ -645,10 +647,39 @@ class ProgressiveFloorPlanNotifier extends StateNotifier<AsyncValue<Result<List<
     print('🔍 DEBUG: ProgressiveFloorPlanNotifier: Manual refresh requested');
     await loadFloorPlansProgressive();
   }
+
+  // Get the current loading progress (returns percentage and floor plan count info)
+  Map<String, dynamic> getLoadingProgress() {
+    final currentData = state.value?.data;
+    if (currentData == null) return {'isLoading': true, 'loadedCount': 0, 'totalCount': 0, 'percentage': 0.0};
+    
+    // This is a simplified progress indicator - in a real implementation, you might want to track total expected count
+    final loadedCount = currentData.length;
+    return {
+      'isLoading': false, 
+      'loadedCount': loadedCount, 
+      'totalCount': loadedCount, // We don't know total until we finish, so use loaded count
+      'percentage': 100.0
+    };
+  }
+
+  // Start fresh loading (clear current data first)
+  Future<void> startFreshLoad() async {
+    print('🔍 DEBUG: ProgressiveFloorPlanNotifier: Starting fresh load');
+    state = AsyncValue.data(Result.success([])); // Clear current data
+    await loadFloorPlansProgressive();
+  }
 }
 
 final progressiveFloorPlansProvider = StateNotifierProvider<ProgressiveFloorPlanNotifier, AsyncValue<Result<List<FloorPlan>>>>((ref) {
   print('🔍 DEBUG: progressiveFloorPlansProvider: Creating ProgressiveFloorPlanNotifier');
   final repository = ref.watch(floorPlanRepositoryProvider);
-  return ProgressiveFloorPlanNotifier(repository);
+  final notifier = ProgressiveFloorPlanNotifier(repository);
+  
+  // Auto-start loading when the provider is first accessed
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    notifier.loadFloorPlansProgressive();
+  });
+  
+  return notifier;
 });

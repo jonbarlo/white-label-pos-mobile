@@ -7,6 +7,7 @@ import 'floor_plan_viewer_screen.dart';
 import 'floor_plan_edit_screen.dart';
 import '../../core/theme/app_theme.dart';
 import '../../shared/models/result.dart';
+import '../../shared/widgets/loading_indicator.dart';
 
 class FloorPlanManagementScreen extends ConsumerStatefulWidget {
   const FloorPlanManagementScreen({super.key});
@@ -24,9 +25,9 @@ class _FloorPlanManagementScreenState extends ConsumerState<FloorPlanManagementS
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
-    // Load floor plans when screen initializes
+    // Load floor plans progressively when screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.invalidate(floorPlansWithTablesProvider);
+      ref.read(progressiveFloorPlansProvider.notifier).startFreshLoad();
     });
   }
 
@@ -38,28 +39,68 @@ class _FloorPlanManagementScreenState extends ConsumerState<FloorPlanManagementS
 
   @override
   Widget build(BuildContext context) {
-    final floorPlanState = ref.watch(floorPlansWithTablesProvider);
+    final theme = Theme.of(context);
+    final floorPlanState = ref.watch(progressiveFloorPlansProvider);
 
     return Scaffold(
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
-        title: const Text('Floor Plan Management'),
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: Theme.of(context).colorScheme.primary,
-          tabs: const [
-            Tab(text: '📊 Overview'),
-            Tab(text: '🗺️ Floor Plans'),
-            Tab(text: '📋 Tables'),
-            Tab(text: '⚙️ Settings'),
-          ],
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        backgroundColor: theme.colorScheme.surface,
+        surfaceTintColor: Colors.transparent,
+        centerTitle: true,
+        title: Text(
+          'Floor Plan Management',
+          style: theme.textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
+        leading: IconButton(
+          onPressed: () => context.pop(),
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            color: theme.colorScheme.onSurface,
+          ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => ref.invalidate(floorPlansWithTablesProvider),
+            icon: Icon(Icons.refresh, color: theme.colorScheme.onSurface),
+            onPressed: () => ref.read(progressiveFloorPlansProvider.notifier).refresh(),
             tooltip: 'Refresh',
           ),
         ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(52),
+          child: Container(
+            margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainer,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: TabBar(
+              controller: _tabController,
+              indicator: BoxDecoration(
+                color: theme.colorScheme.primary,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              indicatorSize: TabBarIndicatorSize.tab,
+              dividerColor: Colors.transparent,
+              labelColor: theme.colorScheme.onPrimary,
+              unselectedLabelColor: theme.colorScheme.onSurface,
+              labelStyle: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w600),
+              unselectedLabelStyle: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w500),
+              tabs: const [
+                Tab(text: 'Overview'),
+                Tab(text: 'Floor Plans'),
+                Tab(text: 'Tables'),
+                Tab(text: 'Settings'),
+              ],
+            ),
+          ),
+        ),
       ),
       body: TabBarView(
         controller: _tabController,
@@ -90,7 +131,7 @@ class _FloorPlanManagementScreenState extends ConsumerState<FloorPlanManagementS
       },
       loading: () {
         print('🔍 DEBUG: _buildOverviewTab: Loading state');
-        return const Center(child: CircularProgressIndicator());
+        return const Center(child: LoadingIndicator());
       },
       error: (error, stack) {
         print('🔍 DEBUG: _buildOverviewTab: Error state: $error');
@@ -100,6 +141,8 @@ class _FloorPlanManagementScreenState extends ConsumerState<FloorPlanManagementS
   }
 
   Widget _buildRestaurantOverview(List<FloorPlan> floorPlans) {
+    final theme = Theme.of(context);
+    
     // Calculate statistics
     int totalTables = 0;
     int availableTables = 0;
@@ -109,21 +152,23 @@ class _FloorPlanManagementScreenState extends ConsumerState<FloorPlanManagementS
     double totalRevenue = 0.0;
 
     for (final floorPlan in floorPlans) {
-      for (final table in floorPlan.tables ?? []) {
-        totalTables++;
-        switch (table.tableStatus.toLowerCase()) {
-          case 'available':
-            availableTables++;
-            break;
-          case 'occupied':
-            occupiedTables++;
-            break;
-          case 'reserved':
-            reservedTables++;
-            break;
-          case 'cleaning':
-            cleaningTables++;
-            break;
+      if (floorPlan.tables != null) {
+        totalTables += floorPlan.tables!.length;
+        for (final table in floorPlan.tables!) {
+          switch (table.tableStatus.toLowerCase()) {
+            case 'available':
+              availableTables++;
+              break;
+            case 'occupied':
+              occupiedTables++;
+              break;
+            case 'reserved':
+              reservedTables++;
+              break;
+            case 'cleaning':
+              cleaningTables++;
+              break;
+          }
         }
       }
     }
@@ -133,122 +178,149 @@ class _FloorPlanManagementScreenState extends ConsumerState<FloorPlanManagementS
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Restaurant Overview Cards
-          Text(
-            '📊 RESTAURANT OVERVIEW',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.primary,
+          // Restaurant Metrics Section
+          _buildSectionHeader(
+            title: 'Table Status Overview',
+            subtitle: 'Real-time restaurant floor plan metrics',
+            icon: Icons.analytics,
+            theme: theme,
+          ),
+          
+          // Compact Statistics Row
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _buildCompactStatCard('Total Tables', totalTables.toString(), Icons.table_restaurant, theme.colorScheme.primary, theme),
+                const SizedBox(width: 8),
+                _buildCompactStatCard('Available', availableTables.toString(), Icons.check_circle, Colors.green, theme),
+                const SizedBox(width: 8),
+                _buildCompactStatCard('Occupied', occupiedTables.toString(), Icons.people, Colors.red, theme),
+                const SizedBox(width: 8),
+                _buildCompactStatCard('Reserved', reservedTables.toString(), Icons.schedule, Colors.orange, theme),
+                const SizedBox(width: 8),
+                _buildCompactStatCard('Cleaning', cleaningTables.toString(), Icons.cleaning_services, Colors.purple, theme),
+                const SizedBox(width: 8),
+                _buildCompactStatCard('Revenue Today', '\$${totalRevenue.toStringAsFixed(2)}', Icons.attach_money, theme.colorScheme.secondary, theme),
+              ],
             ),
           ),
-          const SizedBox(height: 16),
           
-          // Statistics Grid
-          GridView.count(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 2,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: 1.5,
+          const SizedBox(height: 24),
+          
+          // Floor Plan Summary Section Header with Create Button
+          Row(
             children: [
-              _buildStatCard('Total Tables', totalTables.toString(), Icons.table_restaurant, Colors.blue),
-              _buildStatCard('Available', availableTables.toString(), Icons.check_circle, Colors.green),
-              _buildStatCard('Occupied', occupiedTables.toString(), Icons.people, Colors.red),
-              _buildStatCard('Reserved', reservedTables.toString(), Icons.schedule, Colors.orange),
-              _buildStatCard('Cleaning', cleaningTables.toString(), Icons.cleaning_services, Colors.purple),
-              _buildStatCard('Revenue Today', '\$${totalRevenue.toStringAsFixed(2)}', Icons.attach_money, Colors.green),
+              Expanded(
+                child: _buildSectionHeader(
+                  title: 'Floor Plans',
+                  subtitle: 'Manage your restaurant layouts and table arrangements',
+                  icon: Icons.map,
+                  theme: theme,
+                ),
+              ),
+              ElevatedButton.icon(
+                onPressed: () => _showAddFloorPlanDialog(),
+                icon: const Icon(Icons.add, size: 18),
+                label: const Text('Create Floor Plan'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.colorScheme.primary,
+                  foregroundColor: theme.colorScheme.onPrimary,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
             ],
           ),
           
-          const SizedBox(height: 32),
+          const SizedBox(height: 12),
           
-          // Floor Plan Summary
-          Text(
-            '🗺️ FLOOR PLAN SUMMARY',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-          ),
-          const SizedBox(height: 16),
-          
-          // Floor Plan Cards
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: floorPlans.length,
-            itemBuilder: (context, index) {
-              final floorPlan = floorPlans[index];
-              return _buildFloorPlanCard(floorPlan);
-            },
-          ),
+          // Compact Floor Plan Cards with lazy loading
+          floorPlans.isEmpty
+              ? _buildEmptyFloorPlansState(theme)
+              : Column(
+                  children: floorPlans.map((floorPlan) => _buildCompactFloorPlanCard(floorPlan, theme)).toList(),
+                ),
         ],
       ),
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+  Widget _buildCompactStatCard(String title, String value, IconData icon, Color color, ThemeData theme) {
     return Card(
-      elevation: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 32, color: color),
-            const SizedBox(height: 8),
-            Text(
-              value,
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: color,
+      elevation: 2,
+      shadowColor: theme.colorScheme.shadow.withValues(alpha: 0.08),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              color.withValues(alpha: 0.08),
+              color.withValues(alpha: 0.04),
+            ],
+          ),
+        ),
+        child: IntrinsicWidth(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Icon(icon, color: color, size: 14),
+                  ),
+                  const SizedBox(width: 6),
+                  Icon(
+                    Icons.trending_up,
+                    color: color.withValues(alpha: 0.6),
+                    size: 12,
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              title,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Colors.grey[600],
+              const SizedBox(height: 6),
+              Text(
+                title,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-              textAlign: TextAlign.center,
-            ),
-          ],
+              const SizedBox(height: 2),
+              Text(
+                value,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: theme.colorScheme.onSurface,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildFloorPlanCard(FloorPlan floorPlan) {
-    final tableCount = floorPlan.tables?.length ?? 0;
-    final availableCount = floorPlan.tables?.where((t) => t.tableStatus.toLowerCase() == 'available').length ?? 0;
-    
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          child: Icon(Icons.map, color: Colors.white),
-        ),
-        title: Text(floorPlan.name),
-        subtitle: Text('$tableCount tables • $availableCount available'),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.edit),
-              onPressed: () => _editFloorPlan(floorPlan),
-              tooltip: 'Edit Floor Plan',
-            ),
-            IconButton(
-              icon: const Icon(Icons.delete, color: Colors.red),
-              onPressed: () => _deleteFloorPlan(floorPlan),
-              tooltip: 'Delete Floor Plan',
-            ),
-          ],
-        ),
-        onTap: () => _viewFloorPlan(floorPlan),
-      ),
+  Widget _buildCompactFloorPlanCard(FloorPlan floorPlan, ThemeData theme) {
+    return _FloorPlanCardWithAnimation(
+      key: ValueKey(floorPlan.id),
+      floorPlan: floorPlan,
+      theme: theme,
+      onTap: () => _viewFloorPlan(floorPlan),
+      onEdit: () => _editFloorPlan(floorPlan),
+      onDelete: () => _deleteFloorPlan(floorPlan),
     );
   }
 
@@ -261,7 +333,7 @@ class _FloorPlanManagementScreenState extends ConsumerState<FloorPlanManagementS
           return _buildErrorState(result.errorMessage ?? 'Unknown error occurred');
         }
       },
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const Center(child: LoadingIndicator()),
       error: (error, stack) => _buildErrorState(error.toString()),
     );
   }
@@ -283,7 +355,7 @@ class _FloorPlanManagementScreenState extends ConsumerState<FloorPlanManagementS
               ),
               const SizedBox(width: 12),
               ElevatedButton.icon(
-                onPressed: () => ref.invalidate(floorPlansWithTablesProvider),
+                onPressed: () => ref.read(progressiveFloorPlansProvider.notifier).refresh(),
                 icon: const Icon(Icons.refresh),
                 label: const Text('Refresh'),
               ),
@@ -429,7 +501,7 @@ class _FloorPlanManagementScreenState extends ConsumerState<FloorPlanManagementS
           return _buildErrorState(result.errorMessage ?? 'Unknown error occurred');
         }
       },
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const Center(child: LoadingIndicator()),
       error: (error, stack) => _buildErrorState(error.toString()),
     );
   }
@@ -709,24 +781,75 @@ class _FloorPlanManagementScreenState extends ConsumerState<FloorPlanManagementS
   }
 
   Widget _buildErrorState(String error) {
+    final theme = Theme.of(context);
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.error_outline, size: 64, color: Colors.red),
-          const SizedBox(height: 16),
-          Text(
-            'Error loading floor plans',
-            style: Theme.of(context).textTheme.headlineSmall,
+      child: Container(
+        margin: const EdgeInsets.all(24),
+        child: Card(
+          elevation: 2,
+          shadowColor: theme.colorScheme.shadow.withValues(alpha: 0.1),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: Container(
+            padding: const EdgeInsets.all(24.0),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  theme.colorScheme.error.withValues(alpha: 0.08),
+                  theme.colorScheme.error.withValues(alpha: 0.04),
+                ],
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.error.withValues(alpha: 0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.error_outline,
+                    color: theme.colorScheme.error,
+                    size: 32,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Unable to Load Floor Plans',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: theme.colorScheme.onSurface,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Please check your connection and try again',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                FilledButton.icon(
+                  onPressed: () => ref.invalidate(floorPlansWithTablesProvider),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: theme.colorScheme.primary,
+                    foregroundColor: theme.colorScheme.onPrimary,
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  icon: const Icon(Icons.refresh, size: 18),
+                  label: const Text('Try Again'),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 8),
-          Text(error),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () => ref.invalidate(floorPlansWithTablesProvider),
-            child: const Text('Retry'),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -1944,6 +2067,350 @@ class _FloorPlanManagementScreenState extends ConsumerState<FloorPlanManagementS
   void _exportFloorPlans() {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Export functionality coming soon!')),
+    );
+  }
+
+  Widget _buildSectionHeader({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required ThemeData theme,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primary.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(
+              icon,
+              color: theme.colorScheme.primary,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyFloorPlansState(ThemeData theme) {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primary.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.map_outlined,
+              size: 48,
+              color: theme.colorScheme.primary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'No Floor Plans Yet',
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Create your first floor plan to start managing your restaurant layout',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          FilledButton.icon(
+            onPressed: () => _showAddFloorPlanDialog(),
+            style: FilledButton.styleFrom(
+              backgroundColor: theme.colorScheme.primary,
+              foregroundColor: theme.colorScheme.onPrimary,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            icon: const Icon(Icons.add, size: 18),
+            label: const Text('Create Floor Plan'),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+} 
+
+class _FloorPlanCardWithAnimation extends StatefulWidget {
+  final FloorPlan floorPlan;
+  final ThemeData theme;
+  final VoidCallback onTap;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+
+  const _FloorPlanCardWithAnimation({
+    super.key,
+    required this.floorPlan,
+    required this.theme,
+    required this.onTap,
+    required this.onEdit,
+    required this.onDelete,
+  });
+
+  @override
+  State<_FloorPlanCardWithAnimation> createState() => _FloorPlanCardWithAnimationState();
+}
+
+class _FloorPlanCardWithAnimationState extends State<_FloorPlanCardWithAnimation>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+  bool _showLoadingAnimation = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
+    
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOut,
+    ));
+    
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOut,
+    ));
+
+    // Show loading animation then fade in the card
+    Future.delayed(const Duration(milliseconds: 1200), () {
+      if (mounted) {
+        setState(() {
+          _showLoadingAnimation = false;
+        });
+        _animationController.forward();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_showLoadingAnimation) {
+      return Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        child: Card(
+          elevation: 1,
+          shadowColor: widget.theme.colorScheme.shadow.withValues(alpha: 0.1),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: widget.theme.colorScheme.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(widget.theme.colorScheme.primary),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 120,
+                        height: 14,
+                        decoration: BoxDecoration(
+                          color: widget.theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Container(
+                        width: 80,
+                        height: 12,
+                        decoration: BoxDecoration(
+                          color: widget.theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    return SlideTransition(
+      position: _slideAnimation,
+      child: FadeTransition(
+        opacity: _fadeAnimation,
+        child: _buildActualFloorPlanCard(),
+      ),
+    );
+  }
+
+  Widget _buildActualFloorPlanCard() {
+    final tableCount = widget.floorPlan.tables?.length ?? 0;
+    final availableCount = widget.floorPlan.tables?.where((t) => t.tableStatus.toLowerCase() == 'available').length ?? 0;
+    final occupiedCount = widget.floorPlan.tables?.where((t) => t.tableStatus.toLowerCase() == 'occupied').length ?? 0;
+    
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Card(
+        elevation: 1,
+        shadowColor: widget.theme.colorScheme.shadow.withValues(alpha: 0.1),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: InkWell(
+          onTap: widget.onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: widget.theme.colorScheme.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.map,
+                    color: widget.theme.colorScheme.primary,
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.floorPlan.name,
+                        style: widget.theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: widget.theme.colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Row(
+                        children: [
+                          Icon(Icons.table_restaurant, size: 14, color: widget.theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                          const SizedBox(width: 4),
+                          Text(
+                            '$tableCount tables',
+                            style: widget.theme.textTheme.bodySmall?.copyWith(
+                              color: widget.theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Icon(Icons.check_circle, size: 14, color: Colors.green),
+                          const SizedBox(width: 4),
+                          Text(
+                            '$availableCount available',
+                            style: widget.theme.textTheme.bodySmall?.copyWith(
+                              color: Colors.green,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          if (occupiedCount > 0) ...[
+                            const SizedBox(width: 12),
+                            Icon(Icons.people, size: 14, color: Colors.red),
+                            const SizedBox(width: 4),
+                            Text(
+                              '$occupiedCount occupied',
+                              style: widget.theme.textTheme.bodySmall?.copyWith(
+                                color: Colors.red,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.edit, color: widget.theme.colorScheme.onSurface.withValues(alpha: 0.7)),
+                      onPressed: widget.onEdit,
+                      tooltip: 'Edit Floor Plan',
+                      iconSize: 20,
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: widget.onDelete,
+                      tooltip: 'Delete Floor Plan',
+                      iconSize: 20,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 } 
