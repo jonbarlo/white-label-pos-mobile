@@ -161,6 +161,7 @@ class MockPosRepository extends _i1.Mock implements _i5.PosRepository {
     required _i2.PaymentMethod? paymentMethod,
     String? customerName,
     String? customerEmail,
+    int? existingOrderId,
   }) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -171,6 +172,7 @@ class MockPosRepository extends _i1.Mock implements _i5.PosRepository {
             #paymentMethod: paymentMethod,
             #customerName: customerName,
             #customerEmail: customerEmail,
+            #existingOrderId: existingOrderId,
           },
         ),
         returnValue: _i6.Future<_i2.Sale>.value(_FakeSale_0(
@@ -183,6 +185,7 @@ class MockPosRepository extends _i1.Mock implements _i5.PosRepository {
               #paymentMethod: paymentMethod,
               #customerName: customerName,
               #customerEmail: customerEmail,
+              #existingOrderId: existingOrderId,
             },
           ),
         )),

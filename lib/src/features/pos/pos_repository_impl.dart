@@ -151,6 +151,7 @@ class PosRepositoryImpl implements PosRepository {
     required PaymentMethod paymentMethod,
     String? customerName,
     String? customerEmail,
+    int? existingOrderId,
   }) async {
     try {
       print('🔍 POS Repository: Creating sale with ${items.length} items');
@@ -167,7 +168,7 @@ class PosRepositoryImpl implements PosRepository {
       final total = items.fold<double>(0.0, (sum, item) => sum + (item.price * (item.quantity ?? 1)));
 
       // Create sale with items using the /api/sales/with-items endpoint
-      // This will automatically create kitchen orders
+      // This will automatically create kitchen orders and update order status
       final orderItems = items.map((item) => {
         'itemId': int.tryParse(item.id) ?? 1,
         'quantity': item.quantity ?? 1,
@@ -183,7 +184,11 @@ class PosRepositoryImpl implements PosRepository {
         'paymentMethod': _mapPaymentMethodToApi(paymentMethod),
         'status': 'completed',
         'orderItems': orderItems, // Required field with unitPrice
+        if (existingOrderId != null) 'existingOrderId': existingOrderId, // Link to existing order
       };
+
+      print('🔍 POS Repository: Creating sale with existingOrderId: $existingOrderId');
+      print('🔍 POS Repository: Sale data: $saleData');
 
       final saleResponse = await _dio.post('/sales/with-items', data: saleData);
       
@@ -736,8 +741,7 @@ class PosRepositoryImpl implements PosRepository {
       categoryId = 1;
     }
     
-    print('Processing menu item: "$itemName" (category: $categoryValue, original image: $imageUrl)');
-    print('🔍 Available fields in JSON: ${json.keys.toList()}');
+            // Debug logging removed to reduce console noise
 
     final menuItem = MenuItem(
       id: json['id'] as int,
@@ -757,7 +761,7 @@ class PosRepositoryImpl implements PosRepository {
       updatedAt: DateTime.tryParse(json['updatedAt'] as String? ?? '') ?? DateTime.now(),
     );
     
-    print('Created MenuItem for "$itemName" with image: ${menuItem.image}');
+          // Debug logging removed to reduce console noise
     return menuItem;
   }
 
@@ -1330,32 +1334,144 @@ class PosRepositoryImpl implements PosRepository {
   // Get restaurant orders for Orders section
   Future<List<Map<String, dynamic>>> getRestaurantOrders() async {
     try {
+      print('🔍 DEBUG: getRestaurantOrders called');
+      
       final response = await _dio.get('/orders', queryParameters: {
         'limit': 100,
+        'status': 'pending', // Only fetch pending orders
       });
+
+      print('🔍 DEBUG: getRestaurantOrders response status: ${response.statusCode}');
+      print('🔍 DEBUG: getRestaurantOrders response data: ${response.data}');
 
       final responseData = response.data;
       if (responseData['success'] == true && responseData['data'] != null) {
         final List<dynamic> orders = responseData['data'];
-        return orders.map((order) => {
-          'id': order['id'].toString(),
-          'tableNumber': order['tableId'] != null ? 'Table ${order['tableId']}' : 'Takeaway',
-          'waitstaff': order['waitstaff'] ?? 'N/A',
-          'orderTime': order['createdAt'],
-          'orderNumber': order['orderNumber'],
-          'items': order['items'] ?? [],
-          'total': (order['totalAmount'] ?? 0.0).toDouble(),
-          'subtotal': (order['subtotal'] ?? 0.0).toDouble(),
-          'taxAmount': (order['taxAmount'] ?? 0.0).toDouble(),
-          'status': order['status'],
-          'orderType': order['orderType'],
-          'notes': order['notes'],
-        }).toList();
+        print('🔍 DEBUG: Found ${orders.length} orders');
+        
+        // Debug: Print first order structure if available
+        if (orders.isNotEmpty) {
+          print('🔍 DEBUG: First order structure: ${orders.first}');
+          print('🔍 DEBUG: First order orderItems: ${orders.first['orderItems']}');
+          print('🔍 DEBUG: First order serverId: ${orders.first['serverId']}');
+          print('🔍 DEBUG: First order keys: ${orders.first.keys.toList()}');
+          
+          // Check if orderItems exists and has content
+          final orderItems = orders.first['orderItems'];
+          if (orderItems != null) {
+            print('🔍 DEBUG: orderItems type: ${orderItems.runtimeType}');
+            if (orderItems is List) {
+              print('🔍 DEBUG: orderItems length: ${orderItems.length}');
+              if (orderItems.isNotEmpty) {
+                print('🔍 DEBUG: First orderItem: ${orderItems.first}');
+              }
+            }
+          }
+        }
+        
+        // Fetch detailed order information for each order
+        final List<Map<String, dynamic>> result = [];
+        
+        for (final order in orders) {
+          try {
+            // Fetch individual order details to get orderItems
+            print('🔍 DEBUG: Starting to fetch order ${order['id']} details');
+            final orderResponse = await _dio.get('/orders/${order['id']}');
+            print('🔍 DEBUG: Fetching order ${order['id']} details - Response received');
+            print('🔍 DEBUG: Order ${order['id']} response status: ${orderResponse.statusCode}');
+            print('🔍 DEBUG: Order ${order['id']} response data: ${orderResponse.data}');
+            
+            if (orderResponse.data['success'] == true && orderResponse.data['data'] != null) {
+              final orderDetails = orderResponse.data['data'];
+              final List<dynamic> orderItems = orderDetails['orderItems'] ?? [];
+              
+              print('🔍 DEBUG: Order ${order['id']} has ${orderItems.length} items');
+              
+              final List<dynamic> processedItems = orderItems.map((item) => {
+                'itemId': item['itemId'] ?? item['menuItem']?['id'],
+                'itemName': item['itemName'] ?? item['menuItem']?['name'] ?? 'Unknown Item',
+                'quantity': item['quantity'] ?? 1,
+                'unitPrice': (item['unitPrice'] ?? item['menuItem']?['price'] ?? 0.0).toDouble(),
+                'totalPrice': (item['totalPrice'] ?? 0.0).toDouble(),
+                'notes': item['notes'] ?? '',
+              }).toList();
+
+              // Get server name if available, otherwise use serverId or default
+              String waitstaffName = 'N/A';
+              if (order['serverId'] != null) {
+                // Try to get server name from server object if available
+                if (orderDetails['server'] != null) {
+                  waitstaffName = orderDetails['server']['name'] ?? 'Server ${order['serverId']}';
+                } else {
+                  waitstaffName = 'Server ${order['serverId']}';
+                }
+              }
+
+              // Debug: Print waitstaff name for first order
+              if (orders.first == order) {
+                print('🔍 DEBUG: Waitstaff name for first order: $waitstaffName (serverId: ${order['serverId']}, server object: ${orderDetails['server']})');
+              }
+
+              result.add({
+                'id': order['id'].toString(),
+                'tableNumber': order['tableId'] != null ? 'Table ${order['tableId']}' : 'Takeaway',
+                'waitstaff': waitstaffName,
+                'orderTime': order['createdAt'],
+                'orderNumber': order['orderNumber'] ?? 'N/A',
+                'items': processedItems,
+                'total': (order['totalAmount'] ?? 0.0).toDouble(),
+                'subtotal': (order['subtotal'] ?? 0.0).toDouble(),
+                'taxAmount': (order['taxAmount'] ?? 0.0).toDouble(),
+                'status': order['status'] ?? 'pending',
+                'orderType': order['orderType'] ?? 'dine_in',
+                'notes': order['notes'] ?? '',
+              });
+            } else {
+              print('🔍 DEBUG: Failed to fetch order ${order['id']} details');
+              // Fallback to basic order info without items
+              result.add({
+                'id': order['id'].toString(),
+                'tableNumber': order['tableId'] != null ? 'Table ${order['tableId']}' : 'Takeaway',
+                'waitstaff': order['serverId'] != null ? 'Server ${order['serverId']}' : 'N/A',
+                'orderTime': order['createdAt'],
+                'orderNumber': order['orderNumber'] ?? 'N/A',
+                'items': [],
+                'total': (order['totalAmount'] ?? 0.0).toDouble(),
+                'subtotal': (order['subtotal'] ?? 0.0).toDouble(),
+                'taxAmount': (order['taxAmount'] ?? 0.0).toDouble(),
+                'status': order['status'] ?? 'pending',
+                'orderType': order['orderType'] ?? 'dine_in',
+                'notes': order['notes'] ?? '',
+              });
+            }
+          } catch (e) {
+            print('🔍 DEBUG: Error fetching order ${order['id']} details: $e');
+            // Fallback to basic order info without items
+            result.add({
+              'id': order['id'].toString(),
+              'tableNumber': order['tableId'] != null ? 'Table ${order['tableId']}' : 'Takeaway',
+              'waitstaff': order['serverId'] != null ? 'Server ${order['serverId']}' : 'N/A',
+              'orderTime': order['createdAt'],
+              'orderNumber': order['orderNumber'] ?? 'N/A',
+              'items': [],
+              'total': (order['totalAmount'] ?? 0.0).toDouble(),
+              'subtotal': (order['subtotal'] ?? 0.0).toDouble(),
+              'taxAmount': (order['taxAmount'] ?? 0.0).toDouble(),
+              'status': order['status'] ?? 'pending',
+              'orderType': order['orderType'] ?? 'dine_in',
+              'notes': order['notes'] ?? '',
+            });
+          }
+        }
+        
+        print('🔍 DEBUG: Processed ${result.length} orders');
+        return result;
       }
 
+      print('🔍 DEBUG: No orders found or invalid response format');
       return [];
     } catch (e) {
-      print('Error fetching restaurant orders: $e');
+      print('🔍 DEBUG: Error fetching restaurant orders: $e');
       return [];
     }
   }
@@ -1363,6 +1479,8 @@ class PosRepositoryImpl implements PosRepository {
   // Get daily transactions for Transactions section
   Future<List<Map<String, dynamic>>> getDailyTransactions() async {
     try {
+      print('🔍 DEBUG: getDailyTransactions called');
+      
       final today = DateTime.now();
       final startOfDay = DateTime(today.year, today.month, today.day);
       final endOfDay = startOfDay.add(const Duration(days: 1));
@@ -1373,23 +1491,33 @@ class PosRepositoryImpl implements PosRepository {
         'limit': 100,
       });
 
+      print('🔍 DEBUG: getDailyTransactions response status: ${response.statusCode}');
+      print('🔍 DEBUG: getDailyTransactions response data: ${response.data}');
+
       final responseData = response.data;
-      if (responseData is List) {
-        return responseData.map((sale) => {
+      if (responseData['success'] == true && responseData['data'] != null) {
+        final List<dynamic> sales = responseData['data'];
+        print('🔍 DEBUG: Found ${sales.length} sales');
+        
+        final result = sales.map((sale) => {
           'id': sale['id'].toString(),
           'orderNumber': sale['orderNumber'] ?? 'N/A',
           'amount': (sale['totalAmount'] ?? 0.0).toDouble(),
           'paymentMethod': sale['paymentMethod'] ?? 'cash',
           'timestamp': sale['createdAt'],
-          'customerName': sale['customerName'],
-          'status': sale['status'],
-          'items': sale['items'] ?? [],
+          'customerName': sale['customerName'] ?? 'Guest',
+          'status': sale['status'] ?? 'completed',
+          'items': sale['orderItems'] ?? [],
         }).toList();
+        
+        print('🔍 DEBUG: Processed ${result.length} sales');
+        return result;
       }
 
+      print('🔍 DEBUG: No sales found or invalid response format');
       return [];
     } catch (e) {
-      print('Error fetching daily transactions: $e');
+      print('🔍 DEBUG: Error fetching daily transactions: $e');
       return [];
     }
   }

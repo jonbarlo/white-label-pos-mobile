@@ -16,6 +16,7 @@ abstract class PosRepository {
     required PaymentMethod paymentMethod,
     String? customerName,
     String? customerEmail,
+    int? existingOrderId,
   });
 
   /// Get recent sales for the current business

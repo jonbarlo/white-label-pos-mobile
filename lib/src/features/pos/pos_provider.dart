@@ -29,6 +29,9 @@ class CartNotifier extends _$CartNotifier {
   }
 
   void addItem(CartItem item) {
+    print('🔍 DEBUG: CartNotifier.addItem called with: ${item.name} x${item.quantity}');
+    print('🔍 DEBUG: Current cart state before adding: ${state.length} items');
+    
     final existingIndex = state.indexWhere((cartItem) => cartItem.id == item.id);
     
     if (existingIndex != -1) {
@@ -43,10 +46,14 @@ class CartNotifier extends _$CartNotifier {
         updatedItem,
         ...state.sublist(existingIndex + 1),
       ];
+      print('🔍 DEBUG: Updated existing item quantity. New cart state: ${state.length} items');
     } else {
       // Add new item
       state = [...state, item];
+      print('🔍 DEBUG: Added new item. New cart state: ${state.length} items');
     }
+    
+    print('🔍 DEBUG: Final cart state: ${state.map((item) => '${item.name} x${item.quantity}').join(', ')}');
   }
 
   void removeItem(String itemId) {
@@ -227,6 +234,57 @@ Future<Sale> createSale(
   await Future.delayed(const Duration(milliseconds: 500));
 
   return sale;
+  } catch (e) {
+    rethrow;
+  }
+}
+
+// Create sale with custom cart items
+@riverpod
+Future<Sale> createSaleWithItems(
+  CreateSaleWithItemsRef ref,
+  List<CartItem> items,
+  PaymentMethod paymentMethod, {
+  String? customerName,
+  String? customerEmail,
+  int? existingOrderId,
+}) async {
+  if (items.isEmpty) {
+    throw Exception('Cannot create sale with empty cart');
+  }
+
+  final repository = await ref.read(posRepositoryProvider.future);
+  
+  try {
+    final sale = await repository.createSale(
+      items: items,
+      paymentMethod: paymentMethod,
+      customerName: customerName,
+      customerEmail: customerEmail,
+      existingOrderId: existingOrderId,
+    );
+    
+    // Clear cart after successful sale
+    ref.read(cartNotifierProvider.notifier).clearCart();
+    
+    // Add to recent sales
+    ref.read(recentSalesNotifierProvider.notifier).addSale(sale);
+
+    // Invalidate all related providers to refresh data after order submission
+    ref.invalidate(tablesProvider);
+    ref.invalidate(recentSalesNotifierProvider);
+    ref.invalidate(salesSummaryProvider(DateTime.now().subtract(const Duration(days: 7)), DateTime.now()));
+    
+    // Force refresh of all table data by invalidating the provider family
+    // This will cause all table-related data to be refetched
+    ref.invalidate(tablesByStatusProvider(waiter_table.TableStatus.occupied));
+    ref.invalidate(myAssignedTablesProvider);
+    
+    // Add a small delay to ensure the backend has processed the order
+    // before refreshing table data
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    return sale;
   } catch (e) {
     rethrow;
   }
@@ -516,11 +574,11 @@ Future<List<CartItem>> itemsByCategory(ItemsByCategoryRef ref, String category) 
   final filteredItems = allItems.where((item) {
     final itemCategory = item.category ?? '';
     final matches = itemCategory == categoryId;
-    print('🔍 DEBUG: Item "${item.name}" has category "$itemCategory", matches "$categoryId": $matches');
+            // Debug logging removed to reduce console noise
     return matches;
   }).toList();
   
-  print('🔍 DEBUG: Filtered ${filteredItems.length} items for category "$category" (ID: $categoryId) from ${allItems.length} total items');
+      // Debug logging removed to reduce console noise
   
   return filteredItems;
 }

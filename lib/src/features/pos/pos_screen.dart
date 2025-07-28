@@ -9,6 +9,7 @@ import 'package:white_label_pos_mobile/src/features/pos/customer_selection_dialo
 import 'package:white_label_pos_mobile/src/features/pos/split_payment_dialog.dart';
 import 'package:white_label_pos_mobile/src/features/auth/auth_provider.dart';
 import 'package:white_label_pos_mobile/src/features/auth/models/user.dart';
+import 'package:white_label_pos_mobile/src/features/promotions/promotions_provider.dart';
 import '../../core/theme/app_theme.dart';
 
 import '../../shared/widgets/app_image.dart';
@@ -40,6 +41,10 @@ class _PosScreenState extends ConsumerState<PosScreen>
 
   // Section management for bottom navigation
   String _currentSection = 'Menu'; // Menu, Orders, Transactions, Inventory
+  
+  // Local cart state to persist across rebuilds
+  List<CartItem> _localCart = [];
+  int? _currentOrderId; // Track the order ID when settling an order
 
   @override
   void initState() {
@@ -56,6 +61,11 @@ class _PosScreenState extends ConsumerState<PosScreen>
         _loadRecentSales();
       });
     }
+    
+    // Debug: Check cart state on screen load
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      print('🔍 DEBUG: POS screen loaded. Current cart items: ${ref.read(cartNotifierProvider).length}');
+    });
   }
 
   @override
@@ -193,7 +203,8 @@ class _PosScreenState extends ConsumerState<PosScreen>
   }
 
   void _showCheckoutDialog() {
-    final cart = ref.read(cartNotifierProvider);
+    // Use local cart state instead of provider
+    final cart = _localCart;
     if (cart.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -204,11 +215,14 @@ class _PosScreenState extends ConsumerState<PosScreen>
       return;
     }
 
+    // Calculate total from local cart
+    final total = cart.fold(0.0, (sum, item) => sum + item.total);
+
     showDialog(
       context: context,
       builder: (context) => _CheckoutDialog(
         cart: cart,
-        total: ref.read(cartTotalProvider),
+        total: total,
         selectedPaymentMethod: _selectedPaymentMethod,
         onPaymentMethodChanged: (method) {
           setState(() {
@@ -299,6 +313,44 @@ class _PosScreenState extends ConsumerState<PosScreen>
         },
       ),
     );
+  }
+
+  // Promotions functionality
+  void _showPromotionsDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => _PromotionsDialog(
+        onPromotionSelected: (promotion) {
+          // Add promotion to cart
+          _addPromotionToCart(promotion);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Promotion applied: ${promotion.name}'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  void _addPromotionToCart(dynamic promotion) {
+    // Create a special cart item for the promotion
+    final promotionCartItem = CartItem(
+      id: 'promotion_${promotion.id}',
+      name: promotion.name,
+      price: 0.0, // Promotions are typically applied as discounts, not items
+      quantity: 1,
+      category: 'Promotion',
+      promotionId: promotion.id.toString(),
+      promotionName: promotion.name,
+      originalPrice: null, // Will be calculated when applied to items
+    );
+    
+    // Add the promotion to cart
+    ref.read(cartNotifierProvider.notifier).addItem(promotionCartItem);
+    
+    print('Added promotion to cart: ${promotion.name}');
   }
 
   @override
@@ -459,6 +511,13 @@ class _PosScreenState extends ConsumerState<PosScreen>
                 Icons.percent,
                 'Discounts',
                 _showDiscountsDialog,
+              ),
+              const SizedBox(width: 8),
+              _buildHeaderActionButton(
+                theme,
+                Icons.local_offer,
+                'Promotions',
+                _showPromotionsDialog,
               ),
               const SizedBox(width: 8),
               _buildHeaderActionButton(
@@ -889,8 +948,15 @@ class _PosScreenState extends ConsumerState<PosScreen>
   }
 
   Widget _buildCartTab(ThemeData theme) {
-    final cart = ref.watch(cartNotifierProvider);
-    final total = ref.watch(cartTotalProvider);
+    // Use local cart state instead of provider
+    final cart = _localCart;
+    final total = cart.fold(0.0, (sum, item) => sum + item.total);
+    
+    // Debug: Log cart state
+    print('🔍 DEBUG: _buildCartTab - Local cart has ${cart.length} items');
+    if (cart.isNotEmpty) {
+      print('🔍 DEBUG: Local cart items: ${cart.map((item) => '${item.name} x${item.quantity}').join(', ')}');
+    }
 
     return Column(
       children: [
@@ -1378,10 +1444,22 @@ class _PosScreenState extends ConsumerState<PosScreen>
 
   Future<void> _completeSale(String customerName, String customerEmail) async {
     try {
-      await ref.read(createSaleProvider(_selectedPaymentMethod, customerName: customerName, customerEmail: customerEmail).future);
+      print('🔍 DEBUG: _completeSale - _currentOrderId: $_currentOrderId');
+      print('🔍 DEBUG: _completeSale - _localCart items: ${_localCart.length}');
+      // Use local cart items instead of provider
+      await ref.read(createSaleWithItemsProvider(_localCart, _selectedPaymentMethod, customerName: customerName, customerEmail: customerEmail, existingOrderId: _currentOrderId).future);
+      
+      // Clear local cart after successful sale
+      setState(() {
+        _localCart = [];
+        _currentOrderId = null; // Clear the order ID after successful sale
+      });
       
       // Refresh sales summary/report
       ref.invalidate(salesSummaryProvider(DateTime.now().subtract(const Duration(days: 7)), DateTime.now()));
+      
+      // Refresh orders list to remove completed orders
+      ref.invalidate(restaurantOrdersProvider);
       
       // Switch to Recent Sales tab if user can access reports
       final authState = ref.read(authNotifierProvider);
@@ -1443,6 +1521,9 @@ class _PosScreenState extends ConsumerState<PosScreen>
       
       // Refresh sales summary/report
       ref.invalidate(salesSummaryProvider(DateTime.now().subtract(const Duration(days: 7)), DateTime.now()));
+      
+      // Refresh orders list to remove completed orders
+      ref.invalidate(restaurantOrdersProvider);
       
       // Switch to Recent Sales tab if user can access reports
       final authState = ref.read(authNotifierProvider);
@@ -1773,12 +1854,13 @@ class _PosScreenState extends ConsumerState<PosScreen>
 
   Widget _buildOrderCard(ThemeData theme, Map<String, dynamic> order) {
     final tableNumber = order['tableNumber']?.toString() ?? 'Unknown';
-    final guestCount = order['guestCount'] ?? 1;
+    final guestCount = order['guestCount'] ?? order['items']?.length ?? 1;
     final waitstaff = order['waitstaff']?.toString() ?? 'Unknown';
     final total = (order['total'] ?? 0.0).toDouble();
     final status = order['status']?.toString() ?? 'pending';
     final items = order['items'] as List<dynamic>? ?? [];
-    final createdAt = order['createdAt'] as DateTime? ?? DateTime.now();
+    final orderTime = order['orderTime']?.toString() ?? '';
+    final createdAt = DateTime.tryParse(orderTime) ?? DateTime.now();
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -2131,31 +2213,112 @@ class _PosScreenState extends ConsumerState<PosScreen>
       context: context,
       builder: (context) => _SettleOrderDialog(
         order: order,
-        onSettleOrder: (orderItems) {
+        onSettleOrder: (orderItems) async {
+          print('🔍 DEBUG: _showSettleOrderDialog - Processing ${orderItems.length} items');
+          print('🔍 DEBUG: _showSettleOrderDialog - Items: $orderItems');
+          print('🔍 DEBUG: _showSettleOrderDialog - Raw order data: $order');
+          
+          // Validate that we have items to load
+          if (orderItems.isEmpty) {
+            print('🔍 DEBUG: No items to load, showing error message');
+            Navigator.of(context).pop();
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('No items found in this order'),
+                backgroundColor: Colors.orange,
+              ),
+            );
+            return;
+          }
+          
           // Load order items into cart
           final cartNotifier = ref.read(cartNotifierProvider.notifier);
+          print('🔍 DEBUG: Clearing cart...');
           cartNotifier.clearCart();
           
+          // Also clear local cart
+          setState(() {
+            _localCart = [];
+          });
+          
           for (final item in orderItems) {
-            final cartItem = CartItem(
-              id: item['itemId'].toString(),
-              name: item['itemName'],
-              price: item['unitPrice'].toDouble(),
-              quantity: item['quantity'],
-              category: '1',
-            );
-            cartNotifier.addItem(cartItem);
+            print('🔍 DEBUG: _showSettleOrderDialog - Processing item: $item');
+            print('🔍 DEBUG: _showSettleOrderDialog - Item keys: ${item.keys.toList()}');
+            try {
+              final cartItem = CartItem(
+                id: item['itemId'].toString(),
+                name: item['itemName'],
+                price: item['unitPrice'].toDouble(),
+                quantity: item['quantity'],
+                category: '1',
+              );
+              print('🔍 DEBUG: Created CartItem: ${cartItem.name} x${cartItem.quantity}');
+              cartNotifier.addItem(cartItem);
+              
+              // Also add to local cart
+              setState(() {
+                _localCart.add(cartItem);
+              });
+              
+              print('🔍 DEBUG: Added item to cart successfully');
+            } catch (e) {
+              print('🔍 DEBUG: Error creating CartItem: $e');
+              print('🔍 DEBUG: Item data: $item');
+            }
+          }
+          print('🔍 DEBUG: Finished processing all items');
+          print('🔍 DEBUG: About to navigate back to menu screen');
+          
+          // Check cart state before setState
+          final cartBeforeSetState = ref.read(cartNotifierProvider);
+          print('🔍 DEBUG: Cart state before setState: ${cartBeforeSetState.length} items');
+          if (cartBeforeSetState.isNotEmpty) {
+            print('🔍 DEBUG: Cart items before setState: ${cartBeforeSetState.map((item) => '${item.name} x${item.quantity}').join(', ')}');
           }
           
           // Update table information for header
-          setState(() {
-            _selectedTableNumber = order['tableNumber']?.toString();
-            _selectedTableWaitstaff = order['waitstaff']?.toString();
-            _serviceType = 'Table Service';
-            _currentSection = 'Menu'; // Switch back to menu section for checkout
-          });
+          print('🔍 DEBUG: About to call setState to update table info');
+          try {
+            setState(() {
+              _selectedTableNumber = order['tableNumber']?.toString();
+              _selectedTableWaitstaff = order['waitstaff']?.toString();
+              _serviceType = 'Table Service';
+              _currentSection = 'Menu'; // Switch back to menu section for checkout
+              _currentOrderId = order['id'] != null ? int.tryParse(order['id'].toString()) : null; // Store the order ID for sale creation
+            });
+            print('🔍 DEBUG: setState completed');
+          } catch (e) {
+            print('🔍 DEBUG: Error in setState: $e');
+            // Continue with dialog dismissal even if setState fails
+          }
           
-          Navigator.of(context).pop();
+          // Check cart state after setState
+          final cartAfterSetState = ref.read(cartNotifierProvider);
+          print('🔍 DEBUG: Cart state after setState: ${cartAfterSetState.length} items');
+          if (cartAfterSetState.isNotEmpty) {
+            print('🔍 DEBUG: Cart items after setState: ${cartAfterSetState.map((item) => '${item.name} x${item.quantity}').join(', ')}');
+          }
+          
+          print('🔍 DEBUG: About to call Navigator.pop()');
+          try {
+            // Check if context is still mounted
+            if (mounted) {
+              Navigator.of(context).pop();
+              print('🔍 DEBUG: Navigator.pop() completed');
+            } else {
+              print('🔍 DEBUG: Widget not mounted, cannot dismiss dialog');
+            }
+          } catch (e) {
+            print('🔍 DEBUG: Error in Navigator.pop(): $e');
+            // Try alternative dismissal method
+            try {
+              if (mounted && Navigator.of(context).canPop()) {
+                Navigator.of(context).pop();
+              }
+            } catch (e2) {
+              print('🔍 DEBUG: Alternative dismissal also failed: $e2');
+            }
+          }
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Order loaded into cart - Table ${order['tableNumber']}'),
@@ -3304,8 +3467,31 @@ class _CartItemTile extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
+                  if (item.promotionId != null) ...[
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.secondary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: theme.colorScheme.secondary.withValues(alpha: 0.3),
+                        ),
+                      ),
+                      child: Text(
+                        'PROMOTION',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.secondary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 10,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                  ],
                   Text(
-                    '\$${item.price.toStringAsFixed(2)} each',
+                    item.promotionId != null 
+                        ? 'Applied to cart'
+                        : '\$${item.price.toStringAsFixed(2)} each',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
@@ -4425,6 +4611,12 @@ class _SettleOrderDialog extends StatelessWidget {
     final total = (order['total'] ?? 0.0).toDouble();
     final items = order['items'] as List<dynamic>? ?? [];
     final orderTime = order['orderTime']?.toString() ?? '';
+    
+    // Debug logging for settle order dialog
+    print('🔍 DEBUG: SettleOrderDialog - tableNumber: $tableNumber, waitstaff: $waitstaff, total: $total, items.length: ${items.length}');
+    if (items.isNotEmpty) {
+      print('🔍 DEBUG: SettleOrderDialog - first item: ${items.first}');
+    }
 
     return AlertDialog(
       title: Row(
@@ -4562,11 +4754,46 @@ class _SettleOrderDialog extends StatelessWidget {
             
             const SizedBox(height: 16),
             
+            // Warning for empty orders
+            if (items.isEmpty)
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.errorContainer.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: theme.colorScheme.error.withValues(alpha: 0.3),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.warning_amber_rounded,
+                      color: theme.colorScheme.error,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'This order has no items but shows a total amount. This may indicate a data inconsistency.',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.error,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            
+            if (items.isEmpty) const SizedBox(height: 16),
+            
             // Total
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
+                color: items.isEmpty 
+                    ? theme.colorScheme.errorContainer.withValues(alpha: 0.3)
+                    : theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -4579,10 +4806,12 @@ class _SettleOrderDialog extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '\$${total.toStringAsFixed(2)}',
+                    items.isEmpty ? 'No Items' : '\$${total.toStringAsFixed(2)}',
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.primary,
+                      color: items.isEmpty 
+                          ? theme.colorScheme.error
+                          : theme.colorScheme.primary,
                     ),
                   ),
                 ],
@@ -4598,9 +4827,13 @@ class _SettleOrderDialog extends StatelessWidget {
         ),
         FilledButton(
           onPressed: items.isNotEmpty
-              ? () => onSettleOrder(items)
+              ? () {
+                  print('🔍 DEBUG: SettleOrderDialog - Button pressed with ${items.length} items');
+                  print('🔍 DEBUG: SettleOrderDialog - Items: $items');
+                  onSettleOrder(items);
+                }
               : null,
-          child: const Text('Load to Cart & Settle'),
+          child: Text(items.isNotEmpty ? 'Load to Cart & Settle (${items.length} items)' : 'No Items to Load'),
         ),
       ],
     );
@@ -4622,5 +4855,174 @@ class _SettleOrderDialog extends StatelessWidget {
     } catch (e) {
       return orderTime;
     }
+  }
+}
+
+class _PromotionsDialog extends ConsumerWidget {
+  final Function(dynamic) onPromotionSelected;
+
+  const _PromotionsDialog({
+    required this.onPromotionSelected,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final promotionsAsync = ref.watch(activePromotionsProvider);
+
+    return AlertDialog(
+      title: Row(
+        children: [
+          Icon(
+            Icons.local_offer,
+            color: theme.colorScheme.primary,
+            size: 24,
+          ),
+          const SizedBox(width: 8),
+          const Text('Select Promotion'),
+        ],
+      ),
+      content: SizedBox(
+        width: 400,
+        height: 400,
+        child: promotionsAsync.when(
+          data: (promotions) {
+            if (promotions.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.local_offer_outlined,
+                      size: 64,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'No Active Promotions',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'No promotions are currently available',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            return ListView.builder(
+              itemCount: promotions.length,
+              itemBuilder: (context, index) {
+                final promotion = promotions[index];
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  child: ListTile(
+                    leading: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Icons.local_offer,
+                        color: theme.colorScheme.primary,
+                        size: 20,
+                      ),
+                    ),
+                    title: Text(
+                      promotion.name,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          promotion.description,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.secondary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            promotion.discountDisplay,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.colorScheme.secondary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    trailing: Icon(
+                      Icons.arrow_forward_ios,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                      size: 16,
+                    ),
+                    onTap: () {
+                      onPromotionSelected(promotion);
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                );
+              },
+            );
+          },
+          loading: () => const Center(
+            child: CircularProgressIndicator(),
+          ),
+          error: (error, stack) => Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: 48,
+                  color: theme.colorScheme.error,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Error Loading Promotions',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.error,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Please try again later',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+      ],
+    );
   }
 }

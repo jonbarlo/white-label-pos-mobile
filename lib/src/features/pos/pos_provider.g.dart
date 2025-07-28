@@ -224,6 +224,206 @@ class _CreateSaleProviderElement extends AutoDisposeFutureProviderElement<Sale>
   String? get customerEmail => (origin as CreateSaleProvider).customerEmail;
 }
 
+String _$createSaleWithItemsHash() =>
+    r'8f7ed0b8cdf06546d118bcf48975ccae73df15b3';
+
+/// See also [createSaleWithItems].
+@ProviderFor(createSaleWithItems)
+const createSaleWithItemsProvider = CreateSaleWithItemsFamily();
+
+/// See also [createSaleWithItems].
+class CreateSaleWithItemsFamily extends Family<AsyncValue<Sale>> {
+  /// See also [createSaleWithItems].
+  const CreateSaleWithItemsFamily();
+
+  /// See also [createSaleWithItems].
+  CreateSaleWithItemsProvider call(
+    List<CartItem> items,
+    PaymentMethod paymentMethod, {
+    String? customerName,
+    String? customerEmail,
+    int? existingOrderId,
+  }) {
+    return CreateSaleWithItemsProvider(
+      items,
+      paymentMethod,
+      customerName: customerName,
+      customerEmail: customerEmail,
+      existingOrderId: existingOrderId,
+    );
+  }
+
+  @override
+  CreateSaleWithItemsProvider getProviderOverride(
+    covariant CreateSaleWithItemsProvider provider,
+  ) {
+    return call(
+      provider.items,
+      provider.paymentMethod,
+      customerName: provider.customerName,
+      customerEmail: provider.customerEmail,
+      existingOrderId: provider.existingOrderId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'createSaleWithItemsProvider';
+}
+
+/// See also [createSaleWithItems].
+class CreateSaleWithItemsProvider extends AutoDisposeFutureProvider<Sale> {
+  /// See also [createSaleWithItems].
+  CreateSaleWithItemsProvider(
+    List<CartItem> items,
+    PaymentMethod paymentMethod, {
+    String? customerName,
+    String? customerEmail,
+    int? existingOrderId,
+  }) : this._internal(
+          (ref) => createSaleWithItems(
+            ref as CreateSaleWithItemsRef,
+            items,
+            paymentMethod,
+            customerName: customerName,
+            customerEmail: customerEmail,
+            existingOrderId: existingOrderId,
+          ),
+          from: createSaleWithItemsProvider,
+          name: r'createSaleWithItemsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$createSaleWithItemsHash,
+          dependencies: CreateSaleWithItemsFamily._dependencies,
+          allTransitiveDependencies:
+              CreateSaleWithItemsFamily._allTransitiveDependencies,
+          items: items,
+          paymentMethod: paymentMethod,
+          customerName: customerName,
+          customerEmail: customerEmail,
+          existingOrderId: existingOrderId,
+        );
+
+  CreateSaleWithItemsProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.items,
+    required this.paymentMethod,
+    required this.customerName,
+    required this.customerEmail,
+    required this.existingOrderId,
+  }) : super.internal();
+
+  final List<CartItem> items;
+  final PaymentMethod paymentMethod;
+  final String? customerName;
+  final String? customerEmail;
+  final int? existingOrderId;
+
+  @override
+  Override overrideWith(
+    FutureOr<Sale> Function(CreateSaleWithItemsRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: CreateSaleWithItemsProvider._internal(
+        (ref) => create(ref as CreateSaleWithItemsRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        items: items,
+        paymentMethod: paymentMethod,
+        customerName: customerName,
+        customerEmail: customerEmail,
+        existingOrderId: existingOrderId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<Sale> createElement() {
+    return _CreateSaleWithItemsProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is CreateSaleWithItemsProvider &&
+        other.items == items &&
+        other.paymentMethod == paymentMethod &&
+        other.customerName == customerName &&
+        other.customerEmail == customerEmail &&
+        other.existingOrderId == existingOrderId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, items.hashCode);
+    hash = _SystemHash.combine(hash, paymentMethod.hashCode);
+    hash = _SystemHash.combine(hash, customerName.hashCode);
+    hash = _SystemHash.combine(hash, customerEmail.hashCode);
+    hash = _SystemHash.combine(hash, existingOrderId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin CreateSaleWithItemsRef on AutoDisposeFutureProviderRef<Sale> {
+  /// The parameter `items` of this provider.
+  List<CartItem> get items;
+
+  /// The parameter `paymentMethod` of this provider.
+  PaymentMethod get paymentMethod;
+
+  /// The parameter `customerName` of this provider.
+  String? get customerName;
+
+  /// The parameter `customerEmail` of this provider.
+  String? get customerEmail;
+
+  /// The parameter `existingOrderId` of this provider.
+  int? get existingOrderId;
+}
+
+class _CreateSaleWithItemsProviderElement
+    extends AutoDisposeFutureProviderElement<Sale> with CreateSaleWithItemsRef {
+  _CreateSaleWithItemsProviderElement(super.provider);
+
+  @override
+  List<CartItem> get items => (origin as CreateSaleWithItemsProvider).items;
+  @override
+  PaymentMethod get paymentMethod =>
+      (origin as CreateSaleWithItemsProvider).paymentMethod;
+  @override
+  String? get customerName =>
+      (origin as CreateSaleWithItemsProvider).customerName;
+  @override
+  String? get customerEmail =>
+      (origin as CreateSaleWithItemsProvider).customerEmail;
+  @override
+  int? get existingOrderId =>
+      (origin as CreateSaleWithItemsProvider).existingOrderId;
+}
+
 String _$scanBarcodeHash() => r'6e6bfbe7e3c9885b917d66472796d3a6d382ee87';
 
 /// See also [scanBarcode].
@@ -1910,7 +2110,7 @@ final posCategoriesProvider = AutoDisposeFutureProvider<List<String>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef PosCategoriesRef = AutoDisposeFutureProviderRef<List<String>>;
-String _$itemsByCategoryHash() => r'9c5989e024cd2d86b432ee1dbdeb62b1a2034f03';
+String _$itemsByCategoryHash() => r'9bc967f7f8673855ce8d25250cc50bcc303bcd8c';
 
 /// See also [itemsByCategory].
 @ProviderFor(itemsByCategory)
@@ -2135,7 +2335,7 @@ final inventoryStatusProvider =
 // ignore: unused_element
 typedef InventoryStatusRef
     = AutoDisposeFutureProviderRef<List<Map<String, dynamic>>>;
-String _$cartNotifierHash() => r'3c7b3606d59f8a0be1ed390808870100bf6e87c1';
+String _$cartNotifierHash() => r'5b00a2a7ea73a4fc58fd4e8be4188a17ab0ecdc5';
 
 /// See also [CartNotifier].
 @ProviderFor(CartNotifier)
