@@ -1893,6 +1893,248 @@ class _InventoryAnalyticsProviderElement
   int? get limit => (origin as InventoryAnalyticsProvider).limit;
 }
 
+String _$posCategoriesHash() => r'5f2b84d3e8ea1effac4ee42d1efb5817169f06e7';
+
+/// See also [posCategories].
+@ProviderFor(posCategories)
+final posCategoriesProvider = AutoDisposeFutureProvider<List<String>>.internal(
+  posCategories,
+  name: r'posCategoriesProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$posCategoriesHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef PosCategoriesRef = AutoDisposeFutureProviderRef<List<String>>;
+String _$itemsByCategoryHash() => r'0cf916062db40070763f09aa7dfc8aad51956fbc';
+
+/// See also [itemsByCategory].
+@ProviderFor(itemsByCategory)
+const itemsByCategoryProvider = ItemsByCategoryFamily();
+
+/// See also [itemsByCategory].
+class ItemsByCategoryFamily extends Family<AsyncValue<List<CartItem>>> {
+  /// See also [itemsByCategory].
+  const ItemsByCategoryFamily();
+
+  /// See also [itemsByCategory].
+  ItemsByCategoryProvider call(
+    String category,
+  ) {
+    return ItemsByCategoryProvider(
+      category,
+    );
+  }
+
+  @override
+  ItemsByCategoryProvider getProviderOverride(
+    covariant ItemsByCategoryProvider provider,
+  ) {
+    return call(
+      provider.category,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'itemsByCategoryProvider';
+}
+
+/// See also [itemsByCategory].
+class ItemsByCategoryProvider
+    extends AutoDisposeFutureProvider<List<CartItem>> {
+  /// See also [itemsByCategory].
+  ItemsByCategoryProvider(
+    String category,
+  ) : this._internal(
+          (ref) => itemsByCategory(
+            ref as ItemsByCategoryRef,
+            category,
+          ),
+          from: itemsByCategoryProvider,
+          name: r'itemsByCategoryProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$itemsByCategoryHash,
+          dependencies: ItemsByCategoryFamily._dependencies,
+          allTransitiveDependencies:
+              ItemsByCategoryFamily._allTransitiveDependencies,
+          category: category,
+        );
+
+  ItemsByCategoryProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.category,
+  }) : super.internal();
+
+  final String category;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<CartItem>> Function(ItemsByCategoryRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: ItemsByCategoryProvider._internal(
+        (ref) => create(ref as ItemsByCategoryRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        category: category,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<CartItem>> createElement() {
+    return _ItemsByCategoryProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is ItemsByCategoryProvider && other.category == category;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, category.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin ItemsByCategoryRef on AutoDisposeFutureProviderRef<List<CartItem>> {
+  /// The parameter `category` of this provider.
+  String get category;
+}
+
+class _ItemsByCategoryProviderElement
+    extends AutoDisposeFutureProviderElement<List<CartItem>>
+    with ItemsByCategoryRef {
+  _ItemsByCategoryProviderElement(super.provider);
+
+  @override
+  String get category => (origin as ItemsByCategoryProvider).category;
+}
+
+String _$allMenuItemsHash() => r'3632cdc5be18b86caed6d41d7236c091f725752b';
+
+/// See also [allMenuItems].
+@ProviderFor(allMenuItems)
+final allMenuItemsProvider = AutoDisposeFutureProvider<List<CartItem>>.internal(
+  allMenuItems,
+  name: r'allMenuItemsProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$allMenuItemsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef AllMenuItemsRef = AutoDisposeFutureProviderRef<List<CartItem>>;
+String _$tableOrdersReadyToChargeHash() =>
+    r'af5e6690252d01d08a31ed356bc7966db2b4aed4';
+
+/// See also [tableOrdersReadyToCharge].
+@ProviderFor(tableOrdersReadyToCharge)
+final tableOrdersReadyToChargeProvider =
+    AutoDisposeFutureProvider<List<Map<String, dynamic>>>.internal(
+  tableOrdersReadyToCharge,
+  name: r'tableOrdersReadyToChargeProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$tableOrdersReadyToChargeHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef TableOrdersReadyToChargeRef
+    = AutoDisposeFutureProviderRef<List<Map<String, dynamic>>>;
+String _$restaurantOrdersHash() => r'9d965dda6e97ba6bfaefdc38050d7ab01526e332';
+
+/// See also [restaurantOrders].
+@ProviderFor(restaurantOrders)
+final restaurantOrdersProvider =
+    AutoDisposeFutureProvider<List<Map<String, dynamic>>>.internal(
+  restaurantOrders,
+  name: r'restaurantOrdersProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$restaurantOrdersHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef RestaurantOrdersRef
+    = AutoDisposeFutureProviderRef<List<Map<String, dynamic>>>;
+String _$dailyTransactionsHash() => r'3e7d87788fb51497b8f12c922d1d713d591c98dd';
+
+/// See also [dailyTransactions].
+@ProviderFor(dailyTransactions)
+final dailyTransactionsProvider =
+    AutoDisposeFutureProvider<List<Map<String, dynamic>>>.internal(
+  dailyTransactions,
+  name: r'dailyTransactionsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$dailyTransactionsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef DailyTransactionsRef
+    = AutoDisposeFutureProviderRef<List<Map<String, dynamic>>>;
+String _$inventoryStatusHash() => r'8da89a51fb3fda970b24e9efe88d2ae4914df1a0';
+
+/// See also [inventoryStatus].
+@ProviderFor(inventoryStatus)
+final inventoryStatusProvider =
+    AutoDisposeFutureProvider<List<Map<String, dynamic>>>.internal(
+  inventoryStatus,
+  name: r'inventoryStatusProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$inventoryStatusHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef InventoryStatusRef
+    = AutoDisposeFutureProviderRef<List<Map<String, dynamic>>>;
 String _$cartNotifierHash() => r'3c7b3606d59f8a0be1ed390808870100bf6e87c1';
 
 /// See also [CartNotifier].

@@ -473,4 +473,76 @@ class MockPosRepository extends _i1.Mock implements _i5.PosRepository {
           ),
         )),
       ) as _i6.Future<_i4.SplitBillingStats>);
+
+  @override
+  _i6.Future<List<String>> getCategories() => (super.noSuchMethod(
+        Invocation.method(
+          #getCategories,
+          [],
+        ),
+        returnValue: _i6.Future<List<String>>.value(<String>[]),
+      ) as _i6.Future<List<String>>);
+
+  @override
+  _i6.Future<List<_i7.CartItem>> getItemsByCategory(String? category) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getItemsByCategory,
+          [category],
+        ),
+        returnValue: _i6.Future<List<_i7.CartItem>>.value(<_i7.CartItem>[]),
+      ) as _i6.Future<List<_i7.CartItem>>);
+
+  @override
+  _i6.Future<List<_i7.CartItem>> getAllItems() => (super.noSuchMethod(
+        Invocation.method(
+          #getAllItems,
+          [],
+        ),
+        returnValue: _i6.Future<List<_i7.CartItem>>.value(<_i7.CartItem>[]),
+      ) as _i6.Future<List<_i7.CartItem>>);
+
+  @override
+  _i6.Future<List<Map<String, dynamic>>> getTableOrdersReadyToCharge() =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getTableOrdersReadyToCharge,
+          [],
+        ),
+        returnValue: _i6.Future<List<Map<String, dynamic>>>.value(
+            <Map<String, dynamic>>[]),
+      ) as _i6.Future<List<Map<String, dynamic>>>);
+
+  @override
+  _i6.Future<List<Map<String, dynamic>>> getRestaurantOrders() =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getRestaurantOrders,
+          [],
+        ),
+        returnValue: _i6.Future<List<Map<String, dynamic>>>.value(
+            <Map<String, dynamic>>[]),
+      ) as _i6.Future<List<Map<String, dynamic>>>);
+
+  @override
+  _i6.Future<List<Map<String, dynamic>>> getDailyTransactions() =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getDailyTransactions,
+          [],
+        ),
+        returnValue: _i6.Future<List<Map<String, dynamic>>>.value(
+            <Map<String, dynamic>>[]),
+      ) as _i6.Future<List<Map<String, dynamic>>>);
+
+  @override
+  _i6.Future<List<Map<String, dynamic>>> getInventoryStatus() =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getInventoryStatus,
+          [],
+        ),
+        returnValue: _i6.Future<List<Map<String, dynamic>>>.value(
+            <Map<String, dynamic>>[]),
+      ) as _i6.Future<List<Map<String, dynamic>>>);
 }

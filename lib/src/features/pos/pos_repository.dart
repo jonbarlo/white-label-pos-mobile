@@ -82,4 +82,21 @@ abstract class PosRepository {
 
   /// Get split billing statistics
   Future<SplitBillingStats> getSplitBillingStats();
+
+  // Add new methods for POS categories and filtering
+  Future<List<String>> getCategories();
+  Future<List<CartItem>> getItemsByCategory(String category);
+  Future<List<CartItem>> getAllItems();
+
+  // Table orders methods
+  Future<List<Map<String, dynamic>>> getTableOrdersReadyToCharge();
+
+  // Restaurant orders methods
+  Future<List<Map<String, dynamic>>> getRestaurantOrders();
+
+  // Daily transactions methods
+  Future<List<Map<String, dynamic>>> getDailyTransactions();
+
+  // Inventory status methods
+  Future<List<Map<String, dynamic>>> getInventoryStatus();
 } 

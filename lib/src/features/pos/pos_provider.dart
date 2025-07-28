@@ -87,16 +87,23 @@ class SearchNotifier extends _$SearchNotifier {
   }
 
   Future<void> searchItems(String query) async {
+    print('🔍 DEBUG: SearchNotifier.searchItems called with query: "$query"');
+    
     if (query.trim().isEmpty) {
+      print('🔍 DEBUG: Query is empty, clearing search results');
       state = [];
       return;
     }
 
     try {
+      print('🔍 DEBUG: Getting repository and searching...');
       final repository = await ref.read(posRepositoryProvider.future);
       final results = await repository.searchItems(query);
+      
+      print('🔍 DEBUG: Search results count: ${results.length}');
+      
       // Convert CartItem results to MenuItem for display
-      state = results.map((item) => MenuItem(
+      final menuItems = results.map((item) => MenuItem(
         id: int.parse(item.id),
         businessId: 1, // This should come from auth state
         categoryId: int.tryParse(item.category ?? '1') ?? 1,
@@ -113,13 +120,18 @@ class SearchNotifier extends _$SearchNotifier {
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       )).toList();
+      
+      print('🔍 DEBUG: Converted to ${menuItems.length} MenuItems');
+      state = menuItems;
     } catch (e) {
+      print('🔍 DEBUG: Error in searchItems: $e');
       // Handle error silently for now, could add error state later
       state = [];
     }
   }
 
   void clearSearch() {
+    print('🔍 DEBUG: SearchNotifier.clearSearch called');
     state = [];
   }
 }
@@ -461,4 +473,54 @@ Future<InventoryAnalytics> inventoryAnalytics(
     print('Error fetching inventory analytics: $e');
     rethrow;
   }
+} 
+
+// Add new providers for POS categories and filtering
+@riverpod
+Future<List<String>> posCategories(PosCategoriesRef ref) async {
+  final repository = await ref.watch(posRepositoryProvider.future);
+  return await repository.getCategories();
+}
+
+@riverpod
+Future<List<CartItem>> itemsByCategory(ItemsByCategoryRef ref, String category) async {
+  final repository = await ref.watch(posRepositoryProvider.future);
+  if (category == 'All') {
+    return await repository.getAllItems();
+  }
+  return await repository.getItemsByCategory(category);
+}
+
+@riverpod
+Future<List<CartItem>> allMenuItems(AllMenuItemsRef ref) async {
+  final repository = await ref.watch(posRepositoryProvider.future);
+  return await repository.getAllItems();
+}
+
+// Table orders provider for POS charging flow
+@riverpod
+Future<List<Map<String, dynamic>>> tableOrdersReadyToCharge(TableOrdersReadyToChargeRef ref) async {
+  final repository = await ref.watch(posRepositoryProvider.future);
+  return await repository.getTableOrdersReadyToCharge();
+}
+
+// Restaurant orders provider for Orders section
+@riverpod
+Future<List<Map<String, dynamic>>> restaurantOrders(RestaurantOrdersRef ref) async {
+  final repository = await ref.watch(posRepositoryProvider.future);
+  return await repository.getRestaurantOrders();
+}
+
+// Daily transactions provider for Transactions section
+@riverpod
+Future<List<Map<String, dynamic>>> dailyTransactions(DailyTransactionsRef ref) async {
+  final repository = await ref.watch(posRepositoryProvider.future);
+  return await repository.getDailyTransactions();
+}
+
+// Inventory status provider for Inventory section  
+@riverpod
+Future<List<Map<String, dynamic>>> inventoryStatus(InventoryStatusRef ref) async {
+  final repository = await ref.watch(posRepositoryProvider.future);
+  return await repository.getInventoryStatus();
 } 

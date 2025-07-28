@@ -10,11 +10,11 @@ import 'package:white_label_pos_mobile/src/features/pos/split_payment_dialog.dar
 import 'package:white_label_pos_mobile/src/features/auth/auth_provider.dart';
 import 'package:white_label_pos_mobile/src/features/auth/models/user.dart';
 import '../../core/theme/app_theme.dart';
-import '../promotions/widgets/promotion_banner.dart';
 
 import '../../shared/widgets/app_image.dart';
 import '../../core/services/navigation_service.dart';
-
+import '../../shared/widgets/loading_indicator.dart';
+import 'package:go_router/go_router.dart';
 
 class PosScreen extends ConsumerStatefulWidget {
   const PosScreen({super.key});
@@ -28,62 +28,18 @@ class _PosScreenState extends ConsumerState<PosScreen>
   late TabController _tabController;
   final TextEditingController _searchController = TextEditingController();
   PaymentMethod _selectedPaymentMethod = PaymentMethod.cash;
-  String _selectedCategory = 'all';
+  String _selectedCategory = 'All';
   bool _isSearching = false;
-  int _currentOrderNumber = 14; // Mock order number
+  int _currentOrderNumber = DateTime.now().millisecondsSinceEpoch ~/ 1000 % 10000; // Dynamic order number based on timestamp
+  String _selectedTab = 'Cart'; // Track selected tab for better UX
+  
+  // Table information for dynamic header
+  String? _selectedTableNumber;
+  String? _selectedTableWaitstaff;
+  String _serviceType = 'POS Service'; // Default service type
 
-  // Square-style categories with colors and icons
-  final List<Map<String, dynamic>> _categories = [
-    {
-      'id': 'all',
-      'name': 'All',
-      'icon': Icons.all_inclusive,
-      'color': Colors.grey,
-      'itemCount': 0
-    },
-    {
-      'id': 'burgers',
-      'name': 'Burgers',
-      'icon': Icons.lunch_dining,
-      'color': Colors.orange,
-      'itemCount': 9
-    },
-    {
-      'id': 'sides',
-      'name': 'Sides',
-      'icon': Icons.fastfood,
-      'color': Colors.orange.shade300,
-      'itemCount': 4
-    },
-    {
-      'id': 'salads',
-      'name': 'Salads',
-      'icon': Icons.eco,
-      'color': Colors.red.shade700,
-      'itemCount': 3
-    },
-    {
-      'id': 'drinks',
-      'name': 'Wine & Beer',
-      'icon': Icons.local_bar,
-      'color': Colors.red.shade800,
-      'itemCount': 5
-    },
-    {
-      'id': 'beverages',
-      'name': 'Drinks',
-      'icon': Icons.local_drink,
-      'color': Colors.blue,
-      'itemCount': 6
-    },
-    {
-      'id': 'desserts',
-      'name': 'Desserts',
-      'icon': Icons.cake,
-      'color': Colors.pink,
-      'itemCount': 3
-    },
-  ];
+  // Section management for bottom navigation
+  String _currentSection = 'Menu'; // Menu, Orders, Transactions, Inventory
 
   @override
   void initState() {
@@ -114,23 +70,35 @@ class _PosScreenState extends ConsumerState<PosScreen>
   }
 
   void _onSearchChanged(String query) {
-    setState(() {
-      _isSearching = query.isNotEmpty;
-    });
+    print('🔍 DEBUG: _onSearchChanged called with query: "$query"');
     
     if (query.isNotEmpty) {
+      print('🔍 DEBUG: Calling searchItems with query: "$query"');
       ref.read(searchNotifierProvider.notifier).searchItems(query);
     } else {
+      print('🔍 DEBUG: Clearing search');
       ref.read(searchNotifierProvider.notifier).clearSearch();
     }
   }
 
   void _onCategorySelected(String categoryId) {
+    print('🔍 DEBUG: _onCategorySelected called with categoryId: "$categoryId"');
+    
     setState(() {
       _selectedCategory = categoryId;
       _isSearching = false;
     });
+    
+    print('🔍 DEBUG: _selectedCategory set to: "$_selectedCategory"');
+    print('🔍 DEBUG: _isSearching set to: $_isSearching');
+    
+    // Clear search when selecting category
+    _searchController.clear();
     ref.read(searchNotifierProvider.notifier).clearSearch();
+    
+    // Invalidate the items provider to refetch based on new category
+    print('🔍 DEBUG: Invalidating itemsByCategoryProvider for category: "$_selectedCategory"');
+    ref.invalidate(itemsByCategoryProvider(_selectedCategory));
   }
 
   void _addToCart(CartItem item) {
@@ -157,6 +125,71 @@ class _PosScreenState extends ConsumerState<PosScreen>
 
   void _updateQuantity(String itemId, int quantity) {
     ref.read(cartNotifierProvider.notifier).updateItemQuantity(itemId, quantity);
+  }
+
+  // Category information for colorful UI
+  CategoryInfo _getCategoryInfo(String category) {
+    switch (category.toLowerCase()) {
+      case 'all':
+        return CategoryInfo(
+          color: const Color(0xFF6366F1), // Indigo
+          icon: Icons.restaurant_menu,
+        );
+      case 'burgers':
+        return CategoryInfo(
+          color: const Color(0xFFEF4444), // Red
+          icon: Icons.lunch_dining,
+        );
+      case 'sides':
+        return CategoryInfo(
+          color: const Color(0xFFEAB308), // Yellow/Orange
+          icon: Icons.fastfood,
+        );
+      case 'wine & beer':
+      case 'wine':
+      case 'beer':
+      case 'beverages':
+      case 'drinks':
+        return CategoryInfo(
+          color: const Color(0xFF991B1B), // Dark red/wine
+          icon: Icons.local_bar,
+        );
+      case 'salads':
+        return CategoryInfo(
+          color: const Color(0xFFDC2626), // Red
+          icon: Icons.eco,
+        );
+      case 'desserts':
+        return CategoryInfo(
+          color: const Color(0xFFDB2777), // Pink
+          icon: Icons.cake,
+        );
+      case 'pizza':
+        return CategoryInfo(
+          color: const Color(0xFFEF4444), // Red
+          icon: Icons.local_pizza,
+        );
+      case 'pasta':
+        return CategoryInfo(
+          color: const Color(0xFFF59E0B), // Amber
+          icon: Icons.ramen_dining,
+        );
+      case 'seafood':
+        return CategoryInfo(
+          color: const Color(0xFF059669), // Emerald
+          icon: Icons.set_meal,
+        );
+      case 'soups':
+        return CategoryInfo(
+          color: const Color(0xFF7C3AED), // Violet
+          icon: Icons.soup_kitchen,
+        );
+      default:
+        return CategoryInfo(
+          color: const Color(0xFF6B7280), // Gray
+          icon: Icons.category,
+        );
+    }
   }
 
   void _showCheckoutDialog() {
@@ -189,6 +222,1157 @@ class _PosScreenState extends ConsumerState<PosScreen>
     );
   }
 
+  // Barcode scanning functionality
+  void _onScanBarcode() {
+    // TODO: Implement barcode scanning
+    // For now, show a dialog asking for manual barcode entry
+    showDialog(
+      context: context,
+      builder: (context) => _BarcodeInputDialog(
+        onBarcodeScanned: _handleBarcodeScanned,
+      ),
+    );
+  }
+
+  void _handleBarcodeScanned(String barcode) async {
+    try {
+      final repository = await ref.read(posRepositoryProvider.future);
+      final item = await repository.getItemByBarcode(barcode);
+      
+      if (item != null) {
+        _addToCart(item);
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Item not found for this barcode'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error scanning barcode: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  // Discounts functionality
+  void _showDiscountsDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => _DiscountsDialog(
+        onDiscountApplied: (discount) {
+          // TODO: Implement discount application to cart
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Discount applied: ${discount.name}'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  // Guest functionality
+  void _showGuestDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => _GuestSelectionDialog(
+        onGuestSelected: (guestCount) {
+          setState(() {
+            // Store guest count for order
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Guest count set to $guestCount'),
+              backgroundColor: Colors.blue,
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final authState = ref.watch(authNotifierProvider);
+    final cashierName = authState.user?.name ?? 'Cashier';
+
+    return Scaffold(
+      backgroundColor: theme.colorScheme.surface,
+      body: Column(
+        children: [
+          // Modern POS Header
+          _buildPosHeader(theme, cashierName),
+          
+          // Main Content Area - now switches based on current section
+          Expanded(
+            child: _buildMainContent(theme),
+          ),
+          
+          // Bottom Navigation
+          _buildBottomNavigation(theme),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMainContent(ThemeData theme) {
+    switch (_currentSection) {
+      case 'Menu':
+        return _buildMenuSection(theme);
+      case 'Orders':
+        return _buildOrdersSection(theme);
+      case 'Transactions':
+        return _buildTransactionsSection(theme);
+      case 'Inventory':
+        return _buildInventorySection(theme);
+      default:
+        return _buildMenuSection(theme);
+    }
+  }
+
+  Widget _buildMenuSection(ThemeData theme) {
+    final authState = ref.watch(authNotifierProvider);
+    final userRole = authState.user?.role;
+    final canSeeReportsTab = userRole == UserRole.admin || userRole == UserRole.manager;
+
+    return canSeeReportsTab
+        ? TabBarView(
+            controller: _tabController,
+            children: [
+              _buildPosMainContent(theme),
+              _buildReportsTab(theme),
+            ],
+          )
+        : _buildPosMainContent(theme);
+  }
+
+  Widget _buildPosHeader(ThemeData theme, String cashierName) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        border: Border(
+          bottom: BorderSide(
+            color: theme.colorScheme.outline.withValues(alpha: 0.2),
+            width: 1,
+          ),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: theme.colorScheme.shadow.withValues(alpha: 0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Business/Order Info
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                _selectedTableNumber != null 
+                  ? 'Table $_selectedTableNumber' 
+                  : 'Order #$_currentOrderNumber',
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+              Text(
+                _selectedTableNumber != null 
+                  ? 'Waitstaff: ${_selectedTableWaitstaff ?? "Unassigned"}'
+                  : _serviceType,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                ),
+              ),
+            ],
+          ),
+          
+          const Spacer(),
+          
+          // Search Bar
+          Container(
+            width: 300,
+            height: 44,
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: theme.colorScheme.outline.withValues(alpha: 0.3),
+              ),
+            ),
+            child: TextField(
+              controller: _searchController,
+              onChanged: _onSearchChanged,
+              decoration: InputDecoration(
+                hintText: 'Search menu items...',
+                hintStyle: TextStyle(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                  fontSize: 14,
+                ),
+                prefixIcon: Icon(
+                  Icons.search,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                  size: 20,
+                ),
+                suffixIcon: _isSearching
+                    ? IconButton(
+                        icon: Icon(
+                          Icons.clear,
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                          size: 20,
+                        ),
+                        onPressed: () {
+                          _searchController.clear();
+                          _onSearchChanged('');
+                        },
+                      )
+                    : null,
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              ),
+            ),
+          ),
+          
+          const SizedBox(width: 16),
+          
+          // Action Buttons
+          Row(
+            children: [
+              _buildHeaderActionButton(
+                theme,
+                Icons.percent,
+                'Discounts',
+                _showDiscountsDialog,
+              ),
+              const SizedBox(width: 8),
+              _buildHeaderActionButton(
+                theme,
+                Icons.qr_code_scanner,
+                'Scan',
+                _onScanBarcode,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeaderActionButton(
+    ThemeData theme,
+    IconData icon,
+    String label,
+    VoidCallback onPressed,
+  ) {
+    return ElevatedButton.icon(
+      onPressed: onPressed,
+      icon: Icon(icon, size: 18),
+      label: Text(label),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+        foregroundColor: theme.colorScheme.primary,
+        elevation: 0,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: BorderSide(
+            color: theme.colorScheme.primary.withValues(alpha: 0.3),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPosMainContent(ThemeData theme) {
+    return Row(
+      children: [
+        // Left Side - Menu Items
+        Expanded(
+          flex: 3,
+          child: Column(
+            children: [
+              // Category Filter Tabs
+              _buildCategoryTabs(theme),
+              
+              // Menu Items Grid
+              Expanded(
+                child: _buildMenuItemsGrid(theme),
+              ),
+            ],
+          ),
+        ),
+        
+        // Right Side - Cart and Checkout
+        Container(
+          width: 400,
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surfaceContainerLow,
+            border: Border(
+              left: BorderSide(
+                color: theme.colorScheme.outline.withValues(alpha: 0.2),
+              ),
+            ),
+          ),
+          child: _buildCartSection(theme),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCategoryTabs(ThemeData theme) {
+    final categoriesAsync = ref.watch(posCategoriesProvider);
+    
+    return categoriesAsync.when(
+      data: (categories) => Container(
+        padding: const EdgeInsets.all(16),
+        child: GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 6,
+            childAspectRatio: 2.2,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+          ),
+          itemCount: categories.length,
+          itemBuilder: (context, index) {
+            final category = categories[index];
+            final isSelected = _selectedCategory == category;
+            
+            // Get category color and icon
+            final categoryInfo = _getCategoryInfo(category);
+            
+            return InkWell(
+              onTap: () => _onCategorySelected(category),
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: isSelected ? categoryInfo.color : categoryInfo.color.withValues(alpha: 0.8),
+                  borderRadius: BorderRadius.circular(12),
+                  border: isSelected 
+                    ? Border.all(color: theme.colorScheme.primary, width: 2)
+                    : null,
+                  boxShadow: [
+                    BoxShadow(
+                      color: categoryInfo.color.withValues(alpha: 0.3),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  child: Row(
+                    children: [
+                      Icon(
+                        categoryInfo.icon,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              category,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            FutureBuilder<List<CartItem>>(
+                              future: ref.read(itemsByCategoryProvider(category).future),
+                              builder: (context, snapshot) {
+                                final itemCount = snapshot.data?.length ?? 0;
+                                return Text(
+                                  '$itemCount items',
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.9),
+                                    fontSize: 12,
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+      loading: () => Container(
+        height: 60,
+        child: const Center(child: LoadingIndicator()),
+      ),
+      error: (error, stack) => Container(
+        height: 60,
+        child: Center(
+          child: Text(
+            'Error loading categories',
+            style: TextStyle(color: theme.colorScheme.error),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMenuItemsGrid(ThemeData theme) {
+    if (_isSearching) {
+      final searchResults = ref.watch(searchNotifierProvider);
+      return _buildSearchResults(theme, searchResults);
+    } else {
+      final itemsAsync = ref.watch(itemsByCategoryProvider(_selectedCategory));
+      return itemsAsync.when(
+        data: (items) => _buildItemsGrid(theme, items),
+        loading: () => const Center(child: LoadingIndicator()),
+        error: (error, stack) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.error_outline,
+                size: 48,
+                color: theme.colorScheme.error,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Error loading items',
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  color: theme.colorScheme.error,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                error.toString(),
+                style: theme.textTheme.bodyMedium,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(width: 16),
+              ElevatedButton(
+                onPressed: () => ref.invalidate(itemsByCategoryProvider(_selectedCategory)),
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+  }
+
+  Widget _buildSearchResults(ThemeData theme, List<MenuItem> searchResults) {
+    if (searchResults.isEmpty) {
+      return const Center(child: LoadingIndicator());
+    }
+    
+    // Convert MenuItem to CartItem for display
+    final cartItems = searchResults.map((item) => CartItem(
+      id: item.id.toString(),
+      name: item.name,
+      price: item.price,
+      quantity: 1,
+      imageUrl: item.image,
+      category: 'Search Result',
+    )).toList();
+    
+    return _buildItemsGrid(theme, cartItems);
+  }
+
+  Widget _buildItemsGrid(ThemeData theme, List<CartItem> items) {
+    if (items.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.restaurant_menu,
+              size: 64,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No items found',
+              style: theme.textTheme.headlineSmall?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              _isSearching 
+                ? 'Try adjusting your search terms'
+                : 'No items available in this category',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return GridView.builder(
+      padding: const EdgeInsets.all(16),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        childAspectRatio: 0.85,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+      ),
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        final item = items[index];
+        return _buildMenuItemCard(theme, item);
+      },
+    );
+  }
+
+  Widget _buildMenuItemCard(ThemeData theme, CartItem item) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: InkWell(
+        onTap: () => _addToCart(item),
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Item Image
+              Expanded(
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: item.imageUrl != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: AppImage(
+                            imageUrl: item.imageUrl!,
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                      : Icon(
+                          Icons.restaurant,
+                          size: 32,
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                        ),
+                ),
+              ),
+              
+              const SizedBox(height: 8),
+              
+              // Item Name
+              Text(
+                item.name,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              
+              const SizedBox(height: 4),
+              
+              // Item Price
+              Text(
+                '\$${item.price.toStringAsFixed(2)}',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: theme.colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCartSection(ThemeData theme) {
+    return Column(
+      children: [
+        // Tab Header
+        _buildCartTabHeader(theme),
+        
+        // Cart Content
+        Expanded(
+                    child: _selectedTab == 'Cart'
+              ? _buildCartTab(theme)
+            : _selectedTab == 'Actions' 
+              ? _buildCartActionsTab(theme)
+              : _buildCartGuestTab(theme),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCartTabHeader(ThemeData theme) {
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        border: Border(
+          bottom: BorderSide(
+            color: theme.colorScheme.outline.withValues(alpha: 0.2),
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+                        _buildTabButton(theme, 'Cart', _selectedTab == 'Cart'),
+          _buildTabButton(theme, 'Actions', _selectedTab == 'Actions'),
+          _buildTabButton(theme, 'Guest', _selectedTab == 'Guest'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTabButton(ThemeData theme, String label, bool isSelected) {
+    return Expanded(
+      child: InkWell(
+        onTap: () => setState(() => _selectedTab = label),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: isSelected 
+                  ? theme.colorScheme.primary 
+                  : Colors.transparent,
+                width: 2,
+              ),
+            ),
+          ),
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: isSelected 
+                ? theme.colorScheme.primary 
+                : theme.colorScheme.onSurface.withValues(alpha: 0.7),
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCartTab(ThemeData theme) {
+    final cart = ref.watch(cartNotifierProvider);
+    final total = ref.watch(cartTotalProvider);
+
+    return Column(
+      children: [
+        // Cart Items
+        Expanded(
+          child: cart.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.shopping_cart_outlined,
+                        size: 64,
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Your cart is empty',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Add items to get started',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: cart.length,
+                  itemBuilder: (context, index) {
+                    final item = cart[index];
+                    return _buildCartItem(theme, item);
+                  },
+                ),
+        ),
+        
+        // Cart Summary and Checkout
+        if (cart.isNotEmpty) _buildCartSummary(theme, total),
+      ],
+    );
+  }
+
+  Widget _buildCartActionsTab(ThemeData theme) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          _buildActionButton(
+            theme,
+            'Charge Table Order',
+            Icons.table_restaurant,
+            () => _showTableOrdersDialog(),
+          ),
+          const SizedBox(height: 12),
+          _buildActionButton(
+            theme,
+            'Hold Order',
+            Icons.pause,
+            () {
+              // TODO: Implement hold order functionality
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Order held')),
+              );
+            },
+          ),
+          const SizedBox(height: 12),
+          _buildActionButton(
+            theme,
+            'Void Order',
+            Icons.cancel,
+            () {
+              ref.read(cartNotifierProvider.notifier).clearCart();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Order voided')),
+              );
+            },
+          ),
+          const SizedBox(height: 12),
+          _buildActionButton(
+            theme,
+            'Print Receipt',
+            Icons.print,
+            () {
+              // TODO: Implement print functionality
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Receipt printed')),
+              );
+            },
+          ),
+          const SizedBox(height: 12),
+          _buildActionButton(
+            theme,
+            'Email Receipt',
+            Icons.email,
+            () {
+              // TODO: Implement email functionality
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Receipt emailed')),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCartGuestTab(ThemeData theme) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          _buildActionButton(
+            theme,
+            'Set Guest Count',
+            Icons.people,
+            _showGuestDialog,
+          ),
+          const SizedBox(height: 12),
+          _buildActionButton(
+            theme,
+            'Customer Info',
+            Icons.person,
+            () {
+              // TODO: Implement customer info functionality
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Customer info dialog')),
+              );
+            },
+          ),
+          const SizedBox(height: 12),
+          _buildActionButton(
+            theme,
+            'Special Requests',
+            Icons.note_add,
+            () {
+              // TODO: Implement special requests functionality
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Special requests dialog')),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButton(
+    ThemeData theme,
+    String label,
+    IconData icon,
+    VoidCallback onPressed,
+  ) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: onPressed,
+        icon: Icon(icon),
+        label: Text(label),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: theme.colorScheme.surfaceContainerHigh,
+          foregroundColor: theme.colorScheme.onSurface,
+          elevation: 0,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCartItem(ThemeData theme, CartItem item) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            // Item Info
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.name,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '\$${item.price.toStringAsFixed(2)} each',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            // Quantity Controls
+            Row(
+              children: [
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEF4444), // Red
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 2,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: InkWell(
+                    onTap: item.quantity! > 1
+                        ? () => _updateQuantity(item.id, item.quantity! - 1)
+                        : () => _removeFromCart(item.id),
+                    borderRadius: BorderRadius.circular(8),
+                    child: Icon(
+                      item.quantity! > 1 ? Icons.remove : Icons.delete,
+                      size: 16,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Container(
+                    constraints: const BoxConstraints(minWidth: 32),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surface,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                        color: theme.colorScheme.outline.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: Text(
+                      '${item.quantity}',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+                
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF22C55E), // Green
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 2,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: InkWell(
+                    onTap: () => _updateQuantity(item.id, item.quantity! + 1),
+                    borderRadius: BorderRadius.circular(8),
+                    child: const Icon(
+                      Icons.add,
+                      size: 16,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCartSummary(ThemeData theme, double total) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        border: Border(
+          top: BorderSide(
+            color: theme.colorScheme.outline.withValues(alpha: 0.2),
+          ),
+        ),
+      ),
+      child: Column(
+        children: [
+          // Total
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Total',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                '\$${total.toStringAsFixed(2)}',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+            ],
+          ),
+          
+          const SizedBox(height: 16),
+          
+          // Checkout Button
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: _showCheckoutDialog,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: theme.colorScheme.primary,
+                foregroundColor: theme.colorScheme.onPrimary,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Text(
+                'Charge \$${total.toStringAsFixed(2)}',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBottomNavigation(ThemeData theme) {
+    final authState = ref.watch(authNotifierProvider);
+    final cashierName = authState.user?.name ?? 'Cashier';
+    
+    return Container(
+      height: 70,
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        border: Border(
+          top: BorderSide(
+            color: theme.colorScheme.outline.withValues(alpha: 0.2),
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          _buildBottomNavItem(
+            theme,
+            cashierName.split(' ').map((name) => name[0]).take(2).join(),
+            cashierName,
+            () {
+              // Show cashier profile or settings
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Signed in as $cashierName')),
+              );
+            },
+            isSelected: false,
+          ),
+          _buildBottomNavItem(
+            theme,
+            Icons.restaurant_menu,
+            'Menu',
+            () => setState(() => _currentSection = 'Menu'),
+            isSelected: _currentSection == 'Menu',
+          ),
+          _buildBottomNavItem(
+            theme,
+            Icons.receipt_long,
+            'Orders',
+            () => setState(() => _currentSection = 'Orders'),
+            isSelected: _currentSection == 'Orders',
+          ),
+          _buildBottomNavItem(
+            theme,
+            Icons.analytics,
+            'Transactions',
+            () => setState(() => _currentSection = 'Transactions'),
+            isSelected: _currentSection == 'Transactions',
+          ),
+          _buildBottomNavItem(
+            theme,
+            Icons.inventory,
+            'Inventory',
+            () => setState(() => _currentSection = 'Inventory'),
+            isSelected: _currentSection == 'Inventory',
+          ),
+          _buildBottomNavItem(
+            theme,
+            Icons.more_horiz,
+            'More',
+            () => context.go('/settings'),
+            isSelected: false,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBottomNavItem(
+    ThemeData theme,
+    dynamic icon,
+    String label,
+    VoidCallback onTap, {
+    bool isSelected = false,
+  }) {
+    final color = isSelected 
+        ? theme.colorScheme.primary 
+        : theme.colorScheme.onSurface.withValues(alpha: 0.7);
+        
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          decoration: isSelected
+              ? BoxDecoration(
+                  border: Border(
+                    top: BorderSide(
+                      color: theme.colorScheme.primary,
+                      width: 2,
+                    ),
+                  ),
+                )
+              : null,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (icon is IconData)
+                Icon(
+                  icon,
+                  size: 24,
+                  color: color,
+                )
+              else
+                CircleAvatar(
+                  radius: 12,
+                  backgroundColor: theme.colorScheme.primary,
+                  child: Text(
+                    icon.toString(),
+                    style: TextStyle(
+                      color: theme.colorScheme.onPrimary,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: color,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Future<void> _completeSale(String customerName, String customerEmail) async {
     try {
       await ref.read(createSaleProvider(_selectedPaymentMethod, customerName: customerName, customerEmail: customerEmail).future);
@@ -207,6 +1391,10 @@ class _PosScreenState extends ConsumerState<PosScreen>
       setState(() {
         _selectedPaymentMethod = PaymentMethod.cash;
         _currentOrderNumber++; // Increment order number
+        // Clear table information after completing sale
+        _selectedTableNumber = null;
+        _selectedTableWaitstaff = null;
+        _serviceType = 'POS Service';
       });
       
       // Close dialog safely
@@ -302,646 +1490,732 @@ class _PosScreenState extends ConsumerState<PosScreen>
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final cart = ref.watch(cartNotifierProvider);
-    final cartTotal = ref.watch(cartTotalProvider);
-    final searchResults = ref.watch(searchNotifierProvider);
-    final recentSales = ref.watch(recentSalesNotifierProvider);
-    final menuItemsAsync = ref.watch(menuItemsProvider);
-    final authState = ref.watch(authNotifierProvider);
-    final userRole = authState.user?.role;
-    final canSeeReportsTab = userRole == UserRole.admin || userRole == UserRole.manager;
+     Widget _buildReportsTab(ThemeData theme) {
+     final sales = ref.watch(recentSalesNotifierProvider);
 
-    // Debug: Print auth state to help identify issues
-    print('🔍 POS Screen Build - Auth State: ${authState.status}');
-    print('🔍 POS Screen Build - User: ${authState.user?.id}');
-    print('🔍 POS Screen Build - Business: ${authState.business?.id}');
-    print('🔍 POS Screen Build - Menu Items Async: ${menuItemsAsync.toString()}');
+     if (sales.isEmpty) {
+       return Center(
+         child: Column(
+           mainAxisAlignment: MainAxisAlignment.center,
+           children: [
+             Icon(
+               Icons.receipt_long,
+               size: 64,
+               color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+             ),
+             const SizedBox(height: 16),
+             Text(
+               'No recent sales',
+               style: theme.textTheme.headlineSmall?.copyWith(
+                 color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+               ),
+             ),
+             const SizedBox(height: 8),
+             Text(
+               'Sales will appear here after transactions',
+               style: theme.textTheme.bodyMedium?.copyWith(
+                 color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+               ),
+             ),
+           ],
+         ),
+       );
+     }
 
-    // Handle error states gracefully
-    if (authState.status == AuthStatus.unauthenticated) {
-      return const Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.error_outline, size: 64, color: Colors.red),
-              SizedBox(height: 16),
-              Text('Authentication Error', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              SizedBox(height: 8),
-              Text('Please log in again'),
-            ],
+     return _RecentSalesTab(sales: sales);
+   }
+
+   // Section builders for bottom navigation
+  Widget _buildOrdersSection(ThemeData theme) {
+    return Column(
+      children: [
+        // Section header
+        _buildSectionHeader(theme, 'Current Orders', 'Manage restaurant orders'),
+        
+        // Orders list
+        Expanded(
+          child: Consumer(
+            builder: (context, ref, child) {
+              final ordersAsyncValue = ref.watch(restaurantOrdersProvider);
+              
+              return ordersAsyncValue.when(
+                data: (orders) {
+                  if (orders.isEmpty) {
+                    return _buildEmptyStateSection(
+                      theme,
+                      Icons.receipt_long,
+                      'No Active Orders',
+                      'New orders will appear here',
+                    );
+                  }
+                  
+                  return ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: orders.length,
+                    itemBuilder: (context, index) {
+                      final order = orders[index];
+                      return _buildOrderCard(theme, order);
+                    },
+                  );
+                },
+                loading: () => const Center(child: LoadingIndicator()),
+                error: (error, stackTrace) => _buildErrorState(
+                  theme,
+                  'Failed to load orders',
+                  error.toString(),
+                ),
+              );
+            },
           ),
         ),
-      );
-    }
+      ],
+    );
+  }
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
-      body: Column(
+  Widget _buildTransactionsSection(ThemeData theme) {
+    return Column(
+      children: [
+        // Section header
+        _buildSectionHeader(theme, 'Daily Transactions', 'View completed sales'),
+        
+        // Transactions list
+        Expanded(
+          child: Consumer(
+            builder: (context, ref, child) {
+              final transactionsAsyncValue = ref.watch(dailyTransactionsProvider);
+              
+              return transactionsAsyncValue.when(
+                data: (transactions) {
+                  if (transactions.isEmpty) {
+                    return _buildEmptyStateSection(
+                      theme,
+                      Icons.analytics,
+                      'No Transactions Today',
+                      'Completed sales will appear here',
+                    );
+                  }
+                  
+                  return ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: transactions.length,
+                    itemBuilder: (context, index) {
+                      final transaction = transactions[index];
+                      return _buildTransactionCard(theme, transaction);
+                    },
+                  );
+                },
+                loading: () => const Center(child: LoadingIndicator()),
+                error: (error, stackTrace) => _buildErrorState(
+                  theme,
+                  'Failed to load transactions',
+                  error.toString(),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInventorySection(ThemeData theme) {
+    return Column(
+      children: [
+        // Section header
+        _buildSectionHeader(theme, 'Inventory Status', 'Monitor stock levels'),
+        
+        // Inventory list
+        Expanded(
+          child: Consumer(
+            builder: (context, ref, child) {
+              final inventoryAsyncValue = ref.watch(inventoryStatusProvider);
+              
+              return inventoryAsyncValue.when(
+                data: (items) {
+                  if (items.isEmpty) {
+                    return _buildEmptyStateSection(
+                      theme,
+                      Icons.inventory,
+                      'No Inventory Data',
+                      'Menu items will appear here with stock info',
+                    );
+                  }
+                  
+                  return ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: items.length,
+                    itemBuilder: (context, index) {
+                      final item = items[index];
+                      return _buildInventoryCard(theme, item);
+                    },
+                  );
+                },
+                loading: () => const Center(child: LoadingIndicator()),
+                error: (error, stackTrace) => _buildErrorState(
+                  theme,
+                  'Failed to load inventory',
+                  error.toString(),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSectionHeader(ThemeData theme, String title, String subtitle) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest,
+        border: Border(
+          bottom: BorderSide(
+            color: theme.colorScheme.outline.withValues(alpha: 0.2),
+          ),
+        ),
+      ),
+      child: Row(
         children: [
-          // Top Bar - Square style
-          _buildTopBar(),
-          
-          // Promotion Banners
-          _buildPromotionBanners(),
-          
-          // Main Content
           Expanded(
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Left Panel - Menu Items
-                Expanded(
-                  flex: 3,
-                  child: _buildLeftPanel(
-                    menuItemsAsync: menuItemsAsync,
-                    searchResults: searchResults,
-                    searchController: _searchController,
-                    onSearchChanged: _onSearchChanged,
-                    onAddToCart: _addToCart,
-                    categories: _categories,
-                    selectedCategory: _selectedCategory,
-                    onCategorySelected: _onCategorySelected,
-                    isSearching: _isSearching,
+                Text(
+                  title,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                
-                // Right Panel - Order Summary
-                Expanded(
-                  flex: 1,
-                  child: _buildRightPanel(
-                    cart: cart,
-                    cartTotal: cartTotal,
-                    onRemoveFromCart: _removeFromCart,
-                    onUpdateQuantity: _updateQuantity,
-                    onCheckout: _showCheckoutDialog,
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                 ),
               ],
             ),
           ),
-          
-          // Bottom Navigation - Square style
-          _buildBottomNavigation(),
         ],
       ),
     );
   }
 
-  Widget _buildTopBar() {
-    return Container(
-      height: 60,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(
-          bottom: BorderSide(color: Colors.grey.shade200, width: 1),
+  Widget _buildEmptyStateSection(ThemeData theme, IconData icon, String title, String subtitle) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 64,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              title,
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              subtitle,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Left side
-          Row(
-            children: [
-              Text(
-                'Lunch',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey.shade800,
-                ),
-              ),
-              const SizedBox(width: 20),
-              IconButton(
-                onPressed: () {
-                  // Search functionality
-                },
-                icon: Icon(Icons.search, color: Colors.grey.shade600),
-                tooltip: 'Search',
-              ),
-              IconButton(
-                onPressed: () {
-                  // History functionality
-                },
-                icon: Icon(Icons.history, color: Colors.grey.shade600),
-                tooltip: 'History',
-              ),
-            ],
-          ),
-          
-          const Spacer(),
-          
-          // Right side
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Text(
-                  '#$_currentOrderNumber',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey.shade700,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              IconButton(
-                onPressed: () {
-                  // New order functionality
-                  ref.read(cartNotifierProvider.notifier).clearCart();
-                  setState(() {
-                    _currentOrderNumber++;
-                  });
-                },
-                icon: Icon(Icons.add, color: Colors.grey.shade600),
-                tooltip: 'New Order',
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }
 
-  Widget _buildPromotionBanners() {
-    // For now, return an empty container
-    // TODO: Integrate with promotion provider when available
-    return const SizedBox.shrink();
+  Widget _buildErrorState(ThemeData theme, String title, String error) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 64,
+              color: theme.colorScheme.error,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              title,
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: theme.colorScheme.error,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              error,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
-  Widget _buildLeftPanel({
-    required AsyncValue<List<MenuItem>> menuItemsAsync,
-    required List<MenuItem> searchResults,
-    required TextEditingController searchController,
-    required Function(String) onSearchChanged,
-    required Function(CartItem) onAddToCart,
-    required List<Map<String, dynamic>> categories,
-    required String selectedCategory,
-    required Function(String) onCategorySelected,
-    required bool isSearching,
-  }) {
-    return Container(
-      color: Colors.white,
-      child: Column(
-        children: [
-          // Search bar
-          Container(
-            padding: const EdgeInsets.all(16),
-            child: TextField(
-              controller: searchController,
-              onChanged: onSearchChanged,
-              decoration: InputDecoration(
-                hintText: 'Search menu items...',
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          searchController.clear();
-                          onSearchChanged('');
-                        },
-                      )
-                    : null,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Colors.grey.shade300),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Colors.blue.shade400, width: 2),
-                ),
-                filled: true,
-                fillColor: Colors.grey.shade50,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              ),
-            ),
-          ),
-          
-          // Categories
-          if (!isSearching) ...[
-            Container(
-              height: 100,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: categories.length,
-                itemBuilder: (context, index) {
-                  final category = categories[index];
-                  final isSelected = selectedCategory == category['id'];
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 12),
-                    child: _CategoryButton(
-                      category: category,
-                      isSelected: isSelected,
-                      onTap: () => onCategorySelected(category['id']),
-                    ),
-                  );
-                },
-              ),
-            ),
-            
-            // Action buttons
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
+  Widget _buildOrderCard(ThemeData theme, Map<String, dynamic> order) {
+    final tableNumber = order['tableNumber']?.toString() ?? 'Unknown';
+    final guestCount = order['guestCount'] ?? 1;
+    final waitstaff = order['waitstaff']?.toString() ?? 'Unknown';
+    final total = (order['total'] ?? 0.0).toDouble();
+    final status = order['status']?.toString() ?? 'pending';
+    final items = order['items'] as List<dynamic>? ?? [];
+    final createdAt = order['createdAt'] as DateTime? ?? DateTime.now();
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: InkWell(
+        onTap: () => _showSettleOrderDialog(order),
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
                 children: [
-                  Expanded(
-                    child: _ActionButton(
-                      label: '% Discounts',
-                      icon: Icons.discount,
-                      color: Colors.green,
-                      onTap: () {
-                        // Discount functionality
-                      },
+                  Icon(
+                    Icons.table_restaurant,
+                    size: 20,
+                    color: theme.colorScheme.primary,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Table $tableNumber',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _ActionButton(
-                      label: 'Scan',
-                      icon: Icons.qr_code_scanner,
-                      color: Colors.orange,
-                      onTap: () {
-                        // Scan functionality
-                      },
+                  const Spacer(),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: _getStatusColor(status, theme).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      status.toUpperCase(),
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: _getStatusColor(status, theme),
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ],
               ),
-            ),
-          ],
-          
-          // Menu items grid
-          Expanded(
-            child: menuItemsAsync.when(
-              data: (menuItems) {
-                final itemsToShow = isSearching ? searchResults : menuItems;
-                
-                if (isSearching && searchResults.isEmpty) {
-                  return const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.search_off, size: 64, color: Colors.grey),
-                        SizedBox(height: 16),
-                        Text(
-                          'No items found',
-                          style: TextStyle(fontSize: 18, color: Colors.grey),
-                        ),
-                        Text(
-                          'Try a different search term',
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-                
-                return GridView.builder(
-                  padding: const EdgeInsets.all(16),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    childAspectRatio: 0.85,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Icon(
+                    Icons.people,
+                    size: 16,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
-                  itemCount: itemsToShow.length,
-                  itemBuilder: (context, index) {
-                    final item = itemsToShow[index];
-                    return _MenuItemCard(
-                      item: item,
-                      onAddToCart: onAddToCart,
-                    );
-                  },
-                );
-              },
-              loading: () => const Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CircularProgressIndicator(),
-                    SizedBox(height: 16),
-                    Text('Loading menu items...'),
-                  ],
+                  const SizedBox(width: 4),
+                  Text(
+                    '$guestCount guests',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Icon(
+                    Icons.person,
+                    size: 16,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    waitstaff,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    '\$${total.toStringAsFixed(2)}',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '${items.length} items • ${_formatOrderTime(createdAt)}',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
               ),
-              error: (error, stack) => Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.error_outline,
-                      size: 64,
-                      color: Colors.red,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Error loading menu items',
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      error.toString(),
-                      style: Theme.of(context).textTheme.bodyMedium,
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () {
-                        ref.invalidate(menuItemsProvider);
-                      },
-                      child: const Text('Retry'),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildRightPanel({
-    required List<CartItem> cart,
-    required double cartTotal,
-    required Function(String) onRemoveFromCart,
-    required Function(String, int) onUpdateQuantity,
-    required VoidCallback onCheckout,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(
-          left: BorderSide(color: Colors.grey.shade200, width: 1),
-        ),
-      ),
-      child: Column(
-        children: [
-          // Tabs
-          Container(
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(color: Colors.grey.shade200, width: 1),
-              ),
-            ),
-            child: Row(
+  Widget _buildTransactionCard(ThemeData theme, Map<String, dynamic> transaction) {
+    final id = transaction['id']?.toString() ?? '';
+    final total = (transaction['amount'] ?? transaction['total'] ?? 0.0).toDouble();
+    final paymentMethod = transaction['paymentMethod']?.toString() ?? 'cash';
+    final customerName = transaction['customerName']?.toString() ?? 'Guest';
+    final timestamp = transaction['timestamp']?.toString() ?? '';
+    final createdAt = DateTime.tryParse(timestamp) ?? DateTime.now();
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                Expanded(
-                  child: _TabButton(
-                    label: 'Check',
-                    isSelected: true,
-                    onTap: () {},
+                Icon(
+                  Icons.receipt,
+                  size: 20,
+                  color: theme.colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'SALE-$id',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                Expanded(
-                  child: _TabButton(
-                    label: 'Actions',
-                    isSelected: false,
-                    onTap: () {},
-                  ),
-                ),
-                Expanded(
-                  child: _TabButton(
-                    label: 'Guest',
-                    isSelected: false,
-                    onTap: () {},
+                const Spacer(),
+                Text(
+                  '\$${total.toStringAsFixed(2)}',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.primary,
                   ),
                 ),
               ],
             ),
-          ),
-          
-          // Order items
-          Expanded(
-            child: cart.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.shopping_cart_outlined,
-                          size: 80,
-                          color: Colors.grey.shade400,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Your cart is empty',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Add items to get started',
-                          style: TextStyle(
-                            color: Colors.grey.shade500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: cart.length,
-                    itemBuilder: (context, index) {
-                      final item = cart[index];
-                      return _OrderItemTile(
-                        item: item,
-                        onRemove: onRemoveFromCart,
-                        onUpdateQuantity: onUpdateQuantity,
-                      );
-                    },
-                  ),
-          ),
-          
-          // Totals and Pay button
-          if (cart.isNotEmpty) ...[
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade50,
-                border: Border(
-                  top: BorderSide(color: Colors.grey.shade200, width: 1),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Icon(
+                  _getPaymentMethodIcon(paymentMethod),
+                  size: 16,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
-              ),
+                const SizedBox(width: 4),
+                Text(
+                  paymentMethod.toUpperCase(),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Icon(
+                  Icons.person,
+                  size: 16,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  customerName,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  _formatOrderTime(createdAt),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInventoryCard(ThemeData theme, Map<String, dynamic> item) {
+    final name = item['name']?.toString() ?? 'Unknown Item';
+    final stockQuantity = item['stockQuantity'] ?? 0;
+    final minStock = item['minStock'] ?? 10;
+    final price = (item['price'] ?? 0.0).toDouble();
+    final category = item['category']?.toString() ?? 'General';
+    final imageUrl = item['imageUrl']?.toString();
+    
+    final isLowStock = stockQuantity <= minStock;
+    final isOutOfStock = stockQuantity <= 0;
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            // Item image
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: imageUrl != null
+                  ? AppImage(
+                      imageUrl: imageUrl,
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
+                    )
+                  : Container(
+                      width: 60,
+                      height: 60,
+                      color: theme.colorScheme.surfaceContainerHighest,
+                      child: Icon(
+                        Icons.restaurant,
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                      ),
+                    ),
+            ),
+            const SizedBox(width: 16),
+            
+            // Item details
+            Expanded(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Totals
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'Subtotal:',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey.shade600,
+                      Expanded(
+                        child: Text(
+                          name,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
-                      Text(
-                        '\$${cartTotal.toStringAsFixed(2)}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                      if (isOutOfStock)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.error.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            'OUT OF STOCK',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.colorScheme.error,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        )
+                      else if (isLowStock)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.orange.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            'LOW STOCK',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: Colors.orange,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
-                      ),
                     ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    category,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      Icon(
+                        Icons.inventory_2,
+                        size: 16,
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                      ),
+                      const SizedBox(width: 4),
                       Text(
-                        'Tax:',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey.shade600,
+                        '$stockQuantity in stock',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                         ),
                       ),
+                      const Spacer(),
                       Text(
-                        '\$${(cartTotal * 0.095).toStringAsFixed(2)}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                        '\$${price.toStringAsFixed(2)}',
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: theme.colorScheme.primary,
                         ),
                       ),
                     ],
-                  ),
-                  const Divider(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Total:',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey.shade800,
-                        ),
-                      ),
-                      Text(
-                        '\$${(cartTotal * 1.095).toStringAsFixed(2)}',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue.shade600,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  
-                  // Pay button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: onCheckout,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue.shade600,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        textStyle: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      child: const Text('PAY'),
-                    ),
                   ),
                 ],
               ),
             ),
           ],
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildBottomNavigation() {
-    return Container(
-      height: 60,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(
-          top: BorderSide(color: Colors.grey.shade200, width: 1),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 4,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _BottomNavItem(
-            icon: Icons.person,
-            label: 'LN',
-            onTap: () {
-              // Profile/logout functionality
-            },
-          ),
-          _BottomNavItem(
-            icon: Icons.menu,
-            label: 'Menu',
-            onTap: () {
-              // Menu functionality
-            },
-          ),
-          _BottomNavItem(
-            icon: Icons.receipt_long,
-            label: 'Orders',
-            badge: '2',
-            onTap: () {
-              // Orders functionality
-            },
-          ),
-          _BottomNavItem(
-            icon: Icons.swap_horiz,
-            label: 'Transactions',
-            onTap: () {
-              // Transactions functionality
-            },
-          ),
-          _BottomNavItem(
-            icon: Icons.local_offer,
-            label: 'Items',
-            onTap: () {
-              // Items functionality
-            },
-          ),
-          _BottomNavItem(
-            icon: Icons.more_horiz,
-            label: 'More',
-            onTap: () {
-              // More functionality
-            },
-          ),
-        ],
+  Color _getStatusColor(String status, ThemeData theme) {
+    switch (status.toLowerCase()) {
+      case 'ready':
+      case 'ready_to_pay':
+        return Colors.green;
+      case 'preparing':
+        return Colors.orange;
+      case 'pending':
+        return theme.colorScheme.primary;
+      case 'completed':
+        return Colors.grey;
+      default:
+        return theme.colorScheme.onSurface;
+    }
+  }
+
+  IconData _getPaymentMethodIcon(String method) {
+    switch (method.toLowerCase()) {
+      case 'cash':
+        return Icons.money;
+      case 'card':
+        return Icons.credit_card;
+      case 'mobile':
+        return Icons.phone_android;
+      case 'check':
+        return Icons.receipt;
+      default:
+        return Icons.payment;
+    }
+  }
+
+  String _formatOrderTime(DateTime dateTime) {
+    final now = DateTime.now();
+    final difference = now.difference(dateTime);
+    
+    if (difference.inMinutes < 60) {
+      return '${difference.inMinutes} min ago';
+    } else if (difference.inHours < 24) {
+      return '${difference.inHours}h ${difference.inMinutes % 60}m ago';
+    } else {
+      return '${difference.inDays}d ago';
+    }
+  }
+
+  void _showSettleOrderDialog(Map<String, dynamic> order) {
+    showDialog(
+      context: context,
+      builder: (context) => _SettleOrderDialog(
+        order: order,
+        onSettleOrder: (orderItems) {
+          // Load order items into cart
+          final cartNotifier = ref.read(cartNotifierProvider.notifier);
+          cartNotifier.clearCart();
+          
+          for (final item in orderItems) {
+            final cartItem = CartItem(
+              id: item['itemId'].toString(),
+              name: item['itemName'],
+              price: item['unitPrice'].toDouble(),
+              quantity: item['quantity'],
+              category: '1',
+            );
+            cartNotifier.addItem(cartItem);
+          }
+          
+          // Update table information for header
+          setState(() {
+            _selectedTableNumber = order['tableNumber']?.toString();
+            _selectedTableWaitstaff = order['waitstaff']?.toString();
+            _serviceType = 'Table Service';
+            _currentSection = 'Menu'; // Switch back to menu section for checkout
+          });
+          
+          Navigator.of(context).pop();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Order loaded into cart - Table ${order['tableNumber']}'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        },
       ),
     );
   }
+
+  // Waitstaff to POS charging flow
+   void _showTableOrdersDialog() {
+     showDialog(
+       context: context,
+       builder: (context) => _TableOrdersDialog(
+         onOrderSelected: _chargeTableOrder,
+       ),
+     );
+   }
+
+   void _chargeTableOrder(TableOrder order) async {
+     try {
+       // Update table information in header
+       setState(() {
+         _selectedTableNumber = order.tableNumber;
+         _selectedTableWaitstaff = order.waitstaff;
+         _serviceType = 'Table Service';
+       });
+       
+       // Clear current cart first
+       ref.read(cartNotifierProvider.notifier).clearCart();
+       
+       // Add order items to cart
+       for (final item in order.items) {
+         final cartItem = CartItem(
+           id: item.itemId.toString(),
+           name: item.itemName,
+           price: item.unitPrice,
+           quantity: item.quantity,
+           category: 'Table Order',
+         );
+         ref.read(cartNotifierProvider.notifier).addItem(cartItem);
+       }
+       
+       // Show checkout dialog immediately
+       _showCheckoutDialog();
+       
+       ScaffoldMessenger.of(context).showSnackBar(
+         SnackBar(
+           content: Text('Table ${order.tableNumber} order loaded for charging'),
+           backgroundColor: Colors.green,
+         ),
+       );
+     } catch (e) {
+       ScaffoldMessenger.of(context).showSnackBar(
+         SnackBar(
+           content: Text('Error loading table order: $e'),
+           backgroundColor: Colors.red,
+         ),
+       );
+     }
+   }
 }
 
 class _SalesTab extends StatelessWidget {
@@ -2504,3 +3778,843 @@ class _CheckoutDialogState extends State<_CheckoutDialog> {
     );
   }
 } 
+
+// Add missing dialog classes and helper widgets at the end of the file
+
+// Barcode Input Dialog
+class _BarcodeInputDialog extends StatefulWidget {
+  final Function(String) onBarcodeScanned;
+
+  const _BarcodeInputDialog({
+    required this.onBarcodeScanned,
+  });
+
+  @override
+  State<_BarcodeInputDialog> createState() => _BarcodeInputDialogState();
+}
+
+class _BarcodeInputDialogState extends State<_BarcodeInputDialog> {
+  final TextEditingController _barcodeController = TextEditingController();
+
+  @override
+  void dispose() {
+    _barcodeController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
+    return AlertDialog(
+      title: const Text('Scan Barcode'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text('Enter barcode manually or use camera scanner:'),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _barcodeController,
+            decoration: const InputDecoration(
+              labelText: 'Barcode',
+              hintText: 'Enter barcode number',
+              border: OutlineInputBorder(),
+            ),
+            keyboardType: TextInputType.number,
+            autofocus: true,
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            final barcode = _barcodeController.text.trim();
+            if (barcode.isNotEmpty) {
+              widget.onBarcodeScanned(barcode);
+              Navigator.of(context).pop();
+            }
+          },
+          child: const Text('Scan'),
+        ),
+      ],
+    );
+  }
+}
+
+// Discounts Dialog
+class _DiscountsDialog extends StatelessWidget {
+  final Function(Discount) onDiscountApplied;
+
+  const _DiscountsDialog({
+    required this.onDiscountApplied,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
+    // Mock discounts for now
+    final discounts = [
+      Discount(id: '1', name: '10% Off', percentage: 10, isActive: true),
+      Discount(id: '2', name: '15% Senior Discount', percentage: 15, isActive: true),
+      Discount(id: '3', name: '20% Employee Discount', percentage: 20, isActive: true),
+      Discount(id: '4', name: '5% Student Discount', percentage: 5, isActive: true),
+    ];
+    
+    return AlertDialog(
+      title: const Text('Available Discounts'),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: discounts.length,
+          itemBuilder: (context, index) {
+            final discount = discounts[index];
+            return ListTile(
+              leading: Icon(
+                Icons.local_offer,
+                color: theme.colorScheme.primary,
+              ),
+              title: Text(discount.name),
+              subtitle: Text('${discount.percentage}% off'),
+              onTap: () {
+                onDiscountApplied(discount);
+                Navigator.of(context).pop();
+              },
+            );
+          },
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+      ],
+    );
+  }
+}
+
+// Guest Selection Dialog
+class _GuestSelectionDialog extends StatefulWidget {
+  final Function(int) onGuestSelected;
+
+  const _GuestSelectionDialog({
+    required this.onGuestSelected,
+  });
+
+  @override
+  State<_GuestSelectionDialog> createState() => _GuestSelectionDialogState();
+}
+
+class _GuestSelectionDialogState extends State<_GuestSelectionDialog> {
+  int _guestCount = 1;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
+    return AlertDialog(
+      title: const Text('Set Guest Count'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text('How many guests will be dining?'),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                onPressed: _guestCount > 1 ? () => setState(() => _guestCount--) : null,
+                icon: const Icon(Icons.remove),
+                style: IconButton.styleFrom(
+                  backgroundColor: theme.colorScheme.primaryContainer,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Text(
+                  '$_guestCount',
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              IconButton(
+                onPressed: _guestCount < 20 ? () => setState(() => _guestCount++) : null,
+                icon: const Icon(Icons.add),
+                style: IconButton.styleFrom(
+                  backgroundColor: theme.colorScheme.primaryContainer,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            widget.onGuestSelected(_guestCount);
+            Navigator.of(context).pop();
+          },
+          child: const Text('Set'),
+        ),
+      ],
+    );
+  }
+}
+
+
+
+// Simple Discount model
+class Discount {
+  final String id;
+  final String name;
+  final double percentage;
+  final bool isActive;
+
+  const Discount({
+    required this.id,
+    required this.name,
+    required this.percentage,
+    required this.isActive,
+  });
+}
+
+// Table Orders Dialog for waitstaff charging flow
+class _TableOrdersDialog extends ConsumerWidget {
+  final Function(TableOrder) onOrderSelected;
+
+  const _TableOrdersDialog({
+    required this.onOrderSelected,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final tableOrdersAsync = ref.watch(tableOrdersReadyToChargeProvider);
+    
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Container(
+        width: 600,
+        height: 500,
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            Row(
+              children: [
+                Icon(
+                  Icons.restaurant_menu,
+                  color: theme.colorScheme.primary,
+                  size: 28,
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  'Table Orders Ready to Charge',
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Spacer(),
+                IconButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(Icons.close),
+                ),
+              ],
+            ),
+            
+            const SizedBox(height: 20),
+            
+            // Orders List
+            Expanded(
+              child: tableOrdersAsync.when(
+                loading: () => Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const CircularProgressIndicator(),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Loading table orders...',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                error: (error, stack) => Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.error_outline,
+                        size: 64,
+                        color: theme.colorScheme.error,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Error loading orders',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: theme.colorScheme.error,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        error.toString(),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () => ref.refresh(tableOrdersReadyToChargeProvider),
+                        child: const Text('Retry'),
+                      ),
+                    ],
+                  ),
+                ),
+                data: (orderData) {
+                  // Convert API data to TableOrder objects
+                  final tableOrders = orderData.map((data) {
+                    final items = (data['items'] as List<dynamic>).map((item) {
+                      return TableOrderItem(
+                        itemId: item['itemId'] ?? 0,
+                        itemName: item['itemName'] ?? 'Unknown Item',
+                        quantity: item['quantity'] ?? 1,
+                        unitPrice: (item['unitPrice'] ?? 0.0).toDouble(),
+                      );
+                    }).toList();
+
+                    return TableOrder(
+                      id: data['id'] ?? 0,
+                      tableNumber: data['tableNumber'] ?? 'Unknown',
+                      guestCount: data['guestCount'] ?? 1,
+                      waitstaff: data['waitstaff'] ?? 'Unknown Server',
+                      total: (data['total'] ?? 0.0).toDouble(),
+                      status: data['status'] ?? 'ready_to_pay',
+                      items: items,
+                      createdAt: data['createdAt'] ?? DateTime.now(),
+                    );
+                  }).toList();
+
+                  if (tableOrders.isEmpty) {
+                    return _buildEmptyState(theme);
+                  }
+
+                  return _buildOrdersList(tableOrders, theme);
+                },
+              ),
+            ),
+            
+            // Footer
+            Container(
+              padding: const EdgeInsets.only(top: 16),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    size: 16,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Select an order to load items into POS for charging',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(ThemeData theme) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.receipt_long,
+            size: 64,
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'No orders ready to charge',
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Orders from waitstaff will appear here when ready',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOrdersList(List<TableOrder> tableOrders, ThemeData theme) {
+    return ListView.builder(
+      itemCount: tableOrders.length,
+      itemBuilder: (context, index) {
+        final order = tableOrders[index];
+        return Card(
+          margin: const EdgeInsets.only(bottom: 12),
+          child: InkWell(
+            onTap: () {
+              onOrderSelected(order);
+              Navigator.of(context).pop();
+            },
+            borderRadius: BorderRadius.circular(8),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Order Header
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Text(
+                          'Table ${order.tableNumber}',
+                          style: TextStyle(
+                            color: theme.colorScheme.onPrimary,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Icon(
+                        Icons.people,
+                        size: 16,
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${order.guestCount} guests',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                        ),
+                      ),
+                      const Spacer(),
+                      Text(
+                        '\$${order.total.toStringAsFixed(2)}',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  
+                  const SizedBox(height: 8),
+                  
+                  // Waitstaff and Time
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.person,
+                        size: 16,
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Served by ${order.waitstaff}',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                        ),
+                      ),
+                      const Spacer(),
+                      Icon(
+                        Icons.access_time,
+                        size: 16,
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        _formatOrderTime(order.createdAt),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                        ),
+                      ),
+                    ],
+                  ),
+                  
+                  const SizedBox(height: 12),
+                  
+                  // Items Summary
+                  Text(
+                    'Items (${order.items.length}):',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 4,
+                    children: order.items.take(3).map((item) {
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surfaceContainerHighest,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          '${item.quantity}x ${item.itemName}',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                          ),
+                        ),
+                      );
+                    }).toList()
+                      ..addAll(order.items.length > 3
+                          ? [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.surfaceContainerHighest,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  '+${order.items.length - 3} more',
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                                  ),
+                                ),
+                              ),
+                            ]
+                          : []),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  String _formatOrderTime(DateTime dateTime) {
+    final now = DateTime.now();
+    final difference = now.difference(dateTime);
+    
+    if (difference.inMinutes < 60) {
+      return '${difference.inMinutes} min ago';
+    } else if (difference.inHours < 24) {
+      return '${difference.inHours}h ${difference.inMinutes % 60}m ago';
+    } else {
+      return '${difference.inDays}d ago';
+    }
+  }
+
+
+}
+
+// Table Order Models
+class TableOrder {
+  final int id;
+  final String tableNumber;
+  final int guestCount;
+  final String waitstaff;
+  final double total;
+  final String status;
+  final List<TableOrderItem> items;
+  final DateTime createdAt;
+
+  const TableOrder({
+    required this.id,
+    required this.tableNumber,
+    required this.guestCount,
+    required this.waitstaff,
+    required this.total,
+    required this.status,
+    required this.items,
+    required this.createdAt,
+  });
+}
+
+class TableOrderItem {
+  final int itemId;
+  final String itemName;
+  final int quantity;
+  final double unitPrice;
+
+  const TableOrderItem({
+    required this.itemId,
+    required this.itemName,
+    required this.quantity,
+    required this.unitPrice,
+  });
+}
+
+// Category information class for colorful UI
+class CategoryInfo {
+  final Color color;
+  final IconData icon;
+
+  const CategoryInfo({
+    required this.color,
+    required this.icon,
+  });
+}
+
+// Settlement dialog for table orders
+class _SettleOrderDialog extends StatelessWidget {
+  final Map<String, dynamic> order;
+  final Function(List<dynamic>) onSettleOrder;
+
+  const _SettleOrderDialog({
+    required this.order,
+    required this.onSettleOrder,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final tableNumber = order['tableNumber']?.toString() ?? 'Unknown';
+    final waitstaff = order['waitstaff']?.toString() ?? 'Unknown';
+    final total = (order['total'] ?? 0.0).toDouble();
+    final items = order['items'] as List<dynamic>? ?? [];
+    final orderTime = order['orderTime']?.toString() ?? '';
+
+    return AlertDialog(
+      title: Row(
+        children: [
+          Icon(
+            Icons.table_restaurant,
+            color: theme.colorScheme.primary,
+          ),
+          const SizedBox(width: 8),
+          Text('Settle Order - $tableNumber'),
+        ],
+      ),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Order Details
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.person,
+                          size: 16,
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Waitstaff: $waitstaff',
+                          style: theme.textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.access_time,
+                          size: 16,
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Order Time: ${_formatOrderTime(orderTime)}',
+                          style: theme.textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            
+            // Order Items
+            Text(
+              'Order Items (${items.length})',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            
+            if (items.isNotEmpty)
+              Container(
+                constraints: const BoxConstraints(maxHeight: 200),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: items.length,
+                  itemBuilder: (context, index) {
+                    final item = items[index];
+                    final itemName = item['name'] ?? item['itemName'] ?? 'Unknown Item';
+                    final quantity = item['quantity'] ?? 1;
+                    final price = (item['price'] ?? item['unitPrice'] ?? 0.0).toDouble();
+                    
+                    return ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: CircleAvatar(
+                        radius: 16,
+                        backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+                        child: Text(
+                          quantity.toString(),
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      title: Text(
+                        itemName,
+                        style: theme.textTheme.bodyMedium,
+                      ),
+                      trailing: Text(
+                        '\$${(price * quantity).toStringAsFixed(2)}',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              )
+            else
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surface,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: theme.colorScheme.outline.withValues(alpha: 0.2),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.info_outline,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'No items in this order',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            
+            const SizedBox(height: 16),
+            
+            // Total
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Total Amount:',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    '\$${total.toStringAsFixed(2)}',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        FilledButton(
+          onPressed: items.isNotEmpty
+              ? () => onSettleOrder(items)
+              : null,
+          child: const Text('Load to Cart & Settle'),
+        ),
+      ],
+    );
+  }
+
+  String _formatOrderTime(String orderTime) {
+    try {
+      final dateTime = DateTime.parse(orderTime);
+      final now = DateTime.now();
+      final difference = now.difference(dateTime);
+      
+      if (difference.inMinutes < 60) {
+        return '${difference.inMinutes} min ago';
+      } else if (difference.inHours < 24) {
+        return '${difference.inHours}h ${difference.inMinutes % 60}m ago';
+      } else {
+        return '${difference.inDays}d ago';
+      }
+    } catch (e) {
+      return orderTime;
+    }
+  }
+}

@@ -53,20 +53,27 @@ class PosRepositoryImpl implements PosRepository {
   @override
   Future<List<CartItem>> searchItems(String query) async {
     try {
+      print('🔍 DEBUG: searchItems called with query: "$query"');
+      
       // Get business ID from auth state
       final authState = _ref.read(authNotifierProvider);
       final businessId = authState.business?.id;
+      
+      print('🔍 DEBUG: businessId: $businessId');
       
       if (businessId == null) {
         throw Exception('No businessId found in auth state');
       }
 
       // Use the correct endpoint: /menu/items
+      print('🔍 DEBUG: Making API call to /menu/items with search query: "$query"');
       final response = await _dio.get('/menu/items', queryParameters: {
         'businessId': businessId, // Required parameter
         if (query.isNotEmpty) 'search': query, // Use 'search' for search as per API docs
         'limit': 100, // Get more items for POS
       });
+
+      print('🔍 DEBUG: API Response: ${response.data}');
 
       // The /menu/items endpoint returns {success: true, data: [...]}
       final responseData = response.data;
@@ -80,15 +87,21 @@ class PosRepositoryImpl implements PosRepository {
         throw Exception('Unexpected response format from /menu/items');
       }
 
+      print('🔍 DEBUG: Found ${items.length} items from search');
+
       // Debug: Print raw API response for first item
       if (items.isNotEmpty) {
-        print('🔍 Raw API response for first item: ${items.first}');
+        print('🔍 DEBUG: First search result: ${items.first}');
       }
 
-      return items
+      final cartItems = items
           .map((item) => _convertMenuItemToCartItem(_safeMenuItemFromJson(item as Map<String, dynamic>)))
           .toList();
+          
+      print('🔍 DEBUG: Converted to ${cartItems.length} CartItems');
+      return cartItems;
     } catch (e) {
+      print('🔍 DEBUG: Error in searchItems: $e');
       throw Exception('Failed to search menu items: $e');
     }
   }
@@ -407,6 +420,296 @@ class PosRepositoryImpl implements PosRepository {
     } catch (e) {
       throw Exception('Failed to update stock levels: $e');
     }
+  }
+
+  @override
+  Future<List<String>> getCategories() async {
+    try {
+      print('🔍 DEBUG: getCategories called');
+      
+      // Get business ID from auth state
+      final authState = _ref.read(authNotifierProvider);
+      final businessId = authState.business?.id;
+      
+      print('🔍 DEBUG: businessId for categories: $businessId');
+      
+      if (businessId == null) {
+        throw Exception('No businessId found in auth state');
+      }
+
+      // Try to get categories from dedicated endpoint first
+      try {
+        print('🔍 DEBUG: Trying categories endpoint...');
+        final response = await _dio.get('/menu/categories', queryParameters: {
+          'businessId': businessId,
+        });
+
+        final responseData = response.data;
+        print('🔍 DEBUG: Categories API Response: $responseData');
+        
+        List<dynamic> categories;
+        
+        if (responseData is Map<String, dynamic>) {
+          categories = responseData['data'] as List<dynamic>? ?? [];
+        } else if (responseData is List) {
+          categories = responseData;
+        } else {
+          categories = [];
+        }
+
+        print('🔍 DEBUG: Categories from API: ${categories.length}');
+
+        // Extract category names and create ID-to-name mapping
+        final categoryNames = <String>{'All'}; // Always include 'All'
+        final categoryIdToName = <String, String>{};
+        
+        for (final category in categories) {
+          String? categoryName;
+          String? categoryId;
+          
+          if (category is String) {
+            categoryName = category;
+            categoryId = category;
+          } else if (category is Map<String, dynamic>) {
+            categoryName = category['name'] as String?;
+            categoryId = category['id']?.toString();
+          }
+          
+          if (categoryName != null && categoryName.isNotEmpty) {
+            categoryNames.add(categoryName);
+            if (categoryId != null) {
+              categoryIdToName[categoryId] = categoryName;
+            }
+            print('🔍 DEBUG: Added category: "$categoryName" (ID: $categoryId)');
+          }
+        }
+
+        print('🔍 DEBUG: Final categories: ${categoryNames.toList()}');
+        print('🔍 DEBUG: Category ID to name mapping: $categoryIdToName');
+        return categoryNames.toList()..sort(); // Sort alphabetically
+      } catch (e) {
+        print('🔍 DEBUG: Categories endpoint failed, falling back to menu items: $e');
+      }
+
+      // Fallback: Extract categories from menu items
+      print('🔍 DEBUG: Falling back to extracting categories from menu items...');
+      final response = await _dio.get('/menu/items', queryParameters: {
+        'businessId': businessId,
+        'limit': 100,
+      });
+
+      final responseData = response.data;
+      print('🔍 DEBUG: Menu items API Response: $responseData');
+      
+      List<dynamic> items;
+      
+      if (responseData is Map<String, dynamic>) {
+        items = responseData['data'] as List<dynamic>? ?? [];
+      } else if (responseData is List) {
+        items = responseData;
+      } else {
+        items = [];
+      }
+
+      print('🔍 DEBUG: Total items for category extraction: ${items.length}');
+      
+      // Extract unique categories from menu items
+      final categories = <String>{'All'}; // Always include 'All'
+      
+      for (final item in items) {
+        // Check multiple possible category field names (same as in getItemsByCategory)
+        final category = item['category'] as String? ?? 
+                       item['categoryName'] as String? ?? 
+                       item['category_name'] as String? ??
+                       item['categoryId'] as String? ??
+                       item['category_id'] as String? ??
+                       item['type'] as String? ?? 
+                       item['itemType'] as String? ?? 
+                       item['item_type'] as String?;
+        if (category != null && category.isNotEmpty) {
+          categories.add(category);
+          print('🔍 DEBUG: Extracted category from item "${item['name']}": "$category"');
+        }
+      }
+
+      print('🔍 DEBUG: Final extracted categories: ${categories.toList()}');
+      return categories.toList()..sort(); // Sort alphabetically
+    } catch (e) {
+      print('🔍 DEBUG: Error in getCategories: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<CartItem>> getItemsByCategory(String category) async {
+    try {
+      print('🔍 DEBUG: getItemsByCategory called with category: "$category"');
+      
+      // Get business ID from auth state
+      final authState = _ref.read(authNotifierProvider);
+      final businessId = authState.business?.id;
+      
+      print('🔍 DEBUG: businessId: $businessId');
+      
+      if (businessId == null) {
+        throw Exception('No businessId found in auth state');
+      }
+
+      // If 'All', return all items
+      if (category == 'All') {
+        print('🔍 DEBUG: Returning all items for "All" category');
+        return getAllItems();
+      }
+
+      // First, get the category mapping to convert category name to ID
+      Map<String, String> categoryNameToId = {};
+      try {
+        final categoriesResponse = await _dio.get('/menu/categories', queryParameters: {
+          'businessId': businessId,
+        });
+        
+        final categoriesData = categoriesResponse.data;
+        if (categoriesData is Map<String, dynamic> && categoriesData.containsKey('data')) {
+          final categories = categoriesData['data'] as List<dynamic>;
+          for (final cat in categories) {
+            if (cat is Map<String, dynamic>) {
+              final catName = cat['name'] as String?;
+              final catId = cat['id']?.toString();
+              if (catName != null && catId != null) {
+                categoryNameToId[catName] = catId;
+              }
+            }
+          }
+        }
+        print('🔍 DEBUG: Category name to ID mapping: $categoryNameToId');
+      } catch (e) {
+        print('🔍 DEBUG: Failed to get category mapping: $e');
+      }
+
+      // Get all items and filter by category
+      print('🔍 DEBUG: Fetching menu items from API...');
+      final response = await _dio.get('/menu/items', queryParameters: {
+        'businessId': businessId,
+        'limit': 100,
+      });
+
+      final responseData = response.data;
+      print('🔍 DEBUG: API Response: $responseData');
+      
+      List<dynamic> items;
+      
+      if (responseData is Map<String, dynamic>) {
+        items = responseData['data'] as List<dynamic>? ?? [];
+      } else if (responseData is List) {
+        items = responseData;
+      } else {
+        items = [];
+      }
+
+      print('🔍 DEBUG: Total items from API: ${items.length}');
+      
+      // Debug: Print first few items to see the structure
+      if (items.isNotEmpty) {
+        print('🔍 DEBUG: First item structure: ${items.first}');
+      }
+
+              // Filter items by category ID - items have categoryId field
+        final filteredItems = items.where((item) {
+          // Get categoryId from item
+          final itemCategoryId = item['categoryId'];
+          
+          print('🔍 DEBUG: Item "${item['name']}" has categoryId: "$itemCategoryId"');
+          
+          if (itemCategoryId == null) {
+            print('🔍 DEBUG: Item has no categoryId field: ${item['name']}');
+            return false;
+          }
+          
+          // For "All" category, include all items
+          if (category == 'All') {
+            print('🔍 DEBUG: Including item "${item['name']}" in "All" category');
+            return true;
+          }
+          
+          // Try to match by category name using the mapping
+          bool matches = false;
+          
+          // Get the category ID for the requested category name
+          final targetCategoryId = categoryNameToId[category];
+          
+          if (targetCategoryId != null) {
+            matches = itemCategoryId.toString() == targetCategoryId;
+            print('🔍 DEBUG: Matching categoryId "$itemCategoryId" against target "$targetCategoryId" for category "$category"');
+          } else {
+            // Fallback: try direct string comparison
+            matches = itemCategoryId.toString() == category;
+            print('🔍 DEBUG: No mapping found for category "$category", trying direct comparison');
+          }
+          
+          print('🔍 DEBUG: Category match for "${item['name']}": $matches (categoryId: "$itemCategoryId" vs category: "$category")');
+          return matches;
+        }).toList();
+
+      print('🔍 DEBUG: Filtered items count: ${filteredItems.length}');
+
+      // Convert to CartItem objects
+      final cartItems = filteredItems.map((item) {
+        return CartItem(
+          id: item['id']?.toString() ?? '',
+          name: item['name'] as String? ?? '',
+          price: (item['price'] as num?)?.toDouble() ?? 0.0,
+          quantity: 1,
+          category: item['categoryId']?.toString() ?? '',
+          imageUrl: item['imageUrl'] as String? ?? '',
+        );
+      }).toList();
+
+      print('🔍 DEBUG: Returning ${cartItems.length} CartItems for category "$category"');
+      return Future.value(cartItems);
+    } catch (e) {
+      print('🔍 DEBUG: Error in getItemsByCategory: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<CartItem>> getAllItems() async {
+    try {
+      // Get business ID from auth state
+      final authState = _ref.read(authNotifierProvider);
+      final businessId = authState.business?.id;
+      
+      if (businessId == null) {
+        throw Exception('No businessId found in auth state');
+      }
+
+      final response = await _dio.get('/menu/items', queryParameters: {
+        'businessId': businessId,
+        'limit': 100,
+      });
+
+      final responseData = response.data;
+      List<dynamic> items;
+      
+      if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
+        items = responseData['data'] as List<dynamic>;
+      } else if (responseData is List<dynamic>) {
+        items = responseData;
+      } else {
+        return [];
+      }
+
+      return items
+          .map((item) => _convertMenuItemToCartItem(_safeMenuItemFromJson(item as Map<String, dynamic>)))
+          .toList();
+    } catch (e) {
+      throw Exception('Failed to get all menu items: $e');
+    }
+  }
+
+  Future<List<CartItem>> _getAllItemsAndFilterByCategory(String category) async {
+    final allItems = await getAllItems();
+    return allItems.where((item) => item.category == category).toList();
   }
 
   // Helper methods
@@ -978,6 +1281,146 @@ class PosRepositoryImpl implements PosRepository {
         print('  - Status code: ${e.response?.statusCode}');
       }
       throw Exception('Failed to get inventory analytics: $e');
+    }
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getTableOrdersReadyToCharge() async {
+    try {
+      // Get business ID from auth state
+      final authState = _ref.read(authNotifierProvider);
+      final businessId = authState.business?.id;
+      
+      if (businessId == null) {
+        throw Exception('No businessId found in auth state');
+      }
+
+      // Fetch orders that are ready to be charged (completed or ready status)
+      final response = await _dio.get('/orders', queryParameters: {
+        'status': 'ready', // Orders ready to be charged
+        'limit': 100,
+      });
+
+      final responseData = response.data;
+      if (responseData['success'] == true && responseData['data'] != null) {
+        final List<dynamic> orders = responseData['data'];
+        return orders.map((order) => {
+          'id': order['id'].toString(),
+          'tableNumber': order['tableId'] != null ? 'Table ${order['tableId']}' : 'N/A',
+          'waitstaff': order['waitstaff'] ?? 'Unknown',
+          'orderTime': order['createdAt'],
+          'orderNumber': order['orderNumber'],
+          'items': order['items'] ?? [],
+          'total': (order['totalAmount'] ?? 0.0).toDouble(),
+          'subtotal': (order['subtotal'] ?? 0.0).toDouble(),
+          'taxAmount': (order['taxAmount'] ?? 0.0).toDouble(),
+          'status': order['status'],
+          'orderType': order['orderType'],
+          'notes': order['notes'],
+        }).toList();
+      }
+
+      return [];
+    } catch (e) {
+      print('Error fetching table orders ready to charge: $e');
+      return [];
+    }
+  }
+
+  // Get restaurant orders for Orders section
+  Future<List<Map<String, dynamic>>> getRestaurantOrders() async {
+    try {
+      final response = await _dio.get('/orders', queryParameters: {
+        'limit': 100,
+      });
+
+      final responseData = response.data;
+      if (responseData['success'] == true && responseData['data'] != null) {
+        final List<dynamic> orders = responseData['data'];
+        return orders.map((order) => {
+          'id': order['id'].toString(),
+          'tableNumber': order['tableId'] != null ? 'Table ${order['tableId']}' : 'Takeaway',
+          'waitstaff': order['waitstaff'] ?? 'N/A',
+          'orderTime': order['createdAt'],
+          'orderNumber': order['orderNumber'],
+          'items': order['items'] ?? [],
+          'total': (order['totalAmount'] ?? 0.0).toDouble(),
+          'subtotal': (order['subtotal'] ?? 0.0).toDouble(),
+          'taxAmount': (order['taxAmount'] ?? 0.0).toDouble(),
+          'status': order['status'],
+          'orderType': order['orderType'],
+          'notes': order['notes'],
+        }).toList();
+      }
+
+      return [];
+    } catch (e) {
+      print('Error fetching restaurant orders: $e');
+      return [];
+    }
+  }
+
+  // Get daily transactions for Transactions section
+  Future<List<Map<String, dynamic>>> getDailyTransactions() async {
+    try {
+      final today = DateTime.now();
+      final startOfDay = DateTime(today.year, today.month, today.day);
+      final endOfDay = startOfDay.add(const Duration(days: 1));
+
+      final response = await _dio.get('/sales', queryParameters: {
+        'startDate': startOfDay.toIso8601String().split('T')[0],
+        'endDate': endOfDay.toIso8601String().split('T')[0],
+        'limit': 100,
+      });
+
+      final responseData = response.data;
+      if (responseData is List) {
+        return responseData.map((sale) => {
+          'id': sale['id'].toString(),
+          'orderNumber': sale['orderNumber'] ?? 'N/A',
+          'amount': (sale['totalAmount'] ?? 0.0).toDouble(),
+          'paymentMethod': sale['paymentMethod'] ?? 'cash',
+          'timestamp': sale['createdAt'],
+          'customerName': sale['customerName'],
+          'status': sale['status'],
+          'items': sale['items'] ?? [],
+        }).toList();
+      }
+
+      return [];
+    } catch (e) {
+      print('Error fetching daily transactions: $e');
+      return [];
+    }
+  }
+
+  // Get inventory status for Inventory section
+  Future<List<Map<String, dynamic>>> getInventoryStatus() async {
+    try {
+      final response = await _dio.get('/items', queryParameters: {
+        'limit': 1000, // Get all items for inventory
+      });
+
+      final responseData = response.data;
+      if (responseData is List) {
+        return responseData.map((item) => {
+          'id': item['id'].toString(),
+          'name': item['name'],
+          'price': (item['price'] ?? 0.0).toDouble(),
+          'category': item['category'] ?? 'General',
+          'imageUrl': item['imageUrl'],
+          'stockQuantity': item['stock'] ?? 0,
+          'minStock': 10, // Default minimum stock level
+          'sku': item['sku'],
+          'barcode': item['barcode'],
+          'description': item['description'],
+        }).toList();
+      }
+
+      return [];
+    } catch (e) {
+      print('Error fetching inventory status: $e');
+      return [];
     }
   }
 } 
