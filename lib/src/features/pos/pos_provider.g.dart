@@ -39,6 +39,23 @@ final cartTotalProvider = AutoDisposeProvider<double>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CartTotalRef = AutoDisposeProviderRef<double>;
+String _$persistentCartHash() => r'd67dfa68003d32e052858698542a8446672ed22e';
+
+/// See also [persistentCart].
+@ProviderFor(persistentCart)
+final persistentCartProvider = Provider<List<CartItem>>.internal(
+  persistentCart,
+  name: r'persistentCartProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$persistentCartHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef PersistentCartRef = ProviderRef<List<CartItem>>;
 String _$createSaleHash() => r'fc6a28f6822b485d62617d96ae5c63c270c19d07';
 
 /// Copied from Dart SDK

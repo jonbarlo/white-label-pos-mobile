@@ -129,12 +129,44 @@ class _PosScreenState extends ConsumerState<PosScreen>
     );
   }
 
+  List<CartItem> _getCurrentCart() {
+    // If we're processing an existing order, use local cart
+    if (_currentOrderId != null) {
+      return _localCart;
+    }
+    // Otherwise, use provider cart for normal POS operations
+    return ref.read(cartNotifierProvider);
+  }
+
   void _removeFromCart(String itemId) {
-    ref.read(cartNotifierProvider.notifier).removeItem(itemId);
+    if (_currentOrderId != null) {
+      // Order-based sale: update local cart
+      setState(() {
+        _localCart.removeWhere((item) => item.id == itemId);
+      });
+    } else {
+      // Normal POS sale: update provider cart
+      ref.read(cartNotifierProvider.notifier).removeItem(itemId);
+    }
   }
 
   void _updateQuantity(String itemId, int quantity) {
-    ref.read(cartNotifierProvider.notifier).updateItemQuantity(itemId, quantity);
+    if (_currentOrderId != null) {
+      // Order-based sale: update local cart
+      setState(() {
+        final index = _localCart.indexWhere((item) => item.id == itemId);
+        if (index != -1) {
+          if (quantity <= 0) {
+            _localCart.removeAt(index);
+          } else {
+            _localCart[index] = _localCart[index].copyWith(quantity: quantity);
+          }
+        }
+      });
+    } else {
+      // Normal POS sale: update provider cart
+      ref.read(cartNotifierProvider.notifier).updateItemQuantity(itemId, quantity);
+    }
   }
 
   // Category information for colorful UI
@@ -203,8 +235,8 @@ class _PosScreenState extends ConsumerState<PosScreen>
   }
 
   void _showCheckoutDialog() {
-    // Use local cart state instead of provider
-    final cart = _localCart;
+    // Use the appropriate cart based on context
+    final cart = _getCurrentCart();
     if (cart.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -948,14 +980,14 @@ class _PosScreenState extends ConsumerState<PosScreen>
   }
 
   Widget _buildCartTab(ThemeData theme) {
-    // Use local cart state instead of provider
-    final cart = _localCart;
+    // Get the appropriate cart based on context
+    final cart = _getCurrentCart();
     final total = cart.fold(0.0, (sum, item) => sum + item.total);
     
     // Debug: Log cart state
-    print('🔍 DEBUG: _buildCartTab - Local cart has ${cart.length} items');
+    print('🔍 DEBUG: _buildCartTab - Current cart has ${cart.length} items');
     if (cart.isNotEmpty) {
-      print('🔍 DEBUG: Local cart items: ${cart.map((item) => '${item.name} x${item.quantity}').join(', ')}');
+      print('🔍 DEBUG: Current cart items: ${cart.map((item) => '${item.name} x${item.quantity}').join(', ')}');
     }
 
     return Column(
@@ -1445,15 +1477,33 @@ class _PosScreenState extends ConsumerState<PosScreen>
   Future<void> _completeSale(String customerName, String customerEmail) async {
     try {
       print('🔍 DEBUG: _completeSale - _currentOrderId: $_currentOrderId');
-      print('🔍 DEBUG: _completeSale - _localCart items: ${_localCart.length}');
-      // Use local cart items instead of provider
-      await ref.read(createSaleWithItemsProvider(_localCart, _selectedPaymentMethod, customerName: customerName, customerEmail: customerEmail, existingOrderId: _currentOrderId).future);
       
-      // Clear local cart after successful sale
-      setState(() {
-        _localCart = [];
-        _currentOrderId = null; // Clear the order ID after successful sale
-      });
+      // Determine which cart to use based on whether we're processing an existing order
+      final List<CartItem> itemsToProcess;
+      if (_currentOrderId != null) {
+        // Order-based sale: use local cart
+        print('🔍 DEBUG: _completeSale - Using _localCart for order-based sale: ${_localCart.length} items');
+        itemsToProcess = _localCart;
+      } else {
+        // Normal POS sale: use provider cart
+        final providerCart = ref.read(cartNotifierProvider);
+        print('🔍 DEBUG: _completeSale - Using provider cart for normal POS sale: ${providerCart.length} items');
+        itemsToProcess = providerCart;
+      }
+      
+      await ref.read(createSaleWithItemsProvider(itemsToProcess, _selectedPaymentMethod, customerName: customerName, customerEmail: customerEmail, existingOrderId: _currentOrderId).future);
+      
+      // Clear appropriate cart after successful sale
+      if (_currentOrderId != null) {
+        // Clear local cart for order-based sales
+        setState(() {
+          _localCart = [];
+          _currentOrderId = null; // Clear the order ID after successful sale
+        });
+      } else {
+        // Clear provider cart for normal POS sales
+        ref.read(cartNotifierProvider.notifier).clearCart();
+      }
       
       // Refresh sales summary/report
       ref.invalidate(salesSummaryProvider(DateTime.now().subtract(const Duration(days: 7)), DateTime.now()));

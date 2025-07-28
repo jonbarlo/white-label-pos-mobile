@@ -20,7 +20,7 @@ Future<PosRepository> posRepository(PosRepositoryRef ref) async {
   return PosRepositoryImpl(dio, ref);
 }
 
-// Cart management
+// Cart management - using regular NotifierProvider to persist cart state
 @riverpod
 class CartNotifier extends _$CartNotifier {
   @override
@@ -83,6 +83,12 @@ class CartNotifier extends _$CartNotifier {
 double cartTotal(CartTotalRef ref) {
   final cart = ref.watch(cartNotifierProvider);
   return cart.fold(0.0, (total, item) => total + item.total);
+}
+
+// Keep-alive cart provider to prevent auto-disposal
+@Riverpod(keepAlive: true)
+List<CartItem> persistentCart(PersistentCartRef ref) {
+  return ref.watch(cartNotifierProvider);
 }
 
 // Search functionality
