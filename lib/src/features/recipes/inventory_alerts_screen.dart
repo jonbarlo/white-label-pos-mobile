@@ -30,17 +30,53 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
   @override
   Widget build(BuildContext context) {
     final alertsAsync = ref.watch(inventoryAlertsProvider);
+    final theme = Theme.of(context);
 
     return Scaffold(
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
-        title: const Text('Inventory Alerts'),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'All Alerts'),
-            Tab(text: 'Expiring Items'),
-            Tab(text: 'Underperforming'),
-          ],
+        title: Text(
+          'Inventory Alerts',
+          style: theme.textTheme.headlineMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        centerTitle: false,
+        elevation: 0,
+        backgroundColor: theme.colorScheme.surface,
+        surfaceTintColor: Colors.transparent,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(48),
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: TabBar(
+              controller: _tabController,
+              tabs: const [
+                Tab(text: 'All Alerts'),
+                Tab(text: 'Expiring Items'),
+                Tab(text: 'Underperforming'),
+              ],
+              indicator: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: theme.colorScheme.primary,
+              ),
+              indicatorSize: TabBarIndicatorSize.tab,
+              indicatorPadding: const EdgeInsets.all(4),
+              labelColor: theme.colorScheme.onPrimary,
+              unselectedLabelColor: theme.colorScheme.onSurfaceVariant,
+              labelStyle: theme.textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+              unselectedLabelStyle: theme.textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.w500,
+              ),
+              dividerColor: Colors.transparent,
+            ),
+          ),
         ),
       ),
       body: TabBarView(
@@ -51,13 +87,7 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
           _buildUnderperformingItemsTab(alertsAsync),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showQuickActionsDialog(),
-        icon: const Icon(Icons.add),
-        label: const Text('Quick Actions'),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-      ),
+      // Removed floating action button - inventory alerts should not have cooking/promotion actions
     );
   }
 
@@ -147,10 +177,19 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
   }
 
   Widget _buildAlertCard(InventoryAlert alert) {
-    return Card(
+    final theme = Theme.of(context);
+    
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.2),
+        ),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -158,91 +197,106 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Text(
-                    alert.title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: alert.urgencyColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    _getAlertIcon(alert),
+                    color: alert.urgencyColor,
+                    size: 20,
                   ),
                 ),
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: alert.urgencyColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: alert.urgencyColor),
-                  ),
-                  child: Text(
-                    alert.urgencyText,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: alert.urgencyColor,
-                    ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        alert.title,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: alert.urgencyColor.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: alert.urgencyColor.withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: Text(
+                          alert.urgencyText,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: alert.urgencyColor,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 16),
             Text(
               alert.message,
-              style: const TextStyle(fontSize: 14),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
             ),
             if (alert.itemName != null) ...[
               const SizedBox(height: 8),
-              Text(
-                'Item: ${alert.itemName}',
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primaryContainer.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+                child: Text(
+                  'Item: ${alert.itemName}',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.primary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ),
             ],
-            const SizedBox(height: 8),
-            Text(
-              'Created: ${_formatDate(alert.createdAt)}',
-              style: const TextStyle(
-                fontSize: 12,
-                color: Colors.grey,
-              ),
-            ),
             const SizedBox(height: 12),
-            // Action buttons
             Row(
               children: [
-                if (alert.title == 'Expiring Soon') ...[
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () => _cookRecipe(alert),
-                      icon: const Icon(Icons.restaurant_menu, size: 16),
-                      label: const Text('Cook Recipe'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                      ),
-                    ),
+                Icon(
+                  Icons.access_time,
+                  size: 14,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  _formatDate(alert.createdAt),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
-                  const SizedBox(width: 8),
-                ],
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () => _createPromotion(alert),
-                    icon: const Icon(Icons.local_offer, size: 16),
-                    label: const Text('Create Promotion'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 8),
+                ),
+                const Spacer(),
+                ElevatedButton.icon(
+                  onPressed: () => _viewDetails(alert),
+                  icon: const Icon(Icons.info_outline, size: 16),
+                  label: const Text('View Details'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: theme.colorScheme.primary,
+                    foregroundColor: theme.colorScheme.onPrimary,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
                     ),
                   ),
                 ),
@@ -1167,6 +1221,48 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
       return '${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
     } catch (e) {
       return 'Invalid date';
+    }
+  }
+
+  void _viewDetails(InventoryAlert alert) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(alert.title),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(alert.message),
+            const SizedBox(height: 8),
+            if (alert.itemName != null) Text('Item: ${alert.itemName}'),
+            Text('Created: ${_formatDate(alert.createdAt)}'),
+            Text('Urgency: ${alert.urgencyText}'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  IconData _getAlertIcon(InventoryAlert alert) {
+    // Use title to determine icon type
+    final title = alert.title.toLowerCase();
+    if (title.contains('expiring') || title.contains('expire')) {
+      return Icons.warning_amber;
+    } else if (title.contains('low') || title.contains('stock')) {
+      return Icons.inventory_2;
+    } else if (title.contains('overstock') || title.contains('excess')) {
+      return Icons.inventory;
+    } else if (title.contains('expired') || title.contains('spoiled')) {
+      return Icons.block;
+    } else {
+      return Icons.notifications;
     }
   }
 } 
