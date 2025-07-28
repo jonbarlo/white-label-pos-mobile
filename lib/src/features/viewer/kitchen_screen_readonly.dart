@@ -13,31 +13,58 @@ class KitchenScreenReadOnly extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
-        title: const Text('Kitchen Orders'),
+        title: Text(
+          'Kitchen Orders',
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
         backgroundColor: theme.colorScheme.primary,
         foregroundColor: Colors.white,
-        elevation: 0,
+        elevation: 4,
+        toolbarHeight: 80, // Taller app bar for better visibility
+        centerTitle: true,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh, size: 24),
-            onPressed: () {
-              ref.invalidate(kitchenOrdersProvider);
-            },
-            tooltip: 'Refresh Orders',
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: IconButton(
+              icon: const Icon(Icons.refresh, size: 32),
+              onPressed: () {
+                ref.invalidate(kitchenOrdersProvider);
+              },
+              tooltip: 'Refresh Orders',
+              style: IconButton.styleFrom(
+                backgroundColor: Colors.white.withValues(alpha: 0.2),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.all(12),
+              ),
+            ),
           ),
-          Consumer(
-            builder: (context, ref, child) {
-              final themeMode = ref.watch(themeModeProvider);
-              return IconButton(
-                icon: Icon(
-                  themeMode == ThemeMode.dark ? Icons.light_mode : Icons.dark_mode,
-                ),
-                onPressed: () {
-                  ref.read(themeModeProvider.notifier).toggleTheme();
-                },
-              );
-            },
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: Consumer(
+              builder: (context, ref, child) {
+                final themeMode = ref.watch(themeModeProvider);
+                return IconButton(
+                  icon: Icon(
+                    themeMode == ThemeMode.dark ? Icons.light_mode : Icons.dark_mode,
+                    size: 32,
+                  ),
+                  onPressed: () {
+                    ref.read(themeModeProvider.notifier).toggleTheme();
+                  },
+                  style: IconButton.styleFrom(
+                    backgroundColor: Colors.white.withValues(alpha: 0.2),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.all(12),
+                  ),
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -54,21 +81,24 @@ class KitchenScreenReadOnly extends ConsumerWidget {
                   children: [
                     Icon(
                       Icons.restaurant_menu,
-                      size: 64,
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                      size: 120,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
+                    const SizedBox(height: 32),
+                    Text(
+                      'No Active Orders',
+                      style: theme.textTheme.headlineLarge?.copyWith(
+                        fontSize: 36,
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                      ),
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'No Active Orders',
-                      style: theme.textTheme.headlineMedium?.copyWith(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
                       'All caught up! 🎉',
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontSize: 24,
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                   ],
@@ -78,19 +108,26 @@ class KitchenScreenReadOnly extends ConsumerWidget {
 
             return LayoutBuilder(
               builder: (context, constraints) {
-                // 4-column grid for Square POS style
-                int crossAxisCount = 4;
-                if (constraints.maxWidth < 800) crossAxisCount = 3;
-                if (constraints.maxWidth < 600) crossAxisCount = 2;
-                if (constraints.maxWidth < 400) crossAxisCount = 1;
+                // Optimized grid layout for kitchen displays
+                int crossAxisCount = 3; // Default for most kitchen screens
+                double cardWidth = (constraints.maxWidth - 48) / crossAxisCount;
+                
+                // Adjust based on screen size - prioritize readability over quantity
+                if (constraints.maxWidth > 1600) {
+                  crossAxisCount = 4;
+                } else if (constraints.maxWidth < 1200) {
+                  crossAxisCount = 2;
+                } else if (constraints.maxWidth < 800) {
+                  crossAxisCount = 1;
+                }
                 
                 return GridView.builder(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(24), // Increased padding
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: crossAxisCount,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: 1.0, // Square cards
+                    crossAxisSpacing: 24, // Increased spacing
+                    mainAxisSpacing: 24, // Increased spacing
+                    childAspectRatio: 0.85, // Taller cards for better content display
                   ),
                   itemCount: orders.length,
                   itemBuilder: (context, index) {
@@ -106,45 +143,70 @@ class KitchenScreenReadOnly extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 CircularProgressIndicator(
-                  strokeWidth: 3,
+                  strokeWidth: 6,
                   color: theme.colorScheme.primary,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 32),
                 Text(
                   'Loading kitchen orders...',
-                  style: theme.textTheme.titleMedium,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ],
             ),
           ),
           error: (error, stack) => Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.error_outline,
-                  size: 64,
-                  color: theme.colorScheme.error,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Error loading orders',
-                  style: theme.textTheme.headlineSmall,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  error.toString(),
-                  style: theme.textTheme.bodyMedium,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    ref.invalidate(kitchenOrdersProvider);
-                  },
-                  child: const Text('Retry'),
-                ),
-              ],
+            child: Padding(
+              padding: const EdgeInsets.all(32),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    size: 120,
+                    color: theme.colorScheme.error,
+                  ),
+                  const SizedBox(height: 32),
+                  Text(
+                    'Error Loading Orders',
+                    style: theme.textTheme.headlineLarge?.copyWith(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.error,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Please check your connection and try again',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontSize: 20,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 32),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      ref.invalidate(kitchenOrdersProvider);
+                    },
+                    icon: const Icon(Icons.refresh, size: 24),
+                    label: Text(
+                      'Retry',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.colorScheme.primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -164,119 +226,254 @@ class KitchenOrderCardReadOnly extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
+    final statusColor = _getStatusColor(order.status ?? 'pending');
+    final urgencyLevel = _getUrgencyLevel(order.createdAt);
+    
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: statusColor,
+          width: 3,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: statusColor.withValues(alpha: 0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+          BoxShadow(
+            color: theme.colorScheme.shadow.withValues(alpha: 0.1),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(20), // Increased padding
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Order Header
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Order #${order.orderNumber}',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                Container(
-                  width: 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: _getStatusColor(order.status ?? 'pending'),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              ],
-            ),
-            
-            const SizedBox(height: 2),
-            
-            // Status
-            Text(
-              (order.status ?? 'pending').toUpperCase(),
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: _getStatusColor(order.status ?? 'pending'),
-                fontWeight: FontWeight.w600,
-                fontSize: 10,
+            // Order Header with enhanced visibility
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: statusColor,
+                borderRadius: BorderRadius.circular(12),
               ),
-            ),
-            
-            const SizedBox(height: 6),
-            
-            // Items List - Compact
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
                 children: [
-                  ...order.items.take(2).map((item) => Padding(
-                    padding: const EdgeInsets.only(bottom: 1),
+                  Expanded(
                     child: Text(
-                      '${item.quantity}x ${item.itemName}',
-                      style: theme.textTheme.bodySmall?.copyWith(fontSize: 11),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                      'ORDER #${order.orderNumber}',
+                      style: TextStyle(
+                        fontSize: 26, // Increased from 14-16px
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        letterSpacing: 1.2,
+                      ),
                     ),
-                  )),
-                  if (order.items.length > 2)
-                    Text(
-                      '+${order.items.length - 2} more',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.primary,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 10,
+                  ),
+                  if (urgencyLevel > 0)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.red.shade600,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        'URGENT',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                 ],
               ),
             ),
             
-            const SizedBox(height: 4),
+            const SizedBox(height: 16),
             
-            // Table and Time
-            if (order.tableNumber != null)
-              Text(
-                'Table ${order.tableNumber}',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                  fontSize: 10,
-                ),
+            // Status with larger text
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: statusColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: statusColor.withValues(alpha: 0.3)),
               ),
-            
-            Text(
-              _formatTime(order.createdAt),
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                fontSize: 10,
+              child: Text(
+                (order.status ?? 'pending').toUpperCase(),
+                style: TextStyle(
+                  color: statusColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18, // Increased from 10px
+                  letterSpacing: 1.0,
+                ),
               ),
             ),
             
-            // READ-ONLY MODE - No action buttons
-            const SizedBox(height: 6),
+            const SizedBox(height: 20),
+            
+            // Items List with much larger, more readable text
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'ITEMS',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Expanded(
+                    child: ListView.separated(
+                      itemCount: order.items.length,
+                      separatorBuilder: (context, index) => const SizedBox(height: 8),
+                      itemBuilder: (context, index) {
+                        final item = order.items[index];
+                        return Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: theme.colorScheme.outline.withValues(alpha: 0.2),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              // Quantity - Large and prominent
+                              Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.primary,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    '${item.quantity}',
+                                    style: TextStyle(
+                                      fontSize: 24, // Much larger quantity
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              // Item name - Large and readable
+                              Expanded(
+                                child: Text(
+                                  item.itemName,
+                                  style: TextStyle(
+                                    fontSize: 22, // Increased from 11px to 22px
+                                    fontWeight: FontWeight.w600,
+                                    color: theme.colorScheme.onSurface,
+                                    height: 1.3,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            const SizedBox(height: 16),
+            
+            // Table and Time info with better readability
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceContainerLow,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  if (order.tableNumber != null) ...[
+                    Icon(
+                      Icons.table_restaurant,
+                      size: 20,
+                      color: theme.colorScheme.primary,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Table ${order.tableNumber}',
+                      style: TextStyle(
+                        fontSize: 18, // Increased from 10px
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                    const Spacer(),
+                  ],
+                  Icon(
+                    Icons.schedule,
+                    size: 20,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    _formatTime(order.createdAt),
+                    style: TextStyle(
+                      fontSize: 18, // Increased from 10px
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            const SizedBox(height: 16),
+            
+            // READ-ONLY indicator with better visibility
             Container(
               width: double.infinity,
-              height: 32,
+              height: 50, // Increased height
               decoration: BoxDecoration(
-                color: theme.colorScheme.surface,
-                borderRadius: BorderRadius.circular(4),
+                color: theme.colorScheme.surfaceContainerHigh,
+                borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: theme.colorScheme.outline,
+                  color: theme.colorScheme.outline.withValues(alpha: 0.5),
+                  width: 2,
                 ),
               ),
               child: Center(
-                child: Text(
-                  'READ ONLY',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-                    fontWeight: FontWeight.w600,
-                  ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.visibility,
+                      size: 24,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'READ ONLY MODE',
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18, // Increased from 12px
+                        letterSpacing: 1.0,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -289,15 +486,30 @@ class KitchenOrderCardReadOnly extends StatelessWidget {
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'pending':
-        return Colors.orange;
+        return Colors.orange.shade600;
       case 'preparing':
-        return Colors.blue;
+        return Colors.blue.shade600;
       case 'ready':
-        return Colors.green;
+        return Colors.green.shade600;
       case 'completed':
-        return Colors.grey;
+        return Colors.grey.shade600;
       default:
-        return Colors.grey;
+        return Colors.grey.shade600;
+    }
+  }
+  
+  int _getUrgencyLevel(String? timeString) {
+    if (timeString == null) return 0;
+    try {
+      final time = DateTime.parse(timeString);
+      final now = DateTime.now();
+      final difference = now.difference(time).inMinutes;
+      
+      // Mark as urgent if order is older than 15 minutes
+      if (difference > 15) return 1;
+      return 0;
+    } catch (e) {
+      return 0;
     }
   }
 
@@ -305,7 +517,16 @@ class KitchenOrderCardReadOnly extends StatelessWidget {
     if (timeString == null) return 'N/A';
     try {
       final time = DateTime.parse(timeString);
-      return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+      final now = DateTime.now();
+      final difference = now.difference(time).inMinutes;
+      
+      if (difference < 60) {
+        return '${difference}m ago';
+      } else {
+        final hours = difference ~/ 60;
+        final minutes = difference % 60;
+        return '${hours}h ${minutes}m ago';
+      }
     } catch (e) {
       return 'N/A';
     }
