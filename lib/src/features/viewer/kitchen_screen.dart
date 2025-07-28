@@ -17,55 +17,37 @@ class KitchenScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(
           'Kitchen Orders',
-          style: TextStyle(
-            fontSize: 28, // Increased from default
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
+          style: theme.textTheme.headlineMedium?.copyWith(
+            fontWeight: FontWeight.w600,
           ),
         ),
-        backgroundColor: theme.colorScheme.primary,
-        foregroundColor: Colors.white,
-        elevation: 4,
-        toolbarHeight: 80, // Taller app bar for better visibility
-        centerTitle: true,
+        centerTitle: false,
+        elevation: 0,
+        backgroundColor: theme.colorScheme.surface,
+        surfaceTintColor: Colors.transparent,
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: IconButton(
-              icon: const Icon(Icons.refresh, size: 32), // Larger icon
-              onPressed: () {
-                ref.invalidate(kitchenOrdersProvider);
-              },
-              tooltip: 'Refresh Orders',
-              style: IconButton.styleFrom(
-                backgroundColor: Colors.white.withValues(alpha: 0.2),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.all(12),
-              ),
-            ),
+          IconButton(
+            icon: const Icon(Icons.refresh, size: 24),
+            onPressed: () {
+              ref.invalidate(kitchenOrdersProvider);
+            },
+            tooltip: 'Refresh Orders',
           ),
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: Consumer(
-              builder: (context, ref, child) {
-                final themeMode = ref.watch(themeModeProvider);
-                return IconButton(
-                  icon: Icon(
-                    themeMode == ThemeMode.dark ? Icons.light_mode : Icons.dark_mode,
-                    size: 32, // Larger icon
-                  ),
-                  onPressed: () {
-                    ref.read(themeModeProvider.notifier).toggleTheme();
-                  },
-                  style: IconButton.styleFrom(
-                    backgroundColor: Colors.white.withValues(alpha: 0.2),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.all(12),
-                  ),
-                );
-              },
-            ),
+          Consumer(
+            builder: (context, ref, child) {
+              final themeMode = ref.watch(themeModeProvider);
+              return IconButton(
+                icon: Icon(
+                  themeMode == ThemeMode.dark ? Icons.light_mode : Icons.dark_mode,
+                  size: 24,
+                ),
+                onPressed: () {
+                  ref.read(themeModeProvider.notifier).toggleTheme();
+                },
+              );
+            },
           ),
+          const SizedBox(width: 8),
         ],
       ),
       body: RefreshIndicator(
