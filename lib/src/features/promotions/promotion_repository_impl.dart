@@ -92,18 +92,27 @@ class PromotionRepositoryImpl implements PromotionRepository {
   @override
   Future<List<Promotion>> getActivePromotions() async {
     try {
+      print('🔍 DEBUG: Fetching active promotions...');
       final response = await _dio.get('/promotions', queryParameters: {
         'status': 'active',
         'isActive': true,
       });
+      
+      print('🔍 DEBUG: Active promotions response: ${response.data}');
       
       final responseData = response.data;
       final data = responseData is Map<String, dynamic> && responseData.containsKey('data')
           ? responseData['data'] as List<dynamic>
           : responseData as List<dynamic>;
       
-      return data.map((json) => Promotion.fromJson(json as Map<String, dynamic>)).toList();
+      print('🔍 DEBUG: Parsed data: $data');
+      
+      final promotions = data.map((json) => Promotion.fromJson(json as Map<String, dynamic>)).toList();
+      print('🔍 DEBUG: Successfully parsed ${promotions.length} promotions');
+      
+      return promotions;
     } catch (e) {
+      print('🔍 DEBUG: Error getting active promotions: $e');
       throw Exception('Failed to get active promotions: $e');
     }
   }

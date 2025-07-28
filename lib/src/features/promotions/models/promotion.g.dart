@@ -11,12 +11,12 @@ Promotion _$PromotionFromJson(Map<String, dynamic> json) => Promotion(
       businessId: (json['businessId'] as num).toInt(),
       name: json['name'] as String,
       description: json['description'] as String,
-      type: $enumDecode(_$PromotionTypeEnumMap, json['type']),
+      type: const PromotionTypeConverter().fromJson(json['type'] as String),
       discountType: json['discountType'] as String,
       discountValue: (json['discountValue'] as num).toDouble(),
       startDate: DateTime.parse(json['startDate'] as String),
       endDate: DateTime.parse(json['endDate'] as String),
-      conditions: json['conditions'] as Map<String, dynamic>?,
+      conditions: const ConditionsConverter().fromJson(json['conditions']),
       isActive: json['isActive'] as bool,
       imageUrl: json['imageUrl'] as String?,
       totalQuantity: (json['totalQuantity'] as num?)?.toInt(),
@@ -32,12 +32,12 @@ Map<String, dynamic> _$PromotionToJson(Promotion instance) => <String, dynamic>{
       'businessId': instance.businessId,
       'name': instance.name,
       'description': instance.description,
-      'type': _$PromotionTypeEnumMap[instance.type]!,
+      'type': const PromotionTypeConverter().toJson(instance.type),
       'discountType': instance.discountType,
       'discountValue': instance.discountValue,
       'startDate': instance.startDate.toIso8601String(),
       'endDate': instance.endDate.toIso8601String(),
-      'conditions': instance.conditions,
+      'conditions': const ConditionsConverter().toJson(instance.conditions),
       'isActive': instance.isActive,
       'imageUrl': instance.imageUrl,
       'totalQuantity': instance.totalQuantity,
@@ -47,13 +47,6 @@ Map<String, dynamic> _$PromotionToJson(Promotion instance) => <String, dynamic>{
       'createdAt': instance.createdAt.toIso8601String(),
       'updatedAt': instance.updatedAt.toIso8601String(),
     };
-
-const _$PromotionTypeEnumMap = {
-  PromotionType.discount: 'discount',
-  PromotionType.chef_special: 'chef_special',
-  PromotionType.buyOneGetOne: 'buyOneGetOne',
-  PromotionType.freeItem: 'freeItem',
-};
 
 PromotionStats _$PromotionStatsFromJson(Map<String, dynamic> json) =>
     PromotionStats(
@@ -84,3 +77,10 @@ Map<String, dynamic> _$PromotionStatsToJson(PromotionStats instance) =>
       'totalUses': instance.totalUses,
       'mostPopularPromotions': instance.mostPopularPromotions,
     };
+
+const _$PromotionTypeEnumMap = {
+  PromotionType.discount: 'discount',
+  PromotionType.chef_special: 'chef_special',
+  PromotionType.buyOneGetOne: 'buyOneGetOne',
+  PromotionType.freeItem: 'freeItem',
+};

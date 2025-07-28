@@ -1,9 +1,69 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'dart:convert';
 
 part 'promotion.g.dart';
 
 enum PromotionType { discount, chef_special, buyOneGetOne, freeItem }
 enum PromotionStatus { active, inactive, scheduled, expired }
+
+class PromotionTypeConverter implements JsonConverter<PromotionType, String> {
+  const PromotionTypeConverter();
+
+  @override
+  PromotionType fromJson(String json) {
+    switch (json.toLowerCase()) {
+      case 'discount':
+        return PromotionType.discount;
+      case 'chef_special':
+        return PromotionType.chef_special;
+      case 'buyonegetone':
+      case 'bogo':
+        return PromotionType.buyOneGetOne;
+      case 'freeitem':
+        return PromotionType.freeItem;
+      default:
+        return PromotionType.discount; // Default fallback
+    }
+  }
+
+  @override
+  String toJson(PromotionType object) {
+    switch (object) {
+      case PromotionType.discount:
+        return 'discount';
+      case PromotionType.chef_special:
+        return 'chef_special';
+      case PromotionType.buyOneGetOne:
+        return 'buyOneGetOne';
+      case PromotionType.freeItem:
+        return 'freeItem';
+    }
+  }
+}
+
+class ConditionsConverter implements JsonConverter<Map<String, dynamic>?, dynamic> {
+  const ConditionsConverter();
+
+  @override
+  Map<String, dynamic>? fromJson(dynamic json) {
+    if (json == null) return null;
+    if (json is Map<String, dynamic>) return json;
+    if (json is String) {
+      try {
+        return Map<String, dynamic>.from(jsonDecode(json));
+      } catch (e) {
+        print('🔍 DEBUG: Error parsing conditions JSON: $e');
+        return null;
+      }
+    }
+    return null;
+  }
+
+  @override
+  dynamic toJson(Map<String, dynamic>? object) {
+    return object;
+  }
+}
 
 @JsonSerializable()
 class Promotion {
@@ -11,11 +71,13 @@ class Promotion {
   final int businessId;
   final String name;
   final String description;
+  @PromotionTypeConverter()
   final PromotionType type;
   final String discountType; // percentage, fixed, etc.
   final double discountValue;
   final DateTime startDate;
   final DateTime endDate;
+  @ConditionsConverter()
   final Map<String, dynamic>? conditions;
   final bool isActive;
   final String? imageUrl;
