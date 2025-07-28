@@ -11,6 +11,9 @@ class CartItem {
   final String? barcode;
   final String? imageUrl;
   final String? category;
+  final String? promotionId;
+  final String? promotionName;
+  final double? originalPrice;
 
   const CartItem({
     required this.id,
@@ -20,6 +23,9 @@ class CartItem {
     this.barcode,
     this.imageUrl,
     this.category,
+    this.promotionId,
+    this.promotionName,
+    this.originalPrice,
   });
 
   double get total => price * quantity;
@@ -32,6 +38,9 @@ class CartItem {
     String? barcode,
     String? imageUrl,
     String? category,
+    String? promotionId,
+    String? promotionName,
+    double? originalPrice,
   }) {
     return CartItem(
       id: id ?? this.id,
@@ -41,6 +50,9 @@ class CartItem {
       barcode: barcode ?? this.barcode,
       imageUrl: imageUrl ?? this.imageUrl,
       category: category ?? this.category,
+      promotionId: promotionId ?? this.promotionId,
+      promotionName: promotionName ?? this.promotionName,
+      originalPrice: originalPrice ?? this.originalPrice,
     );
   }
 
