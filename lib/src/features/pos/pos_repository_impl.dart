@@ -725,13 +725,13 @@ class PosRepositoryImpl implements PosRepository {
     final itemName = json['name'] as String;
     
     // Handle both numeric and string category IDs
-    final categoryValue = json['category'];
+    final categoryValue = json['categoryId'] ?? json['category'];
     int categoryId;
     
     if (categoryValue is int) {
       categoryId = categoryValue;
     } else if (categoryValue is String) {
-      categoryId = 1; // Default category ID
+      categoryId = int.tryParse(categoryValue) ?? 1;
     } else {
       categoryId = 1;
     }

@@ -1910,7 +1910,7 @@ final posCategoriesProvider = AutoDisposeFutureProvider<List<String>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef PosCategoriesRef = AutoDisposeFutureProviderRef<List<String>>;
-String _$itemsByCategoryHash() => r'0cf916062db40070763f09aa7dfc8aad51956fbc';
+String _$itemsByCategoryHash() => r'9c5989e024cd2d86b432ee1dbdeb62b1a2034f03';
 
 /// See also [itemsByCategory].
 @ProviderFor(itemsByCategory)
@@ -2150,7 +2150,7 @@ final cartNotifierProvider =
 );
 
 typedef _$CartNotifier = AutoDisposeNotifier<List<CartItem>>;
-String _$searchNotifierHash() => r'c9339d2ba7bb6a22d959578a22ae58dca4829959';
+String _$searchNotifierHash() => r'd15b01bbdee17b7b734a574b2b35973c4acf3d3f';
 
 /// See also [SearchNotifier].
 @ProviderFor(SearchNotifier)

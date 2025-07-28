@@ -485,10 +485,44 @@ Future<List<String>> posCategories(PosCategoriesRef ref) async {
 @riverpod
 Future<List<CartItem>> itemsByCategory(ItemsByCategoryRef ref, String category) async {
   final repository = await ref.watch(posRepositoryProvider.future);
+  
+  // Always fetch all items first (this will be cached by Riverpod)
+  final allItems = await repository.getAllItems();
+  
+  // If "All" category, return all items
   if (category == 'All') {
-    return await repository.getAllItems();
+    return allItems;
   }
-  return await repository.getItemsByCategory(category);
+  
+  // Create a mapping from category names to category IDs
+  // Based on the API response, we know:
+  // Pizza -> 13, Pasta -> 14, Desserts -> 15, Beverages -> 16
+  final categoryNameToId = {
+    'Pizza': '13',
+    'Pasta': '14', 
+    'Desserts': '15',
+    'Beverages': '16',
+  };
+  
+  // Get the category ID for the requested category name
+  final categoryId = categoryNameToId[category];
+  
+  if (categoryId == null) {
+    print('🔍 DEBUG: No mapping found for category "$category"');
+    return [];
+  }
+  
+  // Filter items locally based on category ID
+  final filteredItems = allItems.where((item) {
+    final itemCategory = item.category ?? '';
+    final matches = itemCategory == categoryId;
+    print('🔍 DEBUG: Item "${item.name}" has category "$itemCategory", matches "$categoryId": $matches');
+    return matches;
+  }).toList();
+  
+  print('🔍 DEBUG: Filtered ${filteredItems.length} items for category "$category" (ID: $categoryId) from ${allItems.length} total items');
+  
+  return filteredItems;
 }
 
 @riverpod

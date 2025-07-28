@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 
+// Global cache configuration for better performance
+void _configureImageCache() {
+  // Configure cache settings for better performance
+  PaintingBinding.instance.imageCache.maximumSize = 1000; // Increase memory cache size
+  PaintingBinding.instance.imageCache.maximumSizeBytes = 100 * 1024 * 1024; // 100MB cache
+}
+
 /// A reusable image widget that handles network images with proper loading and error states
 class AppImage extends StatelessWidget {
   final String? imageUrl;
@@ -33,6 +40,9 @@ class AppImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Configure cache on first build
+    _configureImageCache();
+    
     final theme = Theme.of(context);
     final defaultPlaceholder = Container(
       width: width,
@@ -89,6 +99,7 @@ class AppImage extends StatelessWidget {
     return ClipRRect(
       borderRadius: borderRadius ?? BorderRadius.zero,
       child: CachedNetworkImage(
+        key: ValueKey(imageUrl), // Stable key to prevent unnecessary rebuilds
         imageUrl: imageUrl!,
         width: width,
         height: height,
@@ -113,12 +124,22 @@ class AppImage extends StatelessWidget {
           }
           return errorWidget ?? defaultErrorWidget;
         },
+        // Optimize memory usage and caching
         memCacheWidth: width?.toInt(),
         memCacheHeight: height?.toInt(),
         // Add retry logic for failed images
         httpHeaders: const {
           'User-Agent': 'Flutter POS App/1.0',
         },
+        // Optimize caching behavior
+        cacheKey: imageUrl, // Use URL as cache key for better performance
+        maxWidthDiskCache: width?.toInt() ?? 800,
+        maxHeightDiskCache: height?.toInt() ?? 600,
+        // Prevent unnecessary reloads
+        fadeInDuration: const Duration(milliseconds: 200),
+        fadeOutDuration: const Duration(milliseconds: 100),
+        // Optimize for better performance
+        filterQuality: FilterQuality.medium,
       ),
     );
   }

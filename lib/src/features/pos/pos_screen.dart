@@ -746,11 +746,14 @@ class _PosScreenState extends ConsumerState<PosScreen>
         final item = items[index];
         return _buildMenuItemCard(theme, item);
       },
+      // Add key to prevent unnecessary rebuilds
+      key: const PageStorageKey('menu_items_grid'),
     );
   }
 
   Widget _buildMenuItemCard(ThemeData theme, CartItem item) {
     return Card(
+      key: ValueKey('menu_item_${item.id}'), // Add stable key to prevent rebuilds
       elevation: 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
@@ -2390,6 +2393,7 @@ class _MenuSection extends StatelessWidget {
       );
     }
     return GridView.builder(
+      key: const PageStorageKey('search_results_grid'),
       padding: const EdgeInsets.all(16),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
@@ -2415,6 +2419,7 @@ class _MenuSection extends StatelessWidget {
     }
     
     return GridView.builder(
+      key: const PageStorageKey('popular_items_grid'),
       padding: const EdgeInsets.all(16),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
@@ -2503,6 +2508,7 @@ class _MenuItemCard extends StatelessWidget {
     final theme = Theme.of(context);
     
     return Card(
+      key: ValueKey('menu_item_card_${item.id}'), // Add stable key to prevent rebuilds
       elevation: 3,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
