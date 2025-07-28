@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:white_label_pos_mobile/src/features/recipes/smart_recipe_provider.dart';
 import 'package:white_label_pos_mobile/src/features/recipes/models/smart_recipe_suggestion.dart';
 import '../promotions/promotions_provider.dart';
+import '../auth/auth_provider.dart';
+import '../auth/models/user.dart';
 
 class SmartSuggestionsScreen extends ConsumerStatefulWidget {
   const SmartSuggestionsScreen({super.key});
@@ -100,6 +102,7 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
   Widget _buildCookedTab(AsyncValue<List<SmartRecipeSuggestion>> suggestionsAsync) {
     return suggestionsAsync.when(
       data: (suggestions) {
+        print('🔍 DEBUG: Cooked tab - Found ${suggestions.length} cooked suggestions');
         if (suggestions.isEmpty) {
           return const Center(
             child: Text('No cooked suggestions available'),
@@ -404,7 +407,7 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
               ),
             ],
             const SizedBox(height: 16),
-            // Action buttons
+            // Action buttons - only show Cook Recipe for pending suggestions
             Row(
               children: [
                 Expanded(
@@ -417,19 +420,6 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
                     label: Text(suggestion.canBeCooked ? 'Cook Recipe' : 'Already Cooked'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: suggestion.canBeCooked ? Colors.green : Colors.grey,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () => _createPromotion(suggestion),
-                    icon: const Icon(Icons.local_offer, size: 16),
-                    label: const Text('Create Promotion'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
@@ -553,29 +543,49 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
               ),
             ],
             const SizedBox(height: 16),
-            // Show cooked status instead of action buttons
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.green.withOpacity(0.3)),
-              ),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.check_circle, color: Colors.green, size: 20),
-                  SizedBox(width: 8),
-                  Text(
-                    'Recipe Cooked Successfully',
-                    style: TextStyle(
-                      color: Colors.green,
-                      fontWeight: FontWeight.bold,
+            // Show cooked status and create promotion button
+            Column(
+              children: [
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.green.withOpacity(0.3)),
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.check_circle, color: Colors.green, size: 20),
+                      SizedBox(width: 8),
+                      Text(
+                        'Recipe Cooked Successfully',
+                        style: TextStyle(
+                          color: Colors.green,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                // Only show Create Promotion button for managers and admins
+                if (_canCreatePromotions())
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      print('🔍 DEBUG: Create Promotion button pressed for: ${suggestion.recipe.name}');
+                      _createPromotion(suggestion);
+                    },
+                    icon: const Icon(Icons.local_offer, size: 16),
+                    label: const Text('Create Promotion'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
-                ],
-              ),
+              ],
             ),
           ],
         ),
@@ -1333,5 +1343,16 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
     if (daysToExpiry <= 3) return Colors.orange;
     if (daysToExpiry <= 7) return Colors.yellow;
     return Colors.green;
+  }
+
+  bool _canCreatePromotions() {
+    final authState = ref.read(authNotifierProvider);
+    final userRole = authState.user?.role;
+    
+    // Managers, admins, and owners can create promotions from smart AI suggestions
+    final canCreate = userRole == UserRole.manager || userRole == UserRole.admin || userRole == UserRole.owner;
+    print('🔍 DEBUG: _canCreatePromotions() called. User role: $userRole, canCreate: $canCreate');
+    print('🔍 DEBUG: Role comparisons - manager: ${userRole == UserRole.manager}, admin: ${userRole == UserRole.admin}, owner: ${userRole == UserRole.owner}');
+    return canCreate;
   }
 } 
