@@ -8,6 +8,7 @@ import '../recipes/widgets/recipe_creation_dialog.dart';
 import '../recipes/smart_suggestions_screen.dart';
 import '../recipes/inventory_alerts_screen.dart';
 import '../promotions/promotions_provider.dart';
+import '../promotions/models/promotion.dart';
 import '../../shared/widgets/loading_indicator.dart';
 
 class FeatureDashboardScreen extends ConsumerStatefulWidget {
@@ -430,66 +431,100 @@ class _FeatureDashboardScreenState extends ConsumerState<FeatureDashboardScreen>
             }
             
             return Column(
-              children: promotions.take(3).map((promotion) => Container(
-                margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerLowest,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: theme.colorScheme.outline.withValues(alpha: 0.2),
+              children: promotions.take(3).map((promotion) => InkWell(
+                onTap: () => _showPromotionDetails(context, promotion),
+                borderRadius: BorderRadius.circular(16),
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: theme.colorScheme.outline.withValues(alpha: 0.2),
+                    ),
                   ),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.secondary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        Icons.local_offer,
-                        color: theme.colorScheme.secondary,
-                        size: 24,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            promotion.name,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            promotion.description,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.primary,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        promotion.discountDisplay,
-                        style: theme.textTheme.labelMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: theme.colorScheme.onPrimary,
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.secondary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(
+                          Icons.local_offer,
+                          color: theme.colorScheme.secondary,
+                          size: 24,
                         ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              promotion.name,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              promotion.description,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.inventory_2,
+                                  size: 16,
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Qty: ${promotion.totalQuantity ?? '∞'}',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Icon(
+                                  Icons.people,
+                                  size: 16,
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Used: ${promotion.usedQuantity}',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          promotion.discountDisplay,
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: theme.colorScheme.onPrimary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               )).toList(),
             );
@@ -946,5 +981,218 @@ class _FeatureDashboardScreenState extends ConsumerState<FeatureDashboardScreen>
       barrierDismissible: false,
       builder: (context) => const RecipeCreationDialog(),
     );
+  }
+
+  void _showPromotionDetails(BuildContext context, Promotion promotion) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(
+              Icons.local_offer,
+              color: Theme.of(context).colorScheme.primary,
+              size: 24,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                promotion.name,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                promotion.description,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 20),
+              
+              // Promotion Type & Discount
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildDetailCard(
+                      context,
+                      'Type',
+                      promotion.type.name.toUpperCase(),
+                      Icons.category,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildDetailCard(
+                      context,
+                      'Discount',
+                      promotion.discountDisplay,
+                      Icons.percent,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              
+              // Quantity Information
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildDetailCard(
+                      context,
+                      'Total Quantity',
+                      promotion.totalQuantity?.toString() ?? 'Unlimited',
+                      Icons.inventory_2,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildDetailCard(
+                      context,
+                      'Used',
+                      promotion.usedQuantity.toString(),
+                      Icons.people,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              
+              // Remaining Quantity
+              _buildDetailCard(
+                context,
+                'Remaining',
+                promotion.totalQuantity != null 
+                    ? (promotion.totalQuantity! - promotion.usedQuantity).toString()
+                    : 'Unlimited',
+                                 Icons.inventory,
+                color: promotion.totalQuantity != null && (promotion.totalQuantity! - promotion.usedQuantity) <= 5
+                    ? Colors.orange
+                    : null,
+              ),
+              const SizedBox(height: 20),
+              
+              // Date Range
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildDetailCard(
+                      context,
+                      'Start Date',
+                      _formatDate(promotion.startDate),
+                      Icons.calendar_today,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildDetailCard(
+                      context,
+                      'End Date',
+                      _formatDate(promotion.endDate),
+                      Icons.calendar_today,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              
+              // Status
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: promotion.isCurrentlyActive 
+                      ? Colors.green.withOpacity(0.1)
+                      : Colors.red.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: promotion.isCurrentlyActive 
+                        ? Colors.green.withOpacity(0.3)
+                        : Colors.red.withOpacity(0.3),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      promotion.isCurrentlyActive ? Icons.check_circle : Icons.cancel,
+                      color: promotion.isCurrentlyActive ? Colors.green : Colors.red,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      promotion.isCurrentlyActive ? 'Active' : 'Inactive',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: promotion.isCurrentlyActive ? Colors.green : Colors.red,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDetailCard(BuildContext context, String label, String value, IconData icon, {Color? color}) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                icon,
+                size: 16,
+                color: color ?? Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                label,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: color ?? Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
   }
 } 
