@@ -30,6 +30,9 @@ import '../../features/auth/models/user.dart';
 import '../../features/recipes/smart_suggestions_screen.dart';
 import '../../features/recipes/inventory_alerts_screen.dart';
 import '../../features/promotions/promotions_screen.dart';
+import '../../features/admin/admin_menu_management_screen.dart';
+import '../../features/admin/admin_dashboard_screen.dart';
+import '../../features/admin/pdf_menu_generation_screen.dart';
 
 
 /// Provider for SharedPreferences
@@ -84,6 +87,9 @@ class AppRouter {
   static const String splitBillingRoute = '/split-billing';
   static const String floorPlanViewerRoute = '/floor-plan-viewer';
   static const String floorPlanManagementRoute = '/floor-plan-management';
+  static const String adminMenuManagementRoute = '/admin/menu-management';
+  static const String adminDashboardRoute = '/admin/dashboard';
+  static const String pdfMenuGenerationRoute = '/admin/pdf-menu-generation';
 
   /// Create the main router configuration
   static GoRouter createRouter(Ref ref) {
@@ -211,6 +217,23 @@ class AppRouter {
               name: 'business',
               builder: (context, state) => const BusinessListScreen(),
             ),
+            
+            // Admin Menu Management (Admin only)
+                    GoRoute(
+          path: adminDashboardRoute,
+          name: 'admin-dashboard',
+          builder: (context, state) => const AdminDashboardScreen(),
+        ),
+        GoRoute(
+          path: adminMenuManagementRoute,
+          name: 'admin-menu-management',
+          builder: (context, state) => const AdminMenuManagementScreen(),
+        ),
+        GoRoute(
+          path: pdfMenuGenerationRoute,
+          name: 'pdf-menu-generation',
+          builder: (context, state) => const PdfMenuGenerationScreen(),
+        ),
           ],
         ),
         
@@ -383,14 +406,23 @@ class AppRouter {
       debugPrint('🔵 Router: Non-cashier trying to access POS route, redirecting to dashboard');
       return dashboardRoute;
     }
-    // 7. If authenticated and not on a protected route, redirect to appropriate dashboard
+    // 7. Admin route protection - redirect admin users away from regular dashboard, analytics, reports
+    if (authState.status == AuthStatus.authenticated && 
+        authState.user?.role == UserRole.admin &&
+        (state.matchedLocation == dashboardRoute || 
+         state.matchedLocation == analyticsRoute || 
+         state.matchedLocation == reportsRoute)) {
+      debugPrint('🔵 Router: Admin trying to access regular dashboard/analytics/reports, redirecting to admin dashboard');
+      return adminDashboardRoute;
+    }
+    // 8. If authenticated and not on a protected route, redirect to appropriate dashboard
     if (authState.status == AuthStatus.authenticated && 
         !_isProtectedRoute(state.matchedLocation)) {
       final targetRoute = _getRoleBasedRoute(authState);
       debugPrint('🔵 Router: Authenticated user on unprotected route, redirecting to $targetRoute');
       return targetRoute;
     }
-    // 8. If on root path and onboarding completed but not authenticated, redirect to login
+    // 9. If on root path and onboarding completed but not authenticated, redirect to login
     if (state.matchedLocation == '/' && onboardingCompleted && 
         (authState.status == AuthStatus.unauthenticated || authState.status == AuthStatus.initial)) {
       debugPrint('🔵 Router: On root path, onboarding completed, not authenticated, redirecting to login');
@@ -422,7 +454,10 @@ class AppRouter {
            location.startsWith('$waiterRoute/') ||
            location == kitchenRoute ||
            location == barRoute ||
-           location == splitBillingRoute;
+           location == splitBillingRoute ||
+           location == adminDashboardRoute ||
+           location == adminMenuManagementRoute ||
+           location == pdfMenuGenerationRoute;
   }
 
   /// Get the appropriate route based on user role and assignment
@@ -431,6 +466,8 @@ class AppRouter {
     if (user == null) return dashboardRoute;
 
     switch (user.role) {
+      case UserRole.admin:
+        return adminDashboardRoute; // Redirect admins to admin dashboard
       case UserRole.viewer:
         final assignment = user.assignment?.toLowerCase();
         if (assignment == 'kitchen' || assignment == 'kitchen_read') {
@@ -443,7 +480,6 @@ class AppRouter {
       case UserRole.waiter:
       case UserRole.waitstaff:
         return dashboardRoute; // Use dashboard for waitstaff
-      case UserRole.admin:
       case UserRole.owner:
       case UserRole.manager:
       case UserRole.cashier:
@@ -483,15 +519,26 @@ class _MainAppShell extends ConsumerWidget {
     final navigationItems = <BottomNavigationBarItem>[];
     final navigationRoutes = <String>[];
     
-    // Dashboard - available to all authenticated users
-    navigationItems.add(const BottomNavigationBarItem(
-      icon: Icon(Icons.dashboard),
-      label: 'Dashboard',
-    ));
-    navigationRoutes.add(AppRouter.dashboardRoute);
+    // Dashboard - available to all authenticated users except admin
+    if (authState.user?.role != UserRole.admin) {
+      navigationItems.add(const BottomNavigationBarItem(
+        icon: Icon(Icons.dashboard),
+        label: 'Dashboard',
+      ));
+      navigationRoutes.add(AppRouter.dashboardRoute);
+    }
     
-    // Analytics - available to admin, manager, and owner
-    if (authState.canAccessAnalytics) {
+    // Admin Dashboard - available only to admin users
+    if (authState.user?.role == UserRole.admin) {
+      navigationItems.add(const BottomNavigationBarItem(
+        icon: Icon(Icons.admin_panel_settings),
+        label: 'Admin',
+      ));
+      navigationRoutes.add(AppRouter.adminDashboardRoute);
+    }
+    
+    // Analytics - available to admin, manager, and owner (but not shown for admin in nav)
+    if (authState.canAccessAnalytics && authState.user?.role != UserRole.admin) {
       navigationItems.add(const BottomNavigationBarItem(
         icon: Icon(Icons.analytics),
         label: 'Analytics',
@@ -519,8 +566,8 @@ class _MainAppShell extends ConsumerWidget {
       navigationRoutes.add(AppRouter.inventoryRoute);
     }
     
-        // Reports - available to admin and manager
-    if (authState.canAccessReports) {
+    // Reports - available to admin and manager (but not shown for admin in nav)
+    if (authState.canAccessReports && authState.user?.role != UserRole.admin) {
       navigationItems.add(const BottomNavigationBarItem(
         icon: Icon(Icons.assessment),
         label: 'Reports',
