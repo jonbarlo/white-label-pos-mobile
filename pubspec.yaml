@@ -52,6 +52,7 @@ dependencies:
   shimmer: ^3.0.0
   lottie: ^2.7.0
   carousel_slider: ^4.2.1
+  flutter_colorpicker: ^1.0.3
 
   # Navigation
   go_router: ^12.1.3

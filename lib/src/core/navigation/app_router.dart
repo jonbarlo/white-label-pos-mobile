@@ -33,6 +33,7 @@ import '../../features/promotions/promotions_screen.dart';
 import '../../features/admin/admin_menu_management_screen.dart';
 import '../../features/admin/admin_dashboard_screen.dart';
 import '../../features/admin/pdf_menu_generation_screen.dart';
+import '../../features/admin/custom_template_management_screen.dart';
 
 
 /// Provider for SharedPreferences
@@ -90,6 +91,7 @@ class AppRouter {
   static const String adminMenuManagementRoute = '/admin/menu-management';
   static const String adminDashboardRoute = '/admin/dashboard';
   static const String pdfMenuGenerationRoute = '/admin/pdf-menu-generation';
+  static const String customTemplateManagementRoute = '/admin/custom-templates';
 
   /// Create the main router configuration
   static GoRouter createRouter(Ref ref) {
@@ -233,6 +235,11 @@ class AppRouter {
           path: pdfMenuGenerationRoute,
           name: 'pdf-menu-generation',
           builder: (context, state) => const PdfMenuGenerationScreen(),
+        ),
+        GoRoute(
+          path: customTemplateManagementRoute,
+          name: 'custom-template-management',
+          builder: (context, state) => const CustomTemplateManagementScreen(),
         ),
           ],
         ),
@@ -457,7 +464,8 @@ class AppRouter {
            location == splitBillingRoute ||
            location == adminDashboardRoute ||
            location == adminMenuManagementRoute ||
-           location == pdfMenuGenerationRoute;
+           location == pdfMenuGenerationRoute ||
+           location == customTemplateManagementRoute;
   }
 
   /// Get the appropriate route based on user role and assignment

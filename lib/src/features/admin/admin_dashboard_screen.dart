@@ -436,6 +436,18 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                   height: cardHeight,
                   child: _buildFeatureCard(
                     theme,
+                    'Custom Templates',
+                    'Manage custom menu templates',
+                    Icons.description_outlined,
+                    Colors.indigo,
+                    () => context.go('/admin/custom-templates'),
+                  ),
+                ),
+                SizedBox(
+                  width: cardWidth,
+                  height: cardHeight,
+                  child: _buildFeatureCard(
+                    theme,
                     'Menu Templates',
                     'Create and manage menu templates',
                     Icons.copy,

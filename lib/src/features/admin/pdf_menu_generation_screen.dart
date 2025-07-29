@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:typed_data';
 import 'dart:html' as html;
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import '../../core/theme/theme_provider.dart';
 import '../auth/models/user.dart';
 import '../auth/auth_provider.dart';
 import 'admin_menu_provider.dart';
 import 'pdf_menu_provider.dart';
+import 'models/custom_menu_template.dart';
 
 class PdfMenuGenerationScreen extends ConsumerStatefulWidget {
   const PdfMenuGenerationScreen({super.key});
@@ -21,18 +23,62 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
   bool _includeDescriptions = true;
   bool _includeAllergens = true;
   bool _includeCalories = true;
+  bool _includeItemImages = true; // New option for menu item images
+  bool _includeBusinessLogo = true; // New option for business logo
   String _orientation = 'portrait';
   String _fontSize = 'medium';
   String _colorScheme = 'light';
+  // New category layout options
+  String _categoryLayout = 'same-page';
+  String _categoryBackgroundColor = '#0066CC';
+  int _maxItemsPerPage = 8;
   bool _isGenerating = false;
+  List<CustomMenuTemplate> _customTemplates = [];
+  bool _isLoadingCustomTemplates = false;
+  
+  // Controller for the color text field
+  late TextEditingController _colorController;
 
   @override
   void initState() {
     super.initState();
+    // Initialize the color controller
+    _colorController = TextEditingController(text: _categoryBackgroundColor);
+    
     // Load templates when screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(pdfMenuProvider.notifier).loadTemplates();
+      _loadCustomTemplates();
     });
+  }
+
+  @override
+  void dispose() {
+    _colorController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadCustomTemplates() async {
+    setState(() {
+      _isLoadingCustomTemplates = true;
+    });
+
+    try {
+      final authState = ref.read(authNotifierProvider);
+      final businessId = authState.user?.businessId ?? 1;
+      
+      final templates = await ref.read(pdfMenuProvider.notifier).getCustomTemplates(businessId);
+      setState(() {
+        _customTemplates = templates;
+        _isLoadingCustomTemplates = false;
+      });
+    } catch (error) {
+      setState(() {
+        _isLoadingCustomTemplates = false;
+      });
+      // Don't show error for custom templates, just log it
+      print('Error loading custom templates: $error');
+    }
   }
 
   @override
@@ -102,6 +148,8 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
             _buildContentOptions(theme),
             const SizedBox(height: 24),
             _buildLayoutOptions(theme),
+            const SizedBox(height: 24),
+            _buildCategoryLayoutOptions(theme),
             const SizedBox(height: 32),
             _buildGenerateButton(theme),
           ],
@@ -293,6 +341,26 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
                 });
               },
             ),
+            CheckboxListTile(
+              title: const Text('Include Item Images'),
+              subtitle: const Text('Show menu item images in the PDF'),
+              value: _includeItemImages,
+              onChanged: (value) {
+                setState(() {
+                  _includeItemImages = value ?? true;
+                });
+              },
+            ),
+            CheckboxListTile(
+              title: const Text('Include Business Logo'),
+              subtitle: const Text('Show business logo in the PDF header'),
+              value: _includeBusinessLogo,
+              onChanged: (value) {
+                setState(() {
+                  _includeBusinessLogo = value ?? true;
+                });
+              },
+            ),
           ],
         ),
       ),
@@ -371,6 +439,115 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
     );
   }
 
+  Widget _buildCategoryLayoutOptions(ThemeData theme) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Category Layout Options',
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<String>(
+              value: _categoryLayout,
+              decoration: const InputDecoration(
+                labelText: 'Category Layout',
+                border: OutlineInputBorder(),
+                helperText: 'How categories are organized in the PDF',
+              ),
+              items: const [
+                DropdownMenuItem(
+                  value: 'same-page',
+                  child: Text('Same Page (Category + Items together)'),
+                ),
+                DropdownMenuItem(
+                  value: 'separate-page',
+                  child: Text('Separate Page (Category title page + items pages)'),
+                ),
+              ],
+              onChanged: (value) {
+                setState(() {
+                  _categoryLayout = value ?? 'same-page';
+                });
+              },
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    controller: _colorController,
+                    decoration: const InputDecoration(
+                      labelText: 'Category Background Color',
+                      border: OutlineInputBorder(),
+                      helperText: 'Hex color code (e.g., #f8f9fa)',
+                      prefixIcon: Icon(Icons.palette),
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        _categoryBackgroundColor = value;
+                      });
+                    },
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: _parseHexColor(_categoryBackgroundColor),
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(4),
+                      onTap: () => _showColorPicker(context),
+                      child: Icon(
+                        Icons.colorize,
+                        color: _parseHexColor(_categoryBackgroundColor).computeLuminance() > 0.5 
+                            ? Colors.black 
+                            : Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    initialValue: _maxItemsPerPage.toString(),
+                    decoration: const InputDecoration(
+                      labelText: 'Max Items Per Page',
+                      border: OutlineInputBorder(),
+                      helperText: 'Default: 8',
+                    ),
+                    keyboardType: TextInputType.number,
+                    onChanged: (value) {
+                      setState(() {
+                        _maxItemsPerPage = int.tryParse(value) ?? 8;
+                      });
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildGenerateButton(ThemeData theme) {
     return SizedBox(
       width: double.infinity,
@@ -432,9 +609,14 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
         includeDescriptions: _includeDescriptions,
         includeAllergens: _includeAllergens,
         includeCalories: _includeCalories,
+        includeItemImages: _includeItemImages,
+        includeBusinessLogo: _includeBusinessLogo,
         orientation: _orientation,
         fontSize: _fontSize,
         colorScheme: _colorScheme,
+        categoryLayout: _categoryLayout,
+        categoryBackgroundColor: _categoryBackgroundColor,
+        maxItemsPerPage: _maxItemsPerPage,
       );
       
       if (mounted) {
@@ -477,5 +659,88 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
       ..setAttribute('download', filename)
       ..click();
     html.Url.revokeObjectUrl(url);
+  }
+
+  void _showColorPicker(BuildContext context) {
+    Color currentColor = _parseHexColor(_categoryBackgroundColor);
+    Color selectedColor = currentColor; // Local state for the picker
+    
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('Pick Category Background Color'),
+              content: SingleChildScrollView(
+                child: ColorPicker(
+                  pickerColor: selectedColor,
+                  onColorChanged: (color) {
+                    setDialogState(() {
+                      selectedColor = color;
+                    });
+                  },
+                  enableAlpha: false,
+                  displayThumbColor: true,
+                  labelTypes: const [],
+                  pickerAreaHeightPercent: 0.8,
+                  pickerAreaBorderRadius: const BorderRadius.all(Radius.circular(4)),
+                  showLabel: false,
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  child: const Text('OK'),
+                  onPressed: () {
+                    setState(() {
+                      // Extract only RGB values (without alpha) and convert to hex
+                      final red = selectedColor.red.toRadixString(16).padLeft(2, '0');
+                      final green = selectedColor.green.toRadixString(16).padLeft(2, '0');
+                      final blue = selectedColor.blue.toRadixString(16).padLeft(2, '0');
+                      _categoryBackgroundColor = '#$red$green$blue';
+                      _colorController.text = _categoryBackgroundColor;
+                    });
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Color _parseHexColor(String hex) {
+    try {
+      hex = hex.replaceAll('#', '');
+      if (hex.isEmpty) return Colors.grey;
+      
+      // Handle 3-digit hex (e.g., "f8f" -> "f8f8f8")
+      if (hex.length == 3) {
+        hex = hex.split('').map((char) => char + char).join();
+      }
+      
+      // Handle 6-digit hex (add alpha)
+      if (hex.length == 6) {
+        hex = 'FF' + hex;
+      }
+      
+      // Validate length
+      if (hex.length != 8) {
+        return Colors.grey;
+      }
+      
+      return Color(int.parse(hex, radix: 16));
+    } catch (e) {
+      print('Error parsing hex color: $hex - $e');
+      return Colors.grey;
+    }
   }
 }
