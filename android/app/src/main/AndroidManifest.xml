@@ -1,6 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Permissions for file storage and PDF download -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+    
     <application
-        android:label="white_label_pos_mobile"
+        android:label="PreventWastePOS(Prod)"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

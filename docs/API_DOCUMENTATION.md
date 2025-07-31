@@ -467,6 +467,7 @@ Authorization: Bearer <your_jwt_token>
 - `paymentMethod` (string: "cash", "card", "mobile", "other")
 - `status` (string: "pending", "completed", "cancelled", "refunded")
 - `notes` (string)
+- `existingOrderId` (integer) - **NEW**: Optional order ID to link this sale to an existing order. If provided, the order status will be updated to 'completed' and table will be freed up.
 
 **Request Body:**
 ```json
@@ -481,7 +482,8 @@ Authorization: Bearer <your_jwt_token>
   "totalAmount": 1193.49,
   "paymentMethod": "card",
   "status": "completed",
-  "notes": "Customer requested extra napkins"
+  "notes": "Customer requested extra napkins",
+  "existingOrderId": 13
 }
 ```
 
@@ -494,12 +496,13 @@ Authorization: Bearer <your_jwt_token>
 - `userId` (integer) - User ID who created the sale (required by database schema)
 
 **Order Item Required Fields:**
-- `itemId` (integer) - Menu item ID
+- `itemId` (integer) - Menu item ID (will be converted to inventory item ID)
 - `quantity` (integer) - Quantity ordered
 - `unitPrice` (number) - Unit price (REQUIRED - this was missing!)
 
 **Optional Fields:**
 - `customerName`, `customerEmail`, `subtotal`, `tax`, `discount`, `totalAmount`, `paymentMethod`, `status`
+- `existingOrderId` (integer) - **NEW**: Optional order ID to link this sale to an existing order. If provided, the order status will be updated to 'completed' and table will be freed up.
 
 **Request Body:**
 ```json
@@ -508,6 +511,7 @@ Authorization: Bearer <your_jwt_token>
   "businessId": 1,
   "customerName": "John Doe",
   "totalAmount": 1193.49,
+  "existingOrderId": 13,
   "orderItems": [
     {
       "itemId": 1,
@@ -1179,6 +1183,9 @@ Authorization: Bearer <your_jwt_token>
 **Request Body:**
 ```json
 {
+  "customerName": "John Smith",
+  "customerPhone": "+1-555-0101",
+  "customerEmail": "john@example.com",
   "partySize": 4,
   "serverId": 2,
   "notes": "Window seat preferred"
@@ -1189,13 +1196,16 @@ Authorization: Bearer <your_jwt_token>
 - `partySize` (integer) - Number of customers being seated
 
 **Optional Fields:**
+- `customerName` (string) - Customer name for walk-in customers
+- `customerPhone` (string) - Customer phone number
+- `customerEmail` (string) - Customer email address (used to link to existing customer record)
 - `serverId` (integer) - ID of the waiter/server assigned
 - `notes` (string) - Additional notes about the seating
 
 **Response:**
 ```json
 {
-  "data": {
+  "table": {
     "id": 1,
     "businessId": 1,
     "tableNumber": "A1",
@@ -1203,14 +1213,40 @@ Authorization: Bearer <your_jwt_token>
     "partySize": 4,
     "status": "occupied",
     "section": "Main Floor",
-    "currentOrderId": null,
+    "currentOrderId": 123,
     "serverId": 2,
+    "customerName": "John Smith",
+    "notes": "Window seat preferred",
     "isActive": true,
     "createdAt": "2025-01-01T00:00:00.000Z",
     "updatedAt": "2025-01-01T12:00:00.000Z"
+  },
+  "order": {
+    "id": 123,
+    "orderNumber": "ORDER-1704067200000-1",
+    "orderType": "dine_in",
+    "status": "pending",
+    "totalAmount": 0,
+    "customerId": 456,
+    "notes": "Window seat preferred"
+  },
+  "customer": {
+    "id": 456,
+    "name": "John Smith",
+    "email": "john@example.com",
+    "phone": "+1-555-0101",
+    "loyaltyPoints": 0,
+    "totalSpent": "0.00",
+    "visitCount": 1
   }
 }
 ```
+
+**Business Logic:**
+- If `customerEmail` is provided and matches an existing customer, the system links to that customer record
+- If no matching customer is found, a new customer record is created
+- Customer information is stored both in the customer record (for loyalty/reporting) and on the table (for immediate reference)
+- An order is automatically created for the seated customers
 
 ---
 
@@ -2444,7 +2480,6 @@ Authorization: Bearer <your_jwt_token>
       "height": 800,
       "backgroundImage": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&h=800&fit=crop",
       "isActive": true,
-      "tableCount": 12,
       "createdAt": "2025-01-01T00:00:00.000Z",
       "updatedAt": "2025-01-01T00:00:00.000Z"
     }
@@ -2737,6 +2772,604 @@ curl -X GET "http://localhost:3031/api/tables/1/reservations?date=2024-01-15&sta
 
 ---
 
+## Smart Recipe Suggestions Endpoints
+
+### Get Smart Recipe Suggestions
+**GET** `/smart/smart-suggestions`
+
+**Purpose:** Get AI-powered recipe suggestions based on inventory management
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+**Query Parameters:**
+- `includeExpiringItems` (boolean, optional, default: false) - Include items that are expiring soon
+- `includeUnderperformingItems` (boolean, optional, default: false) - Include items with low sales velocity
+- `maxDaysToExpiry` (integer, optional, default: 7) - Maximum days to expiry for items to consider
+- `minSalesVelocity` (number, optional, default: 0.1) - Minimum sales velocity threshold
+- `maxDaysSinceLastSale` (integer, optional, default: 30) - Maximum days since last sale
+- `limit` (integer, optional, default: 10) - Maximum number of suggestions to return
+
+**Request:**
+```bash
+curl -X GET "http://localhost:3031/api/smart/smart-suggestions?includeExpiringItems=true&includeUnderperformingItems=true&limit=5" \
+  -H "Authorization: Bearer <token>"
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "suggestions": [
+    {
+      "recipeId": 4,
+      "recipeName": "Truffle Pizza",
+      "recipeDescription": "Luxury pizza with black truffle, mozzarella, parmesan, and arugula",
+      "recipeDifficulty": "medium",
+      "prepTime": 25,
+      "cookTime": 15,
+      "imageUrl": "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=400&h=300&fit=crop&crop=center",
+      "suggestedItems": [
+        {
+          "itemId": 33,
+          "itemName": "Fresh Mozzarella (Expiring Soon)",
+          "currentStock": 12,
+          "expirationDate": "2025-07-22T06:16:04.404Z",
+          "daysToExpiry": 2,
+          "salesVelocity": 0.08,
+          "daysSinceLastSale": 3,
+          "reason": "Expires in 2 days"
+        },
+        {
+          "itemId": 36,
+          "itemName": "Truffle Oil (Underperforming)",
+          "currentStock": 8,
+          "expirationDate": null,
+          "salesVelocity": 0.03,
+          "daysSinceLastSale": 35,
+          "reason": "Low sales velocity"
+        }
+      ],
+      "confidence": 0.95,
+      "totalPotentialSavings": 228.6,
+      "urgency": "high"
+    }
+  ],
+  "criteria": {
+    "businessId": 1,
+    "includeExpiringItems": true,
+    "includeUnderperformingItems": true,
+    "maxDaysToExpiry": 7,
+    "minSalesVelocity": 0.1,
+    "maxDaysSinceLastSale": 30,
+    "limit": 5
+  },
+  "totalSuggestions": 1
+}
+```
+
+**Status:** ✅ Working
+
+### Cook Recipe
+**POST** `/smart/cook-recipe`
+
+**Purpose:** Cook a recipe and consume inventory items
+
+**Headers:**
+- `Authorization: Bearer <token>`
+- `Content-Type: application/json`
+
+**Request Body:**
+```json
+{
+  "recipeId": 4,
+  "quantity": 1
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "cookingResult": {
+    "recipeId": 4,
+    "recipeName": "Truffle Pizza",
+    "quantity": 1,
+    "consumedItems": [
+      {
+        "itemId": 33,
+        "itemName": "Fresh Mozzarella",
+        "quantityConsumed": 1,
+        "remainingStock": 11,
+        "originalStock": 12,
+        "unitCost": 0
+      }
+    ],
+    "costSavings": 228.6,
+    "wasteReduction": 171.45
+  },
+  "createdPromotion": {
+    "id": 15,
+    "name": "Chef's Special: Truffle Pizza",
+    "discountType": "percentage",
+    "discountValue": 15,
+    "expiresAt": "2025-07-22T23:59:59Z"
+  }
+}
+```
+
+**Status:** ✅ Working
+
+### Get Cooking History
+**GET** `/smart/cooking-history`
+
+**Purpose:** Get cooking history for the business
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+**Query Parameters:**
+- `limit` (integer, optional, default: 50) - Maximum number of records to return
+- `offset` (integer, optional, default: 0) - Number of records to skip
+
+**Request:**
+```bash
+curl -X GET "http://localhost:3031/api/smart/cooking-history?limit=10&offset=0" \
+  -H "Authorization: Bearer <token>"
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "history": [
+    {
+      "id": 1,
+      "recipeId": 4,
+      "quantity": 1,
+      "cookedAt": "2025-07-20T20:30:00.000Z",
+      "wasteReduction": 171.45,
+      "costSavings": 228.6,
+      "createdPromotionId": 15
+    }
+  ],
+  "total": 1,
+  "pagination": {
+    "limit": 10,
+    "offset": 0,
+    "hasMore": false
+  }
+}
+```
+
+**Status:** ✅ Working
+
+### Get Cooking Analytics
+**GET** `/smart/cooking-analytics`
+
+**Purpose:** Get cooking analytics for the business
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+**Request:**
+```bash
+curl -X GET "http://localhost:3031/api/smart/cooking-analytics" \
+  -H "Authorization: Bearer <token>"
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "analytics": {
+    "totalCooked": 5,
+    "totalWasteReduction": 857.25,
+    "totalCostSavings": 1143.0,
+    "averageEfficiency": 75.0
+  }
+}
+```
+
+**Status:** ✅ Working
+
+### Get Inventory Summary
+**GET** `/smart/inventory-summary`
+
+**Purpose:** Get inventory summary for dashboard
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+**Request:**
+```bash
+curl -X GET "http://localhost:3031/api/smart/inventory-summary" \
+  -H "Authorization: Bearer <token>"
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "totalItems": 27,
+  "expiringSoon": 3,
+  "underperforming": 3,
+  "lowStockItems": 0,
+  "expiringPercentage": 11.11,
+  "underperformingPercentage": 11.11
+}
+```
+
+**Status:** ✅ Working
+
+### Get Expiring Items
+**GET** `/smart/expiring-items`
+
+**Purpose:** Get items that are expiring soon
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+**Query Parameters:**
+- `days` (integer, optional, default: 7) - Number of days to look ahead for expiring items
+
+**Request:**
+```bash
+curl -X GET "http://localhost:3031/api/smart/expiring-items?days=7" \
+  -H "Authorization: Bearer <token>"
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "items": [
+    {
+      "id": 20,
+      "name": "Premium Black Truffle Pasta",
+      "stock": 5,
+      "expirationDate": "2025-07-21T06:15:58.830Z",
+      "daysToExpiry": 1,
+      "cost": 15,
+      "potentialLoss": 75
+    },
+    {
+      "id": 21,
+      "name": "Premium Lobster Ravioli",
+      "stock": 13,
+      "expirationDate": "2025-07-21T06:15:58.830Z",
+      "daysToExpiry": 1,
+      "cost": 16.5,
+      "potentialLoss": 214.5
+    }
+  ]
+}
+```
+
+**Status:** ✅ Working
+
+### Get Underperforming Items
+**GET** `/smart/underperforming-items`
+
+**Purpose:** Get underperforming items
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+**Request:**
+```bash
+curl -X GET "http://localhost:3031/api/smart/underperforming-items" \
+  -H "Authorization: Bearer <token>"
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "items": [
+    {
+      "id": 35,
+      "name": "Premium Saffron (Underperforming)",
+      "stock": 5,
+      "salesVelocity": 0.02,
+      "daysSinceLastSale": 45,
+      "lastSoldDate": "2025-06-05T06:16:04.529Z",
+      "cost": 25,
+      "potentialLoss": 125
+    },
+    {
+      "id": 36,
+      "name": "Truffle Oil (Underperforming)",
+      "stock": 8,
+      "salesVelocity": 0.03,
+      "daysSinceLastSale": 35,
+      "lastSoldDate": "2025-06-15T06:16:04.529Z",
+      "cost": 18,
+      "potentialLoss": 144
+    }
+  ]
+}
+```
+
+**Status:** ✅ Working
+
+### Update Item Tracking
+**POST** `/smart/update-tracking`
+
+**Purpose:** Update item inventory tracking data
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+**Request:**
+```bash
+curl -X POST "http://localhost:3031/api/smart/update-tracking" \
+  -H "Authorization: Bearer <token>"
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Inventory tracking data updated successfully"
+}
+```
+
+**Status:** ✅ Working
+
+---
+
+## AI Recipe Generation Endpoints
+
+### Generate AI Recipe
+**POST** `/ai/generate-recipe`
+
+**Purpose:** Generate a new recipe using Claude API based on available ingredients and preferences
+
+**Headers:**
+- `Authorization: Bearer <token>`
+- `Content-Type: application/json`
+
+**Request Body:**
+```json
+{
+  "expiringItems": [
+    {
+      "name": "Fresh Basil",
+      "quantity": 2,
+      "category": "herbs"
+    },
+    {
+      "name": "Cherry Tomatoes",
+      "quantity": 1,
+      "category": "vegetables"
+    },
+    {
+      "name": "Mozzarella",
+      "quantity": 200,
+      "category": "dairy"
+    }
+  ],
+  "cuisine": "Italian",
+  "difficulty": "medium",
+  "servings": 4,
+  "dietaryRestrictions": ["vegetarian", "gluten-free"]
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "recipe": {
+    "recipeName": "Fresh Basil Caprese Salad",
+    "description": "A refreshing Italian salad using fresh basil and cherry tomatoes",
+    "ingredients": [
+      {
+        "name": "Fresh Basil",
+        "quantity": 2,
+        "unit": "cups",
+        "notes": "Freshly picked"
+      },
+      {
+        "name": "Cherry Tomatoes",
+        "quantity": 1,
+        "unit": "pint",
+        "notes": "Halved"
+      },
+      {
+        "name": "Mozzarella",
+        "quantity": 200,
+        "unit": "grams",
+        "notes": "Fresh, torn into pieces"
+      }
+    ],
+    "instructions": [
+      "Wash and dry the fresh basil leaves",
+      "Halve the cherry tomatoes",
+      "Tear the mozzarella into bite-sized pieces",
+      "Combine all ingredients in a large bowl",
+      "Drizzle with olive oil and balsamic vinegar",
+      "Season with salt and pepper to taste"
+    ],
+    "prepTime": 15,
+    "cookTime": 0,
+    "difficulty": "easy",
+    "estimatedCost": 12.50,
+    "confidence": 0.85
+  },
+  "validation": {
+    "isValid": true,
+    "confidence": 0.85,
+    "warnings": [],
+    "provider": "claude"
+  },
+  "approvalId": 123,
+  "aiProvider": "claude"
+}
+```
+
+**Status:** 🚧 Not Yet Implemented
+
+### Generate Batch Recipes
+**POST** `/ai/generate-batch-recipes`
+
+**Purpose:** Generate multiple recipes using AI for different ingredient combinations
+
+**Headers:**
+- `Authorization: Bearer <token>`
+- `Content-Type: application/json`
+
+**Request Body:**
+```json
+{
+  "requests": [
+    {
+      "expiringItems": [
+        {
+          "name": "Fresh Basil",
+          "quantity": 2,
+          "category": "herbs"
+        }
+      ],
+      "cuisine": "Italian",
+      "difficulty": "easy",
+      "servings": 2
+    },
+    {
+      "expiringItems": [
+        {
+          "name": "Cherry Tomatoes",
+          "quantity": 1,
+          "category": "vegetables"
+        }
+      ],
+      "cuisine": "Mediterranean",
+      "difficulty": "medium",
+      "servings": 4
+    }
+  ]
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "recipes": [
+    {
+      "recipeName": "Basil Pesto Pasta",
+      "description": "Simple pasta with fresh basil pesto",
+      "ingredients": [...],
+      "instructions": [...],
+      "prepTime": 10,
+      "cookTime": 15,
+      "difficulty": "easy",
+      "estimatedCost": 8.50,
+      "confidence": 0.90
+    },
+    {
+      "recipeName": "Mediterranean Tomato Salad",
+      "description": "Fresh tomato salad with Mediterranean flavors",
+      "ingredients": [...],
+      "instructions": [...],
+      "prepTime": 20,
+      "cookTime": 0,
+      "difficulty": "medium",
+      "estimatedCost": 15.00,
+      "confidence": 0.85
+    }
+  ],
+  "totalGenerated": 2,
+  "aiProvider": "claude"
+}
+```
+
+**Status:** 🚧 Not Yet Implemented
+
+### Approve AI Recipe
+**POST** `/ai/approve-recipe/{approvalId}`
+
+**Purpose:** Approve an AI-generated recipe to add it to the menu
+
+**Headers:**
+- `Authorization: Bearer <token>`
+- `Content-Type: application/json`
+
+**Path Parameters:**
+- `approvalId` (integer) - ID of the recipe approval record
+
+**Request Body:**
+```json
+{
+  "approved": true,
+  "notes": "Great recipe! Added some extra seasoning.",
+  "modifications": {
+    "addedIngredients": ["Extra virgin olive oil", "Balsamic vinegar"],
+    "modifiedInstructions": "Added step to drizzle with olive oil"
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "recipeId": 456,
+  "status": "approved"
+}
+```
+
+**Status:** 🚧 Not Yet Implemented
+
+### Get AI Usage Statistics
+**GET** `/ai/usage-stats`
+
+**Purpose:** Get statistics about AI recipe generation usage and costs
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+**Query Parameters:**
+- `startDate` (string, optional) - Start date for statistics (YYYY-MM-DD)
+- `endDate` (string, optional) - End date for statistics (YYYY-MM-DD)
+- `provider` (string, optional) - AI provider filter (claude, openai, all)
+
+**Request:**
+```bash
+curl -X GET "http://localhost:3031/api/ai/usage-stats?startDate=2025-01-01&endDate=2025-01-31&provider=claude" \
+  -H "Authorization: Bearer <token>"
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "stats": {
+    "totalRecipesGenerated": 45,
+    "totalCost": 0.89,
+    "averageGenerationTime": 2.3,
+    "successRate": 0.96,
+    "chefApprovalRate": 0.87,
+    "popularCuisines": ["Italian", "Asian", "Mediterranean"],
+    "costTrends": [
+      {
+        "date": "2025-01-01",
+        "cost": 0.02
+      },
+      {
+        "date": "2025-01-02",
+        "cost": 0.03
+      }
+    ]
+  }
+}
+```
+
+**Status:** 🚧 Not Yet Implemented
+
+---
+
 ## Error Responses
 
 All endpoints return errors in this format:
@@ -2754,82 +3387,155 @@ Common HTTP Status Codes:
 - `409` - Conflict (e.g., duplicate SKU/barcode)
 - `500` - Internal Server Error
 
----
+## 📄 PDF Menu Generation
 
-## Important Notes
+The API provides comprehensive PDF menu generation capabilities with professional templates and custom theming options.
 
-1. **Authentication**: All endpoints (except health checks) require Bearer token authentication
-2. **Business Scoping**: All data is scoped to the authenticated user's business
-3. **Validation**: Input validation is enforced at the controller level
-4. **Auto-generation**: SKU and barcode are auto-generated if not provided for items
-5. **Split Billing**: Total payment amounts must equal the sale total amount
-6. **User ID**: Most endpoints require or expect userId in the payload for proper tracking
-7. **Staff Messaging**: 
-   - Messages are automatically scoped to the user's business
-   - Sender information is automatically populated from the authenticated user
-   - Read/acknowledge status is tracked per user
-   - Expired messages are automatically marked as expired
-   - Recipient types: "all", "waitstaff", "kitchen", "managers", "specific_users"
-   - Message types: "announcement", "inventory_alert", "promotion", "discount", "urgent", "general"
-   - Priorities: "low", "normal", "high", "urgent"
-8. **Table Management**:
-   - Table status automatically updates when orders are created/completed
-   - Available → Occupied (when first order is placed)
-   - Occupied → Available (when order is completed)
-   - Tables can be marked as "reserved" for reservations
-   - Reservation data is automatically included in table responses when applicable
-9. **Reservation System**:
-   - Reservations can be created with or without table assignment
-   - Reservation data is automatically included in table responses when:
-     - Table status is "reserved"
-     - Table has active reservations (status: pending or confirmed)
-     - Reservation date matches today's date
-   - Reservation statuses: pending, confirmed, seated, completed, cancelled, no_show
-   - Party size validation: 1-20 guests
-   - Date format: YYYY-MM-DD, Time format: HH:MM:SS
-10. **Order Management**:
-    - Orders can be created for tables, takeaway, or delivery
-    - Kitchen orders are automatically generated for dine-in orders
-    - Order status flows: pending → preparing → ready → completed
-11. **Mobile App Compatibility**:
-    - `/api/messages` is an alias for `/api/staff-messages`
-    - `/api/promotions` returns filtered promotional messages
-    - All mobile app endpoints require authentication
-    - Table endpoints automatically include reservation data for mobile display
-    - Floor plan endpoints include table positions with reservation data
-12. **Response Format**: All endpoints return consistent response format:
-    - Success responses: `{success: true, data: {...}, message: "..."}`
-    - List responses include pagination: `{success: true, data: [...], pagination: {...}}`
-    - Error responses: `{error: "error message"}`
-13. **Required Fields**: 
-    - Sales endpoints require `userId` and `businessId` (not `customerName`)
-    - Sales with items require `unitPrice` for each item
-    - All timestamps include both `createdAt` and `updatedAt`
-    - Reservations require `customerName`, `partySize`, `reservationDate`, `reservationTime`
-14. **Sales Analytics**:
-    - All analytics endpoints support date filtering with `startDate` and `endDate` parameters
-    - Date format: YYYY-MM-DD
-    - Analytics are business-scoped and require appropriate permissions
-    - Item performance includes profit margins, growth rates, and rankings
-    - Revenue trends support daily, weekly, and monthly grouping
-    - Staff performance includes efficiency metrics and customer satisfaction
-    - Customer analytics categorize customers as new, returning, or loyal
-    - Inventory analytics provide stock alerts and reorder recommendations
-15. **Sales with Items**:
-    - `/sales/{id}/with-items` returns complete sale details including all items
-    - Includes item SKU, barcode, category, and pricing information
-    - Perfect for mobile apps requiring detailed sale information
-    - Business-scoped for security
-16. **Floor Plan Management**:
-    - Floor plans have dimensions (width/height) for visual representation
-    - Table positions include x/y coordinates, rotation, and size
-    - Background images can be set for visual floor plan representation
-    - Tables can be positioned on multiple floor plans
-    - Floor plans are business-scoped
-    - Table positions include reservation data when tables are reserved
-17. **Table Management**:
-    - Tables have status tracking (available, occupied, reserved, cleaning, out_of_service)
-    - Tables can be assigned to sections (Main Floor, Patio, etc.)
-    - Table positions are managed separately from table definitions
-    - Table status updates automatically with order lifecycle
-    - Reservation data is automatically included in table responses when applicable
+### Available Templates
+
+The system includes 4 professionally designed templates based on Apple HIG and Material UI principles:
+
+#### 1. **Elegant** - Sophisticated Fine Dining
+- **Style**: Premium design with serif fonts and gold accents
+- **Best for**: High-end restaurants, fine dining, upscale establishments
+- **Features**: Playfair Display serif font, gold gradient accents, elegant typography, sophisticated layout
+
+#### 2. **Modern** - Contemporary Design
+- **Style**: Clean and contemporary with sans-serif fonts
+- **Best for**: Contemporary restaurants, cafes, modern dining concepts
+- **Features**: Inter font, iOS-style colors, clean layout, Material Design principles
+
+#### 3. **Classic** - Traditional Restaurant Style
+- **Style**: Traditional restaurant menu with refined typography
+- **Best for**: Traditional restaurants, family establishments, classic dining
+- **Features**: Crimson Text serif font, traditional layout, elegant borders
+
+#### 4. **Minimal** - Clean and Simple
+- **Style**: Minimalist design focusing on content
+- **Best for**: Minimalist restaurants, cafes, content-focused menus
+- **Features**: Inter font, clean layout, focus on readability, subtle accents
+
+### Built-in Template Endpoints
+
+#### GET /api/menu/pdf/templates
+**Purpose**: Get available built-in templates
+
+**Response**:
+```json
+{
+  "templates": [
+    {
+      "id": "elegant",
+      "name": "Elegant",
+      "description": "Sophisticated design with serif fonts and gold accents"
+    },
+    {
+      "id": "modern", 
+      "name": "Modern",
+      "description": "Clean and contemporary design with sans-serif fonts"
+    },
+    {
+      "id": "classic",
+      "name": "Classic", 
+      "description": "Traditional restaurant menu style"
+    },
+    {
+      "id": "minimal",
+      "name": "Minimal",
+      "description": "Clean and simple design with focus on content"
+    }
+  ]
+}
+```
+
+#### GET /api/menu/pdf/{businessId}/preview
+**Purpose**: Preview menu with specific template
+
+**Parameters**:
+- `template` (optional): Template name (elegant, modern, classic, minimal)
+- `includePrices` (optional): Include prices in preview
+- `includeDescriptions` (optional): Include item descriptions
+- `includeAllergens` (optional): Include allergen information
+- `includeCalories` (optional): Include calorie information
+
+**Example Request**:
+```bash
+curl -X GET "http://localhost:3031/api/menu/pdf/1/preview?template=elegant&includePrices=true" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+#### POST /api/menu/pdf/{businessId}/pdf
+**Purpose**: Generate PDF menu with specific template
+
+**Request Body**:
+```json
+{
+  "template": "elegant",
+  "includePrices": true,
+  "includeDescriptions": true,
+  "includeAllergens": true,
+  "includeCalories": true,
+  "includeImages": true,
+  "includeBusinessLogo": true,
+  "orientation": "portrait",
+  "fontSize": "medium",
+  "colorScheme": "light",
+  "categoryLayout": "same-page",
+  "categoryBackgroundColor": "#f8f9fa",
+  "maxItemsPerPage": 8,
+  "showCategoryTitles": true
+}
+```
+
+**Category Layout Options**:
+- `categoryLayout`: How to organize categories in the PDF
+  - `"same-page"` (default): Category title + items on same page
+  - `"separate-page"`: Dedicated category title page + items pages without category headers
+- `categoryBackgroundColor`: Background color for category sections (default: "#f8f9fa")
+- `maxItemsPerPage`: Maximum number of items per page (default: 8)
+- `showCategoryTitles`: Whether to show category titles (default: true)
+
+**Response**: PDF file (binary)
+
+**Example Request**:
+```bash
+curl -X POST "http://localhost:3031/api/menu/pdf/1/pdf" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "template": "modern",
+    "includePrices": true,
+    "includeDescriptions": true,
+    "categoryLayout": "separate-page",
+    "categoryBackgroundColor": "#e3f2fd",
+    "maxItemsPerPage": 6
+  }' \
+  --output menu.pdf
+```
+
+**Category Layout Examples**:
+
+1. **Same Page Layout** (Default):
+```json
+{
+  "categoryLayout": "same-page",
+  "categoryBackgroundColor": "#f8f9fa"
+}
+```
+
+2. **Separate Page Layout**:
+```json
+{
+  "categoryLayout": "separate-page",
+  "categoryBackgroundColor": "#e3f2fd",
+  "maxItemsPerPage": 6
+}
+```
+
+3. **Title Only Layout**:
+```json
+{
+  "categoryLayout": "title-only",
+  "categoryBackgroundColor": "#fff3e0"
+}
+```

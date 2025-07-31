@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:typed_data';
-import 'dart:html' as html;
+import 'dart:io';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import '../../core/theme/theme_provider.dart';
 import '../auth/models/user.dart';
@@ -9,6 +9,11 @@ import '../auth/auth_provider.dart';
 import 'admin_menu_provider.dart';
 import 'pdf_menu_provider.dart';
 import 'models/custom_menu_template.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:open_file/open_file.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:universal_html/html.dart' as html;
 
 class PdfMenuGenerationScreen extends ConsumerStatefulWidget {
   const PdfMenuGenerationScreen({super.key});
@@ -648,17 +653,61 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
     }
   }
 
-  void _downloadPdf(Uint8List pdfBytes, int businessId) {
+  void _downloadPdf(Uint8List pdfBytes, int businessId) async {
     final timestamp = DateTime.now().millisecondsSinceEpoch;
     final filename = 'menu-$businessId-$timestamp.pdf';
     
-    // Create blob and download
-    final blob = html.Blob([pdfBytes], 'application/pdf');
+    if (kIsWeb) {
+      // Web platform - use HTML download
+      _downloadPdfWeb(pdfBytes, filename);
+    } else {
+      // Mobile platform - use file system
+      await _downloadPdfMobile(pdfBytes, filename);
+    }
+  }
+
+  void _downloadPdfWeb(Uint8List pdfBytes, String filename) {
+    // Web implementation - use universal_html package or show message
+    final blob = html.Blob([pdfBytes]);
     final url = html.Url.createObjectUrlFromBlob(blob);
     final anchor = html.AnchorElement(href: url)
-      ..setAttribute('download', filename)
-      ..click();
+      ..style.display = 'none'
+      ..download = filename;
+    html.document.body!.children.add(anchor);
+    anchor.click();
     html.Url.revokeObjectUrl(url);
+  }
+
+  Future<void> _downloadPdfMobile(Uint8List pdfBytes, String filename) async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final file = File('${directory.path}/$filename');
+
+      await file.writeAsBytes(pdfBytes);
+
+      // Request storage permissions for Android
+      final status = await Permission.storage.request();
+      final externalStatus = await Permission.manageExternalStorage.request();
+      
+      if (status.isGranted || externalStatus.isGranted) {
+        await OpenFile.open(file.path);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Permission denied to open file. Please grant storage permission in settings.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      print('Error downloading PDF on mobile: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error downloading PDF. Please try again.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   void _showColorPicker(BuildContext context) {
