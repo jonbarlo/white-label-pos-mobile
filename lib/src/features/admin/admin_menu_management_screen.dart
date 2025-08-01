@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../core/services/navigation_service.dart';
 import '../../core/theme/theme_provider.dart';
+import '../../shared/widgets/app_image.dart';
 import '../auth/models/user.dart';
 import '../auth/auth_provider.dart';
 import 'admin_menu_provider.dart';
@@ -493,13 +493,21 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: theme.colorScheme.primaryContainer,
-          child: Icon(
-            Icons.restaurant,
-            color: theme.colorScheme.onPrimaryContainer,
-          ),
-        ),
+        leading: item.imageUrl != null && item.imageUrl!.isNotEmpty
+            ? AppThumbnail(
+                imageUrl: item.imageUrl,
+                size: 50,
+                fallbackIcon: Icons.restaurant,
+                backgroundColor: theme.colorScheme.primaryContainer,
+                fallbackIconColor: theme.colorScheme.onPrimaryContainer,
+              )
+            : CircleAvatar(
+                backgroundColor: theme.colorScheme.primaryContainer,
+                child: Icon(
+                  Icons.restaurant,
+                  color: theme.colorScheme.onPrimaryContainer,
+                ),
+              ),
         title: Text(
           item.name,
           style: theme.textTheme.titleMedium,
@@ -677,6 +685,7 @@ class _CreateMenuItemDialogState extends ConsumerState<_CreateMenuItemDialog> {
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _priceController = TextEditingController();
+  final _imageUrlController = TextEditingController();
   String? _selectedBusinessId;
   String? _selectedCategoryId;
 
@@ -699,12 +708,12 @@ class _CreateMenuItemDialogState extends ConsumerState<_CreateMenuItemDialog> {
     _nameController.dispose();
     _descriptionController.dispose();
     _priceController.dispose();
+    _imageUrlController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final businessesAsync = ref.watch(adminBusinessesProvider);
     
     // Get the currently selected business ID
@@ -758,6 +767,16 @@ class _CreateMenuItemDialogState extends ConsumerState<_CreateMenuItemDialog> {
                   }
                   return null;
                 },
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _imageUrlController,
+                decoration: const InputDecoration(
+                  labelText: 'Image URL (Optional)',
+                  prefixIcon: Icon(Icons.image),
+                  hintText: 'https://example.com/image.jpg',
+                ),
+                keyboardType: TextInputType.url,
               ),
               const SizedBox(height: 16),
               businessesAsync.when(
@@ -847,6 +866,7 @@ class _CreateMenuItemDialogState extends ConsumerState<_CreateMenuItemDialog> {
       final name = _nameController.text;
       final description = _descriptionController.text;
       final price = double.parse(_priceController.text);
+      final imageUrl = _imageUrlController.text.isNotEmpty ? _imageUrlController.text : null;
       
       // Get the selected business ID from the notifier
       final selectedBusinessId = ref.read(adminMenuProvider.notifier).selectedBusinessId;
@@ -869,6 +889,7 @@ class _CreateMenuItemDialogState extends ConsumerState<_CreateMenuItemDialog> {
         price: price,
         businessId: businessId,
         categoryId: categoryId,
+        imageUrl: imageUrl,
       ).then((_) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
@@ -903,6 +924,7 @@ class _EditMenuItemDialogState extends ConsumerState<_EditMenuItemDialog> {
   late final TextEditingController _nameController;
   late final TextEditingController _descriptionController;
   late final TextEditingController _priceController;
+  late final TextEditingController _imageUrlController;
   late String? _selectedBusinessId;
   late String? _selectedCategoryId;
 
@@ -912,6 +934,7 @@ class _EditMenuItemDialogState extends ConsumerState<_EditMenuItemDialog> {
     _nameController = TextEditingController(text: widget.item.name);
     _descriptionController = TextEditingController(text: widget.item.description);
     _priceController = TextEditingController(text: widget.item.price.toString());
+    _imageUrlController = TextEditingController(text: widget.item.imageUrl ?? '');
     _selectedBusinessId = widget.item.businessId.toString();
     _selectedCategoryId = widget.item.categoryId.toString();
   }
@@ -921,16 +944,13 @@ class _EditMenuItemDialogState extends ConsumerState<_EditMenuItemDialog> {
     _nameController.dispose();
     _descriptionController.dispose();
     _priceController.dispose();
+    _imageUrlController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final businessesAsync = ref.watch(adminBusinessesProvider);
-    
-    // Create a provider for categories specific to this item's business
-    final categoriesAsync = ref.watch(adminCategoriesProvider);
 
     return AlertDialog(
       title: const Text('Edit Menu Item'),
@@ -980,6 +1000,16 @@ class _EditMenuItemDialogState extends ConsumerState<_EditMenuItemDialog> {
                   }
                   return null;
                 },
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _imageUrlController,
+                decoration: const InputDecoration(
+                  labelText: 'Image URL (Optional)',
+                  prefixIcon: Icon(Icons.image),
+                  hintText: 'https://example.com/image.jpg',
+                ),
+                keyboardType: TextInputType.url,
               ),
               const SizedBox(height: 16),
               businessesAsync.when(
@@ -1069,6 +1099,7 @@ class _EditMenuItemDialogState extends ConsumerState<_EditMenuItemDialog> {
       final name = _nameController.text;
       final description = _descriptionController.text;
       final price = double.parse(_priceController.text);
+      final imageUrl = _imageUrlController.text.isNotEmpty ? _imageUrlController.text : null;
       final businessId = int.parse(_selectedBusinessId!);
       final categoryId = int.parse(_selectedCategoryId!);
 
@@ -1080,6 +1111,7 @@ class _EditMenuItemDialogState extends ConsumerState<_EditMenuItemDialog> {
           price: price,
           businessId: businessId,
           categoryId: categoryId,
+          imageUrl: imageUrl,
         );
         
         Navigator.of(context).pop();

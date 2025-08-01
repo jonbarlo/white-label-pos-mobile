@@ -121,15 +121,22 @@ class AdminMenuRepository {
     required double price,
     required int businessId,
     required int categoryId,
+    String? imageUrl,
   }) async {
     try {
-      await _dio.post('/menu/items', data: {
+      final data = {
         'name': name,
         'description': description,
         'price': price,
         'businessId': businessId,
         'categoryId': categoryId,
-      });
+      };
+      
+      if (imageUrl != null && imageUrl.isNotEmpty) {
+        data['imageUrl'] = imageUrl;
+      }
+
+      await _dio.post('/menu/items', data: data);
     } catch (e) {
       throw Exception('Failed to create menu item: $e');
     }
@@ -142,6 +149,7 @@ class AdminMenuRepository {
     required double price,
     required int businessId,
     required int categoryId,
+    String? imageUrl,
     bool? isAvailable,
   }) async {
     try {
@@ -152,6 +160,10 @@ class AdminMenuRepository {
         'businessId': businessId,
         'categoryId': categoryId,
       };
+      
+      if (imageUrl != null && imageUrl.isNotEmpty) {
+        payload['imageUrl'] = imageUrl;
+      }
       
       if (isAvailable != null) {
         payload['isAvailable'] = isAvailable;
@@ -261,6 +273,7 @@ class AdminMenuNotifier extends StateNotifier<AsyncValue<List<AdminMenuItem>>> {
     required double price,
     required int businessId,
     required int categoryId,
+    String? imageUrl,
   }) async {
     try {
       await _repository.createMenuItem(
@@ -269,6 +282,7 @@ class AdminMenuNotifier extends StateNotifier<AsyncValue<List<AdminMenuItem>>> {
         price: price,
         businessId: businessId,
         categoryId: categoryId,
+        imageUrl: imageUrl,
       );
       // Refresh the menu items with current filters after creation
       await loadMenuItems(
@@ -289,6 +303,7 @@ class AdminMenuNotifier extends StateNotifier<AsyncValue<List<AdminMenuItem>>> {
     required double price,
     required int businessId,
     required int categoryId,
+    String? imageUrl,
     bool? isAvailable,
   }) async {
     try {
@@ -299,6 +314,7 @@ class AdminMenuNotifier extends StateNotifier<AsyncValue<List<AdminMenuItem>>> {
         price: price,
         businessId: businessId,
         categoryId: categoryId,
+        imageUrl: imageUrl,
         isAvailable: isAvailable,
       );
       // Refresh the menu items with current filters after update
