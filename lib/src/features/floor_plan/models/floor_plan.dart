@@ -1,8 +1,5 @@
-import 'package:json_annotation/json_annotation.dart';
 
-part 'floor_plan.g.dart';
 
-@JsonSerializable()
 class Customer {
   final int id;
   final String firstName;
@@ -41,7 +38,6 @@ class Customer {
   String get fullName => '$firstName $lastName';
 }
 
-@JsonSerializable()
 class Reservation {
   final int? id;
   final int? customerId;
@@ -161,7 +157,6 @@ class Reservation {
   }
 }
 
-@JsonSerializable()
 class FloorPlan {
   final int id;
   final int businessId;
@@ -243,10 +238,21 @@ class FloorPlan {
     );
   }
 
-  Map<String, dynamic> toJson() => _$FloorPlanToJson(this);
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'businessId': businessId,
+    'name': name,
+    'width': width,
+    'height': height,
+    'backgroundImage': backgroundImage,
+    'isActive': isActive,
+    'tableCount': tableCount,
+    'tables': tables?.map((t) => t.toJson()).toList(),
+    'createdAt': createdAt?.toIso8601String(),
+    'updatedAt': updatedAt?.toIso8601String(),
+  };
 }
 
-@JsonSerializable()
 class TablePosition {
   final int id;
   final int tableId;
@@ -286,7 +292,10 @@ class TablePosition {
     print('🔍 DEBUG: TablePosition.fromJson: Processing table ${json['tableNumber']}');
     print('🔍 DEBUG: TablePosition.fromJson: Raw tableStatus from JSON: ${json['tableStatus']}');
     print('🔍 DEBUG: TablePosition.fromJson: Available fields: ${json.keys.toList()}');
-    final tableStatus = json['tableStatus'] as String;
+    
+    // Handle null tableStatus with safe casting
+    final rawTableStatus = json['tableStatus'];
+    final tableStatus = rawTableStatus != null ? rawTableStatus.toString() : 'available';
     print('🔍 DEBUG: TablePosition.fromJson: Final tableStatus: $tableStatus');
     
     // Parse reservation data if present
@@ -307,7 +316,7 @@ class TablePosition {
     return TablePosition(
       id: (json['id'] as num).toInt(),
       tableId: (json['tableId'] as num).toInt(),
-      tableNumber: json['tableNumber'] as String,
+      tableNumber: json['tableNumber']?.toString() ?? 'Unknown',
       tableCapacity: (tableCapacity is num) ? tableCapacity.toInt() : int.tryParse(tableCapacity.toString()) ?? 4,
       tableStatus: tableStatus,
       tableSection: tableSection.toString(),
@@ -326,7 +335,22 @@ class TablePosition {
     );
   }
 
-  Map<String, dynamic> toJson() => _$TablePositionToJson(this);
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'tableId': tableId,
+    'tableNumber': tableNumber,
+    'tableCapacity': tableCapacity,
+    'tableStatus': tableStatus,
+    'tableSection': tableSection,
+    'x': x,
+    'y': y,
+    'rotation': rotation,
+    'width': width,
+    'height': height,
+    'createdAt': createdAt?.toIso8601String(),
+    'updatedAt': updatedAt?.toIso8601String(),
+    'reservation': reservation?.toJson(),
+  };
 
   String get statusColor {
     switch (tableStatus.toLowerCase()) {

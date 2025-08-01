@@ -183,11 +183,34 @@ class FloorPlanRepositoryImpl implements FloorPlanRepository {
   Future<Result<TablePosition>> createTablePosition(int floorPlanId, Map<String, dynamic> data) async {
     try {
       final response = await _dio.post('/floor-plans/$floorPlanId/table-positions', data: data);
-      final tablePosition = TablePosition.fromJson(response.data['data'] ?? response.data);
+      
+      // Add debug logging
+      print('🔍 DEBUG: createTablePosition response: ${response.data}');
+      
+      // Check if response indicates an error
+      if (response.data is Map<String, dynamic> && response.data['success'] == false) {
+        final errorMessage = response.data['error']?['message'] ?? 'API returned error';
+        return Result.failure(errorMessage);
+      }
+      
+      final responseData = response.data['data'] ?? response.data;
+      
+      // Validate response data before parsing
+      if (responseData == null) {
+        return Result.failure('Invalid response: no data received');
+      }
+      
+      if (responseData is! Map<String, dynamic>) {
+        return Result.failure('Invalid response format: expected Map, got ${responseData.runtimeType}');
+      }
+      
+      final tablePosition = TablePosition.fromJson(responseData);
       return Result.success(tablePosition);
     } on DioException catch (e) {
+      print('🔍 DEBUG: DioException in createTablePosition: ${e.message}');
       return Result.failure(e.message ?? 'Failed to create table position');
     } catch (e) {
+      print('🔍 DEBUG: Unexpected error in createTablePosition: $e');
       return Result.failure('Unexpected error: $e');
     }
   }
@@ -195,12 +218,36 @@ class FloorPlanRepositoryImpl implements FloorPlanRepository {
   @override
   Future<Result<TablePosition>> updateTablePositionById(int floorPlanId, int positionId, Map<String, dynamic> data) async {
     try {
-      final response = await _dio.put('/floor-plans/$floorPlanId/table-positions/$positionId', data: data);
-      final tablePosition = TablePosition.fromJson(response.data['data'] ?? response.data);
+      // Use the correct endpoint: /tables/{tableId}/position instead of /table-positions/{positionId}
+      final response = await _dio.put('/floor-plans/$floorPlanId/tables/$positionId/position', data: data);
+      
+      // Add debug logging
+      print('🔍 DEBUG: updateTablePositionById response: ${response.data}');
+      
+      // Check if response indicates an error
+      if (response.data is Map<String, dynamic> && response.data['success'] == false) {
+        final errorMessage = response.data['error']?['message'] ?? 'API returned error';
+        return Result.failure(errorMessage);
+      }
+      
+      final responseData = response.data['data'] ?? response.data;
+      
+      // Validate response data before parsing
+      if (responseData == null) {
+        return Result.failure('Invalid response: no data received');
+      }
+      
+      if (responseData is! Map<String, dynamic>) {
+        return Result.failure('Invalid response format: expected Map, got ${responseData.runtimeType}');
+      }
+      
+      final tablePosition = TablePosition.fromJson(responseData);
       return Result.success(tablePosition);
     } on DioException catch (e) {
+      print('🔍 DEBUG: DioException in updateTablePositionById: ${e.message}');
       return Result.failure(e.message ?? 'Failed to update table position');
     } catch (e) {
+      print('🔍 DEBUG: Unexpected error in updateTablePositionById: $e');
       return Result.failure('Unexpected error: $e');
     }
   }
