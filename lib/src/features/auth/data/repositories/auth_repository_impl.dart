@@ -23,40 +23,76 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Result<LoginResponse>> login(String email, String password, String businessSlug) async {
     try {
+      debugPrint('🔵 AuthRepository: Making login request');
       final response = await _dio.post('/auth/login', data: {
         'email': email,
         'password': password,
         'businessSlug': businessSlug,
       });
 
+      debugPrint('🔵 AuthRepository: Response received: ${response.data}');
+      
       // Backend returns direct response, not wrapped in ApiResponse
       final responseData = response.data as Map<String, dynamic>;
+      
+      debugPrint('🔵 AuthRepository: Response data: $responseData');
       
       if (responseData['message'] == 'Login successful' && 
           responseData['user'] != null && 
           responseData['token'] != null &&
           responseData['business'] != null) {
         
-        // Create LoginResponse with business from the response
-        final loginResponse = LoginResponse(
-          user: User.fromJson(responseData['user'] as Map<String, dynamic>),
-          token: responseData['token'] as String,
-          business: Business.fromJson(responseData['business'] as Map<String, dynamic>),
-        );
+                 debugPrint('🔵 AuthRepository: Parsing user data');
+         final userData = responseData['user'] as Map<String, dynamic>;
+         debugPrint('🔵 AuthRepository: User data: $userData');
+         
+         // Debug each required field in User
+         debugPrint('🔵 AuthRepository: User.id = ${userData['id']}');
+         debugPrint('🔵 AuthRepository: User.businessId = ${userData['businessId']}');
+         debugPrint('🔵 AuthRepository: User.name = ${userData['name']}');
+         debugPrint('🔵 AuthRepository: User.email = ${userData['email']}');
+         debugPrint('🔵 AuthRepository: User.role = ${userData['role']}');
+         debugPrint('🔵 AuthRepository: User.isActive = ${userData['isActive']}');
+         debugPrint('🔵 AuthRepository: User.createdAt = ${userData['createdAt']}');
+         debugPrint('🔵 AuthRepository: User.updatedAt = ${userData['updatedAt']}');
+         
+         debugPrint('🔵 AuthRepository: Parsing business data');
+         final businessData = responseData['business'] as Map<String, dynamic>;
+         debugPrint('🔵 AuthRepository: Business data: $businessData');
+         
+         // Debug each required field in Business
+         debugPrint('🔵 AuthRepository: Business.id = ${businessData['id']}');
+         debugPrint('🔵 AuthRepository: Business.name = ${businessData['name']}');
+         debugPrint('🔵 AuthRepository: Business.slug = ${businessData['slug']}');
+         debugPrint('🔵 AuthRepository: Business.taxRate = ${businessData['taxRate']}');
+         debugPrint('🔵 AuthRepository: Business.currencyId = ${businessData['currencyId']}');
+         debugPrint('🔵 AuthRepository: Business.timezone = ${businessData['timezone']}');
+         
+         // Create LoginResponse with business from the response
+         final loginResponse = LoginResponse(
+           user: User.fromJson(userData),
+           token: responseData['token'] as String,
+           business: Business.fromJson(businessData),
+         );
         
+        debugPrint('🔵 AuthRepository: Login response created successfully');
         return Result.success(loginResponse);
       } else {
+        debugPrint('🔴 AuthRepository: Login failed - invalid response structure');
         return Result.failure(
           responseData['message'] ?? 'Login failed',
           responseData['errors'],
         );
       }
     } on DioException catch (e) {
+      debugPrint('🔴 AuthRepository: DioException: ${e.message}');
       return Result.failure(
         AppException.fromDioException(e).message,
         e,
       );
     } catch (e) {
+      debugPrint('🔴 AuthRepository: Unexpected error: $e');
+      debugPrint('🔴 AuthRepository: Error type: ${e.runtimeType}');
       return Result.failure(
         'An unexpected error occurred during login',
         e,

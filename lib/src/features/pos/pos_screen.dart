@@ -15,6 +15,8 @@ import '../../core/theme/app_theme.dart';
 import '../../shared/widgets/app_image.dart';
 import '../../core/services/navigation_service.dart';
 import '../../shared/widgets/loading_indicator.dart';
+import '../../shared/utils/currency_formatter.dart';
+import '../business/business_provider.dart';
 import 'package:go_router/go_router.dart';
 
 class PosScreen extends ConsumerStatefulWidget {
@@ -897,7 +899,10 @@ class _PosScreenState extends ConsumerState<PosScreen>
               
               // Item Price
               Text(
-                '\$${item.price.toStringAsFixed(2)}',
+                CurrencyFormatter.formatBusinessCurrency(
+                  item.price, 
+                  ref.watch(currentBusinessCurrencyIdProvider)
+                ),
                 style: theme.textTheme.titleMedium?.copyWith(
                   color: theme.colorScheme.primary,
                   fontWeight: FontWeight.bold,
@@ -1186,7 +1191,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '\$${item.price.toStringAsFixed(2)} each',
+                    '${CurrencyFormatter.formatBusinessCurrency(item.price, ref.watch(currentBusinessCurrencyIdProvider))} each',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
@@ -1303,7 +1308,10 @@ class _PosScreenState extends ConsumerState<PosScreen>
                 ),
               ),
               Text(
-                '\$${total.toStringAsFixed(2)}',
+                CurrencyFormatter.formatBusinessCurrency(
+                  total, 
+                  ref.watch(currentBusinessCurrencyIdProvider)
+                ),
                 style: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: theme.colorScheme.primary,
@@ -1328,7 +1336,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
                 ),
               ),
               child: Text(
-                'Charge \$${total.toStringAsFixed(2)}',
+                'Charge ${CurrencyFormatter.formatBusinessCurrency(total, ref.watch(currentBusinessCurrencyIdProvider))}',
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -1983,7 +1991,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
                   ),
                   const Spacer(),
                   Text(
-                    '\$${total.toStringAsFixed(2)}',
+                    '${CurrencyFormatter.formatCRC(total)}',
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: theme.colorScheme.primary,
@@ -2036,7 +2044,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
                 ),
                 const Spacer(),
                 Text(
-                  '\$${total.toStringAsFixed(2)}',
+                  '${CurrencyFormatter.formatCRC(total)}',
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: theme.colorScheme.primary,
@@ -2197,7 +2205,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
                       ),
                       const Spacer(),
                       Text(
-                        '\$${price.toStringAsFixed(2)}',
+                        '${CurrencyFormatter.formatCRC(price)}',
                         style: theme.textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w600,
                           color: theme.colorScheme.primary,
@@ -2799,7 +2807,7 @@ class _MenuItemCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          '\$${item.price.toStringAsFixed(2)}',
+                          '${CurrencyFormatter.formatCRC(item.price)}',
                           style: theme.textTheme.titleMedium?.copyWith(
                             color: theme.colorScheme.primary,
                             fontWeight: FontWeight.bold,
@@ -3130,7 +3138,7 @@ class _OrderItemTile extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '\$${item.price.toStringAsFixed(2)} each',
+                      '${CurrencyFormatter.formatCRC(item.price)} each',
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey.shade600,
@@ -3205,7 +3213,7 @@ class _OrderItemTile extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Text(
-                '\$${item.total.toStringAsFixed(2)}',
+                '${CurrencyFormatter.formatCRC(item.total)}',
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
@@ -3429,7 +3437,7 @@ class _CartSection extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        '\$${cartTotal.toStringAsFixed(2)}',
+                        '${CurrencyFormatter.formatCRC(cartTotal)}',
                         style: theme.textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: theme.colorScheme.primary,
@@ -3541,7 +3549,7 @@ class _CartItemTile extends StatelessWidget {
                   Text(
                     item.promotionId != null 
                         ? 'Applied to cart'
-                        : '\$${item.price.toStringAsFixed(2)} each',
+                        : '${CurrencyFormatter.formatCRC(item.price)} each',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
@@ -3703,7 +3711,7 @@ class _RecentSalesTab extends StatelessWidget {
               ],
             ),
             trailing: Text(
-              '\$${sale.total.toStringAsFixed(2)}',
+                              '${CurrencyFormatter.formatCRC(sale.total)}',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: theme.colorScheme.primary,
@@ -3880,7 +3888,7 @@ class _CheckoutDialogState extends State<_CheckoutDialog> {
                           ),
                         ),
                         Text(
-                          '\$${item.total.toStringAsFixed(2)}',
+                          '${CurrencyFormatter.formatCRC(item.total)}',
                           style: theme.textTheme.bodyMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -3903,7 +3911,7 @@ class _CheckoutDialogState extends State<_CheckoutDialog> {
                   ),
                 ),
                 Text(
-                  '\$${widget.total.toStringAsFixed(2)}',
+                  '${CurrencyFormatter.formatCRC(widget.total)}',
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: theme.colorScheme.primary,
@@ -4475,7 +4483,7 @@ class _TableOrdersDialog extends ConsumerWidget {
                       ),
                       const Spacer(),
                       Text(
-                        '\$${order.total.toStringAsFixed(2)}',
+                        '${CurrencyFormatter.formatCRC(order.total)}',
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: theme.colorScheme.primary,
@@ -4766,7 +4774,7 @@ class _SettleOrderDialog extends StatelessWidget {
                         style: theme.textTheme.bodyMedium,
                       ),
                       trailing: Text(
-                        '\$${(price * quantity).toStringAsFixed(2)}',
+                        '${CurrencyFormatter.formatCRC(price * quantity)}',
                         style: theme.textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w600,
                         ),
@@ -4856,7 +4864,7 @@ class _SettleOrderDialog extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    items.isEmpty ? 'No Items' : '\$${total.toStringAsFixed(2)}',
+                    items.isEmpty ? 'No Items' : '${CurrencyFormatter.formatCRC(total)}',
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: items.isEmpty 

@@ -13,6 +13,8 @@ import 'waiter_order_provider.dart' as waiter_order;
 import 'table_provider.dart' as waiter;
 import 'package:another_flushbar/flushbar.dart';
 import '../floor_plan/floor_plan_provider.dart' as fp;
+import '../../shared/utils/currency_formatter.dart';
+import '../business/business_provider.dart';
 
 
 class OrderTakingScreen extends ConsumerStatefulWidget {
@@ -537,7 +539,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
             Row(
               children: [
                 Text(
-                  '\$${price.toStringAsFixed(2)}',
+                  CurrencyFormatter.formatBusinessCurrency(price, ref.watch(currentBusinessCurrencyIdProvider)),
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.primary,
                     fontWeight: FontWeight.bold,
@@ -626,7 +628,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
             Row(
               children: [
                 Text(
-                  '\$${item.price.toStringAsFixed(2)}',
+                  CurrencyFormatter.formatBusinessCurrency(item.price, ref.watch(currentBusinessCurrencyIdProvider)),
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.primary,
                     fontWeight: FontWeight.bold,
@@ -773,7 +775,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       Text(
-                        '\$${_getSubtotal().toStringAsFixed(2)}',
+                        CurrencyFormatter.formatBusinessCurrency(_getSubtotal(), ref.watch(currentBusinessCurrencyIdProvider)),
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -789,7 +791,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                       Text(
-                        '\$${_getTax().toStringAsFixed(2)}',
+                        CurrencyFormatter.formatBusinessCurrency(_getTax(), ref.watch(currentBusinessCurrencyIdProvider)),
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                     ],
@@ -805,7 +807,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
                         ),
                       ),
                       Text(
-                        '\$${_getTotal().toStringAsFixed(2)}',
+                        CurrencyFormatter.formatBusinessCurrency(_getTotal(), ref.watch(currentBusinessCurrencyIdProvider)),
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).colorScheme.primary,
@@ -842,7 +844,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
           ),
         ),
         subtitle: Text(
-          '\$${item.price.toStringAsFixed(2)} each',
+                          '${CurrencyFormatter.formatBusinessCurrency(item.price, ref.watch(currentBusinessCurrencyIdProvider))} each',
           style: TextStyle(
             color: Colors.grey[600],
             fontSize: 14,

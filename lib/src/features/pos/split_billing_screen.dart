@@ -5,6 +5,7 @@ import 'models/cart_item.dart';
 import 'split_billing_provider.dart' as split_billing;
 import 'pos_provider.dart';
 import 'models/split_payment.dart';
+import '../../shared/utils/currency_formatter.dart';
 
 class SplitBillingScreen extends ConsumerWidget {
   final waiter_table.Table table;
@@ -139,8 +140,8 @@ class SplitBillingScreen extends ConsumerWidget {
                               )).toList(),
                             ),
                           const SizedBox(height: 8),
-                          Text('Subtotal: ${split.subtotal.toStringAsFixed(2)}'),
-                          Text('Paid: ${split.paid.toStringAsFixed(2)}'),
+                                      Text('Subtotal: ${CurrencyFormatter.formatCRC(split.subtotal)}'),
+            Text('Paid: ${CurrencyFormatter.formatCRC(split.paid)}'),
                           Row(
                             children: [
                               SizedBox(

@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'data/repositories/business_repository_impl.dart';
 import 'models/business.dart';
+import '../auth/auth_provider.dart';
+import '../../shared/utils/currency_formatter.dart';
 
 /// Provider to get business by slug
 final businessBySlugProvider = FutureProvider.family<Business?, String>((ref, slug) async {
@@ -47,4 +49,37 @@ final businessByIdProvider = FutureProvider.family<Business?, int>((ref, id) asy
   } else {
     return null;
   }
+});
+
+// Provider for current business currency information
+final currentBusinessCurrencyProvider = Provider<Map<String, dynamic>>((ref) {
+  final authState = ref.watch(authNotifierProvider);
+  
+  if (authState.status == AuthStatus.authenticated && authState.business != null) {
+    final business = authState.business!;
+    return {
+      'currencyId': business.currencyId,
+      'symbol': CurrencyFormatter.getCurrencySymbol(business.currencyId),
+      'code': CurrencyFormatter.getCurrencyCode(business.currencyId),
+    };
+  }
+  
+  // Default to CRC if not authenticated or no business
+  return {
+    'currencyId': 2,
+    'symbol': '₡',
+    'code': 'CRC',
+  };
+});
+
+// Provider for current business currency symbol
+final currentBusinessCurrencySymbolProvider = Provider<String>((ref) {
+  final currencyData = ref.watch(currentBusinessCurrencyProvider);
+  return currencyData['symbol'] as String;
+});
+
+// Provider for current business currency ID
+final currentBusinessCurrencyIdProvider = Provider<int>((ref) {
+  final currencyData = ref.watch(currentBusinessCurrencyProvider);
+  return currencyData['currencyId'] as int;
 }); 

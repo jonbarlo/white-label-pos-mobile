@@ -20,7 +20,7 @@ Business _$BusinessFromJson(Map<String, dynamic> json) => Business(
       email: json['email'] as String?,
       website: json['website'] as String?,
       taxRate: (json['taxRate'] as num).toDouble(),
-      currency: json['currency'] as String,
+      currencyId: (json['currencyId'] as num).toInt(),
       timezone: json['timezone'] as String,
       isActive: json['isActive'] as bool?,
       createdAt: json['createdAt'] == null
@@ -45,7 +45,7 @@ Map<String, dynamic> _$BusinessToJson(Business instance) => <String, dynamic>{
       'email': instance.email,
       'website': instance.website,
       'taxRate': instance.taxRate,
-      'currency': instance.currency,
+      'currencyId': instance.currencyId,
       'timezone': instance.timezone,
       'isActive': instance.isActive,
       'createdAt': instance.createdAt?.toIso8601String(),

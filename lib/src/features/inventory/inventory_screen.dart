@@ -5,6 +5,8 @@ import 'package:white_label_pos_mobile/src/features/inventory/models/inventory_i
 import '../../core/theme/app_theme.dart';
 import '../../shared/widgets/theme_toggle_button.dart';
 import '../../shared/widgets/app_image.dart';
+import '../../shared/utils/currency_formatter.dart';
+import '../business/business_provider.dart';
 
 class InventoryScreen extends ConsumerStatefulWidget {
   const InventoryScreen({super.key});
@@ -305,13 +307,16 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(
-              '\$${item.price.toStringAsFixed(2)}',
+                              CurrencyFormatter.formatBusinessCurrency(
+                                item.price, 
+                                ref.watch(currentBusinessCurrencyIdProvider)
+                              ),
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                 color: Theme.of(context).colorScheme.primary,
               ),
             ),
             Text(
-              'Cost: \$${item.cost.toStringAsFixed(2)}',
+                              'Cost: ${CurrencyFormatter.formatBusinessCurrency(item.cost, ref.watch(currentBusinessCurrencyIdProvider))}',
               style: Theme.of(context).textTheme.labelSmall,
             ),
           ],
@@ -428,8 +433,8 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
           children: [
             Text('SKU: ${item.sku}'),
             Text('Category: ${item.category}'),
-            Text('Price: \$${item.price.toStringAsFixed(2)}'),
-            Text('Cost: \$${item.cost.toStringAsFixed(2)}'),
+                         Text('Price: ${CurrencyFormatter.formatBusinessCurrency(item.price, ref.watch(currentBusinessCurrencyIdProvider))}'),
+             Text('Cost: ${CurrencyFormatter.formatBusinessCurrency(item.cost, ref.watch(currentBusinessCurrencyIdProvider))}'),
             Text('Stock: ${item.stockQuantity}'),
             Text('Min Stock: ${item.minStockLevel}'),
             Text('Max Stock: ${item.maxStockLevel}'),

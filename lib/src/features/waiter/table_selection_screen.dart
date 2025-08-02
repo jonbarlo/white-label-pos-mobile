@@ -13,6 +13,8 @@ import '../../core/navigation/app_router.dart';
 import 'waiter_order_provider.dart';
 import '../../core/services/navigation_service.dart';
 import '../../core/theme/theme_provider.dart';
+import '../../shared/utils/currency_formatter.dart';
+import '../business/business_provider.dart';
 
 class TableSelectionScreen extends ConsumerStatefulWidget {
   const TableSelectionScreen({super.key});
@@ -466,7 +468,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
                 if (table.currentOrderTotal != null) ...[
                   const SizedBox(height: 2),
                   Text(
-                    '\$${table.currentOrderTotal!.toStringAsFixed(2)}',
+                    CurrencyFormatter.formatBusinessCurrency(table.currentOrderTotal!, ref.watch(currentBusinessCurrencyIdProvider)),
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: theme.colorScheme.primary,
@@ -625,7 +627,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
                 )) ?? [const Text('No items')]),
                 if (orderDetails['total'] != null) ...[
                   const SizedBox(height: 8),
-                  Text('Total:  \$${orderDetails['total'].toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                  Text('Total:  ${CurrencyFormatter.formatBusinessCurrency(orderDetails['total'], ref.watch(currentBusinessCurrencyIdProvider))}', style: const TextStyle(fontWeight: FontWeight.bold)),
                 ],
               ],
             ],

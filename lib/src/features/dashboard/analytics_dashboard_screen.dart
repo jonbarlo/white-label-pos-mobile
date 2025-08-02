@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../shared/widgets/theme_toggle_button.dart';
 import '../../shared/widgets/loading_indicator.dart';
+import '../../shared/utils/currency_formatter.dart';
+import '../business/business_provider.dart';
 import '../pos/pos_provider.dart';
 import '../pos/models/analytics.dart';
 
@@ -326,7 +328,7 @@ class _AnalyticsDashboardScreenState extends ConsumerState<AnalyticsDashboardScr
                       children: [
                         _buildMetricCard(
                           'Total Revenue',
-                          '\$${NumberFormat('#,##0.00').format(analytics.totalRevenue)}',
+                          CurrencyFormatter.formatCRC(analytics.totalRevenue),
                           Icons.attach_money,
                           theme.colorScheme.primary,
                           theme,
@@ -342,7 +344,7 @@ class _AnalyticsDashboardScreenState extends ConsumerState<AnalyticsDashboardScr
                         const SizedBox(width: 12),
                         _buildMetricCard(
                           'Average Order Value',
-                          '\$${NumberFormat('#,##0.00').format(analytics.averageOrderValue)}',
+                          CurrencyFormatter.formatCRC(analytics.averageOrderValue),
                           Icons.trending_up,
                           theme.colorScheme.tertiary,
                           theme,

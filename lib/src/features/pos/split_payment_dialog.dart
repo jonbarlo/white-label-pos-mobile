@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/widgets/app_button.dart';
 import '../../shared/widgets/app_text_field.dart';
+import '../../shared/utils/currency_formatter.dart';
+import '../business/business_provider.dart';
 import 'models/split_payment.dart';
 import 'models/cart_item.dart';
 
@@ -141,7 +143,7 @@ class _SplitPaymentDialogState extends ConsumerState<SplitPaymentDialog> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Total Amount: \$${widget.totalAmount.toStringAsFixed(2)}',
+                                'Total Amount: ${CurrencyFormatter.formatBusinessCurrency(widget.totalAmount, ref.watch(currentBusinessCurrencyIdProvider))}',
                                 style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -149,7 +151,7 @@ class _SplitPaymentDialogState extends ConsumerState<SplitPaymentDialog> {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                'Total Payments: \$${_totalPaymentAmount.toStringAsFixed(2)}',
+                                'Total Payments: ${CurrencyFormatter.formatBusinessCurrency(_totalPaymentAmount, ref.watch(currentBusinessCurrencyIdProvider))}',
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: _remainingAmount.abs() < 0.01
@@ -159,7 +161,7 @@ class _SplitPaymentDialogState extends ConsumerState<SplitPaymentDialog> {
                               ),
                               if (_remainingAmount.abs() >= 0.01)
                                 Text(
-                                  'Remaining: \$${_remainingAmount.toStringAsFixed(2)}',
+                                  'Remaining: ${CurrencyFormatter.formatBusinessCurrency(_remainingAmount, ref.watch(currentBusinessCurrencyIdProvider))}',
                                   style: const TextStyle(
                                     fontSize: 16,
                                     color: Colors.red,

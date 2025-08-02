@@ -7,6 +7,8 @@ import 'models/sales_report.dart';
 import 'models/revenue_report.dart';
 import '../../core/theme/app_theme.dart';
 import '../../shared/widgets/theme_toggle_button.dart';
+import '../../shared/utils/currency_formatter.dart';
+import '../business/business_provider.dart';
 
 class ReportsScreen extends ConsumerStatefulWidget {
   const ReportsScreen({super.key});
@@ -533,7 +535,7 @@ class _OverviewTab extends ConsumerWidget {
               Expanded(
                 child: _EnhancedSummaryCard(
                   title: 'Total Sales',
-                  value: '\$${report.totalSales.toStringAsFixed(2)}',
+                  value: CurrencyFormatter.formatCRC(report.totalSales),
                   subtitle: '${report.totalTransactions} transactions',
                   icon: Icons.point_of_sale,
                   color: theme.colorScheme.primary,
@@ -545,7 +547,7 @@ class _OverviewTab extends ConsumerWidget {
               Expanded(
                 child: _EnhancedSummaryCard(
                   title: 'Average Order',
-                  value: '\$${report.averageTransactionValue.toStringAsFixed(2)}',
+                  value: CurrencyFormatter.formatCRC(report.averageTransactionValue),
                   subtitle: 'per transaction',
                   icon: Icons.analytics,
                   color: theme.colorScheme.secondary,
@@ -975,7 +977,7 @@ class _TransactionsTab extends ConsumerWidget {
               ),
               const Spacer(),
               Text(
-                'Total: \$${_calculateTotal(transactions).toStringAsFixed(2)}',
+                'Total: ${CurrencyFormatter.formatCRC(_calculateTotal(transactions))}',
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: theme.colorScheme.primary,
@@ -1081,7 +1083,7 @@ class _TransactionCard extends StatelessWidget {
                         ),
                         const Spacer(),
                         Text(
-                          '\$${amount.toStringAsFixed(2)}',
+                          '${CurrencyFormatter.formatCRC(amount)}',
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: theme.colorScheme.primary,
@@ -1256,7 +1258,7 @@ class _TransactionDetailsSheet extends ConsumerWidget {
                   ),
                 ),
                 Text(
-                  '\$${amount.toStringAsFixed(2)}',
+                  '${CurrencyFormatter.formatCRC(amount)}',
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: theme.colorScheme.primary,
@@ -1383,7 +1385,7 @@ class _TransactionDetailsSheet extends ConsumerWidget {
                                   ),
                                   const SizedBox(width: 12),
                                   Text(
-                                    '\$${unitPrice.toStringAsFixed(2)}',
+                                    '${CurrencyFormatter.formatCRC(unitPrice)}',
                                     style: theme.textTheme.bodyMedium?.copyWith(
                                       fontWeight: FontWeight.w500,
                                       color: theme.colorScheme.onSurfaceVariant,
@@ -1391,7 +1393,7 @@ class _TransactionDetailsSheet extends ConsumerWidget {
                                   ),
                                   const SizedBox(width: 12),
                                   Text(
-                                    '\$${totalPrice.toStringAsFixed(2)}',
+                                    '${CurrencyFormatter.formatCRC(totalPrice)}',
                                     style: theme.textTheme.bodyMedium?.copyWith(
                                       fontWeight: FontWeight.bold,
                                       color: theme.colorScheme.primary,
@@ -1636,7 +1638,7 @@ class _RevenueTab extends ConsumerWidget {
               Expanded(
                 child: _EnhancedSummaryCard(
                   title: 'Total Revenue',
-                  value: '\$${report.totalRevenue.toStringAsFixed(2)}',
+                  value: '${CurrencyFormatter.formatCRC(report.totalRevenue)}',
                   subtitle: 'Gross income',
                   icon: Icons.attach_money,
                   color: theme.colorScheme.primary,
@@ -1648,7 +1650,7 @@ class _RevenueTab extends ConsumerWidget {
               Expanded(
                 child: _EnhancedSummaryCard(
                   title: 'Gross Profit',
-                  value: '\$${report.grossProfit.toStringAsFixed(2)}',
+                  value: '${CurrencyFormatter.formatCRC(report.grossProfit)}',
                   subtitle: 'After costs',
                   icon: Icons.trending_up,
                   color: Colors.green,
@@ -1676,7 +1678,7 @@ class _RevenueTab extends ConsumerWidget {
               Expanded(
                 child: _EnhancedSummaryCard(
                   title: 'Total Cost',
-                  value: '\$${report.totalCost.toStringAsFixed(2)}',
+                  value: '${CurrencyFormatter.formatCRC(report.totalCost)}',
                   subtitle: 'Operating costs',
                   icon: Icons.account_balance_wallet,
                   color: theme.colorScheme.error,

@@ -5,6 +5,8 @@ import '../staff_messaging/staff_messaging_provider.dart';
 import '../staff_messaging/models/staff_message.dart';
 
 import '../../shared/widgets/theme_toggle_button.dart';
+import '../../shared/utils/currency_formatter.dart';
+import '../business/business_provider.dart';
 import 'table_selection_screen.dart';
 
 class WaiterScreen extends ConsumerWidget {
@@ -144,7 +146,7 @@ class WaiterScreen extends ConsumerWidget {
                 _buildStatCard(
                   context,
                   'Tips Earned',
-                  '\$45',
+                  CurrencyFormatter.formatCRC(45.0),
                   Icons.attach_money,
                 ),
               ],
@@ -612,7 +614,7 @@ class WaiterScreen extends ConsumerWidget {
               child: _buildStatCard2(
                 context,
                 'Revenue',
-                '\$1,245',
+                CurrencyFormatter.formatCRC(1245.0),
                 '+8%',
                 Icons.attach_money,
                 Colors.green,
@@ -623,7 +625,7 @@ class WaiterScreen extends ConsumerWidget {
               child: _buildStatCard2(
                 context,
                 'Tips',
-                '\$89',
+                CurrencyFormatter.formatCRC(89.0),
                 '+15%',
                 Icons.tips_and_updates,
                 Colors.orange,
@@ -729,7 +731,7 @@ class WaiterScreen extends ConsumerWidget {
                   ),
                 ),
                 title: Text('Order #${1000 + index}'),
-                subtitle: Text('Table ${index + 1} • \$${(index + 1) * 15 + 25}'),
+                subtitle: Text('Table ${index + 1} • ${CurrencyFormatter.formatCRC((index + 1) * 15 + 25)}'),
                 trailing: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(

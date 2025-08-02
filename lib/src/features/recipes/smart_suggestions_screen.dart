@@ -5,6 +5,8 @@ import 'package:white_label_pos_mobile/src/features/recipes/models/smart_recipe_
 import '../promotions/promotions_provider.dart';
 import '../auth/auth_provider.dart';
 import '../auth/models/user.dart';
+import '../../shared/utils/currency_formatter.dart';
+import '../business/business_provider.dart';
 
 class SmartSuggestionsScreen extends ConsumerStatefulWidget {
   const SmartSuggestionsScreen({super.key});
@@ -382,7 +384,7 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
                 ),
                 _buildMetricChip(
                   'Potential Savings',
-                  '\$${suggestion.potentialSavings.toStringAsFixed(2)}',
+                  CurrencyFormatter.formatCRC(suggestion.potentialSavings),
                   Colors.green,
                 ),
               ],
@@ -513,7 +515,7 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
                 ),
                 _buildMetricChip(
                   'Potential Savings',
-                  '\$${suggestion.potentialSavings.toStringAsFixed(2)}',
+                  CurrencyFormatter.formatCRC(suggestion.potentialSavings),
                   Colors.green,
                 ),
                 _buildMetricChip(
@@ -933,7 +935,7 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
               const SizedBox(height: 8),
               if (result['cookingResult'] != null) ...[
                 Text('Quantity Cooked: ${result['cookingResult']['quantity']?.toString() ?? '0'}'),
-                Text('Cost Savings: \$${result['cookingResult']['costSavings']?.toStringAsFixed(2) ?? '0.00'}'),
+                Text('Cost Savings: ${CurrencyFormatter.formatCRC(result['cookingResult']['costSavings'] ?? 0.0)}'),
                 Text('Waste Reduction: ${result['cookingResult']['wasteReduction']?.toString() ?? '0'} items'),
               ],
               const SizedBox(height: 8),
@@ -1092,7 +1094,7 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
                 Expanded(
                   child: _buildWastePreventionMetric(
                     'Potential Waste',
-                    '\$${potentialWasteValue.toStringAsFixed(2)}',
+                    CurrencyFormatter.formatCRC(potentialWasteValue),
                     Icons.attach_money,
                     Colors.red,
                   ),
@@ -1172,7 +1174,7 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
               title: Text(name),
               subtitle: Text('Stock: ${stock.toStringAsFixed(1)} units'),
               trailing: Text(
-                '\$${value.toStringAsFixed(2)}',
+                CurrencyFormatter.formatCRC(value),
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.red,

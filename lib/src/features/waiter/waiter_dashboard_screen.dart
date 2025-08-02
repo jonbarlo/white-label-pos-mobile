@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../shared/widgets/theme_toggle_button.dart';
+import '../../shared/utils/currency_formatter.dart';
 import '../auth/auth_provider.dart';
 import 'table_selection_screen.dart';
 import 'messaging_screen.dart';
@@ -202,7 +203,7 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
         Expanded(
           child: _buildStatCard(
             'Today\'s Tips',
-            '\$45',
+                            CurrencyFormatter.formatCRC(45.0),
             Icons.attach_money,
             theme.colorScheme.primary,
             theme,

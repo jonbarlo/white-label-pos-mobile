@@ -26,7 +26,7 @@ class Business {
   final String? email;
   final String? website;
   final double taxRate;
-  final String currency;
+  final int currencyId;
   final String timezone;
   final bool? isActive;
   final DateTime? createdAt;
@@ -46,7 +46,7 @@ class Business {
     this.email,
     this.website,
     required this.taxRate,
-    required this.currency,
+    required this.currencyId,
     required this.timezone,
     this.isActive,
     this.createdAt,
@@ -67,7 +67,7 @@ class Business {
     String? email,
     String? website,
     double? taxRate,
-    String? currency,
+    int? currencyId,
     String? timezone,
     bool? isActive,
     DateTime? createdAt,
@@ -87,7 +87,7 @@ class Business {
       email: email ?? this.email,
       website: website ?? this.website,
       taxRate: taxRate ?? this.taxRate,
-      currency: currency ?? this.currency,
+      currencyId: currencyId ?? this.currencyId,
       timezone: timezone ?? this.timezone,
       isActive: isActive ?? this.isActive,
       createdAt: createdAt ?? this.createdAt,

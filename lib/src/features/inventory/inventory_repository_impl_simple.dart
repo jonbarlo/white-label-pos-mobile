@@ -13,10 +13,20 @@ class InventoryRepositoryImplSimple implements InventoryRepository {
   Future<Result<List<InventoryItem>>> getInventoryItems() async {
     try {
       final response = await _dio.get('/inventory/items');
+      
+      // Add debug logging
+      print('🔍 DEBUG: getInventoryItems response: ${response.data}');
+      
       final List<dynamic> data = response.data['data'] ?? response.data;
+      
+      if (data.isNotEmpty) {
+        print('🔍 DEBUG: First inventory item: ${data.first}');
+      }
+      
       final items = data.map((json) => InventoryItem.fromJson(json)).toList();
       return Result.success(items);
     } catch (e) {
+      print('🔍 DEBUG: Error in getInventoryItems: $e');
       return Result.failure('Failed to load inventory items: ${e.toString()}');
     }
   }
@@ -81,10 +91,20 @@ class InventoryRepositoryImplSimple implements InventoryRepository {
   Future<Result<List<InventoryItem>>> getLowStockItems() async {
     try {
       final response = await _dio.get('/inventory/items/low-stock');
+      
+      // Add debug logging
+      print('🔍 DEBUG: getLowStockItems response: ${response.data}');
+      
       final List<dynamic> data = response.data['data'] ?? response.data;
+      
+      if (data.isNotEmpty) {
+        print('🔍 DEBUG: First low stock item: ${data.first}');
+      }
+      
       final items = data.map((json) => InventoryItem.fromJson(json)).toList();
       return Result.success(items);
     } catch (e) {
+      print('🔍 DEBUG: Error in getLowStockItems: $e');
       return Result.failure('Failed to load low stock items: ${e.toString()}');
     }
   }

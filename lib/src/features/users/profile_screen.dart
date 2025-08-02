@@ -8,6 +8,8 @@ import 'package:white_label_pos_mobile/src/shared/widgets/error_widget.dart';
 import 'package:white_label_pos_mobile/src/core/config/env_config.dart';
 import '../../shared/widgets/theme_toggle_button.dart';
 import '../../shared/widgets/app_image.dart';
+import '../../shared/utils/currency_formatter.dart';
+import '../business/business_provider.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -447,7 +449,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 const SizedBox(width: 16),
                 Expanded(child: _buildStatItem('Tables', '89', 'This Week', Icons.table_restaurant)),
                 const SizedBox(width: 16),
-                Expanded(child: _buildStatItem('Tips', '\$2,340', 'This Month', Icons.attach_money)),
+                Expanded(child: _buildStatItem('Tips', CurrencyFormatter.formatCRC(2340.0), 'This Month', Icons.attach_money)),
               ],
             ),
           ],

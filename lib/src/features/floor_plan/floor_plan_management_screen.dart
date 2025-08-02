@@ -8,6 +8,8 @@ import 'floor_plan_edit_screen.dart';
 import '../../core/theme/app_theme.dart';
 import '../../shared/models/result.dart';
 import '../../shared/widgets/loading_indicator.dart';
+import '../../shared/utils/currency_formatter.dart';
+import '../business/business_provider.dart';
 
 class FloorPlanManagementScreen extends ConsumerStatefulWidget {
   const FloorPlanManagementScreen({super.key});
@@ -201,7 +203,7 @@ class _FloorPlanManagementScreenState extends ConsumerState<FloorPlanManagementS
                 const SizedBox(width: 8),
                 _buildCompactStatCard('Cleaning', cleaningTables.toString(), Icons.cleaning_services, Colors.purple, theme),
                 const SizedBox(width: 8),
-                _buildCompactStatCard('Revenue Today', '\$${totalRevenue.toStringAsFixed(2)}', Icons.attach_money, theme.colorScheme.secondary, theme),
+                _buildCompactStatCard('Revenue Today', CurrencyFormatter.formatCRC(totalRevenue), Icons.attach_money, theme.colorScheme.secondary, theme),
               ],
             ),
           ),

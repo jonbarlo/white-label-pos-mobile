@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:white_label_pos_mobile/src/features/recipes/smart_recipe_provider.dart';
 import 'package:white_label_pos_mobile/src/features/recipes/models/smart_recipe_suggestion.dart';
 import '../promotions/promotions_provider.dart';
+import '../../shared/utils/currency_formatter.dart';
+import '../business/business_provider.dart';
 
 class InventoryAlertsScreen extends ConsumerStatefulWidget {
   const InventoryAlertsScreen({super.key});
@@ -363,7 +365,7 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
                       final suggestion = suggestions[index];
                       return ListTile(
                         title: Text(suggestion.recipe.name),
-                        subtitle: Text('Potential savings: \$${suggestion.potentialSavings.toStringAsFixed(2)}'),
+                        subtitle: Text('Potential savings: ${CurrencyFormatter.formatCRC(suggestion.potentialSavings)}'),
                         trailing: Text(
                           suggestion.urgencyLevel.name.toUpperCase(),
                           style: TextStyle(
@@ -469,7 +471,7 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
               const SizedBox(height: 8),
               if (result['cookingResult'] != null) ...[
                 Text('Quantity Cooked: ${result['cookingResult']['quantity']?.toString() ?? '0'}'),
-                Text('Cost Savings: \$${result['cookingResult']['costSavings']?.toStringAsFixed(2) ?? '0.00'}'),
+                Text('Cost Savings: ${CurrencyFormatter.formatCRC(result['cookingResult']['costSavings'] ?? 0.0)}'),
                 Text('Waste Reduction: ${result['cookingResult']['wasteReduction']?.toString() ?? '0'} items'),
               ],
               const SizedBox(height: 8),
@@ -1059,14 +1061,14 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
                   const SizedBox(height: 12),
                   _buildAnalyticsCard(
                     'Waste Reduced',
-                    '\$${(analytics['wasteReduced'] ?? 0.0).toStringAsFixed(2)}',
+                    CurrencyFormatter.formatCRC(analytics['wasteReduced'] ?? 0.0),
                     Icons.recycling,
                     Colors.blue,
                   ),
                   const SizedBox(height: 12),
                   _buildAnalyticsCard(
                     'Cost Savings',
-                    '\$${(analytics['costSavings'] ?? 0.0).toStringAsFixed(2)}',
+                    CurrencyFormatter.formatCRC(analytics['costSavings'] ?? 0.0),
                     Icons.savings,
                     Colors.orange,
                   ),
@@ -1190,7 +1192,7 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
                         ],
                       ),
                       trailing: Text(
-                        '\$${(entry['costSavings'] ?? 0.0).toStringAsFixed(2)}',
+                        CurrencyFormatter.formatCRC(entry['costSavings'] ?? 0.0),
                         style: const TextStyle(
                           color: Colors.green,
                           fontWeight: FontWeight.bold,

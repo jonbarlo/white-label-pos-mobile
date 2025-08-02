@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
 import '../../shared/widgets/theme_toggle_button.dart';
 import '../../shared/widgets/loading_indicator.dart';
+import '../../shared/utils/currency_formatter.dart';
+import '../business/business_provider.dart';
 import '../pos/pos_provider.dart';
 import '../pos/models/sale.dart';
 import '../../core/navigation/app_router.dart';
@@ -120,7 +122,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       todaySalesAsync.when(
                         data: (salesSummary) {
                           final totalSales = salesSummary['totalSales'] as double? ?? 0.0;
-                          return '\$${NumberFormat('#,##0.00').format(totalSales)}';
+                          return CurrencyFormatter.formatBusinessCurrency(
+                            totalSales, 
+                            ref.watch(currentBusinessCurrencyIdProvider)
+                          );
                         },
                         loading: () => null,
                         error: (error, stack) {
@@ -134,7 +139,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                             sale.createdAt.isBefore(todayEnd)
                           );
                           final recentTotal = todaySales.fold<double>(0.0, (sum, sale) => sum + sale.total);
-                          return '\$${NumberFormat('#,##0.00').format(recentTotal)}';
+                          return CurrencyFormatter.formatBusinessCurrency(
+                            recentTotal, 
+                            ref.watch(currentBusinessCurrencyIdProvider)
+                          );
                         },
                       ),
                       Icons.attach_money,
@@ -172,10 +180,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                           sale.createdAt.isBefore(todayEnd)
                         ).toList();
                         
-                        if (todaySales.isEmpty) return '\$0.00';
+                        if (todaySales.isEmpty) return CurrencyFormatter.formatBusinessCurrency(
+                          0.0, 
+                          ref.watch(currentBusinessCurrencyIdProvider)
+                        );
                         
                         final avgValue = todaySales.fold<double>(0.0, (sum, sale) => sum + sale.total) / todaySales.length;
-                        return '\$${NumberFormat('#,##0.00').format(avgValue)}';
+                        return CurrencyFormatter.formatBusinessCurrency(
+                          avgValue, 
+                          ref.watch(currentBusinessCurrencyIdProvider)
+                        );
                       }(),
                       Icons.trending_up,
                       theme.colorScheme.tertiary,
@@ -309,13 +323,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             ),
           ],
         ),
-        trailing: Text(
-          '\$${NumberFormat('#,##0.00').format(sale.total)}',
-          style: theme.textTheme.titleMedium?.copyWith(
-            color: theme.colorScheme.primary,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+                 trailing: Text(
+                           CurrencyFormatter.formatBusinessCurrency(
+                             sale.total, 
+                             ref.watch(currentBusinessCurrencyIdProvider)
+                           ),
+           style: theme.textTheme.titleMedium?.copyWith(
+             color: theme.colorScheme.primary,
+             fontWeight: FontWeight.bold,
+           ),
+         ),
       ),
     );
   }
@@ -361,7 +378,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               )
             else
               Text(
-                value ?? '\$0.00',
+                                 value ?? CurrencyFormatter.formatBusinessCurrency(
+                   0.0, 
+                   ref.watch(currentBusinessCurrencyIdProvider)
+                 ),
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: color,

@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/services/navigation_service.dart';
 import '../../core/theme/theme_provider.dart';
 import '../../shared/widgets/app_image.dart';
+import '../../shared/utils/currency_formatter.dart';
+import '../business/business_provider.dart';
 import '../auth/models/user.dart';
 import '../auth/auth_provider.dart';
 import 'admin_menu_provider.dart';
@@ -515,7 +517,7 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('\$${item.price.toStringAsFixed(2)}'),
+                            Text(CurrencyFormatter.formatBusinessCurrency(item.price, ref.watch(currentBusinessCurrencyIdProvider))),
             Text('Category ID: ${item.categoryId}'),
             Row(
               children: [
