@@ -5,6 +5,7 @@ import 'package:white_label_pos_mobile/src/features/recipes/models/smart_recipe_
 import '../promotions/promotions_provider.dart';
 import '../../shared/utils/currency_formatter.dart';
 import '../business/business_provider.dart';
+import '../../core/localization/app_localizations.dart';
 
 class InventoryAlertsScreen extends ConsumerStatefulWidget {
   const InventoryAlertsScreen({super.key});
@@ -33,12 +34,13 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
   Widget build(BuildContext context) {
     final alertsAsync = ref.watch(inventoryAlertsProvider);
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         title: Text(
-          'Inventory Alerts',
+          l10n.inventoryAlerts,
           style: theme.textTheme.headlineMedium?.copyWith(
             fontWeight: FontWeight.w600,
           ),
@@ -57,10 +59,10 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
             ),
             child: TabBar(
               controller: _tabController,
-              tabs: const [
-                Tab(text: 'All Alerts'),
-                Tab(text: 'Expiring Items'),
-                Tab(text: 'Underperforming'),
+              tabs: [
+                Tab(text: l10n.allAlerts),
+                Tab(text: l10n.expiringItems),
+                Tab(text: l10n.underperforming),
               ],
               indicator: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
@@ -94,11 +96,13 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
   }
 
   Widget _buildAllAlertsTab(AsyncValue<List<InventoryAlert>> alertsAsync) {
+    final l10n = AppLocalizations.of(context);
+    
     return alertsAsync.when(
       data: (alerts) {
         if (alerts.isEmpty) {
-          return const Center(
-            child: Text('No inventory alerts available'),
+          return Center(
+            child: Text(l10n.noInventoryAlertsAvailable),
           );
         }
 
@@ -113,22 +117,24 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, stack) => Center(
-        child: Text('Error: $error'),
+        child: Text('${l10n.error}: $error'),
       ),
     );
   }
 
   Widget _buildExpiringItemsTab(AsyncValue<List<InventoryAlert>> alertsAsync) {
+    final l10n = AppLocalizations.of(context);
+    
     return alertsAsync.when(
       data: (alerts) {
-        final expiringAlerts = alerts.where((alert) => 
-          alert.title.toLowerCase().contains('expiring') ||
-          alert.message.toLowerCase().contains('expiring')
+        final expiringAlerts = alerts.where((alert) =>
+            alert.title.toLowerCase().contains('expiring') ||
+            alert.message.toLowerCase().contains('expiring')
         ).toList();
 
         if (expiringAlerts.isEmpty) {
-          return const Center(
-            child: Text('No expiring items alerts'),
+          return Center(
+            child: Text(l10n.noExpiringItemsAlerts),
           );
         }
 
@@ -143,22 +149,24 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, stack) => Center(
-        child: Text('Error: $error'),
+        child: Text('${l10n.error}: $error'),
       ),
     );
   }
 
   Widget _buildUnderperformingItemsTab(AsyncValue<List<InventoryAlert>> alertsAsync) {
+    final l10n = AppLocalizations.of(context);
+    
     return alertsAsync.when(
       data: (alerts) {
-        final underperformingAlerts = alerts.where((alert) => 
-          alert.title.toLowerCase().contains('underperforming') ||
-          alert.message.toLowerCase().contains('turnover')
+        final underperformingAlerts = alerts.where((alert) =>
+            alert.title.toLowerCase().contains('underperforming') ||
+            alert.message.toLowerCase().contains('turnover')
         ).toList();
 
         if (underperformingAlerts.isEmpty) {
-          return const Center(
-            child: Text('No underperforming items alerts'),
+          return Center(
+            child: Text(l10n.noUnderperformingItemsAlerts),
           );
         }
 
@@ -173,13 +181,14 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, stack) => Center(
-        child: Text('Error: $error'),
+        child: Text('${l10n.error}: $error'),
       ),
     );
   }
 
   Widget _buildAlertCard(InventoryAlert alert) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -265,7 +274,7 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  'Item: ${alert.itemName}',
+                  '${l10n.item}: ${alert.itemName}',
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: theme.colorScheme.primary,
                     fontWeight: FontWeight.w500,
@@ -292,7 +301,7 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
                 ElevatedButton.icon(
                   onPressed: () => _viewDetails(alert),
                   icon: const Icon(Icons.info_outline, size: 16),
-                  label: const Text('View Details'),
+                  label: Text(l10n.viewDetails),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: theme.colorScheme.primary,
                     foregroundColor: theme.colorScheme.onPrimary,
@@ -315,22 +324,23 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
   }
 
   void _cookRecipe(InventoryAlert alert) {
+    final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Cook Recipe'),
+        title: Text(l10n.cookRecipe),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Cook recipe using: ${alert.itemName ?? 'Unknown Item'}'),
+            Text('${l10n.cookRecipeUsing}: ${alert.itemName ?? l10n.unknownItem}'),
             const SizedBox(height: 16),
-            const Text('This will:'),
-            const Text('• Consume inventory items'),
-            const Text('• Reduce waste'),
-            const Text('• Create a Chef\'s Special promotion'),
+            const Text(l10n.thisWill),
+            Text('• ${l10n.consumeInventoryItems}'),
+            Text('• ${l10n.reduceWaste}'),
+            Text('• ${l10n.createChefSpecialPromotion}'),
             const SizedBox(height: 16),
-            const Text('Available Recipes:'),
+            const Text(l10n.availableRecipes),
             const SizedBox(height: 8),
             SizedBox(
               height: 200,
@@ -347,15 +357,15 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
                   
                   if (snapshot.hasError) {
                     return Center(
-                      child: Text('Error loading recipes: ${snapshot.error}'),
+                      child: Text('${l10n.errorLoadingRecipes}: ${snapshot.error}'),
                     );
                   }
                   
                   final suggestions = snapshot.data ?? [];
                   
                   if (suggestions.isEmpty) {
-                    return const Center(
-                      child: Text('No recipe suggestions available'),
+                    return Center(
+                      child: Text(l10n.noRecipeSuggestionsAvailable),
                     );
                   }
                   
@@ -365,7 +375,7 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
                       final suggestion = suggestions[index];
                       return ListTile(
                         title: Text(suggestion.recipe.name),
-                        subtitle: Text('Potential savings: ${CurrencyFormatter.formatCRC(suggestion.potentialSavings)}'),
+                        subtitle: Text('${l10n.potentialSavings}: ${CurrencyFormatter.formatCRC(suggestion.potentialSavings)}'),
                         trailing: Text(
                           suggestion.urgencyLevel.name.toUpperCase(),
                           style: TextStyle(
@@ -388,13 +398,13 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
               ),
             ),
             const SizedBox(height: 16),
-            const Text('Quantity to cook:'),
+            const Text(l10n.quantityToCook),
             const SizedBox(height: 8),
             TextField(
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Quantity',
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
+                labelText: l10n.quantity,
                 hintText: '1',
               ),
               controller: TextEditingController(text: '1'),
@@ -404,7 +414,7 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
         ],
       ),
@@ -432,12 +442,12 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const AlertDialog(
+        builder: (context) => AlertDialog(
           content: Row(
             children: [
               CircularProgressIndicator(),
-              SizedBox(width: 16),
-              Text('Cooking recipe...'),
+              const SizedBox(width: 16),
+              Text('${l10n.cookingRecipe}...'),
             ],
           ),
         ),
@@ -462,31 +472,31 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Recipe Cooked Successfully!'),
+          title: Text('${l10n.recipeCookedSuccessfully}!'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Recipe: ${suggestion.recipe.name}'),
+              Text('${l10n.recipe}: ${suggestion.recipe.name}'),
               const SizedBox(height: 8),
               if (result['cookingResult'] != null) ...[
-                Text('Quantity Cooked: ${result['cookingResult']['quantity']?.toString() ?? '0'}'),
-                Text('Cost Savings: ${CurrencyFormatter.formatCRC(result['cookingResult']['costSavings'] ?? 0.0)}'),
-                Text('Waste Reduction: ${result['cookingResult']['wasteReduction']?.toString() ?? '0'} items'),
+                Text('${l10n.quantityCooked}: ${result['cookingResult']['quantity']?.toString() ?? '0'}'),
+                Text('${l10n.costSavings}: ${CurrencyFormatter.formatCRC(result['cookingResult']['costSavings'] ?? 0.0)}'),
+                Text('${l10n.wasteReduction}: ${result['cookingResult']['wasteReduction']?.toString() ?? '0'} ${l10n.items}'),
               ],
               const SizedBox(height: 8),
               if (result['createdPromotion'] != null) ...[
-                const Text('Promotion Created:', style: TextStyle(fontWeight: FontWeight.bold)),
-                Text('Name: ${result['createdPromotion']['name']}'),
-                Text('Type: ${result['createdPromotion']['type'] ?? 'N/A'}'),
-                Text('Discount: ${result['createdPromotion']['discountValue']}%'),
+                const Text('${l10n.promotionCreated}:', style: TextStyle(fontWeight: FontWeight.bold)),
+                Text('${l10n.name}: ${result['createdPromotion']['name']}'),
+                Text('${l10n.type}: ${result['createdPromotion']['type'] ?? l10n.na}'),
+                Text('${l10n.discount}: ${result['createdPromotion']['discountValue']}%'),
                 const SizedBox(height: 4),
-                const Text('Quantity Tracking:', style: TextStyle(fontWeight: FontWeight.bold)),
-                Text('Total Quantity: ${result['createdPromotion']['totalQuantity']?.toString() ?? '0'}'),
-                Text('Used Quantity: ${result['createdPromotion']['usedQuantity']?.toString() ?? '0'}'),
-                Text('Remaining: ${result['createdPromotion']['remainingQuantity']?.toString() ?? '0'}'),
-                Text('Status: ${result['createdPromotion']['status'] ?? 'Unknown'}'),
-                Text('Expires: ${result['createdPromotion']['expiresAt'] ?? 'Unknown'}'),
+                const Text('${l10n.quantityTracking}:', style: TextStyle(fontWeight: FontWeight.bold)),
+                Text('${l10n.totalQuantity}: ${result['createdPromotion']['totalQuantity']?.toString() ?? '0'}'),
+                Text('${l10n.usedQuantity}: ${result['createdPromotion']['usedQuantity']?.toString() ?? '0'}'),
+                Text('${l10n.remaining}: ${result['createdPromotion']['remainingQuantity']?.toString() ?? '0'}'),
+                Text('${l10n.status}: ${result['createdPromotion']['status'] ?? l10n.unknown}'),
+                Text('${l10n.expires}: ${result['createdPromotion']['expiresAt'] ?? l10n.unknown}'),
               ],
             ],
           ),
@@ -497,7 +507,7 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
                 // Refresh the alerts
                 ref.invalidate(inventoryAlertsProvider);
               },
-              child: const Text('OK'),
+              child: Text(l10n.ok),
             ),
           ],
         ),
@@ -510,12 +520,12 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Error'),
-          content: Text('Failed to cook recipe: $e'),
+          title: Text(l10n.error),
+          content: Text('${l10n.failedToCookRecipe}: $e'),
           actions: [
             ElevatedButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('OK'),
+              child: Text(l10n.ok),
             ),
           ],
         ),
@@ -528,7 +538,7 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
       final repository = ref.read(smartRecipeRepositoryProvider);
       
       // Create promotion name based on the alert
-      final promotionName = 'Special Offer: ${alert.itemName ?? 'Selected Items'}';
+      final promotionName = '${l10n.specialOffer}: ${alert.itemName ?? l10n.selectedItems}';
       
       // Set expiration to end of day
       final expiresAt = DateTime.now().add(const Duration(days: 7));
@@ -540,12 +550,12 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
         discountValue: value,
         expiresAt: expiresAt,
         itemIds: alert.itemId != null ? [alert.itemId!] : null,
-        description: 'Promotion created from inventory alert: ${alert.message}',
+        description: '${l10n.promotionCreatedFromInventoryAlert}: ${alert.message}',
       );
       
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Successfully created promotion: ${result['name'] ?? promotionName}'),
+          content: Text('${l10n.successfullyCreatedPromotion}: ${result['name'] ?? promotionName}'),
           backgroundColor: Colors.green,
           duration: const Duration(seconds: 3),
         ),
@@ -557,7 +567,7 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error creating promotion: $e'),
+          content: Text('${l10n.errorCreatingPromotion}: $e'),
           backgroundColor: Colors.red,
           duration: const Duration(seconds: 3),
         ),
@@ -566,17 +576,18 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
   }
 
   void _showQuickActionsDialog() {
+    final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Quick Actions'),
+        title: Text(l10n.quickActions),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
               leading: const Icon(Icons.restaurant_menu, color: Colors.green),
-              title: const Text('Cook Recipe'),
-              subtitle: const Text('Use expiring items to create dishes'),
+              title: Text(l10n.cookRecipe),
+              subtitle: Text(l10n.useExpiringItemsToCreateDishes),
               onTap: () {
                 Navigator.of(context).pop();
                 _showCookRecipeDialog();
@@ -584,8 +595,8 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
             ),
             ListTile(
               leading: const Icon(Icons.local_offer, color: Colors.orange),
-              title: const Text('Create Promotion'),
-              subtitle: const Text('Create special offers for items'),
+              title: Text(l10n.createPromotion),
+              subtitle: Text(l10n.createSpecialOffersForItems),
               onTap: () {
                 Navigator.of(context).pop();
                 _showCreatePromotionDialog();
@@ -593,8 +604,8 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
             ),
             ListTile(
               leading: const Icon(Icons.analytics, color: Colors.blue),
-              title: const Text('View Analytics'),
-              subtitle: const Text('Check cooking history and metrics'),
+              title: Text(l10n.viewAnalytics),
+              subtitle: Text(l10n.checkCookingHistoryAndMetrics),
               onTap: () {
                 Navigator.of(context).pop();
                 _showAnalyticsDialog();
@@ -602,8 +613,8 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
             ),
             ListTile(
               leading: const Icon(Icons.history, color: Colors.purple),
-              title: const Text('Cooking History'),
-              subtitle: const Text('View recent cooking activities'),
+              title: Text(l10n.cookingHistory),
+              subtitle: Text(l10n.viewRecentCookingActivities),
               onTap: () {
                 Navigator.of(context).pop();
                 _showCookingHistoryDialog();
@@ -614,7 +625,7 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
         ],
       ),
@@ -622,19 +633,20 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
   }
 
   void _showCookRecipeDialog() {
+    final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Cook Recipe'),
+        title: Text(l10n.cookRecipe),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Select a recipe to cook using expiring items:'),
+            Text(l10n.selectARecipeToCookUsingExpiringItems),
             const SizedBox(height: 16),
-            const Text('This feature will:'),
-            const Text('• Automatically select recipes using expiring items'),
-            const Text('• Consume inventory and reduce waste'),
-            const Text('• Create customizable promotions'),
+            const Text(l10n.thisFeatureWill),
+            Text('• ${l10n.automaticallySelectRecipesUsingExpiringItems}'),
+            Text('• ${l10n.consumeInventoryAndReduceWaste}'),
+            Text('• ${l10n.createCustomizablePromotions}'),
             const SizedBox(height: 16),
             SizedBox(
               height: 300,
@@ -650,13 +662,13 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
                   }
                   
                   if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
+                    return Center(child: Text('${l10n.error}: ${snapshot.error}'));
                   }
                   
                   final suggestions = snapshot.data ?? [];
                   
                   if (suggestions.isEmpty) {
-                    return const Center(child: Text('No recipe suggestions available'));
+                    return Center(child: Text(l10n.noRecipeSuggestionsAvailable));
                   }
                   
                   return ListView.builder(
@@ -667,13 +679,13 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
                         margin: const EdgeInsets.only(bottom: 8),
                         child: ListTile(
                           title: Text(suggestion.recipe.name),
-                          subtitle: Text(suggestion.recipe.description ?? 'No description'),
+                          subtitle: Text(suggestion.recipe.description ?? l10n.noDescription),
                           trailing: ElevatedButton(
                             onPressed: () {
                               Navigator.of(context).pop();
                               _showCookRecipeWithPromotionDialog(suggestion);
                             },
-                            child: const Text('Cook'),
+                            child: Text(l10n.cook),
                           ),
                         ),
                       );
@@ -687,7 +699,7 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
         ],
       ),
@@ -695,8 +707,8 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
   }
 
   void _showCookRecipeWithPromotionDialog(SmartRecipeSuggestion suggestion) {
-    final nameController = TextEditingController(text: 'Chef\'s Special: ${suggestion.recipe.name}');
-    final descriptionController = TextEditingController(text: 'Freshly prepared ${suggestion.recipe.name.toLowerCase()} using premium ingredients');
+    final nameController = TextEditingController(text: '${l10n.chefSpecial}: ${suggestion.recipe.name}');
+    final descriptionController = TextEditingController(text: '${l10n.freshlyPrepared} ${suggestion.recipe.name.toLowerCase()} ${l10n.usingPremiumIngredients}');
     final discountValueController = TextEditingController(text: '25');
     final expiresHoursController = TextEditingController(text: '48');
     final quantityController = TextEditingController(text: '1');
@@ -707,64 +719,64 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: Text('Cook ${suggestion.recipe.name}'),
+          title: Text('${l10n.cook} ${suggestion.recipe.name}'),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Cook recipe using: ${suggestion.recipe.name}'),
+                Text('${l10n.cookRecipeUsing}: ${suggestion.recipe.name}'),
                 const SizedBox(height: 16),
-                const Text('This will:'),
-                const Text('• Consume inventory items'),
-                const Text('• Reduce waste'),
-                const Text('• Create a promotion with quantity tracking'),
+                const Text(l10n.thisWill),
+                Text('• ${l10n.consumeInventoryItems}'),
+                Text('• ${l10n.reduceWaste}'),
+                Text('• ${l10n.createPromotionWithQuantityTracking}'),
                 const SizedBox(height: 16),
-                const Text('Recipe Configuration:', style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text(l10n.recipeConfiguration),
                 const SizedBox(height: 8),
                 TextField(
                   controller: quantityController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Quantity to Cook',
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    labelText: l10n.quantityToCook,
                     hintText: '1',
-                    helperText: 'This will create a promotion with the same quantity',
+                    helperText: l10n.thisWillCreateAPromotionWithTheSameQuantity,
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Text('Promotion Configuration:', style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text(l10n.promotionConfiguration),
                 const SizedBox(height: 8),
                 TextField(
                   controller: nameController,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Promotion Name',
-                    hintText: 'e.g., Chef\'s Special: Truffle Pizza',
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    labelText: l10n.promotionName,
+                    hintText: '${l10n.eG} ${l10n.chefSpecial}: ${l10n.trufflePizza}',
                   ),
                 ),
                 const SizedBox(height: 8),
                 TextField(
                   controller: descriptionController,
                   maxLines: 2,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Promotion Description',
-                    hintText: 'Description of the promotion',
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    labelText: l10n.promotionDescription,
+                    hintText: l10n.descriptionOfThePromotion,
                   ),
                 ),
                 const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Promotion Type',
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    labelText: l10n.promotionType,
                   ),
                   value: selectedPromotionType,
                   items: const [
-                    DropdownMenuItem(value: 'chef_special', child: Text('Chef\'s Special')),
-                    DropdownMenuItem(value: 'discount', child: Text('Discount')),
-                    DropdownMenuItem(value: 'bogo', child: Text('Buy One Get One')),
-                    DropdownMenuItem(value: 'flash_sale', child: Text('Flash Sale')),
+                    DropdownMenuItem(value: 'chef_special', child: Text(l10n.chefSpecial)),
+                    DropdownMenuItem(value: 'discount', child: Text(l10n.discount)),
+                    DropdownMenuItem(value: 'bogo', child: Text(l10n.buyOneGetOne)),
+                    DropdownMenuItem(value: 'flash_sale', child: Text(l10n.flashSale)),
                   ],
                   onChanged: (value) {
                     setState(() {
@@ -774,16 +786,16 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
                 ),
                 const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Discount Type',
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    labelText: l10n.discountType,
                   ),
                   value: selectedDiscountType,
                   items: const [
-                    DropdownMenuItem(value: 'percentage', child: Text('Percentage Discount')),
-                    DropdownMenuItem(value: 'fixed', child: Text('Fixed Amount Off')),
-                    DropdownMenuItem(value: 'free_item', child: Text('Free Item')),
-                    DropdownMenuItem(value: 'bogo', child: Text('Buy One Get One')),
+                    DropdownMenuItem(value: 'percentage', child: Text(l10n.percentageDiscount)),
+                    DropdownMenuItem(value: 'fixed', child: Text(l10n.fixedAmountOff)),
+                    DropdownMenuItem(value: 'free_item', child: Text(l10n.freeItem)),
+                    DropdownMenuItem(value: 'bogo', child: Text(l10n.buyOneGetOne)),
                   ],
                   onChanged: (value) {
                     setState(() {
@@ -797,7 +809,7 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                     border: const OutlineInputBorder(),
-                    labelText: selectedDiscountType == 'percentage' ? 'Discount Percentage (%)' : 'Discount Amount (\$)',
+                    labelText: selectedDiscountType == 'percentage' ? l10n.discountPercentage : l10n.discountAmount,
                     hintText: selectedDiscountType == 'percentage' ? '25' : '5.00',
                   ),
                 ),
@@ -805,9 +817,9 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
                 TextField(
                   controller: expiresHoursController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Promotion Expires In (Hours)',
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    labelText: l10n.promotionExpiresInHours,
                     hintText: '48',
                   ),
                 ),
@@ -817,7 +829,7 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
+              child: Text(l10n.cancel),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -829,14 +841,14 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
                 
                 if (name.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Please enter a promotion name')),
+                    SnackBar(content: Text(l10n.pleaseEnterAPromotionName)),
                   );
                   return;
                 }
                 
                 if (quantity <= 0) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Quantity must be greater than 0')),
+                    SnackBar(content: Text(l10n.quantityMustBeGreaterThan0)),
                   );
                   return;
                 }
@@ -853,7 +865,7 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
                   promotionExpiresInHours: expiresHours,
                 );
               },
-              child: const Text('Cook Recipe'),
+              child: Text(l10n.cookRecipe),
             ),
           ],
         ),
@@ -871,37 +883,37 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: const Text('Create Promotion'),
+          title: Text(l10n.createPromotion),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('Create a promotion for expiring or underperforming items:'),
+              Text(l10n.createAPromotionForExpiringOrUnderperformingItems),
               const SizedBox(height: 16),
-              const Text('This feature will:'),
-              const Text('• Create targeted promotions'),
-              const Text('• Help move inventory'),
-              const Text('• Increase sales and reduce waste'),
+              const Text(l10n.thisFeatureWill),
+              Text('• ${l10n.createTargetedPromotions}'),
+              Text('• ${l10n.helpMoveInventory}'),
+              Text('• ${l10n.increaseSalesAndReduceWaste}'),
               const SizedBox(height: 16),
               TextField(
                 controller: nameController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Promotion Name',
-                  hintText: 'e.g., Flash Sale - 20% Off',
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
+                  labelText: l10n.promotionName,
+                  hintText: '${l10n.eG} ${l10n.flashSale} - 20% Off',
                 ),
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Promotion Type',
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
+                  labelText: l10n.promotionType,
                 ),
                 value: selectedPromotionType,
                 items: const [
-                  DropdownMenuItem(value: 'discount', child: Text('Discount')),
-                  DropdownMenuItem(value: 'chef_special', child: Text('Chef\'s Special')),
-                  DropdownMenuItem(value: 'bogo', child: Text('Buy One Get One')),
-                  DropdownMenuItem(value: 'flash_sale', child: Text('Flash Sale')),
+                  DropdownMenuItem(value: 'discount', child: Text(l10n.discount)),
+                  DropdownMenuItem(value: 'chef_special', child: Text(l10n.chefSpecial)),
+                  DropdownMenuItem(value: 'bogo', child: Text(l10n.buyOneGetOne)),
+                  DropdownMenuItem(value: 'flash_sale', child: Text(l10n.flashSale)),
                 ],
                 onChanged: (value) {
                   setState(() {
@@ -911,15 +923,15 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Discount Type',
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
+                  labelText: l10n.discountType,
                 ),
                 value: selectedDiscountType,
                 items: const [
-                  DropdownMenuItem(value: 'percentage', child: Text('Percentage Discount')),
-                  DropdownMenuItem(value: 'fixed', child: Text('Fixed Amount Off')),
-                  DropdownMenuItem(value: 'buyOneGetOne', child: Text('Buy One Get One')),
+                  DropdownMenuItem(value: 'percentage', child: Text(l10n.percentageDiscount)),
+                  DropdownMenuItem(value: 'fixed', child: Text(l10n.fixedAmountOff)),
+                  DropdownMenuItem(value: 'buyOneGetOne', child: Text(l10n.buyOneGetOne)),
                 ],
                 onChanged: (value) {
                   setState(() {
@@ -933,7 +945,7 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   border: const OutlineInputBorder(),
-                  labelText: selectedDiscountType == 'percentage' ? 'Percentage (%)' : 'Amount (\$)',
+                  labelText: selectedDiscountType == 'percentage' ? l10n.percentage : l10n.amount,
                   hintText: selectedDiscountType == 'percentage' ? '20' : '5.00',
                 ),
               ),
@@ -942,7 +954,7 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
+              child: Text(l10n.cancel),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -951,8 +963,8 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
                 
                 if (name.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Please enter a promotion name'),
+                    SnackBar(
+                      content: Text(l10n.pleaseEnterAPromotionName),
                       backgroundColor: Colors.red,
                     ),
                   );
@@ -961,8 +973,8 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
                 
                 if (value <= 0) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Please enter a valid discount value'),
+                    SnackBar(
+                      content: Text(l10n.pleaseEnterAValidDiscountValue),
                       backgroundColor: Colors.red,
                     ),
                   );
@@ -986,7 +998,7 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
                   
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Successfully created promotion: ${result['name'] ?? name}'),
+                      content: Text('${l10n.successfullyCreatedPromotion}: ${result['name'] ?? name}'),
                       backgroundColor: Colors.green,
                       duration: const Duration(seconds: 3),
                     ),
@@ -1002,7 +1014,7 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
                 } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Error creating promotion: $e'),
+                      content: Text('${l10n.errorCreatingPromotion}: $e'),
                       backgroundColor: Colors.red,
                       duration: const Duration(seconds: 3),
                     ),
@@ -1013,7 +1025,7 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
                 backgroundColor: Colors.orange,
                 foregroundColor: Colors.white,
               ),
-              child: const Text('Create Promotion'),
+              child: Text(l10n.createPromotion),
             ),
           ],
         ),
@@ -1022,10 +1034,11 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
   }
 
   void _showAnalyticsDialog() {
+    final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Cooking Analytics'),
+        title: Text(l10n.cookingAnalytics),
         content: SizedBox(
           width: double.maxFinite,
           child: FutureBuilder<Map<String, dynamic>>(
@@ -1041,7 +1054,7 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
                   children: [
                     const Icon(Icons.error_outline, color: Colors.red, size: 48),
                     const SizedBox(height: 16),
-                    Text('Error loading analytics: ${snapshot.error}'),
+                    Text('${l10n.errorLoadingAnalytics}: ${snapshot.error}'),
                   ],
                 );
               }
@@ -1053,28 +1066,28 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildAnalyticsCard(
-                    'Total Recipes Cooked',
+                    l10n.totalRecipesCooked,
                     '${analytics['totalRecipesCooked'] ?? 0}',
                     Icons.restaurant_menu,
                     Colors.green,
                   ),
                   const SizedBox(height: 12),
                   _buildAnalyticsCard(
-                    'Waste Reduced',
+                    l10n.wasteReduced,
                     CurrencyFormatter.formatCRC(analytics['wasteReduced'] ?? 0.0),
                     Icons.recycling,
                     Colors.blue,
                   ),
                   const SizedBox(height: 12),
                   _buildAnalyticsCard(
-                    'Cost Savings',
+                    l10n.costSavings,
                     CurrencyFormatter.formatCRC(analytics['costSavings'] ?? 0.0),
                     Icons.savings,
                     Colors.orange,
                   ),
                   const SizedBox(height: 12),
                   _buildAnalyticsCard(
-                    'Promotions Created',
+                    l10n.promotionsCreated,
                     '${analytics['promotionsCreated'] ?? 0}',
                     Icons.local_offer,
                     Colors.purple,
@@ -1087,7 +1100,7 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+            child: Text(l10n.close),
           ),
         ],
       ),
@@ -1095,6 +1108,7 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
   }
 
   Widget _buildAnalyticsCard(String title, String value, IconData icon, Color color) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -1134,10 +1148,11 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
   }
 
   void _showCookingHistoryDialog() {
+    final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Cooking History'),
+        title: Text(l10n.cookingHistory),
         content: SizedBox(
           width: double.maxFinite,
           height: 400,
@@ -1154,7 +1169,7 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
                   children: [
                     const Icon(Icons.error_outline, color: Colors.red, size: 48),
                     const SizedBox(height: 16),
-                    Text('Error loading history: ${snapshot.error}'),
+                    Text('${l10n.errorLoadingHistory}: ${snapshot.error}'),
                   ],
                 );
               }
@@ -1162,14 +1177,14 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
               final history = snapshot.data ?? [];
               
               if (history.isEmpty) {
-                return const Center(
+                return Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(Icons.history, color: Colors.grey, size: 48),
-                      SizedBox(height: 16),
-                      Text('No cooking history yet'),
-                      Text('Start cooking recipes to see your history here'),
+                      const SizedBox(height: 16),
+                      Text(l10n.noCookingHistoryYet),
+                      Text('${l10n.startCookingRecipesToSeeYourHistoryHere}'),
                     ],
                   ),
                 );
@@ -1183,12 +1198,12 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
                     margin: const EdgeInsets.only(bottom: 8),
                     child: ListTile(
                       leading: const Icon(Icons.restaurant_menu, color: Colors.green),
-                      title: Text(entry['recipeName'] ?? 'Unknown Recipe'),
+                      title: Text(entry['recipeName'] ?? l10n.unknownRecipe),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Quantity: ${entry['quantity'] ?? 0}'),
-                          Text('Date: ${_formatHistoryDate(entry['createdAt'])}'),
+                          Text('${l10n.quantity}: ${entry['quantity'] ?? 0}'),
+                          Text('${l10n.date}: ${_formatHistoryDate(entry['createdAt'])}'),
                         ],
                       ),
                       trailing: Text(
@@ -1208,7 +1223,7 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+            child: Text(l10n.close),
           ),
         ],
       ),
@@ -1216,17 +1231,19 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
   }
 
   String _formatHistoryDate(dynamic dateValue) {
-    if (dateValue == null) return 'Unknown date';
+    final l10n = AppLocalizations.of(context);
+    if (dateValue == null) return l10n.unknownDate;
     
     try {
       final date = DateTime.parse(dateValue.toString());
       return '${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
     } catch (e) {
-      return 'Invalid date';
+      return l10n.invalidDate;
     }
   }
 
   void _viewDetails(InventoryAlert alert) {
+    final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -1237,15 +1254,15 @@ class _InventoryAlertsScreenState extends ConsumerState<InventoryAlertsScreen>
           children: [
             Text(alert.message),
             const SizedBox(height: 8),
-            if (alert.itemName != null) Text('Item: ${alert.itemName}'),
-            Text('Created: ${_formatDate(alert.createdAt)}'),
-            Text('Urgency: ${alert.urgencyText}'),
+            if (alert.itemName != null) Text('${l10n.item}: ${alert.itemName}'),
+            Text('${l10n.created}: ${_formatDate(alert.createdAt)}'),
+            Text('${l10n.urgency}: ${alert.urgencyText}'),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+            child: Text(l10n.close),
           ),
         ],
       ),
