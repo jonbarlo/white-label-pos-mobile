@@ -692,6 +692,50 @@ class AppLocalizations {
   String get deleteRecipeConfirmation => _locale.languageCode == 'en' ? 'Are you sure you want to delete' : '¿Estás seguro de que quieres eliminar';
   String get recipeDeletedSuccessfully => _locale.languageCode == 'en' ? 'Recipe deleted successfully' : 'Receta eliminada exitosamente';
   String get failedToDeleteRecipe => _locale.languageCode == 'en' ? 'Failed to delete recipe:' : 'Error al eliminar receta:';
+  
+  // Smart suggestions screen strings
+  String get smartRecipeSuggestions => _locale.languageCode == 'en' ? 'Smart Recipe Suggestions' : 'Sugerencias Inteligentes de Recetas';
+  String get cooked => _locale.languageCode == 'en' ? 'Cooked' : 'Cocinado';
+  String get wastePrevention => _locale.languageCode == 'en' ? 'Waste Prevention' : 'Prevención de Desperdicio';
+  String get noPendingSuggestionsAvailable => _locale.languageCode == 'en' ? 'No pending suggestions available' : 'No hay sugerencias pendientes disponibles';
+  String get highUrgency => _locale.languageCode == 'en' ? 'High Urgency' : 'Alta Urgencia';
+  String get mediumUrgency => _locale.languageCode == 'en' ? 'Medium Urgency' : 'Urgencia Media';
+  String get lowUrgency => _locale.languageCode == 'en' ? 'Low Urgency' : 'Baja Urgencia';
+  String get noCookedSuggestionsAvailable => _locale.languageCode == 'en' ? 'No cooked suggestions available' : 'No hay sugerencias cocinadas disponibles';
+  String get noSuggestionsAvailable => _locale.languageCode == 'en' ? 'No suggestions available' : 'No hay sugerencias disponibles';
+  String get errorLoadingWastePreventionData => _locale.languageCode == 'en' ? 'Error loading waste prevention data' : 'Error al cargar datos de prevención de desperdicio';
+  String get noSmartRecipeSuggestionsAvailable => _locale.languageCode == 'en' ? 'No smart recipe suggestions available' : 'No hay sugerencias inteligentes de recetas disponibles';
+  
+  // Additional smart suggestions strings
+  String get confidence => _locale.languageCode == 'en' ? 'Confidence' : 'Confianza';
+  String get potentialSavings => _locale.languageCode == 'en' ? 'Potential Savings' : 'Ahorro Potencial';
+  String get cookRecipe => _locale.languageCode == 'en' ? 'Cook Recipe' : 'Cocinar Receta';
+  String get alreadyCooked => _locale.languageCode == 'en' ? 'Already Cooked' : 'Ya Cocinado';
+  String get cookedOn => _locale.languageCode == 'en' ? 'Cooked On' : 'Cocinado El';
+  String get recipeCookedSuccessfully => _locale.languageCode == 'en' ? 'Recipe Cooked Successfully' : 'Receta Cocinada Exitosamente';
+  String get cookRecipeTitle => _locale.languageCode == 'en' ? 'Cook' : 'Cocinar';
+  String get cookRecipeUsing => _locale.languageCode == 'en' ? 'Cook recipe using:' : 'Cocinar receta usando:';
+  String get thisWill => _locale.languageCode == 'en' ? 'This will:' : 'Esto hará:';
+  String get consumeInventoryItems => _locale.languageCode == 'en' ? '• Consume inventory items' : '• Consumir artículos del inventario';
+  String get reduceWaste => _locale.languageCode == 'en' ? '• Reduce waste' : '• Reducir desperdicio';
+  String get createPromotionWithQuantityTracking => _locale.languageCode == 'en' ? '• Create a promotion with quantity tracking' : '• Crear una promoción con seguimiento de cantidad';
+  String get recipeConfiguration => _locale.languageCode == 'en' ? 'Recipe Configuration:' : 'Configuración de Receta:';
+  String get quantityToCook => _locale.languageCode == 'en' ? 'Quantity to Cook' : 'Cantidad a Cocinar';
+  String get thisWillCreatePromotionWithSameQuantity => _locale.languageCode == 'en' ? 'This will create a promotion with the same quantity' : 'Esto creará una promoción con la misma cantidad';
+  String get promotionConfiguration => _locale.languageCode == 'en' ? 'Promotion Configuration:' : 'Configuración de Promoción:';
+  String get promotionName => _locale.languageCode == 'en' ? 'Promotion Name' : 'Nombre de Promoción';
+  String get promotionDescription => _locale.languageCode == 'en' ? 'Promotion Description' : 'Descripción de Promoción';
+  String get descriptionOfPromotion => _locale.languageCode == 'en' ? 'Description of the promotion' : 'Descripción de la promoción';
+  String get chefsSpecial => _locale.languageCode == 'en' ? 'Chef\'s Special' : 'Especial del Chef';
+  String get buyOneGetOne => _locale.languageCode == 'en' ? 'Buy One Get One' : 'Compra Uno Obtén Uno';
+  String get flashSale => _locale.languageCode == 'en' ? 'Flash Sale' : 'Venta Flash';
+  String get discountType => _locale.languageCode == 'en' ? 'Discount Type' : 'Tipo de Descuento';
+  String get percentageDiscount => _locale.languageCode == 'en' ? 'Percentage Discount' : 'Descuento Porcentual';
+  String get fixedAmountOff => _locale.languageCode == 'en' ? 'Fixed Amount Off' : 'Cantidad Fija de Descuento';
+  String get freeItem => _locale.languageCode == 'en' ? 'Free Item' : 'Artículo Gratis';
+  String get discountAmount => _locale.languageCode == 'en' ? 'Discount Amount (\$)' : 'Cantidad de Descuento (\$)';
+  String get matchingIngredients => _locale.languageCode == 'en' ? 'Matching Ingredients:' : 'Ingredientes Coincidentes:';
+  String get ingredientsUsed => _locale.languageCode == 'en' ? 'Ingredients Used:' : 'Ingredientes Usados:';
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

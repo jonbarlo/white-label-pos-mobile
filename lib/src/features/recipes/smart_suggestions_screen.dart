@@ -7,6 +7,7 @@ import '../auth/auth_provider.dart';
 import '../auth/models/user.dart';
 import '../../shared/utils/currency_formatter.dart';
 import '../business/business_provider.dart';
+import '../../core/localization/app_localizations.dart';
 
 class SmartSuggestionsScreen extends ConsumerStatefulWidget {
   const SmartSuggestionsScreen({super.key});
@@ -37,17 +38,18 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
     final cookedSuggestionsAsync = ref.watch(cookedSuggestionsProvider);
     final allSuggestionsAsync = ref.watch(allSuggestionsProvider);
     final wastePreventionAsync = ref.watch(wastePreventionSuggestionsProvider);
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Smart Recipe Suggestions'),
+        title: Text(l10n.smartRecipeSuggestions),
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
-            Tab(text: 'Pending'),
-            Tab(text: 'Cooked'),
-            Tab(text: 'All'),
-            Tab(text: 'Waste Prevention'),
+          tabs: [
+            Tab(text: l10n.pending),
+            Tab(text: l10n.cooked),
+            Tab(text: l10n.all),
+            Tab(text: l10n.wastePrevention),
           ],
         ),
       ),
@@ -64,11 +66,13 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
   }
 
   Widget _buildPendingTab(AsyncValue<List<SmartRecipeSuggestion>> suggestionsAsync) {
+    final l10n = AppLocalizations.of(context);
+    
     return suggestionsAsync.when(
       data: (suggestions) {
         if (suggestions.isEmpty) {
-          return const Center(
-            child: Text('No pending suggestions available'),
+          return Center(
+            child: Text(l10n.noPendingSuggestionsAvailable),
           );
         }
 
@@ -81,33 +85,35 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
           padding: const EdgeInsets.all(16),
           children: [
             if (highUrgency.isNotEmpty) ...[
-              _buildUrgencySection('High Urgency', highUrgency, Colors.red),
+              _buildUrgencySection(l10n.highUrgency, highUrgency, Colors.red),
               const SizedBox(height: 16),
             ],
             if (mediumUrgency.isNotEmpty) ...[
-              _buildUrgencySection('Medium Urgency', mediumUrgency, Colors.orange),
+              _buildUrgencySection(l10n.mediumUrgency, mediumUrgency, Colors.orange),
               const SizedBox(height: 16),
             ],
             if (lowUrgency.isNotEmpty) ...[
-              _buildUrgencySection('Low Urgency', lowUrgency, Colors.green),
+              _buildUrgencySection(l10n.lowUrgency, lowUrgency, Colors.green),
             ],
           ],
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, stack) => Center(
-        child: Text('Error: $error'),
+        child: Text('${l10n.error}: $error'),
       ),
     );
   }
 
   Widget _buildCookedTab(AsyncValue<List<SmartRecipeSuggestion>> suggestionsAsync) {
+    final l10n = AppLocalizations.of(context);
+    
     return suggestionsAsync.when(
       data: (suggestions) {
         print('🔍 DEBUG: Cooked tab - Found ${suggestions.length} cooked suggestions');
         if (suggestions.isEmpty) {
-          return const Center(
-            child: Text('No cooked suggestions available'),
+          return Center(
+            child: Text(l10n.noCookedSuggestionsAvailable),
           );
         }
 
@@ -126,17 +132,19 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, stack) => Center(
-        child: Text('Error: $error'),
+        child: Text('${l10n.error}: $error'),
       ),
     );
   }
 
   Widget _buildAllTab(AsyncValue<List<SmartRecipeSuggestion>> suggestionsAsync) {
+    final l10n = AppLocalizations.of(context);
+    
     return suggestionsAsync.when(
       data: (suggestions) {
         if (suggestions.isEmpty) {
-          return const Center(
-            child: Text('No suggestions available'),
+          return Center(
+            child: Text(l10n.noSuggestionsAvailable),
           );
         }
 
@@ -155,12 +163,14 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, stack) => Center(
-        child: Text('Error: $error'),
+        child: Text('${l10n.error}: $error'),
       ),
     );
   }
 
   Widget _buildWastePreventionTab(AsyncValue<Map<String, dynamic>> wastePreventionAsync) {
+    final l10n = AppLocalizations.of(context);
+    
     return wastePreventionAsync.when(
       data: (data) {
         final summary = data['summary'] as Map<String, dynamic>? ?? {};
@@ -207,7 +217,7 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
             const Icon(Icons.error_outline, size: 64, color: Colors.red),
             const SizedBox(height: 16),
             Text(
-              'Error loading waste prevention data',
+              l10n.errorLoadingWastePreventionData,
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 8),
@@ -223,7 +233,7 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
               onPressed: () {
                 ref.invalidate(wastePreventionSuggestionsProvider);
               },
-              child: const Text('Retry'),
+              child: Text(l10n.retry),
             ),
           ],
         ),
@@ -232,11 +242,13 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
   }
 
   Widget _buildUrgencyTab(AsyncValue<List<SmartRecipeSuggestion>> suggestionsAsync) {
+    final l10n = AppLocalizations.of(context);
+    
     return suggestionsAsync.when(
       data: (suggestions) {
         if (suggestions.isEmpty) {
-          return const Center(
-            child: Text('No smart recipe suggestions available'),
+          return Center(
+            child: Text(l10n.noSmartRecipeSuggestionsAvailable),
           );
         }
 
@@ -249,32 +261,34 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
           padding: const EdgeInsets.all(16),
           children: [
             if (highUrgency.isNotEmpty) ...[
-              _buildUrgencySection('High Urgency', highUrgency, Colors.red),
+              _buildUrgencySection(l10n.highUrgency, highUrgency, Colors.red),
               const SizedBox(height: 16),
             ],
             if (mediumUrgency.isNotEmpty) ...[
-              _buildUrgencySection('Medium Urgency', mediumUrgency, Colors.orange),
+              _buildUrgencySection(l10n.mediumUrgency, mediumUrgency, Colors.orange),
               const SizedBox(height: 16),
             ],
             if (lowUrgency.isNotEmpty) ...[
-              _buildUrgencySection('Low Urgency', lowUrgency, Colors.green),
+              _buildUrgencySection(l10n.lowUrgency, lowUrgency, Colors.green),
             ],
           ],
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, stack) => Center(
-        child: Text('Error: $error'),
+        child: Text('${l10n.error}: $error'),
       ),
     );
   }
 
   Widget _buildSavingsTab(AsyncValue<List<SmartRecipeSuggestion>> suggestionsAsync) {
+    final l10n = AppLocalizations.of(context);
+    
     return suggestionsAsync.when(
       data: (suggestions) {
         if (suggestions.isEmpty) {
-          return const Center(
-            child: Text('No smart recipe suggestions available'),
+          return Center(
+            child: Text(l10n.noSmartRecipeSuggestionsAvailable),
           );
         }
 
@@ -293,7 +307,7 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, stack) => Center(
-        child: Text('Error: $error'),
+        child: Text('${l10n.error}: $error'),
       ),
     );
   }
@@ -324,6 +338,8 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
   }
 
   Widget _buildSuggestionCard(SmartRecipeSuggestion suggestion) {
+    final l10n = AppLocalizations.of(context);
+    
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
@@ -378,12 +394,12 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
               runSpacing: 4,
               children: [
                 _buildMetricChip(
-                  'Confidence',
+                  l10n.confidence,
                   '${(suggestion.confidenceScore * 100).toInt()}%',
                   Colors.blue,
                 ),
                 _buildMetricChip(
-                  'Potential Savings',
+                  l10n.potentialSavings,
                   CurrencyFormatter.formatCRC(suggestion.potentialSavings),
                   Colors.green,
                 ),
@@ -399,7 +415,7 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
             if (suggestion.matchingIngredients.isNotEmpty) ...[
               const SizedBox(height: 8),
               Text(
-                'Matching Ingredients: ${suggestion.matchingIngredients.map((i) => i.name).join(', ')}',
+                '${l10n.matchingIngredients} ${suggestion.matchingIngredients.map((i) => i.name).join(', ')}',
                 style: const TextStyle(
                   fontSize: 12,
                   color: Colors.grey,
@@ -419,7 +435,7 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
                       suggestion.canBeCooked ? Icons.restaurant_menu : Icons.check_circle,
                       size: 16,
                     ),
-                    label: Text(suggestion.canBeCooked ? 'Cook Recipe' : 'Already Cooked'),
+                    label: Text(suggestion.canBeCooked ? l10n.cookRecipe : l10n.alreadyCooked),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: suggestion.canBeCooked ? Colors.green : Colors.grey,
                       foregroundColor: Colors.white,
@@ -455,6 +471,8 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
   }
 
   Widget _buildCookedSuggestionCard(SmartRecipeSuggestion suggestion) {
+    final l10n = AppLocalizations.of(context);
+    
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
@@ -509,17 +527,17 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
               runSpacing: 4,
               children: [
                 _buildMetricChip(
-                  'Confidence',
+                  l10n.confidence,
                   '${(suggestion.confidenceScore * 100).toInt()}%',
                   Colors.blue,
                 ),
                 _buildMetricChip(
-                  'Potential Savings',
+                  l10n.potentialSavings,
                   CurrencyFormatter.formatCRC(suggestion.potentialSavings),
                   Colors.green,
                 ),
                 _buildMetricChip(
-                  'Cooked On',
+                  l10n.cookedOn,
                   '${suggestion.createdAt.day}/${suggestion.createdAt.month}/${suggestion.createdAt.year}',
                   Colors.orange,
                 ),
@@ -535,7 +553,7 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
             if (suggestion.matchingIngredients.isNotEmpty) ...[
               const SizedBox(height: 8),
               Text(
-                'Ingredients Used: ${suggestion.matchingIngredients.map((i) => i.name).join(', ')}',
+                '${l10n.ingredientsUsed} ${suggestion.matchingIngredients.map((i) => i.name).join(', ')}',
                 style: const TextStyle(
                   fontSize: 12,
                   color: Colors.grey,
@@ -556,14 +574,14 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: Colors.green.withOpacity(0.3)),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 20),
-                      SizedBox(width: 8),
+                      const Icon(Icons.check_circle, color: Colors.green, size: 20),
+                      const SizedBox(width: 8),
                       Text(
-                        'Recipe Cooked Successfully',
-                        style: TextStyle(
+                        l10n.recipeCookedSuccessfully,
+                        style: const TextStyle(
                           color: Colors.green,
                           fontWeight: FontWeight.bold,
                         ),
@@ -580,7 +598,7 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
                       _createPromotion(suggestion);
                     },
                     icon: const Icon(Icons.local_offer, size: 16),
-                    label: const Text('Create Promotion'),
+                    label: Text(l10n.createPromotion),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.orange,
                       foregroundColor: Colors.white,
