@@ -9,6 +9,7 @@ import 'widgets/recipe_filter_chips.dart';
 import 'widgets/recipe_creation_dialog.dart';
 import '../../shared/widgets/loading_indicator.dart';
 import '../auth/auth_provider.dart';
+import '../../core/localization/app_localizations.dart';
 
 class RecipesScreen extends ConsumerStatefulWidget {
   const RecipesScreen({super.key});
@@ -42,12 +43,13 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
     final authState = ref.watch(authNotifierProvider);
     final canManageRecipes = authState.canAccessKitchen || authState.isManager || authState.isAdmin;
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         title: Text(
-          'Recipes',
+          l10n.recipes,
           style: theme.textTheme.headlineMedium?.copyWith(
             fontWeight: FontWeight.w600,
           ),
@@ -62,7 +64,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
             FilledButton.icon(
               onPressed: () => _showCreateRecipeDialog(),
               icon: const Icon(Icons.add, size: 18),
-              label: const Text('New'),
+              label: Text(l10n.newText),
               style: FilledButton.styleFrom(
                 backgroundColor: theme.colorScheme.primary,
                 foregroundColor: theme.colorScheme.onPrimary,
@@ -73,7 +75,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => ref.read(recipeNotifierProvider.notifier).refreshRecipes(),
-            tooltip: 'Refresh Recipes',
+            tooltip: l10n.refreshRecipes,
           ),
           const SizedBox(width: 8),
         ],
@@ -87,11 +89,11 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
             ),
             child: TabBar(
               controller: _tabController,
-              tabs: const [
-                Tab(text: 'All'),
-                Tab(text: 'Easy'),
-                Tab(text: 'Medium'),
-                Tab(text: 'Hard'),
+              tabs: [
+                Tab(text: l10n.all),
+                Tab(text: l10n.easy),
+                Tab(text: l10n.medium),
+                Tab(text: l10n.hard),
               ],
               indicator: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
@@ -137,7 +139,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
                   child: TextField(
                     controller: _searchController,
                     decoration: InputDecoration(
-                      hintText: 'Search recipes...',
+                      hintText: l10n.searchRecipes,
                       hintStyle: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
@@ -177,7 +179,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
                   children: [
                     // Active Only Filter
                     FilterChip(
-                      label: Text('Active Only'),
+                      label: Text(l10n.activeOnly),
                       selected: _showOnlyActive,
                       onSelected: (selected) {
                         setState(() {
@@ -259,13 +261,14 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
 
   Widget _buildSearchResults(String query) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     
     return FutureBuilder<List<Recipe>?>(
       future: ref.read(recipeSearchProvider(query).future),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: LoadingIndicator(message: 'Searching recipes...'),
+          return Center(
+            child: LoadingIndicator(message: l10n.searchingRecipes),
           );
         }
         
@@ -287,13 +290,14 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
 
   Widget _buildDifficultyFilteredList(RecipeDifficulty difficulty) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     
     return FutureBuilder<List<Recipe>?>(
       future: ref.read(recipesByDifficultyProvider(difficulty).future),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: LoadingIndicator(message: 'Loading recipes...'),
+          return Center(
+            child: LoadingIndicator(message: l10n.loadingRecipes),
           );
         }
         
@@ -315,13 +319,14 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
 
   Widget _buildAllRecipesList() {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     
     return FutureBuilder<List<Recipe>?>(
       future: ref.read(recipesProvider.future),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: LoadingIndicator(message: 'Loading recipes...'),
+          return Center(
+            child: LoadingIndicator(message: l10n.loadingRecipes),
           );
         }
         
@@ -343,6 +348,8 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
   }
 
   Widget _buildErrorState(String error, ThemeData theme) {
+    final l10n = AppLocalizations.of(context);
+    
     return Container(
       padding: const EdgeInsets.all(32),
       child: Column(
@@ -362,7 +369,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
           ),
           const SizedBox(height: 24),
           Text(
-            'Unable to Load Recipes',
+            l10n.unableToLoadRecipes,
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.w600,
               color: theme.colorScheme.onSurface,
@@ -370,7 +377,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
           ),
           const SizedBox(height: 8),
           Text(
-            'Please check your connection and try again',
+            l10n.checkConnectionAndTryAgain,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -380,7 +387,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
           FilledButton.icon(
             onPressed: () => setState(() {}),
             icon: const Icon(Icons.refresh, size: 18),
-            label: const Text('Try Again'),
+            label: Text(l10n.tryAgain),
           ),
         ],
       ),
@@ -388,6 +395,8 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
   }
 
   Widget _buildEmptySearchState(String query, ThemeData theme) {
+    final l10n = AppLocalizations.of(context);
+    
     return Container(
       padding: const EdgeInsets.all(32),
       child: Column(
@@ -407,7 +416,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
           ),
           const SizedBox(height: 24),
           Text(
-            'No Recipes Found',
+            l10n.noRecipesFound,
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.w600,
               color: theme.colorScheme.onSurface,
@@ -415,7 +424,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
           ),
           const SizedBox(height: 8),
           Text(
-            'No recipes found for "$query"',
+            l10n.noRecipesFoundForQuery(query),
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -428,7 +437,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
               setState(() {});
             },
             icon: const Icon(Icons.clear, size: 18),
-            label: const Text('Clear Search'),
+            label: Text(l10n.clearSearch),
           ),
         ],
       ),
@@ -436,6 +445,8 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
   }
 
   Widget _buildEmptyDifficultyState(RecipeDifficulty difficulty, ThemeData theme) {
+    final l10n = AppLocalizations.of(context);
+    
     return Container(
       padding: const EdgeInsets.all(32),
       child: Column(
@@ -455,7 +466,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
           ),
           const SizedBox(height: 24),
           Text(
-            'No ${difficulty.name.toUpperCase()} Recipes',
+            l10n.noDifficultyRecipes(difficulty.name.toUpperCase()),
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.w600,
               color: theme.colorScheme.onSurface,
@@ -463,7 +474,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
           ),
           const SizedBox(height: 8),
           Text(
-            'Try a different difficulty level or create a new recipe',
+            l10n.tryDifferentDifficultyOrCreateNew,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -602,6 +613,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
 
   void _showRecipeDetails(Recipe recipe) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     
     showDialog(
       context: context,
@@ -626,13 +638,13 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
                 ),
               ),
               const SizedBox(height: 16),
-              _buildRecipeInfoRow('Difficulty', recipe.difficulty.name.toUpperCase(), theme),
-              _buildRecipeInfoRow('Prep Time', '${recipe.prepTimeMinutes} minutes', theme),
-              _buildRecipeInfoRow('Cook Time', '${recipe.cookTimeMinutes} minutes', theme),
-              _buildRecipeInfoRow('Servings', '${recipe.servings}', theme),
+              _buildRecipeInfoRow(l10n.difficulty, recipe.difficulty.name.toUpperCase(), theme),
+              _buildRecipeInfoRow(l10n.prepTime, '${recipe.prepTimeMinutes} ${l10n.minutes}', theme),
+              _buildRecipeInfoRow(l10n.cookTime, '${recipe.cookTimeMinutes} ${l10n.minutes}', theme),
+              _buildRecipeInfoRow(l10n.servings, '${recipe.servings}', theme),
               const SizedBox(height: 16),
               Text(
-                'Ingredients:',
+                l10n.ingredients,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -649,7 +661,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
               ),
               const SizedBox(height: 16),
               Text(
-                'Instructions:',
+                l10n.instructions,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -670,7 +682,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+            child: Text(l10n.close),
           ),
         ],
       ),
@@ -720,6 +732,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
 
   void _showDeleteRecipeDialog(Recipe recipe) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     
     showDialog(
       context: context,
@@ -727,19 +740,19 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
         backgroundColor: theme.colorScheme.surface,
         surfaceTintColor: Colors.transparent,
         title: Text(
-          'Delete Recipe',
+          l10n.deleteRecipe,
           style: theme.textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.w600,
           ),
         ),
         content: Text(
-          'Are you sure you want to delete "${recipe.name}"? This action cannot be undone.',
+          l10n.deleteRecipeConfirmation(recipe.name),
           style: theme.textTheme.bodyMedium,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () async {
@@ -748,7 +761,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
                 await ref.read(recipeNotifierProvider.notifier).deleteRecipe(recipe.id);
                 if (mounted) {
                   Flushbar(
-                    message: 'Recipe deleted successfully',
+                    message: l10n.recipeDeletedSuccessfully,
                     backgroundColor: theme.colorScheme.primary,
                     icon: Icon(Icons.check_circle, color: theme.colorScheme.onPrimary),
                     duration: const Duration(seconds: 3),
@@ -757,7 +770,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
               } catch (e) {
                 if (mounted) {
                   Flushbar(
-                    message: 'Failed to delete recipe: $e',
+                    message: l10n.failedToDeleteRecipe(e.toString()),
                     backgroundColor: theme.colorScheme.error,
                     icon: Icon(Icons.error, color: theme.colorScheme.onError),
                     duration: const Duration(seconds: 4),
@@ -767,7 +780,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
             },
             style: FilledButton.styleFrom(backgroundColor: theme.colorScheme.error),
             child: Text(
-              'Delete',
+              l10n.delete,
               style: TextStyle(color: theme.colorScheme.onError),
             ),
           ),

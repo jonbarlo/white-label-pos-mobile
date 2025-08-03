@@ -662,6 +662,36 @@ class AppLocalizations {
   String get pleaseEnterAValidPrice => _locale.languageCode == 'en' ? 'Please enter a valid price' : 'Por favor ingresa un precio válido';
   String get business => _locale.languageCode == 'en' ? 'Business' : 'Negocio';
   String get na => _locale.languageCode == 'en' ? 'N/A' : 'N/A';
+  
+  // Recipe-related strings
+  String get newText => _locale.languageCode == 'en' ? 'New' : 'Nuevo';
+  String get refreshRecipes => _locale.languageCode == 'en' ? 'Refresh Recipes' : 'Actualizar Recetas';
+  String get easy => _locale.languageCode == 'en' ? 'Easy' : 'Fácil';
+  String get medium => _locale.languageCode == 'en' ? 'Medium' : 'Medio';
+  String get hard => _locale.languageCode == 'en' ? 'Hard' : 'Difícil';
+  String get searchRecipes => _locale.languageCode == 'en' ? 'Search recipes...' : 'Buscar recetas...';
+  String get activeOnly => _locale.languageCode == 'en' ? 'Active Only' : 'Solo Activos';
+  String get searchingRecipes => _locale.languageCode == 'en' ? 'Searching recipes...' : 'Buscando recetas...';
+  String get loadingRecipes => _locale.languageCode == 'en' ? 'Loading recipes...' : 'Cargando recetas...';
+  String get unableToLoadRecipes => _locale.languageCode == 'en' ? 'Unable to Load Recipes' : 'No se Pudieron Cargar las Recetas';
+  String get checkConnectionAndTryAgain => _locale.languageCode == 'en' ? 'Please check your connection and try again' : 'Por favor verifica tu conexión e intenta de nuevo';
+  String get tryAgain => _locale.languageCode == 'en' ? 'Try Again' : 'Intentar de Nuevo';
+  String get noRecipesFound => _locale.languageCode == 'en' ? 'No Recipes Found' : 'No se Encontraron Recetas';
+  String get noRecipesFoundForQuery => _locale.languageCode == 'en' ? 'No recipes found for' : 'No se encontraron recetas para';
+  String get clearSearch => _locale.languageCode == 'en' ? 'Clear Search' : 'Limpiar Búsqueda';
+  String get noDifficultyRecipes => _locale.languageCode == 'en' ? 'No' : 'No hay';
+  String get tryDifferentDifficultyOrCreateNew => _locale.languageCode == 'en' ? 'Try a different difficulty level or create a new recipe' : 'Intenta un nivel de dificultad diferente o crea una nueva receta';
+  String get difficulty => _locale.languageCode == 'en' ? 'Difficulty' : 'Dificultad';
+  String get prepTime => _locale.languageCode == 'en' ? 'Prep Time' : 'Tiempo de Preparación';
+  String get cookTime => _locale.languageCode == 'en' ? 'Cook Time' : 'Tiempo de Cocción';
+  String get minutes => _locale.languageCode == 'en' ? 'minutes' : 'minutos';
+  String get servings => _locale.languageCode == 'en' ? 'Servings' : 'Porciones';
+  String get ingredients => _locale.languageCode == 'en' ? 'Ingredients:' : 'Ingredientes:';
+  String get instructions => _locale.languageCode == 'en' ? 'Instructions:' : 'Instrucciones:';
+  String get deleteRecipe => _locale.languageCode == 'en' ? 'Delete Recipe' : 'Eliminar Receta';
+  String get deleteRecipeConfirmation => _locale.languageCode == 'en' ? 'Are you sure you want to delete' : '¿Estás seguro de que quieres eliminar';
+  String get recipeDeletedSuccessfully => _locale.languageCode == 'en' ? 'Recipe deleted successfully' : 'Receta eliminada exitosamente';
+  String get failedToDeleteRecipe => _locale.languageCode == 'en' ? 'Failed to delete recipe:' : 'Error al eliminar receta:';
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {
