@@ -7,6 +7,8 @@ import '../../shared/widgets/theme_toggle_button.dart';
 import '../../shared/widgets/app_image.dart';
 import '../../core/config/env_config.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/localization/app_localizations.dart';
+import '../../core/services/language_service.dart';
 import '../business/business_provider.dart';
 import '../business/models/business.dart';
 
@@ -110,13 +112,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
     final isWideScreen = MediaQuery.of(context).size.width > 800;
+    final l10n = AppLocalizations.of(context);
+    final currentLanguage = ref.watch(languageNotifierProvider);
 
     // Show error dialog when login fails
     if (authState.status == AuthStatus.error && authState.errorMessage != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         MessageDialogExtension.showError(
           context,
-          title: 'Login Failed',
+          title: currentLanguage == 'es_CR' ? 'Error al Iniciar Sesión' : 'Login Failed',
           message: authState.errorMessage!,
           actions: [
             TextButton(
@@ -124,7 +128,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 Navigator.of(context).pop();
                 ref.read(authNotifierProvider.notifier).clearError();
               },
-              child: const Text('OK'),
+              child: Text(l10n.ok),
             ),
           ],
         );
@@ -312,9 +316,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Widget _buildMobileLayout(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Login'),
+        title: Text(l10n.login),
         centerTitle: true,
         actions: const [
           ThemeToggleButton(),
@@ -327,6 +332,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget _buildLoginForm(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
     final businessSlug = _businessSlugController.text.trim();
+    final l10n = AppLocalizations.of(context);
     debugPrint('🔵 LoginScreen: _buildLoginForm - businessSlug: "$businessSlug"');
     final businessAsync = businessSlug.isNotEmpty 
         ? ref.watch(businessBySlugProvider(businessSlug))
@@ -367,7 +373,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 
                 // Welcome text
                 Text(
-                  'Welcome Back :)',
+                  l10n.welcomeBack,
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -375,7 +381,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'To keep connected with us please login with your personal information',
+                  l10n.loginSubtitle,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
@@ -387,8 +393,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 TextFormField(
                   controller: _businessSlugController,
                   decoration: InputDecoration(
-                    labelText: 'Business Slug',
-                    hintText: 'Enter your business slug',
+                    labelText: l10n.businessSlug,
+                    hintText: l10n.enterBusinessSlug,
                     prefixIcon: const Icon(Icons.business),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -412,8 +418,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 TextFormField(
                   controller: _emailController,
                   decoration: InputDecoration(
-                    labelText: 'Email Address',
-                    hintText: 'Enter your email',
+                    labelText: l10n.email,
+                    hintText: l10n.enterEmail,
                     prefixIcon: const Icon(Icons.email),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -431,8 +437,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 TextFormField(
                   controller: _passwordController,
                   decoration: InputDecoration(
-                    labelText: 'Password',
-                    hintText: 'Enter your password',
+                    labelText: l10n.password,
+                    hintText: l10n.enterPassword,
                     prefixIcon: const Icon(Icons.lock),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -452,7 +458,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   DropdownButtonFormField<String>(
                     value: _selectedTestUserLabel,
                     decoration: InputDecoration(
-                      labelText: 'Quick Login (Test User)',
+                      labelText: l10n.quickLogin,
                       prefixIcon: const Icon(Icons.person),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -512,9 +518,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                           ),
                         )
-                      : const Text(
-                          'Login Now',
-                          style: TextStyle(
+                      : Text(
+                          l10n.loginNow,
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -583,6 +589,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Widget _buildLoadingLogo(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Column(
       children: [
         Container(
@@ -598,7 +605,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
         const SizedBox(height: 16),
         Text(
-          'Loading business...',
+          l10n.loading,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: Theme.of(context).colorScheme.onSurface.withAlpha(180),
           ),
@@ -609,6 +616,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Widget _buildDefaultLogo(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Column(
       children: [
         Container(
@@ -633,7 +641,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
         const SizedBox(height: 16),
         Text(
-          'White Label POS',
+          l10n.appTitle,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.bold,
             color: Theme.of(context).colorScheme.primary,
@@ -642,7 +650,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
         const SizedBox(height: 4),
         Text(
-          'Point of Sale System',
+          l10n.pointOfSaleSystem,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: Theme.of(context).colorScheme.onSurface.withAlpha(180),
           ),

@@ -1,0 +1,223 @@
+{
+  "@@locale": "es_CR",
+  "appTitle": "POS Móvil",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  "login": "Iniciar Sesión",
+  "@login": {
+    "description": "Login button text"
+  },
+  "loginFailed": "Error al Iniciar Sesión",
+  "@loginFailed": {
+    "description": "Login failed error message"
+  },
+  "loginError": "Error al Iniciar Sesión",
+  "@loginError": {
+    "description": "Login error message"
+  },
+  "welcomeBack": "¡Bienvenido de Vuelta :)",
+  "@welcomeBack": {
+    "description": "Welcome back message"
+  },
+  "loginSubtitle": "Para mantenerte conectado con nosotros, por favor inicia sesión con tu información personal",
+  "@loginSubtitle": {
+    "description": "Login subtitle message"
+  },
+  "enterBusinessSlug": "Ingresa el slug de tu negocio",
+  "@enterBusinessSlug": {
+    "description": "Business slug hint text"
+  },
+  "enterEmail": "Ingresa tu correo",
+  "@enterEmail": {
+    "description": "Email hint text"
+  },
+  "enterPassword": "Ingresa tu contraseña",
+  "@enterPassword": {
+    "description": "Password hint text"
+  },
+  "quickLogin": "Inicio Rápido (Usuario de Prueba)",
+  "@quickLogin": {
+    "description": "Quick login dropdown label"
+  },
+  "loginNow": "Iniciar Sesión Ahora",
+  "@loginNow": {
+    "description": "Login button text"
+  },
+  "email": "Correo Electrónico",
+  "@email": {
+    "description": "Email field label"
+  },
+  "password": "Contraseña",
+  "@password": {
+    "description": "Password field label"
+  },
+  "businessSlug": "Slug del Negocio",
+  "@businessSlug": {
+    "description": "Business slug field label"
+  },
+  "dashboard": "Panel Principal",
+  "@dashboard": {
+    "description": "Dashboard screen title"
+  },
+  "settings": "Configuración",
+  "@settings": {
+    "description": "Settings screen title"
+  },
+  "logout": "Cerrar Sesión",
+  "@logout": {
+    "description": "Logout button text"
+  },
+  "cancel": "Cancelar",
+  "@cancel": {
+    "description": "Cancel button text"
+  },
+  "confirm": "Confirmar",
+  "@confirm": {
+    "description": "Confirm button text"
+  },
+  "save": "Guardar",
+  "@save": {
+    "description": "Save button text"
+  },
+  "delete": "Eliminar",
+  "@delete": {
+    "description": "Delete button text"
+  },
+  "back": "Atrás",
+  "@back": {
+    "description": "Back button"
+  },
+  "next": "Siguiente",
+  "@next": {
+    "description": "Next button"
+  },
+  "previous": "Anterior",
+  "@previous": {
+    "description": "Previous button"
+  },
+  "search": "Buscar",
+  "@search": {
+    "description": "Search field placeholder"
+  },
+  "filter": "Filtrar",
+  "@filter": {
+    "description": "Filter button"
+  },
+  "sort": "Ordenar",
+  "@sort": {
+    "description": "Sort button"
+  },
+  "refresh": "Actualizar",
+  "@refresh": {
+    "description": "Refresh button"
+  },
+  "loading": "Cargando...",
+  "@loading": {
+    "description": "Loading message"
+  },
+  "error": "Error",
+  "@error": {
+    "description": "Error message"
+  },
+  "success": "Éxito",
+  "@success": {
+    "description": "Success message"
+  },
+  "warning": "Advertencia",
+  "@warning": {
+    "description": "Warning message"
+  },
+  "info": "Información",
+  "@info": {
+    "description": "Info message"
+  },
+  "yes": "Sí",
+  "@yes": {
+    "description": "Yes button"
+  },
+  "no": "No",
+  "@no": {
+    "description": "No button"
+  },
+  "ok": "OK",
+  "@ok": {
+    "description": "OK button"
+  },
+  "close": "Cerrar",
+  "@close": {
+    "description": "Close button"
+  },
+  "open": "Abrir",
+  "@open": {
+    "description": "Open button"
+  },
+  "edit": "Editar",
+  "@edit": {
+    "description": "Edit button text"
+  },
+  "add": "Agregar",
+  "@add": {
+    "description": "Add button text"
+  },
+  "remove": "Remover",
+  "@remove": {
+    "description": "Remove button"
+  },
+  "select": "Seleccionar",
+  "@select": {
+    "description": "Select button"
+  },
+  "deselect": "Deseleccionar",
+  "@deselect": {
+    "description": "Deselect button"
+  },
+  "clear": "Limpiar",
+  "@clear": {
+    "description": "Clear button"
+  },
+  "reset": "Restablecer",
+  "@reset": {
+    "description": "Reset button"
+  },
+  "apply": "Aplicar",
+  "@apply": {
+    "description": "Apply button"
+  },
+  "submit": "Enviar",
+  "@submit": {
+    "description": "Submit button"
+  },
+  "continueAction": "Continuar",
+  "@continueAction": {
+    "description": "Continue button"
+  },
+  "finish": "Finalizar",
+  "@finish": {
+    "description": "Finish button"
+  },
+  "start": "Iniciar",
+  "@start": {
+    "description": "Start button"
+  },
+  "stop": "Detener",
+  "@stop": {
+    "description": "Stop button"
+  },
+  "pause": "Pausar",
+  "@pause": {
+    "description": "Pause button"
+  },
+  "resume": "Reanudar",
+  "@resume": {
+    "description": "Resume button"
+  },
+  "retry": "Reintentar",
+  "@retry": {
+    "description": "Retry button"
+  },
+  "pointOfSaleSystem": "Sistema de Punto de Venta",
+  "@pointOfSaleSystem": {
+    "description": "Point of sale system subtitle"
+  }
+} 

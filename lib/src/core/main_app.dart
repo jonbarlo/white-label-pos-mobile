@@ -6,12 +6,18 @@ import '../features/auth/auth_provider.dart';
 import '../features/floor_plan/floor_plan_provider.dart';
 import 'navigation/app_router.dart';
 import 'theme/theme_provider.dart';
+import 'localization/app_localizations.dart';
+import 'services/language_service.dart';
 
 /// Provider for app initialization state
 final appInitializationProvider = FutureProvider<void>((ref) async {
   // Initialize SharedPreferences
   final prefs = await SharedPreferences.getInstance();
   ref.read(sharedPreferencesProvider.notifier).state = prefs;
+  
+  // Initialize language service
+  final languageNotifier = ref.read(languageNotifierProvider.notifier);
+  await languageNotifier.loadLanguage();
   
   // Don't check auth status during initialization - let the router handle it
   // This prevents hanging on API calls when no token is stored
@@ -25,6 +31,8 @@ class MainApp extends ConsumerWidget {
     final themeData = ref.watch(themeDataProvider);
     final themeMode = ref.watch(themeModeProvider);
     final initializationState = ref.watch(appInitializationProvider);
+    final currentLanguage = ref.watch(languageNotifierProvider);
+    final currentLocale = LanguageService.getLocaleFromLanguageCode(currentLanguage);
     
     // Test floor plan provider initialization
     try {
@@ -34,13 +42,16 @@ class MainApp extends ConsumerWidget {
       print('🔍 DEBUG: MainApp: Error watching floor plan provider: $e');
     }
     
-    print('MainApp build - Theme mode: $themeMode');
+    print('MainApp build - Theme mode: $themeMode, Language: $currentLanguage');
 
     return initializationState.when(
       loading: () => MaterialApp(
         title: 'White Label POS',
         debugShowCheckedModeBanner: false,
         theme: themeData,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: currentLocale,
         home: const Scaffold(
           body: Center(
             child: CircularProgressIndicator(),
@@ -51,6 +62,9 @@ class MainApp extends ConsumerWidget {
         title: 'White Label POS',
         debugShowCheckedModeBanner: false,
         theme: themeData,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: currentLocale,
         home: Scaffold(
           body: Center(
             child: Column(
@@ -77,6 +91,9 @@ class MainApp extends ConsumerWidget {
           title: 'White Label POS',
           debugShowCheckedModeBanner: false,
           theme: themeData,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: currentLocale,
           routerConfig: router,
         );
       },

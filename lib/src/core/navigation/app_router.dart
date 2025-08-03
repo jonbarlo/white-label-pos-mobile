@@ -34,8 +34,9 @@ import '../../features/admin/admin_menu_management_screen.dart';
 import '../../features/admin/admin_dashboard_screen.dart';
 import '../../features/admin/pdf_menu_generation_screen.dart';
 import '../../features/admin/custom_template_management_screen.dart';
-import '../../features/language/language_settings_screen.dart';
 import '../../features/language/language_test_screen.dart';
+import '../../features/settings/language_settings_screen.dart';
+import '../../features/settings/i18n_test_screen.dart';
 
 
 /// Provider for SharedPreferences
@@ -96,6 +97,7 @@ class AppRouter {
   static const String customTemplateManagementRoute = '/admin/custom-templates';
   static const String languageSettingsRoute = '/language-settings';
   static const String languageTestRoute = '/language-test';
+  static const String i18nTestRoute = '/i18n-test';
 
   /// Create the main router configuration
   static GoRouter createRouter(Ref ref) {
@@ -229,6 +231,13 @@ class AppRouter {
               path: languageTestRoute,
               name: 'language-test',
               builder: (context, state) => const LanguageTestScreen(),
+            ),
+            
+            // i18n Test Screen
+            GoRoute(
+              path: i18nTestRoute,
+              name: 'i18n-test',
+              builder: (context, state) => const I18nTestScreen(),
             ),
             
             // Business Management

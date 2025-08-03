@@ -108,6 +108,10 @@ dev_dependencies:
   hive_generator: ^2.0.1
   freezed: ^2.4.4
 
+  # i18n Generation
+  flutter_gen_runner: ^5.4.0
+  intl_utils: ^2.8.5
+
   # Linting
   flutter_lints: ^3.0.0
 
@@ -156,3 +160,12 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+# Flutter Intl configuration
+flutter_intl:
+  enabled: true
+  class_name: AppLocalizations
+  main_locale: es_CR
+  arb_dir: lib/l10n
+  output_dir: lib/src/core/localization
+  use_deferred_loading: false

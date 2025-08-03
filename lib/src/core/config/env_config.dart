@@ -9,17 +9,14 @@ class EnvConfig {
   /// Initialize environment configuration
   /// Loads the appropriate .env file based on the environment
   static Future<void> initialize({String? environment}) async {
-    final env = environment ?? const String.fromEnvironment('ENVIRONMENT', defaultValue: 'development');
-    
     try {
-      await dotenv.load(fileName: '.env.$env');
+      print('🔍 DEBUG: EnvConfig.initialize() - Trying to load .env');
+      await dotenv.load(fileName: '.env');
+      print('🔍 DEBUG: EnvConfig.initialize() - Successfully loaded .env');
+      print('🔍 DEBUG: EnvConfig.initialize() - API_BASE_URL from .env: ${dotenv.env['API_BASE_URL']}');
     } catch (e) {
-      // Fallback to default .env file if environment-specific file doesn't exist
-      try {
-        await dotenv.load(fileName: '.env');
-      } catch (e) {
-        // If no .env file exists, use default values
-      }
+      print('🔍 DEBUG: EnvConfig.initialize() - Failed to load .env: $e');
+      print('🔍 DEBUG: EnvConfig.initialize() - Using default values');
     }
   }
 
@@ -58,9 +55,9 @@ class EnvConfig {
   /// Get the app name
   static String get appName {
     try {
-      return dotenv.env['APP_NAME'] ?? 'White Label POS';
+      return dotenv.env['APP_NAME'] ?? 'POS Mobile';
     } catch (e) {
-      return 'White Label POS';
+      return 'POS Mobile';
     }
   }
 
