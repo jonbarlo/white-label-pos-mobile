@@ -32,18 +32,24 @@ class AuthRepositoryImpl implements AuthRepository {
 
       debugPrint('🔵 AuthRepository: Response received: ${response.data}');
       
-      // Backend returns direct response, not wrapped in ApiResponse
+      // Backend now returns nested structure with 'data' containing the actual response
       final responseData = response.data as Map<String, dynamic>;
       
       debugPrint('🔵 AuthRepository: Response data: $responseData');
       
-      if (responseData['message'] == 'Login successful' && 
-          responseData['user'] != null && 
-          responseData['token'] != null &&
-          responseData['business'] != null) {
+      // Check if response has nested 'data' structure
+      final actualData = responseData['data'] as Map<String, dynamic>? ?? responseData;
+      
+      debugPrint('🔵 AuthRepository: Actual data: $actualData');
+      
+      // Check if the outer message indicates success and inner data has required fields
+      if (responseData['message'] == 'auth.login.success' && 
+          actualData['user'] != null && 
+          actualData['token'] != null &&
+          actualData['business'] != null) {
         
                  debugPrint('🔵 AuthRepository: Parsing user data');
-         final userData = responseData['user'] as Map<String, dynamic>;
+         final userData = actualData['user'] as Map<String, dynamic>;
          debugPrint('🔵 AuthRepository: User data: $userData');
          
          // Debug each required field in User
@@ -57,7 +63,7 @@ class AuthRepositoryImpl implements AuthRepository {
          debugPrint('🔵 AuthRepository: User.updatedAt = ${userData['updatedAt']}');
          
          debugPrint('🔵 AuthRepository: Parsing business data');
-         final businessData = responseData['business'] as Map<String, dynamic>;
+         final businessData = actualData['business'] as Map<String, dynamic>;
          debugPrint('🔵 AuthRepository: Business data: $businessData');
          
          // Debug each required field in Business
@@ -71,7 +77,7 @@ class AuthRepositoryImpl implements AuthRepository {
          // Create LoginResponse with business from the response
          final loginResponse = LoginResponse(
            user: User.fromJson(userData),
-           token: responseData['token'] as String,
+           token: actualData['token'] as String,
            business: Business.fromJson(businessData),
          );
         
@@ -80,8 +86,8 @@ class AuthRepositoryImpl implements AuthRepository {
       } else {
         debugPrint('🔴 AuthRepository: Login failed - invalid response structure');
         return Result.failure(
-          responseData['message'] ?? 'Login failed',
-          responseData['errors'],
+          actualData['message'] ?? responseData['message'] ?? 'Login failed',
+          actualData['errors'] ?? responseData['errors'],
         );
       }
     } on DioException catch (e) {

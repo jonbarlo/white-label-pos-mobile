@@ -5,6 +5,7 @@ import '../config/env_config.dart';
 import 'interceptors/logging_interceptor.dart';
 import 'interceptors/auth_interceptor.dart';
 import 'interceptors/error_interceptor.dart';
+import 'interceptors/language_interceptor.dart';
 
 /// Centralized Dio client provider
 final dioClientProvider = Provider<Dio>((ref) {
@@ -38,6 +39,7 @@ final dioClientProvider = Provider<Dio>((ref) {
     LoggingInterceptor(),
     AuthInterceptor(ref),
     ErrorInterceptor(),
+    LanguageInterceptor(ref),
   ]);
 
   print('🔍 DEBUG: dioClientProvider: Dio client created successfully');

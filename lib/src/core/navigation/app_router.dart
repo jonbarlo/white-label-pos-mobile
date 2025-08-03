@@ -34,6 +34,8 @@ import '../../features/admin/admin_menu_management_screen.dart';
 import '../../features/admin/admin_dashboard_screen.dart';
 import '../../features/admin/pdf_menu_generation_screen.dart';
 import '../../features/admin/custom_template_management_screen.dart';
+import '../../features/language/language_settings_screen.dart';
+import '../../features/language/language_test_screen.dart';
 
 
 /// Provider for SharedPreferences
@@ -92,6 +94,8 @@ class AppRouter {
   static const String adminDashboardRoute = '/admin/dashboard';
   static const String pdfMenuGenerationRoute = '/admin/pdf-menu-generation';
   static const String customTemplateManagementRoute = '/admin/custom-templates';
+  static const String languageSettingsRoute = '/language-settings';
+  static const String languageTestRoute = '/language-test';
 
   /// Create the main router configuration
   static GoRouter createRouter(Ref ref) {
@@ -211,6 +215,20 @@ class AppRouter {
               path: profileRoute,
               name: 'profile',
               builder: (context, state) => const ProfileScreen(),
+            ),
+            
+            // Language Settings
+            GoRoute(
+              path: languageSettingsRoute,
+              name: 'language-settings',
+              builder: (context, state) => const LanguageSettingsScreen(),
+            ),
+            
+            // Language Testing
+            GoRoute(
+              path: languageTestRoute,
+              name: 'language-test',
+              builder: (context, state) => const LanguageTestScreen(),
             ),
             
             // Business Management
@@ -456,6 +474,7 @@ class AppRouter {
            location == tablesRoute ||
            location == messagesRoute ||
            location == profileRoute ||
+           location == languageSettingsRoute ||
            location == businessRoute ||
            location == waiterRoute ||
            location.startsWith('$waiterRoute/') ||

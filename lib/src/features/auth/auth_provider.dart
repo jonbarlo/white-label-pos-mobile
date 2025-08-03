@@ -3,6 +3,7 @@ import 'data/repositories/auth_repository_impl.dart';
 import 'models/user.dart';
 import '../business/models/business.dart';
 import '../business/data/repositories/business_repository_impl.dart';
+import '../language/language_provider.dart';
 import 'package:flutter/foundation.dart';
 
 part 'auth_provider.g.dart';
@@ -99,6 +100,9 @@ class AuthNotifier extends _$AuthNotifier {
           errorMessage: null,
         );
         debugPrint('🔵 AuthNotifier: State set to authenticated');
+        
+        // Initialize language preferences after successful login
+        await _initializeLanguagePreferences();
       } else {
         debugPrint('🔴 AuthNotifier: Login failed');
         debugPrint('🔴 AuthNotifier: Error: ${result.errorMessage}');
@@ -117,6 +121,19 @@ class AuthNotifier extends _$AuthNotifier {
         errorMessage: e.toString(),
       );
       debugPrint('🔴 AuthNotifier: State set to error due to exception');
+    }
+  }
+
+  // Initialize language preferences after login
+  Future<void> _initializeLanguagePreferences() async {
+    try {
+      debugPrint('🌐 AuthNotifier: Initializing language preferences...');
+      final languageNotifier = ref.read(languageNotifierProvider.notifier);
+      await languageNotifier.initializeLanguage();
+      debugPrint('🌐 AuthNotifier: Language preferences initialized');
+    } catch (e) {
+      debugPrint('⚠️ AuthNotifier: Failed to initialize language preferences: $e');
+      // Don't fail the login if language initialization fails
     }
   }
 

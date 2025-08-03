@@ -42,7 +42,7 @@ final defaultCurrencyProvider = AutoDisposeProvider<Currency?>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef DefaultCurrencyRef = AutoDisposeProviderRef<Currency?>;
-String _$formatCurrencyHash() => r'92317d6c5ab1e8c5cdfe217960b44443cc71847f';
+String _$formatCurrencyHash() => r'23a3ffe35e93c643731bc1b8a265628a0322f214';
 
 /// Copied from Dart SDK
 class _SystemHash {

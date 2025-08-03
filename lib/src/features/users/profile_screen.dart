@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:white_label_pos_mobile/src/features/auth/auth_provider.dart';
 import 'package:white_label_pos_mobile/src/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:white_label_pos_mobile/src/features/auth/models/user.dart';
@@ -492,6 +493,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Theme settings coming soon!')),
               );
+            }),
+            _buildSettingsItem('Language Settings', Icons.language_outlined, () {
+              context.go('/language-settings');
             }),
             _buildSettingsItem('Privacy & Security', Icons.security_outlined, () {
               ScaffoldMessenger.of(context).showSnackBar(
