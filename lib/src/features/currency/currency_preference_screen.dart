@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:white_label_pos_mobile/src/core/localization/app_localizations.dart';
 import 'package:white_label_pos_mobile/src/features/currency/currency_provider.dart';
 import 'package:white_label_pos_mobile/src/features/currency/models/currency.dart';
 import 'package:white_label_pos_mobile/src/shared/widgets/app_image.dart';
@@ -31,11 +32,12 @@ class _CurrencyPreferenceScreenState extends ConsumerState<CurrencyPreferenceScr
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final currenciesAsync = ref.watch(currencyNotifierProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Currency Preference'),
+        title: Text(l10n.currencyPreferences),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
       ),
@@ -45,7 +47,7 @@ class _CurrencyPreferenceScreenState extends ConsumerState<CurrencyPreferenceScr
             final currencies = result.data ?? [];
             return _buildCurrencySelection(context, currencies);
           } else {
-            return _buildErrorWidget(context, result.errorMessage ?? 'Unknown error');
+            return _buildErrorWidget(context, result.errorMessage ?? l10n.unknown);
           }
         },
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -55,6 +57,8 @@ class _CurrencyPreferenceScreenState extends ConsumerState<CurrencyPreferenceScr
   }
 
   Widget _buildCurrencySelection(BuildContext context, List<Currency> currencies) {
+    final l10n = AppLocalizations.of(context);
+    
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -74,7 +78,7 @@ class _CurrencyPreferenceScreenState extends ConsumerState<CurrencyPreferenceScr
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        'Select Your Preferred Currency',
+                        l10n.selectYourPreferredCurrency,
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -83,7 +87,7 @@ class _CurrencyPreferenceScreenState extends ConsumerState<CurrencyPreferenceScr
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'This will be used for displaying prices and calculations throughout the app.',
+                    l10n.currencyPreferenceDescription,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                     ),
@@ -164,7 +168,7 @@ class _CurrencyPreferenceScreenState extends ConsumerState<CurrencyPreferenceScr
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Text(
-                                      'Default',
+                                      l10n.defaultText,
                                       style: TextStyle(
                                         color: Theme.of(context).colorScheme.primary,
                                         fontSize: 12,
@@ -211,9 +215,9 @@ class _CurrencyPreferenceScreenState extends ConsumerState<CurrencyPreferenceScr
                         valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                       ),
                     )
-                  : const Text(
-                      'Save Preference',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  : Text(
+                      l10n.savePreference,
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
             ),
           ),
@@ -223,6 +227,8 @@ class _CurrencyPreferenceScreenState extends ConsumerState<CurrencyPreferenceScr
   }
 
   Future<void> _saveCurrencyPreference(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
+    
     if (selectedCurrency == null) return;
 
     setState(() {
@@ -244,7 +250,7 @@ class _CurrencyPreferenceScreenState extends ConsumerState<CurrencyPreferenceScr
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Currency preference updated to ${selectedCurrency!.name}',
+              '${l10n.currencyPreferenceUpdatedTo} ${selectedCurrency!.name}',
             ),
             backgroundColor: Colors.green,
           ),
@@ -257,7 +263,7 @@ class _CurrencyPreferenceScreenState extends ConsumerState<CurrencyPreferenceScr
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to update currency preference: $e'),
+            content: Text('${l10n.failedToUpdateCurrencyPreference}: $e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -272,6 +278,8 @@ class _CurrencyPreferenceScreenState extends ConsumerState<CurrencyPreferenceScr
   }
 
   Widget _buildErrorWidget(BuildContext context, String message) {
+    final l10n = AppLocalizations.of(context);
+    
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -283,7 +291,7 @@ class _CurrencyPreferenceScreenState extends ConsumerState<CurrencyPreferenceScr
           ),
           const SizedBox(height: 16),
           Text(
-            'Failed to load currencies',
+            l10n.failedToLoadCurrencies,
             style: Theme.of(context).textTheme.headlineSmall,
           ),
           const SizedBox(height: 8),
@@ -299,7 +307,7 @@ class _CurrencyPreferenceScreenState extends ConsumerState<CurrencyPreferenceScr
             onPressed: () {
               ref.read(currencyNotifierProvider.notifier).refreshCurrencies();
             },
-            child: const Text('Retry'),
+            child: Text(l10n.retry),
           ),
         ],
       ),

@@ -15,6 +15,7 @@ import 'package:another_flushbar/flushbar.dart';
 import '../floor_plan/floor_plan_provider.dart' as fp;
 import '../../shared/utils/currency_formatter.dart';
 import '../business/business_provider.dart';
+import '../../core/localization/app_localizations.dart';
 
 
 class OrderTakingScreen extends ConsumerStatefulWidget {
@@ -89,6 +90,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     
     // Use Riverpod provider for merged table orders
@@ -96,7 +98,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
     
     return Scaffold(
       appBar: AppBar(
-        title: Text('Order - Table ${widget.table.name}'),
+        title: Text('${l10n.orderForTable} ${widget.table.name}'),
         centerTitle: true,
         elevation: 2,
         backgroundColor: theme.colorScheme.primary,
@@ -109,7 +111,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
               ref.invalidate(waiter_order.tableOrdersProvider(widget.table.id));
               ref.invalidate(waiter_order.mergedTableOrdersProvider(widget.table.id));
             },
-            tooltip: 'Refresh Orders',
+            tooltip: l10n.refreshOrders,
           ),
           const ThemeToggleButton(),
         ],
@@ -156,13 +158,13 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
             ],
           );
         },
-        loading: () => const Center(
+        loading: () => Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 16),
-              Text('Loading table orders...'),
+              const CircularProgressIndicator(),
+              const SizedBox(height: 16),
+              Text(l10n.loadingTableOrders),
             ],
           ),
         ),
@@ -177,7 +179,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
               ),
               const SizedBox(height: 16),
               Text(
-                'Error loading orders',
+                l10n.errorLoadingOrders,
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 8),
@@ -191,7 +193,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
                 onPressed: () {
                   ref.invalidate(waiter_order.mergedTableOrdersProvider(widget.table.id));
                 },
-                child: const Text('Retry'),
+                child: Text(l10n.retry),
               ),
             ],
           ),
@@ -351,6 +353,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
   }
 
   Widget _buildCustomerDetails() {
+    final l10n = AppLocalizations.of(context);
     print('🔍 DEBUG: _buildCustomerDetails called');
     print('🔍 DEBUG: _customerNameController.text: "${_customerNameController.text}"');
     print('🔍 DEBUG: _customerNotesController.text: "${_customerNotesController.text}"');
@@ -362,7 +365,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Customer Details',
+            l10n.customerDetails,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -372,10 +375,10 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
             children: [
               Expanded(
                 child: TextField(
-                  decoration: const InputDecoration(
-                    labelText: 'Customer Name',
-                    hintText: 'Enter customer name',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: l10n.customerNameLabel,
+                    hintText: l10n.enterCustomerName,
+                    border: const OutlineInputBorder(),
                   ),
                   onChanged: (value) => _customerName = value,
                   controller: _customerNameController,
@@ -386,10 +389,10 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
           ),
           const SizedBox(height: 12),
           TextField(
-            decoration: const InputDecoration(
-              labelText: 'Special Instructions',
-              hintText: 'Allergies, preferences, etc.',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: l10n.specialInstructions,
+              hintText: l10n.specialInstructionsHint,
+              border: const OutlineInputBorder(),
             ),
             maxLines: 2,
             onChanged: (value) => _customerNotes = value,
@@ -401,6 +404,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
   }
 
   Widget _buildMenuItems() {
+    final l10n = AppLocalizations.of(context);
     // Try to use waiter menu items first, fallback to POS search
     final waiterMenuItemsAsync = ref.watch(waiter_order.menuItemsProvider(null));
     
@@ -410,7 +414,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
         Padding(
           padding: const EdgeInsets.all(16),
           child: Text(
-            'Menu Items',
+            l10n.menuItems,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -420,8 +424,8 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
           child: waiterMenuItemsAsync.when(
             data: (menuItems) {
               if (menuItems.isEmpty) {
-                return const Center(
-                  child: Text('No menu items available'),
+                return Center(
+                  child: Text(l10n.noMenuItemsAvailable),
                 );
               }
               
@@ -458,7 +462,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Menu items temporarily unavailable',
+                        l10n.menuItemsTemporarilyUnavailable,
                         style: TextStyle(
                           color: Colors.grey[600],
                           fontSize: 16,
@@ -467,7 +471,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Existing order items will still be shown',
+                        l10n.existingOrderItemsWillStillBeShown,
                         style: TextStyle(
                           color: Colors.grey[500],
                           fontSize: 14,
@@ -477,7 +481,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
                       const SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: () => ref.invalidate(waiter_order.menuItemsProvider(null)),
-                        child: const Text('Retry'),
+                        child: Text(l10n.retry),
                       ),
                     ],
                   ),
@@ -500,6 +504,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
   }
 
   Widget _buildMenuItemCard(Map<String, dynamic> item) {
+    final l10n = AppLocalizations.of(context);
     final name = item['name'] ?? '';
     final description = item['description'] ?? '';
     final price = (item['price'] ?? 0.0).toDouble();
@@ -554,7 +559,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
                       _addToCartFromMap(item);
                     },
                     icon: Icon(Icons.add, size: 20),
-                    label: Text('Add', style: TextStyle(
+                    label: Text(l10n.add, style: TextStyle(
                       fontSize: 16, 
                       fontWeight: FontWeight.bold
                     )),
@@ -577,7 +582,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
                       border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
                     ),
                     child: Text(
-                      'Unavailable',
+                      l10n.unavailable,
                       style: TextStyle(
                         color: Colors.grey,
                         fontSize: 14,
@@ -595,6 +600,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
   }
 
   Widget _buildMenuItemCardFromPos(MenuItem item) {
+    final l10n = AppLocalizations.of(context);
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
@@ -643,7 +649,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
                       _addToCartFromPosItem(item);
                     },
                     icon: Icon(Icons.add, size: 20),
-                    label: Text('Add', style: TextStyle(
+                    label: Text(l10n.add, style: TextStyle(
                       fontSize: 16, 
                       fontWeight: FontWeight.bold
                     )),
@@ -666,7 +672,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
                       border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
                     ),
                     child: Text(
-                      'Unavailable',
+                      l10n.unavailable,
                       style: TextStyle(
                         color: Colors.grey,
                         fontSize: 14,
@@ -711,6 +717,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
   }
 
   Widget _buildCart() {
+    final l10n = AppLocalizations.of(context);
     return Container(
       decoration: BoxDecoration(
         border: Border(
@@ -725,7 +732,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
           Padding(
             padding: const EdgeInsets.all(16),
             child: Text(
-              'Order Items (${_cartItems.length})',
+              '${l10n.orderItemsCount} (${_cartItems.length})',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -744,7 +751,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'No items in cart',
+                          l10n.noItemsInCart,
                           style: TextStyle(
                             color: Colors.grey[600],
                             fontSize: 16,
@@ -771,7 +778,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Subtotal:',
+                        l10n.subtotal,
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       Text(
@@ -787,7 +794,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Tax (8.5%):',
+                        l10n.tax,
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                       Text(
@@ -801,7 +808,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Total:',
+                        l10n.totalWithColon,
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -928,6 +935,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
   }
 
   Widget _buildBottomActions() {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -949,7 +957,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
                 }
               },
               icon: Icon(Icons.cancel, size: 24),
-              label: Text('Cancel', style: TextStyle(
+              label: Text(l10n.cancel, style: TextStyle(
                 fontSize: 16, 
                 fontWeight: FontWeight.bold
               )),
@@ -979,7 +987,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
                     )
                   : Icon(Icons.send, size: 24),
               label: Text(
-                _isSubmitting ? 'Submitting...' : 'Submit Order',
+                _isSubmitting ? l10n.submitting : l10n.submitOrder,
                 style: TextStyle(
                   fontSize: 16, 
                   fontWeight: FontWeight.bold
@@ -1013,7 +1021,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
                 );
               },
               icon: Icon(Icons.call_split, size: 24),
-              label: Text('Split Bill', style: TextStyle(
+              label: Text(l10n.splitBill, style: TextStyle(
                 fontSize: 16, 
                 fontWeight: FontWeight.bold
               )),
@@ -1122,9 +1130,10 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
   }
 
   void _submitOrder() async {
+    final l10n = AppLocalizations.of(context);
     if (_cartItems.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please add items to the order')),
+        SnackBar(content: Text(l10n.pleaseAddItemsToOrder)),
       );
       return;
     }
@@ -1173,7 +1182,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
         
         final result = await ref.read(waiter_order.submitTableOrderProvider((
           tableId: widget.table.id,
-          customerName: _customerName.isNotEmpty ? _customerName : 'Guest',
+          customerName: _customerName.isNotEmpty ? _customerName : l10n.guest,
           customerNotes: _customerNotes,
           items: _cartItems,
           subtotal: _getSubtotal(),
@@ -1200,16 +1209,16 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
 
       // Show success message (Flutter convention)
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Row(
             children: [
-              Icon(Icons.check_circle, color: Colors.white),
-              SizedBox(width: 8),
-              Text('Order submitted successfully!'),
+              const Icon(Icons.check_circle, color: Colors.white),
+              const SizedBox(width: 8),
+              Text(l10n.orderSubmittedSuccessfully),
             ],
           ),
           backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -1233,7 +1242,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
         if (!mounted) return;
         
         Flushbar(
-          message: 'Failed to submit order: ${e.toString()}',
+          message: '${l10n.failedToSubmitOrder} ${e.toString()}',
           duration: const Duration(seconds: 3),
           backgroundColor: Colors.red,
           icon: const Icon(Icons.error, color: Colors.white),

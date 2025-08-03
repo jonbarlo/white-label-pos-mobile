@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:white_label_pos_mobile/src/core/localization/app_localizations.dart';
 import 'package:white_label_pos_mobile/src/features/currency/currency_provider.dart';
 import 'package:white_label_pos_mobile/src/features/currency/models/currency.dart';
 
@@ -8,11 +9,12 @@ class CurrencyManagementScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final currenciesAsync = ref.watch(currencyNotifierProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Currency Management'),
+        title: Text(l10n.currencyManagement),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
       ),
@@ -22,7 +24,7 @@ class CurrencyManagementScreen extends ConsumerWidget {
             final currencies = result.data ?? [];
             return _buildCurrenciesList(context, currencies, ref);
           } else {
-            return _buildErrorWidget(context, result.errorMessage ?? 'Unknown error');
+            return _buildErrorWidget(context, result.errorMessage ?? l10n.unknown);
           }
         },
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -48,6 +50,7 @@ class CurrencyManagementScreen extends ConsumerWidget {
   }
 
   Widget _buildCurrencyCard(BuildContext context, Currency currency, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     
     return Card(
@@ -71,7 +74,7 @@ class CurrencyManagementScreen extends ConsumerWidget {
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Text(
-          '${currency.code} • ${currency.symbol}${currency.isDefault ? ' (Default)' : ''}',
+          '${currency.code} • ${currency.symbol}${currency.isDefault ? ' (${l10n.defaultText})' : ''}',
           style: TextStyle(
             color: currency.isDefault 
                 ? theme.colorScheme.primary 
@@ -87,7 +90,7 @@ class CurrencyManagementScreen extends ConsumerWidget {
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
-            currency.isActive ? 'Active' : 'Inactive',
+            currency.isActive ? l10n.active : l10n.inactive,
             style: TextStyle(
               color: currency.isActive ? Colors.green : Colors.red,
               fontSize: 12,
@@ -103,6 +106,8 @@ class CurrencyManagementScreen extends ConsumerWidget {
   }
 
   Widget _buildExchangeRatesList(BuildContext context, Currency currency, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    
     return FutureBuilder(
       future: ref.read(currencyNotifierProvider.notifier).getExchangeRates(currency.id),
       builder: (context, snapshot) {
@@ -117,7 +122,7 @@ class CurrencyManagementScreen extends ConsumerWidget {
           return Padding(
             padding: const EdgeInsets.all(16),
             child: Text(
-              'Error loading exchange rates: ${snapshot.error}',
+              '${l10n.errorLoadingExchangeRates}: ${snapshot.error}',
               style: const TextStyle(color: Colors.red),
             ),
           );
@@ -128,7 +133,7 @@ class CurrencyManagementScreen extends ConsumerWidget {
                       return Padding(
               padding: const EdgeInsets.all(16),
               child: Text(
-                result?.errorMessage ?? 'Failed to load exchange rates',
+                result?.errorMessage ?? l10n.failedToLoadExchangeRates,
                 style: const TextStyle(color: Colors.red),
               ),
             );
@@ -137,11 +142,11 @@ class CurrencyManagementScreen extends ConsumerWidget {
         final exchangeRates = result.data ?? [];
         
         if (exchangeRates.isEmpty) {
-          return const Padding(
-            padding: EdgeInsets.all(16),
+          return Padding(
+            padding: const EdgeInsets.all(16),
             child: Text(
-              'No exchange rates available',
-              style: TextStyle(fontStyle: FontStyle.italic),
+              l10n.noExchangeRatesAvailable,
+              style: const TextStyle(fontStyle: FontStyle.italic),
             ),
           );
         }
@@ -152,7 +157,7 @@ class CurrencyManagementScreen extends ConsumerWidget {
               dense: true,
               leading: const Icon(Icons.currency_exchange, size: 20),
               title: Text('1 ${currency.code} = ${rate.rate.toStringAsFixed(6)}'),
-              subtitle: Text('Updated: ${_formatDate(rate.createdAt)}'),
+              subtitle: Text('${l10n.updated}: ${_formatDate(rate.createdAt)}'),
               trailing: rate.isActive 
                   ? const Icon(Icons.check_circle, color: Colors.green, size: 16)
                   : const Icon(Icons.cancel, color: Colors.red, size: 16),
@@ -164,6 +169,8 @@ class CurrencyManagementScreen extends ConsumerWidget {
   }
 
   Widget _buildErrorWidget(BuildContext context, String message) {
+    final l10n = AppLocalizations.of(context);
+    
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -175,7 +182,7 @@ class CurrencyManagementScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'Failed to load currencies',
+            l10n.failedToLoadCurrencies,
             style: Theme.of(context).textTheme.headlineSmall,
           ),
           const SizedBox(height: 8),
@@ -191,7 +198,7 @@ class CurrencyManagementScreen extends ConsumerWidget {
             onPressed: () {
               // Refresh currencies
             },
-            child: const Text('Retry'),
+            child: Text(l10n.retry),
           ),
         ],
       ),

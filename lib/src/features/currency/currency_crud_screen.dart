@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:white_label_pos_mobile/src/features/currency/currency_provider.dart';
 import 'package:white_label_pos_mobile/src/features/currency/models/currency.dart';
+import '../../core/localization/app_localizations.dart';
 
 class CurrencyCrudScreen extends ConsumerStatefulWidget {
   const CurrencyCrudScreen({super.key});
@@ -16,17 +17,18 @@ class _CurrencyCrudScreenState extends ConsumerState<CurrencyCrudScreen> {
   @override
   Widget build(BuildContext context) {
     final currenciesAsync = ref.watch(currencyNotifierProvider);
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Currency Management'),
+        title: Text(l10n.currencyManagement),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () => _showCreateCurrencyDialog(context),
-            tooltip: 'Add Currency',
+            tooltip: l10n.addCurrency,
           ),
         ],
       ),
@@ -36,7 +38,7 @@ class _CurrencyCrudScreenState extends ConsumerState<CurrencyCrudScreen> {
             final currencies = result.data ?? [];
             return _buildCurrenciesList(context, currencies, ref);
           } else {
-            return _buildErrorWidget(context, result.errorMessage ?? 'Unknown error');
+            return _buildErrorWidget(context, result.errorMessage ?? l10n.unknown);
           }
         },
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -63,6 +65,7 @@ class _CurrencyCrudScreenState extends ConsumerState<CurrencyCrudScreen> {
 
   Widget _buildCurrencyCard(BuildContext context, Currency currency) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -107,7 +110,7 @@ class _CurrencyCrudScreenState extends ConsumerState<CurrencyCrudScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    currency.isActive ? 'Active' : 'Inactive',
+                    currency.isActive ? l10n.active : l10n.inactive,
                     style: TextStyle(
                       color: currency.isActive ? Colors.green : Colors.red,
                       fontSize: 10,
@@ -142,16 +145,16 @@ class _CurrencyCrudScreenState extends ConsumerState<CurrencyCrudScreen> {
             }
           },
           itemBuilder: (context) => [
-            const PopupMenuItem(
-              value: 'edit',
-              child: Row(
-                children: [
-                  Icon(Icons.edit, size: 16),
-                  SizedBox(width: 8),
-                  Text('Edit'),
-                ],
+                          PopupMenuItem(
+                value: 'edit',
+                child: Row(
+                  children: [
+                    const Icon(Icons.edit, size: 16),
+                    const SizedBox(width: 8),
+                    Text(l10n.edit),
+                  ],
+                ),
               ),
-            ),
             PopupMenuItem(
               value: 'toggle',
               child: Row(
@@ -182,6 +185,7 @@ class _CurrencyCrudScreenState extends ConsumerState<CurrencyCrudScreen> {
   }
 
   void _showCreateCurrencyDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final nameController = TextEditingController();
     final codeController = TextEditingController();
     final symbolController = TextEditingController();
@@ -193,34 +197,34 @@ class _CurrencyCrudScreenState extends ConsumerState<CurrencyCrudScreen> {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: const Text('Create Currency'),
+          title: Text(l10n.addCurrency),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
                   controller: nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Currency Name',
-                    hintText: 'e.g., US Dollar',
-                  ),
+                                      decoration: InputDecoration(
+                      labelText: l10n.currencyName,
+                      hintText: 'e.g., US Dollar',
+                    ),
                 ),
                 const SizedBox(height: 16),
-                TextField(
-                  controller: codeController,
-                  decoration: const InputDecoration(
-                    labelText: 'Currency Code',
-                    hintText: 'e.g., USD',
+                                  TextField(
+                    controller: codeController,
+                    decoration: InputDecoration(
+                      labelText: l10n.currencyCode,
+                      hintText: 'e.g., USD',
+                    ),
                   ),
-                ),
                 const SizedBox(height: 16),
-                TextField(
-                  controller: symbolController,
-                  decoration: const InputDecoration(
-                    labelText: 'Currency Symbol',
-                    hintText: 'e.g., \$',
+                                  TextField(
+                    controller: symbolController,
+                    decoration: InputDecoration(
+                      labelText: l10n.currencySymbol,
+                      hintText: 'e.g., \$',
+                    ),
                   ),
-                ),
                 const SizedBox(height: 16),
                 TextField(
                   controller: decimalPlacesController,
@@ -255,7 +259,7 @@ class _CurrencyCrudScreenState extends ConsumerState<CurrencyCrudScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
+              child: Text(l10n.cancel),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -263,7 +267,7 @@ class _CurrencyCrudScreenState extends ConsumerState<CurrencyCrudScreen> {
                     codeController.text.isEmpty || 
                     symbolController.text.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Please fill in all required fields')),
+                    SnackBar(content: Text(l10n.pleaseFillAllRequiredFields)),
                   );
                   return;
                 }
@@ -284,8 +288,8 @@ class _CurrencyCrudScreenState extends ConsumerState<CurrencyCrudScreen> {
                   if (mounted) {
                     Navigator.of(context).pop();
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Currency created successfully'),
+                      SnackBar(
+                        content: Text(l10n.currencyCreatedSuccessfully),
                         backgroundColor: Colors.green,
                       ),
                     );
@@ -294,14 +298,14 @@ class _CurrencyCrudScreenState extends ConsumerState<CurrencyCrudScreen> {
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Failed to create currency: ${result.errorMessage}'),
+                        content: Text('${l10n.failedToCreateCurrency}: ${result.errorMessage}'),
                         backgroundColor: Colors.red,
                       ),
                     );
                   }
                 }
               },
-              child: const Text('Create'),
+              child: Text(l10n.create),
             ),
           ],
         ),

@@ -5,6 +5,7 @@ import '../../core/theme/theme_provider.dart';
 import '../auth/models/user.dart';
 import '../auth/auth_provider.dart';
 import 'admin_dashboard_config.dart';
+import '../../core/localization/app_localizations.dart';
 
 class AdminDashboardScreen extends ConsumerStatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -16,6 +17,7 @@ class AdminDashboardScreen extends ConsumerStatefulWidget {
 class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final authState = ref.watch(authNotifierProvider);
     
@@ -23,7 +25,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
     if (authState.user?.role != UserRole.admin) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Access Denied'),
+          title: Text(l10n.accessDenied),
           backgroundColor: theme.colorScheme.surface,
           elevation: 0,
         ),
@@ -38,14 +40,14 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
               ),
               const SizedBox(height: 16),
               Text(
-                'Access Denied',
+                l10n.accessDenied,
                 style: theme.textTheme.headlineMedium?.copyWith(
                   color: theme.colorScheme.error,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                'This feature is only available to system administrators.',
+                l10n.accessDeniedDescription,
                 style: theme.textTheme.bodyLarge?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -60,7 +62,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'System Administration',
+          l10n.systemAdministration,
           style: theme.textTheme.headlineMedium?.copyWith(
             fontWeight: FontWeight.w600,
           ),
@@ -112,6 +114,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
   }
 
   Widget _buildWelcomeSection(ThemeData theme) {
+    final l10n = AppLocalizations.of(context);
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
@@ -146,14 +149,14 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'System Administration',
+                        l10n.systemAdministration,
                         style: theme.textTheme.headlineSmall?.copyWith(
                           color: theme.colorScheme.onPrimary,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
-                        'Multi-tenant POS Management',
+                        l10n.multiTenantPosManagement,
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: theme.colorScheme.onPrimary.withOpacity(0.8),
                         ),
@@ -165,7 +168,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Manage all businesses, menus, inventory, and system settings from one centralized dashboard.',
+              l10n.multiTenantPosDescription,
               style: theme.textTheme.bodyLarge?.copyWith(
                 color: theme.colorScheme.onPrimary.withOpacity(0.9),
               ),
@@ -177,11 +180,12 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
   }
 
   Widget _buildQuickStatsSection(ThemeData theme) {
+    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'System Overview',
+          l10n.systemOverview,
           style: theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.w600,
           ),
@@ -201,7 +205,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                   height: cardHeight,
                   child: _buildStatCard(
                     theme,
-                    'Total Businesses',
+                    l10n.totalBusinesses,
                     '12',
                     Icons.business,
                     Colors.blue,
@@ -212,7 +216,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                   height: cardHeight,
                   child: _buildStatCard(
                     theme,
-                    'Active Users',
+                    l10n.activeUsers,
                     '156',
                     Icons.people,
                     Colors.green,
@@ -223,7 +227,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                   height: cardHeight,
                   child: _buildStatCard(
                     theme,
-                    'Menu Items',
+                    l10n.menuItems,
                     '1,247',
                     Icons.restaurant_menu,
                     Colors.orange,
@@ -234,7 +238,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                   height: cardHeight,
                   child: _buildStatCard(
                     theme,
-                    'Total Sales',
+                    l10n.totalSales,
                     '\$45.2K',
                     Icons.attach_money,
                     Colors.purple,

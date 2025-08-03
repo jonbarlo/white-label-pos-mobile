@@ -7,6 +7,7 @@ import '../auth/auth_provider.dart';
 import 'table_selection_screen.dart';
 import 'messaging_screen.dart';
 import 'table_provider.dart';
+import '../../core/localization/app_localizations.dart';
 
 class WaiterDashboardScreen extends ConsumerStatefulWidget {
   const WaiterDashboardScreen({super.key});
@@ -24,23 +25,24 @@ class _WaiterDashboardScreenState extends ConsumerState<WaiterDashboardScreen> {
     const MessagingScreen(),
   ];
 
-  final List<BottomNavigationBarItem> _navigationItems = const [
+  final List<BottomNavigationBarItem> _navigationItems = [
     BottomNavigationBarItem(
-      icon: Icon(Icons.dashboard),
+      icon: const Icon(Icons.dashboard),
       label: 'Dashboard',
     ),
     BottomNavigationBarItem(
-      icon: Icon(Icons.table_restaurant),
+      icon: const Icon(Icons.table_restaurant),
       label: 'Tables',
     ),
     BottomNavigationBarItem(
-      icon: Icon(Icons.message),
+      icon: const Icon(Icons.message),
       label: 'Messages',
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     
     return Scaffold(
@@ -57,7 +59,20 @@ class _WaiterDashboardScreenState extends ConsumerState<WaiterDashboardScreen> {
             ref.invalidate(tablesProvider);
           }
         },
-        items: _navigationItems,
+        items: [
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.dashboard),
+            label: l10n.waiterDashboard,
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.table_restaurant),
+            label: l10n.tables,
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.message),
+            label: l10n.messages,
+          ),
+        ],
       ),
     );
   }
@@ -73,12 +88,13 @@ class WaiterHomeTab extends ConsumerStatefulWidget {
 class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final user = ref.watch(authNotifierProvider).user;
     
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dashboard'),
+        title: Text(l10n.waiterDashboard),
         centerTitle: true,
         actions: const [
           ThemeToggleButton(),
@@ -110,6 +126,7 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
   }
 
   Widget _buildWelcomeSection(user, ThemeData theme) {
+    final l10n = AppLocalizations.of(context);
     return Card(
       child: Container(
         padding: const EdgeInsets.all(20),
@@ -144,14 +161,14 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Welcome back,',
+                        l10n.welcomeBack,
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.9),
                           fontSize: 16,
                         ),
                       ),
                       Text(
-                        user?.name ?? 'Waiter',
+                        user?.name ?? l10n.waiter,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 24,
@@ -165,7 +182,7 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Ready to serve your customers?',
+              l10n.readyToServeCustomers,
               style: TextStyle(
                 color: Colors.white.withValues(alpha: 0.9),
                 fontSize: 16,
@@ -177,12 +194,13 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
     );
   }
 
-  Widget _buildQuickStats(ThemeData theme) {
+    Widget _buildQuickStats(ThemeData theme) {
+    final l10n = AppLocalizations.of(context);
     return Row(
       children: [
         Expanded(
           child: _buildStatCard(
-            'Active Tables',
+            l10n.activeTables,
             '3',
             Icons.table_restaurant,
             theme.colorScheme.secondary,
@@ -192,7 +210,7 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
         const SizedBox(width: 12),
         Expanded(
           child: _buildStatCard(
-            'Pending Orders',
+            l10n.pendingOrders,
             '2',
             Icons.pending_actions,
             theme.colorScheme.tertiary,
@@ -202,8 +220,8 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
         const SizedBox(width: 12),
         Expanded(
           child: _buildStatCard(
-            'Today\'s Tips',
-                            CurrencyFormatter.formatCRC(45.0),
+            l10n.todaysTips,
+            CurrencyFormatter.formatCRC(45.0),
             Icons.attach_money,
             theme.colorScheme.primary,
             theme,
@@ -249,11 +267,12 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
   }
 
   Widget _buildMainActions(ThemeData theme) {
+    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Quick Actions',
+          l10n.quickActions,
           style: theme.textTheme.titleLarge,
         ),
         const SizedBox(height: 16),
@@ -266,35 +285,35 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
           childAspectRatio: 1.2,
           children: [
             _buildActionCard(
-              'Order History',
+              l10n.orderHistory,
               Icons.history,
               theme.colorScheme.primary,
-              'View past orders',
-              () => _showComingSoon('Order History'),
+              l10n.viewPastOrders,
+              () => _showComingSoon(l10n.orderHistory),
               theme,
             ),
             _buildActionCard(
-              'Customer Info',
+              l10n.customerInfo,
               Icons.people,
               theme.colorScheme.secondary,
-              'Manage customer details',
-              () => _showComingSoon('Customer Information'),
+              l10n.manageCustomerDetails,
+              () => _showComingSoon(l10n.customerInformation),
               theme,
             ),
             _buildActionCard(
-              'Inventory Check',
+              l10n.inventoryCheck,
               Icons.inventory,
               theme.colorScheme.tertiary,
-              'Check item availability',
-              () => _showComingSoon('Inventory Check'),
+              l10n.checkItemAvailability,
+              () => _showComingSoon(l10n.inventoryCheck),
               theme,
             ),
             _buildActionCard(
-              'Daily Report',
+              l10n.dailyReport,
               Icons.assessment,
               theme.colorScheme.primary,
-              'View daily summary',
-              () => _showComingSoon('Daily Report'),
+              l10n.viewDailySummary,
+              () => _showComingSoon(l10n.dailyReport),
               theme,
             ),
           ],
@@ -345,11 +364,12 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
   }
 
   Widget _buildRecentActivity(ThemeData theme) {
+    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Recent Activity',
+          l10n.recentActivity,
           style: theme.textTheme.titleLarge,
         ),
         const SizedBox(height: 16),
@@ -357,7 +377,7 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
           child: Column(
             children: [
               _buildActivityItem(
-                'Table 3 order completed',
+                '${l10n.tableOrderCompleted} 3 ${l10n.orderCompletedLowercase}',
                 '2 minutes ago',
                 Icons.check_circle,
                 theme.colorScheme.secondary,
@@ -365,7 +385,7 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
               ),
               Divider(height: 1, color: theme.colorScheme.outline),
               _buildActivityItem(
-                'New customer at Table 5',
+                '${l10n.newCustomerAtTable} 5',
                 '15 minutes ago',
                 Icons.person_add,
                 theme.colorScheme.primary,
@@ -373,7 +393,7 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
               ),
               Divider(height: 1, color: theme.colorScheme.outline),
               _buildActivityItem(
-                'Kitchen notification: Table 2 ready',
+                '${l10n.kitchenNotificationTableReady} 2 ${l10n.readyLowercase}',
                 '25 minutes ago',
                 Icons.restaurant,
                 theme.colorScheme.tertiary,
@@ -381,7 +401,7 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
               ),
               Divider(height: 1, color: theme.colorScheme.outline),
               _buildActivityItem(
-                'Promotion updated: Happy Hour Special',
+                '${l10n.promotionUpdated} ${l10n.happyHourSpecial}',
                 '1 hour ago',
                 Icons.local_offer,
                 theme.colorScheme.primary,
@@ -428,9 +448,10 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
   }
 
   void _showComingSoon(String feature) {
+    final l10n = AppLocalizations.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('$feature - Coming Soon!'),
+        content: Text('$feature - ${l10n.comingSoon}!'),
         duration: const Duration(seconds: 2),
       ),
     );

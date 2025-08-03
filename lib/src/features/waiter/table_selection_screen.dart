@@ -9,6 +9,7 @@ import '../../features/floor_plan/models/floor_plan.dart';
 import '../../features/floor_plan/floor_plan_provider.dart' as fp;
 import '../../features/auth/auth_provider.dart';
 import '../../core/navigation/app_router.dart';
+import '../../core/localization/app_localizations.dart';
 
 import 'waiter_order_provider.dart';
 import '../../core/services/navigation_service.dart';
@@ -42,12 +43,13 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final tablesAsync = ref.watch(waiter.tablesProvider);
     final tableStatsAsync = ref.watch(waiter.tableStatsProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tables'),
+        title: Text(l10n.tables),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -57,7 +59,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
             onPressed: () {
               ref.invalidate(waiter.tablesProvider);
             },
-            tooltip: 'Refresh Tables',
+            tooltip: l10n.refreshTables,
           ),
           Consumer(
             builder: (context, ref, child) {
@@ -93,8 +95,8 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
                 // Show error if no floor plans available
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('No floor plans available. Please create a floor plan first.'),
+                    SnackBar(
+                      content: Text(l10n.noFloorPlansAvailable),
                       backgroundColor: Colors.orange,
                     ),
                   );
@@ -116,7 +118,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
                 });
               }
             },
-            tooltip: 'Floor Plan View',
+            tooltip: l10n.floorPlanView,
           ),
           IconButton(
             icon: const Icon(Icons.person),
@@ -158,6 +160,8 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
   }
 
   Widget _buildSearchBar() {
+    final l10n = AppLocalizations.of(context);
+    
     return Container(
       padding: const EdgeInsets.all(16),
       child: TextField(
@@ -167,7 +171,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
           });
         },
         decoration: InputDecoration(
-          hintText: 'Search tables...',
+          hintText: l10n.searchTables,
           prefixIcon: const Icon(Icons.search, size: 20),
           suffixIcon: _searchQuery.isNotEmpty
               ? IconButton(
@@ -200,6 +204,8 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
   }
 
   Widget _buildStatusTabs(AsyncValue<Map<String, int>> statsAsync) {
+    final l10n = AppLocalizations.of(context);
+    
     return Container(
       color: Theme.of(context).colorScheme.primary,
       child: TabBar(
@@ -212,11 +218,11 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
         labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
         unselectedLabelStyle: const TextStyle(fontSize: 14),
         tabs: [
-          _buildTab('All', null, statsAsync),
-          _buildTab('Available', waiter_table.TableStatus.available, statsAsync),
-          _buildTab('Occupied', waiter_table.TableStatus.occupied, statsAsync),
-          _buildTab('Reserved', waiter_table.TableStatus.reserved, statsAsync),
-          _buildTab('Cleaning', waiter_table.TableStatus.cleaning, statsAsync),
+          _buildTab(l10n.all, null, statsAsync),
+          _buildTab(l10n.available, waiter_table.TableStatus.available, statsAsync),
+          _buildTab(l10n.occupied, waiter_table.TableStatus.occupied, statsAsync),
+          _buildTab(l10n.reserved, waiter_table.TableStatus.reserved, statsAsync),
+          _buildTab(l10n.cleaning, waiter_table.TableStatus.cleaning, statsAsync),
         ],
       ),
     );
@@ -255,6 +261,8 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
   }
 
   Widget _buildTablesGrid(AsyncValue<List<waiter_table.Table>> tablesAsync, waiter_table.TableStatus? filterStatus) {
+    final l10n = AppLocalizations.of(context);
+    
     return tablesAsync.when(
       data: (tables) {
         // Filter tables by status and search query
@@ -284,13 +292,13 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
           },
         );
       },
-      loading: () => const Center(
+      loading: () => Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text('Loading tables...'),
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
+            Text(l10n.loadingTables),
           ],
         ),
       ),
@@ -305,7 +313,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
             ),
             const SizedBox(height: 16),
             Text(
-              'Error loading tables',
+              l10n.errorLoadingTables,
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 8),
@@ -319,7 +327,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
               onPressed: () {
                 ref.invalidate(waiter.tablesProvider);
               },
-              child: const Text('Retry'),
+              child: Text(l10n.retry),
             ),
           ],
         ),
@@ -328,32 +336,34 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
   }
 
   Widget _buildEmptyState(waiter_table.TableStatus? filterStatus) {
+    final l10n = AppLocalizations.of(context);
+    
     String message;
     IconData icon;
 
     if (_searchQuery.isNotEmpty) {
-      message = 'No tables found matching "$_searchQuery"';
+      message = '${l10n.noTablesFoundMatching} "$_searchQuery"';
       icon = Icons.search_off;
     } else {
       switch (filterStatus) {
         case waiter_table.TableStatus.available:
-          message = 'No available tables';
+          message = l10n.noAvailableTables;
           icon = Icons.table_restaurant_outlined;
           break;
         case waiter_table.TableStatus.occupied:
-          message = 'No occupied tables';
+          message = l10n.noOccupiedTables;
           icon = Icons.people_outline;
           break;
         case waiter_table.TableStatus.reserved:
-          message = 'No reserved tables';
+          message = l10n.noReservedTables;
           icon = Icons.event_available_outlined;
           break;
         case waiter_table.TableStatus.cleaning:
-          message = 'No tables being cleaned';
+          message = l10n.noTablesBeingCleaned;
           icon = Icons.cleaning_services_outlined;
           break;
         default:
-          message = 'No tables found';
+          message = l10n.noTablesFound;
           icon = Icons.table_restaurant_outlined;
       }
     }
@@ -376,7 +386,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
           ),
           const SizedBox(height: 8),
           Text(
-            'Check back later or try a different filter',
+            l10n.checkBackLaterOrTryDifferentFilter,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: Colors.grey,
             ),
@@ -387,6 +397,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
   }
 
   Widget _buildTableCard(waiter_table.Table table) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final statusColor = _getStatusColor(table.status);
     final canTakeOrder = table.status.canTakeOrder;
@@ -404,7 +415,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
             children: [
               // Table name
               Text(
-                'Table ${table.name}',
+                '${l10n.table} ${table.name}',
                 style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -442,7 +453,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
                   Icon(Icons.people, size: 12, color: Colors.grey[600]),
                   const SizedBox(width: 2),
                   Text(
-                    '${table.capacity} seats',
+                    '${table.capacity} ${l10n.seats}',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: Colors.grey[600],
                     ),
@@ -458,7 +469,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
                     Icon(Icons.receipt, size: 12, color: Colors.grey[600]),
                     const SizedBox(width: 2),
                     Text(
-                      'Order ${table.currentOrderNumber ?? table.currentOrderId}',
+                      '${l10n.order} ${table.currentOrderNumber ?? table.currentOrderId}',
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: Colors.grey[600],
                       ),
@@ -487,8 +498,6 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
       ),
     );
   }
-
-
 
   Color _getStatusColor(waiter_table.TableStatus status) {
     switch (status) {
@@ -545,10 +554,10 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
         final selected = await showDialog<Map<String, dynamic>>(
           context: context,
           builder: (context) => SimpleDialog(
-            title: const Text('Select Open Order'),
+            title: Text(l10n.selectOpenOrder),
             children: openOrders.map((order) => SimpleDialogOption(
               onPressed: () => Navigator.pop(context, order),
-              child: Text('Order #${order['orderNumber'] ?? order['id']}'),
+              child: Text('${l10n.order} #${order['orderNumber'] ?? order['id']}'),
             )).toList(),
           ),
         );
@@ -596,6 +605,8 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
   }
 
   void _showTableDetails(waiter_table.Table table) async {
+    final l10n = AppLocalizations.of(context);
+    
     // Fetch order details if there is a current order
     Map<String, dynamic>? orderDetails;
     if (table.currentOrderId != null) {
@@ -605,29 +616,29 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Table ${table.name} Details'),
+        title: Text('${l10n.table} ${table.name} ${l10n.details}'),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Status: ${table.status.displayName}'),
-              Text('Capacity: ${table.capacity} seats'),
-              if (table.customerName != null) Text('Customer: ${table.customerName}'),
-              if (table.assignedWaiter != null) Text('Assigned to: ${table.assignedWaiter}'),
-              if (table.notes != null) Text('Notes: ${table.notes}'),
-              if (table.lastActivity != null) Text('Last Activity: ${_formatDateTime(table.lastActivity!)}'),
-              if (table.reservationTime != null) Text('Reservation: ${_formatDateTime(table.reservationTime!)}'),
+              Text('${l10n.status}: ${table.status.displayName}'),
+              Text('${l10n.capacity}: ${table.capacity} ${l10n.seats}'),
+              if (table.customerName != null) Text('${l10n.customer}: ${table.customerName}'),
+              if (table.assignedWaiter != null) Text('${l10n.assignedTo}: ${table.assignedWaiter}'),
+              if (table.notes != null) Text('${l10n.notes}: ${table.notes}'),
+              if (table.lastActivity != null) Text('${l10n.lastActivity}: ${_formatDateTime(table.lastActivity!)}'),
+              if (table.reservationTime != null) Text('${l10n.reservation}: ${_formatDateTime(table.reservationTime!)}'),
               if (orderDetails != null) ...[
                 const Divider(height: 24),
-                const Text('Order Items:', style: TextStyle(fontWeight: FontWeight.bold)),
+                Text('${l10n.orderItems}:', style: const TextStyle(fontWeight: FontWeight.bold)),
                 ...((orderDetails['items'] as List?)?.map((item) => Text(
                   '${item['quantity']}x ${item['name']}',
                   style: const TextStyle(fontSize: 15),
-                )) ?? [const Text('No items')]),
+                )) ?? [Text(l10n.noItems)]),
                 if (orderDetails['total'] != null) ...[
                   const SizedBox(height: 8),
-                  Text('Total:  ${CurrencyFormatter.formatBusinessCurrency(orderDetails['total'], ref.watch(currentBusinessCurrencyIdProvider))}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                  Text('${l10n.total}:  ${CurrencyFormatter.formatBusinessCurrency(orderDetails['total'], ref.watch(currentBusinessCurrencyIdProvider))}', style: const TextStyle(fontWeight: FontWeight.bold)),
                 ],
               ],
             ],
@@ -636,7 +647,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
         actions: [
           TextButton(
             onPressed: () => NavigationService.goBack(context),
-            child: const Text('Close'),
+            child: Text(l10n.close),
           ),
         ],
       ),
@@ -644,6 +655,8 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
   }
 
   void _showReserveTableDialog(waiter_table.Table table) {
+    final l10n = AppLocalizations.of(context);
+    
     showDialog(
       context: context,
       builder: (context) {
@@ -652,23 +665,23 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
         DateTime? reservationTime;
         return StatefulBuilder(
           builder: (context, setState) => AlertDialog(
-            title: Text('Reserve Table ${table.name}'),
+            title: Text('${l10n.reserveTable} ${table.name}'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
                   controller: nameController,
-                  decoration: const InputDecoration(labelText: 'Customer Name'),
+                  decoration: InputDecoration(labelText: l10n.customerName),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: notesController,
-                  decoration: const InputDecoration(labelText: 'Notes'),
+                  decoration: InputDecoration(labelText: l10n.notes),
                 ),
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    const Text('Time:'),
+                    Text('${l10n.time}:'),
                     const SizedBox(width: 8),
                     Expanded(
                       child: OutlinedButton(
@@ -691,7 +704,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
                         },
                         child: Text(reservationTime != null
                             ? '${reservationTime!.hour.toString().padLeft(2, '0')}:${reservationTime!.minute.toString().padLeft(2, '0')}'
-                            : 'Select Time'),
+                            : l10n.selectTime),
                       ),
                     ),
                   ],
@@ -701,7 +714,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Cancel'),
+                child: Text(l10n.cancel),
               ),
               ElevatedButton(
                 onPressed: () {
@@ -709,10 +722,10 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
                   // For now, just close dialog
                   NavigationService.goBack(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Table reserved (placeholder)!')),
+                    SnackBar(content: Text('${l10n.table} ${l10n.reserved} (${l10n.placeholder})!')),
                   );
                 },
-                child: const Text('Reserve'),
+                child: Text(l10n.reserve),
               ),
             ],
           ),
@@ -722,6 +735,8 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
   }
 
   void _showSeatCustomerDialog(waiter_table.Table table) {
+    final l10n = AppLocalizations.of(context);
+    
     showDialog(
       context: context,
       builder: (context) {
@@ -730,31 +745,31 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
         final notesController = TextEditingController();
         return StatefulBuilder(
           builder: (context, setState) => AlertDialog(
-            title: Text('Seat Customer at Table ${table.name}'),
+            title: Text('${l10n.seatCustomerAtTable} ${table.name}'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
                   controller: nameController,
-                  decoration: const InputDecoration(labelText: 'Customer Name'),
+                  decoration: InputDecoration(labelText: l10n.customerName),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: partySizeController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'Party Size'),
+                  decoration: InputDecoration(labelText: l10n.partySize),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: notesController,
-                  decoration: const InputDecoration(labelText: 'Notes'),
+                  decoration: InputDecoration(labelText: l10n.notes),
                 ),
               ],
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Cancel'),
+                child: Text(l10n.cancel),
               ),
               ElevatedButton(
                 onPressed: () async {
@@ -763,7 +778,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
                   final notes = notesController.text.trim();
                   if (name.isEmpty || partySize == null || partySize < 1) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Please enter a valid name and party size.')),
+                      SnackBar(content: Text(l10n.pleaseEnterValidNameAndPartySize)),
                     );
                     return;
                   }
@@ -775,16 +790,16 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
                         NavigationService.goBack(context);
                       });
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Customer seated at table ${table.name}!')),
+                        SnackBar(content: Text('${l10n.customerSeatedAtTable} ${table.name}!')),
                       );
                     }
                   } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Failed to seat customer: $e')),
+                      SnackBar(content: Text('${l10n.failedToSeatCustomer}: $e')),
                     );
                   }
                 },
-                child: const Text('Seat'),
+                child: Text(l10n.seat),
               ),
             ],
           ),
@@ -794,6 +809,8 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
   }
 
   void _clearTable(waiter_table.Table table) async {
+    final l10n = AppLocalizations.of(context);
+    
     try {
       final container = ProviderScope.containerOf(context, listen: false);
       
@@ -808,7 +825,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
                 child: CircularProgressIndicator(strokeWidth: 2),
               ),
               const SizedBox(width: 16),
-              Text('Clearing table ${table.name}...'),
+              Text('${l10n.clearingTable} ${table.name}...'),
             ],
           ),
           duration: const Duration(seconds: 2),
@@ -822,7 +839,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Table ${table.name} cleared successfully!'),
+            content: Text('${l10n.table} ${table.name} ${l10n.clearedSuccessfully}!'),
             backgroundColor: Colors.green,
           ),
         );
@@ -832,7 +849,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to clear table: ${e.toString()}'),
+            content: Text('${l10n.failedToClearTable}: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -841,6 +858,8 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
   }
 
   void _showCheckInDialog(waiter_table.Table table) {
+    final l10n = AppLocalizations.of(context);
+    
     showDialog(
       context: context,
       builder: (context) {
@@ -849,31 +868,31 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
         final notesController = TextEditingController(text: table.notes ?? '');
         return StatefulBuilder(
           builder: (context, setState) => AlertDialog(
-            title: Text('Check-in Reservation for Table ${table.name}'),
+            title: Text('${l10n.checkInReservationForTable} ${table.name}'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
                   controller: nameController,
-                  decoration: const InputDecoration(labelText: 'Customer Name'),
+                  decoration: InputDecoration(labelText: l10n.customerName),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: partySizeController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'Party Size'),
+                  decoration: InputDecoration(labelText: l10n.partySize),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: notesController,
-                  decoration: const InputDecoration(labelText: 'Notes'),
+                  decoration: InputDecoration(labelText: l10n.notes),
                 ),
               ],
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Cancel'),
+                child: Text(l10n.cancel),
               ),
               ElevatedButton(
                 onPressed: () async {
@@ -882,7 +901,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
                   final notes = notesController.text.trim();
                   if (name.isEmpty || partySize == null || partySize < 1) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Please enter a valid name and party size.')),
+                      SnackBar(content: Text(l10n.pleaseEnterValidNameAndPartySize)),
                     );
                     return;
                   }
@@ -894,16 +913,16 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
                         NavigationService.goBack(context);
                       });
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Reservation checked in for table ${table.name}!')),
+                        SnackBar(content: Text('${l10n.reservationCheckedInForTable} ${table.name}!')),
                       );
                     }
                   } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Failed to check-in: $e')),
+                      SnackBar(content: Text('${l10n.failedToCheckIn}: $e')),
                     );
                   }
                 },
-                child: const Text('Check-in'),
+                child: Text(l10n.checkIn),
               ),
             ],
           ),
@@ -932,21 +951,25 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
   }
 
   String _getActionText(waiter_table.Table table) {
+    final l10n = AppLocalizations.of(context);
+    
     switch (table.status) {
       case waiter_table.TableStatus.available:
-        return 'Seat';
+        return l10n.seat;
       case waiter_table.TableStatus.reserved:
-        return 'Check-in';
+        return l10n.checkIn;
       case waiter_table.TableStatus.occupied:
-        return 'View';
+        return l10n.view;
       case waiter_table.TableStatus.cleaning:
-        return 'Ready';
+        return l10n.ready;
       default:
-        return 'Details';
+        return l10n.details;
     }
   }
 
   Widget _buildActionButtons(waiter_table.Table table, Color statusColor) {
+    final l10n = AppLocalizations.of(context);
+    
     switch (table.status) {
       case waiter_table.TableStatus.available:
         return SizedBox(
@@ -962,7 +985,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
               ),
               padding: EdgeInsets.zero,
             ),
-            child: const Text('Seat', style: TextStyle(fontSize: 10)),
+            child: Text(l10n.seat, style: const TextStyle(fontSize: 10)),
           ),
         );
         
@@ -983,7 +1006,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
               padding: EdgeInsets.zero,
             ),
             child: Text(
-              hasOrders ? 'Add Items' : 'Start',
+              hasOrders ? l10n.addItems : l10n.start,
               style: const TextStyle(fontSize: 10),
             ),
           ),
@@ -1003,7 +1026,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
               ),
               padding: EdgeInsets.zero,
             ),
-            child: const Text('Check-in', style: TextStyle(fontSize: 10)),
+            child: Text(l10n.checkIn, style: const TextStyle(fontSize: 10)),
           ),
         );
         
@@ -1021,7 +1044,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
               ),
               padding: EdgeInsets.zero,
             ),
-            child: const Text('Ready', style: TextStyle(fontSize: 10)),
+            child: Text(l10n.ready, style: const TextStyle(fontSize: 10)),
           ),
         );
         
@@ -1039,7 +1062,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
               ),
               padding: EdgeInsets.zero,
             ),
-            child: const Text('Details', style: TextStyle(fontSize: 10)),
+            child: Text(l10n.details, style: const TextStyle(fontSize: 10)),
           ),
         );
     }

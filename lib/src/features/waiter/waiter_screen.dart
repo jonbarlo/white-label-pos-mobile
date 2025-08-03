@@ -4,6 +4,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import '../staff_messaging/staff_messaging_provider.dart';
 import '../staff_messaging/models/staff_message.dart';
 
+import '../../core/localization/app_localizations.dart';
 import '../../shared/widgets/theme_toggle_button.dart';
 import '../../shared/utils/currency_formatter.dart';
 import '../business/business_provider.dart';
@@ -14,12 +15,13 @@ class WaiterScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final activeMessagesAsync = ref.watch(activeMessagesProvider);
 
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Waiter Dashboard'),
+        title: Text(l10n.waiterDashboard),
         centerTitle: true,
         elevation: 2,
         backgroundColor: Theme.of(context).colorScheme.primary,
@@ -31,7 +33,7 @@ class WaiterScreen extends ConsumerWidget {
               ref.invalidate(activeMessagesProvider);
               ref.invalidate(unreadMessageCountProvider);
             },
-            tooltip: 'Refresh',
+            tooltip: l10n.refresh,
           ),
           const ThemeToggleButton(),
         ],
@@ -72,6 +74,8 @@ class WaiterScreen extends ConsumerWidget {
   }
 
   Widget _buildWelcomeSection(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    
     return Card(
       elevation: 4,
       child: Container(
@@ -108,7 +112,7 @@ class WaiterScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Welcome back!',
+                        l10n.welcomeBack,
                         style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -116,7 +120,7 @@ class WaiterScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Ready to serve your customers?',
+                        l10n.readyToServeCustomers,
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                           color: Colors.white.withValues(alpha: 0.9),
                         ),
@@ -131,21 +135,21 @@ class WaiterScreen extends ConsumerWidget {
               children: [
                 _buildStatCard(
                   context,
-                  'Today\'s Orders',
+                  l10n.todaysOrders,
                   '12',
                   Icons.receipt_long,
                 ),
                 const SizedBox(width: 16),
                 _buildStatCard(
                   context,
-                  'Active Tables',
+                  l10n.activeTables,
                   '8',
                   Icons.table_restaurant,
                 ),
                 const SizedBox(width: 16),
                 _buildStatCard(
                   context,
-                  'Tips Earned',
+                  l10n.tipsEarned,
                   CurrencyFormatter.formatCRC(45.0),
                   Icons.attach_money,
                 ),
@@ -190,11 +194,13 @@ class WaiterScreen extends ConsumerWidget {
   }
 
   Widget _buildQuickActions(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Quick Actions',
+          l10n.quickActions,
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
           ),
@@ -205,7 +211,7 @@ class WaiterScreen extends ConsumerWidget {
             Expanded(
               child: _buildActionCard(
                 context,
-                'Take Order',
+                l10n.takeOrder,
                 Icons.add_shopping_cart,
                 Colors.blue,
                 () {
@@ -217,7 +223,7 @@ class WaiterScreen extends ConsumerWidget {
             Expanded(
               child: _buildActionCard(
                 context,
-                'View Tables',
+                l10n.viewTables,
                 Icons.table_restaurant,
                 Colors.green,
                 () {
@@ -237,7 +243,7 @@ class WaiterScreen extends ConsumerWidget {
             Expanded(
               child: _buildActionCard(
                 context,
-                'Kitchen View',
+                l10n.kitchenView,
                 Icons.kitchen,
                 Colors.orange,
                 () {
@@ -249,7 +255,7 @@ class WaiterScreen extends ConsumerWidget {
             Expanded(
               child: _buildActionCard(
                 context,
-                'Messages',
+                l10n.messages,
                 Icons.message,
                 Colors.purple,
                 () {
@@ -311,6 +317,8 @@ class WaiterScreen extends ConsumerWidget {
     WidgetRef ref,
     AsyncValue<List<StaffMessage>> activeMessagesAsync,
   ) {
+    final l10n = AppLocalizations.of(context);
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -318,7 +326,7 @@ class WaiterScreen extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Messages & Promotions',
+              l10n.messagesAndPromotions,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -339,7 +347,7 @@ class WaiterScreen extends ConsumerWidget {
                 ),
               ),
               loading: () => const CircularProgressIndicator(),
-              error: (_, __) => const Text('Error'),
+              error: (_, __) => Text(l10n.error),
             ),
           ],
         ),
@@ -379,6 +387,8 @@ class WaiterScreen extends ConsumerWidget {
   }
 
   Widget _buildMessageCard(BuildContext context, WidgetRef ref, StaffMessage message) {
+    final l10n = AppLocalizations.of(context);
+    
     Color cardColor;
     IconData icon;
     
@@ -465,9 +475,9 @@ class WaiterScreen extends ConsumerWidget {
                         color: Colors.red,
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Text(
-                        'URGENT',
-                        style: TextStyle(
+                      child: Text(
+                        l10n.urgent,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
@@ -490,7 +500,7 @@ class WaiterScreen extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Created: ${_formatDate(message.createdAt)}',
+                    '${l10n.created}: ${_formatDate(message.createdAt)}',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Colors.grey[600],
                     ),
@@ -500,7 +510,7 @@ class WaiterScreen extends ConsumerWidget {
                       onPressed: () {
                         ref.read(markMessageAsReadProvider(message.id));
                       },
-                      child: const Text('Mark as Read'),
+                      child: Text(l10n.markAsRead),
                     ),
                 ],
               ),
@@ -512,33 +522,35 @@ class WaiterScreen extends ConsumerWidget {
   }
 
   Widget _buildEmptyMessagesCard(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    
     return Card(
       elevation: 2,
       child: Container(
         height: 200,
         padding: const EdgeInsets.all(20),
-        child: const Center(
+        child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
+              const Icon(
                 Icons.message_outlined,
                 size: 48,
                 color: Colors.grey,
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Text(
-                'No messages or promotions',
-                style: TextStyle(
+                l10n.noMessagesOrPromotions,
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                   color: Colors.grey,
                 ),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text(
-                'Check back later for updates',
-                style: TextStyle(
+                l10n.checkBackLaterForUpdates,
+                style: const TextStyle(
                   color: Colors.grey,
                 ),
               ),
@@ -550,6 +562,8 @@ class WaiterScreen extends ConsumerWidget {
   }
 
   Widget _buildErrorCard(BuildContext context, String error) {
+    final l10n = AppLocalizations.of(context);
+    
     return Card(
       elevation: 2,
       child: Container(
@@ -566,7 +580,7 @@ class WaiterScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                'Error loading messages',
+                l10n.errorLoadingMessages,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: Colors.red,
                 ),
@@ -587,11 +601,13 @@ class WaiterScreen extends ConsumerWidget {
   }
 
   Widget _buildTodayStats(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Today\'s Performance',
+          l10n.todaysPerformance,
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
           ),
@@ -602,7 +618,7 @@ class WaiterScreen extends ConsumerWidget {
             Expanded(
               child: _buildStatCard2(
                 context,
-                'Orders',
+                l10n.orders,
                 '24',
                 '+12%',
                 Icons.receipt_long,
@@ -613,7 +629,7 @@ class WaiterScreen extends ConsumerWidget {
             Expanded(
               child: _buildStatCard2(
                 context,
-                'Revenue',
+                l10n.revenue,
                 CurrencyFormatter.formatCRC(1245.0),
                 '+8%',
                 Icons.attach_money,
@@ -624,7 +640,7 @@ class WaiterScreen extends ConsumerWidget {
             Expanded(
               child: _buildStatCard2(
                 context,
-                'Tips',
+                l10n.tips,
                 CurrencyFormatter.formatCRC(89.0),
                 '+15%',
                 Icons.tips_and_updates,
@@ -702,11 +718,13 @@ class WaiterScreen extends ConsumerWidget {
   }
 
   Widget _buildRecentOrders(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Recent Orders',
+          l10n.recentOrders,
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
           ),
@@ -730,17 +748,17 @@ class WaiterScreen extends ConsumerWidget {
                     ),
                   ),
                 ),
-                title: Text('Order #${1000 + index}'),
-                subtitle: Text('Table ${index + 1} • ${CurrencyFormatter.formatCRC((index + 1) * 15 + 25)}'),
+                title: Text('${l10n.order} #${1000 + index}'),
+                subtitle: Text('${l10n.table} ${index + 1} • ${CurrencyFormatter.formatCRC((index + 1) * 15 + 25)}'),
                 trailing: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: Colors.green.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Text(
-                    'Completed',
-                    style: TextStyle(
+                  child: Text(
+                    l10n.completed,
+                    style: const TextStyle(
                       color: Colors.green,
                       fontSize: 12,
                       fontWeight: FontWeight.bold,

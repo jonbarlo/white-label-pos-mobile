@@ -9,6 +9,7 @@ import '../auth/models/user.dart';
 import '../auth/auth_provider.dart';
 import 'admin_menu_provider.dart';
 import 'models/admin_menu_item.dart';
+import '../../core/localization/app_localizations.dart';
 
 class AdminMenuManagementScreen extends ConsumerStatefulWidget {
   const AdminMenuManagementScreen({super.key});
@@ -34,6 +35,7 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final authState = ref.watch(authNotifierProvider);
     
@@ -41,7 +43,7 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
     if (authState.user?.role != UserRole.admin) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Access Denied'),
+          title: Text(l10n.accessDenied),
           backgroundColor: theme.colorScheme.surface,
           elevation: 0,
         ),
@@ -56,14 +58,14 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
               ),
               const SizedBox(height: 16),
               Text(
-                'Access Denied',
+                l10n.accessDenied,
                 style: theme.textTheme.headlineMedium?.copyWith(
                   color: theme.colorScheme.error,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                'This feature is only available to system administrators.',
+                l10n.accessDeniedDescription,
                 style: theme.textTheme.bodyLarge?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -72,7 +74,7 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () => NavigationService.goBack(context),
-                child: const Text('Go Back'),
+                child: Text(l10n.goBack),
               ),
             ],
           ),
@@ -83,7 +85,7 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Menu Management',
+          l10n.menuManagement,
           style: theme.textTheme.headlineMedium?.copyWith(
             fontWeight: FontWeight.w600,
           ),
@@ -100,7 +102,7 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
               ref.invalidate(adminCategoriesProvider);
               ref.invalidate(adminMenuProvider);
             },
-            tooltip: 'Refresh Data',
+            tooltip: l10n.refreshData,
           ),
           Consumer(
             builder: (context, ref, child) {
@@ -130,7 +132,7 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showCreateMenuItemDialog(context),
         icon: const Icon(Icons.add),
-        label: const Text('Add Menu Item'),
+                    label: Text(l10n.addMenuItem),
         backgroundColor: theme.colorScheme.primary,
         foregroundColor: theme.colorScheme.onPrimary,
       ),
@@ -177,6 +179,7 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
   }
 
   Widget _buildBusinessSelector(ThemeData theme) {
+    final l10n = AppLocalizations.of(context);
     final businessesAsync = ref.watch(adminBusinessesProvider);
     
     return businessesAsync.when(
@@ -184,16 +187,16 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
         return DropdownButtonFormField<String>(
           value: _selectedBusinessId ?? 'select', // Default to 'select' value
           decoration: InputDecoration(
-            labelText: 'Select Business',
+            labelText: l10n.selectBusiness,
             prefixIcon: const Icon(Icons.business),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
             ),
           ),
           items: [
-            const DropdownMenuItem<String>(
+            DropdownMenuItem<String>(
               value: 'select',
-              child: Text('Select One Business'),
+              child: Text(l10n.selectOneBusiness),
             ),
             ...businesses.map((business) => DropdownMenuItem<String>(
               value: business.id.toString(),
@@ -223,14 +226,15 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
         );
       },
       loading: () => const LinearProgressIndicator(),
-      error: (error, stack) => Text('Error loading businesses: $error'),
+      error: (error, stack) => Text('${l10n.errorLoadingBusinesses} $error'),
     );
   }
 
   Widget _buildSearchField(ThemeData theme) {
+    final l10n = AppLocalizations.of(context);
     return TextField(
       decoration: InputDecoration(
-        labelText: 'Search menu items...',
+        labelText: l10n.searchMenuItems,
         prefixIcon: const Icon(Icons.search),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -273,6 +277,7 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
   }
 
   Widget _buildCategoryFilter(ThemeData theme) {
+    final l10n = AppLocalizations.of(context);
     final categoriesAsync = ref.watch(adminCategoriesProvider);
     
     return categoriesAsync.when(
@@ -280,7 +285,7 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
         return DropdownButtonFormField<String>(
           value: _selectedCategoryId,
           decoration: InputDecoration(
-            labelText: 'Category',
+            labelText: l10n.category,
             prefixIcon: const Icon(Icons.category),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
@@ -288,9 +293,9 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           ),
           items: [
-            const DropdownMenuItem<String>(
+            DropdownMenuItem<String>(
               value: null,
-              child: Text('All Categories'),
+              child: Text(l10n.allCategories),
             ),
             ...categories.map((category) => DropdownMenuItem<String>(
               value: category.id.toString(),
@@ -317,14 +322,15 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
         width: 120,
         child: LinearProgressIndicator(),
       ),
-      error: (error, stack) => const SizedBox(
+      error: (error, stack) => SizedBox(
         width: 120,
-        child: Text('Error'),
+        child: Text(l10n.error),
       ),
     );
   }
 
   Widget _buildAvailabilityFilter(ThemeData theme) {
+    final l10n = AppLocalizations.of(context);
     return Row(
       children: [
         Checkbox(
@@ -345,7 +351,7 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
           },
         ),
         Text(
-          'Available Only',
+          l10n.availableOnly,
           style: theme.textTheme.bodyMedium,
         ),
       ],
@@ -353,6 +359,7 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
   }
 
   Widget _buildClearFiltersButton(ThemeData theme) {
+    final l10n = AppLocalizations.of(context);
     return TextButton.icon(
       onPressed: () {
         setState(() {
@@ -366,13 +373,14 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
         ref.invalidate(adminMenuProvider);
       },
       icon: const Icon(Icons.clear_all),
-      label: const Text('Clear Filters'),
+      label: Text(l10n.clearFilters),
     );
   }
 
   Widget _buildContent(ThemeData theme) {
     // Show message when no business is selected
     if (_selectedBusinessId == null) {
+      final l10n = AppLocalizations.of(context);
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -384,14 +392,14 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
             ),
             const SizedBox(height: 16),
             Text(
-              'Select a Business',
+              l10n.selectABusiness,
               style: theme.textTheme.headlineSmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Please select a business from the dropdown above to view and manage menu items.',
+              l10n.pleaseSelectABusinessFromDropdown,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -424,44 +432,48 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.error_outline,
-              size: 64,
-              color: theme.colorScheme.error,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Error Loading Menu Items',
-              style: theme.textTheme.headlineSmall?.copyWith(
+      error: (error, stack) {
+        final l10n = AppLocalizations.of(context);
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.error_outline,
+                size: 64,
                 color: theme.colorScheme.error,
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              error.toString(),
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
+              const SizedBox(height: 16),
+              Text(
+                l10n.errorLoadingMenuItems,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  color: theme.colorScheme.error,
+                ),
               ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                ref.invalidate(adminMenuProvider);
-              },
-              child: const Text('Retry'),
-            ),
-          ],
-        ),
-      ),
+              const SizedBox(height: 8),
+              Text(
+                error.toString(),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  ref.invalidate(adminMenuProvider);
+                },
+                child: Text(l10n.retry),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
   Widget _buildEmptyState(ThemeData theme) {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -473,14 +485,14 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
           ),
           const SizedBox(height: 16),
           Text(
-            'No menu items found',
+            l10n.noMenuItemsFound,
             style: theme.textTheme.headlineSmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            'Try adjusting your filters or add a new menu item.',
+            l10n.tryAdjustingFiltersOrAddNewMenuItem,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -492,6 +504,7 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
   }
 
   Widget _buildMenuItemCard(ThemeData theme, AdminMenuItem item) {
+    final l10n = AppLocalizations.of(context);
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: ListTile(
@@ -518,10 +531,10 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
                             Text(CurrencyFormatter.formatBusinessCurrency(item.price, ref.watch(currentBusinessCurrencyIdProvider))),
-            Text('Category ID: ${item.categoryId}'),
+            Text('${l10n.categoryId} ${item.categoryId}'),
             Row(
               children: [
-                Text(item.isAvailable ? 'Available' : 'Unavailable'),
+                Text(item.isAvailable ? l10n.available : l10n.unavailable),
                 const SizedBox(width: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
@@ -561,13 +574,13 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
             }
           },
           itemBuilder: (context) => [
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'edit',
               child: Row(
                 children: [
-                  Icon(Icons.edit),
-                  SizedBox(width: 8),
-                  Text('Edit'),
+                  const Icon(Icons.edit),
+                  const SizedBox(width: 8),
+                  Text(l10n.edit),
                 ],
               ),
             ),
@@ -577,17 +590,17 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
                 children: [
                   Icon(item.isAvailable ? Icons.visibility_off : Icons.visibility),
                   const SizedBox(width: 8),
-                  Text(item.isAvailable ? 'Make Unavailable' : 'Make Available'),
+                  Text(item.isAvailable ? l10n.makeUnavailable : l10n.available),
                 ],
               ),
             ),
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'delete',
               child: Row(
                 children: [
-                  Icon(Icons.delete, color: Colors.red),
-                  SizedBox(width: 8),
-                  Text('Delete', style: TextStyle(color: Colors.red)),
+                  const Icon(Icons.delete, color: Colors.red),
+                  const SizedBox(width: 8),
+                  Text(l10n.delete, style: const TextStyle(color: Colors.red)),
                 ],
               ),
             ),
@@ -612,15 +625,16 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
   }
 
   void _showDeleteMenuItemDialog(BuildContext context, AdminMenuItem item) {
+    final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Menu Item'),
-        content: Text('Are you sure you want to delete "${item.name}"? This action cannot be undone.'),
+        title: Text(l10n.deleteMenuItem),
+        content: Text('${l10n.areYouSureYouWantToDelete} "${item.name}"? ${l10n.thisActionCannotBeUndone}'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () async {
@@ -628,15 +642,15 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
               try {
                 await ref.read(adminMenuProvider.notifier).deleteMenuItem(item.id);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Menu item deleted successfully'),
+                  SnackBar(
+                    content: Text(l10n.menuItemDeletedSuccessfully),
                     backgroundColor: Colors.green,
                   ),
                 );
               } catch (error) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Error deleting menu item: $error'),
+                    content: Text('${l10n.errorDeletingMenuItem} $error'),
                     backgroundColor: Colors.red,
                   ),
                 );
@@ -645,7 +659,7 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
             style: TextButton.styleFrom(
               foregroundColor: Colors.red,
             ),
-            child: const Text('Delete'),
+            child: Text(l10n.delete),
           ),
         ],
       ),
@@ -653,6 +667,7 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
   }
 
   void _toggleMenuItemAvailability(AdminMenuItem item) async {
+    final l10n = AppLocalizations.of(context);
     try {
       await ref.read(adminMenuProvider.notifier).toggleMenuItemAvailability(
         item.id,
@@ -660,14 +675,14 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
       );
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Menu item ${item.isAvailable ? 'made unavailable' : 'made available'} successfully'),
+          content: Text('Menu item ${item.isAvailable ? l10n.menuItemMadeUnavailable : l10n.menuItemMadeAvailable} ${l10n.successfully}'),
           backgroundColor: Colors.green,
         ),
       );
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error updating menu item availability: $error'),
+          content: Text('${l10n.errorUpdatingMenuItemAvailability} $error'),
           backgroundColor: Colors.red,
         ),
       );
@@ -716,13 +731,14 @@ class _CreateMenuItemDialogState extends ConsumerState<_CreateMenuItemDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final businessesAsync = ref.watch(adminBusinessesProvider);
     
     // Get the currently selected business ID
     final selectedBusinessId = ref.watch(adminMenuProvider.notifier).selectedBusinessId;
 
     return AlertDialog(
-      title: const Text('Create Menu Item'),
+      title: Text(l10n.createMenuItem),
       content: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -791,9 +807,9 @@ class _CreateMenuItemDialogState extends ConsumerState<_CreateMenuItemDialog> {
                   
                   return DropdownButtonFormField<String>(
                     value: selectedBusiness.id.toString(),
-                    decoration: const InputDecoration(
-                      labelText: 'Business',
-                      prefixIcon: Icon(Icons.business),
+                    decoration: InputDecoration(
+                      labelText: l10n.business,
+                      prefixIcon: const Icon(Icons.business),
                     ),
                     items: businesses.map((business) => DropdownMenuItem<String>(
                       value: business.id.toString(),
@@ -816,16 +832,16 @@ class _CreateMenuItemDialogState extends ConsumerState<_CreateMenuItemDialog> {
                         }
                         
                         if (snapshot.hasError) {
-                          return Text('Error loading categories: ${snapshot.error}');
+                          return Text('${l10n.errorLoadingCategories}: ${snapshot.error}');
                         }
                         
                         final categories = snapshot.data ?? [];
                         
                         return DropdownButtonFormField<String>(
                           value: _selectedCategoryId,
-                          decoration: const InputDecoration(
-                            labelText: 'Category',
-                            prefixIcon: Icon(Icons.category),
+                          decoration: InputDecoration(
+                            labelText: l10n.category,
+                            prefixIcon: const Icon(Icons.category),
                           ),
                           items: categories.map((category) => DropdownMenuItem<String>(
                             value: category.id.toString(),
@@ -833,7 +849,7 @@ class _CreateMenuItemDialogState extends ConsumerState<_CreateMenuItemDialog> {
                           )).toList(),
                           validator: (value) {
                             if (value == null) {
-                              return 'Please select a category';
+                              return l10n.pleaseSelectACategory;
                             }
                             return null;
                           },
@@ -853,17 +869,18 @@ class _CreateMenuItemDialogState extends ConsumerState<_CreateMenuItemDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(l10n.cancel),
         ),
         ElevatedButton(
           onPressed: _createMenuItem,
-          child: const Text('Create'),
+          child: Text(l10n.create),
         ),
       ],
     );
   }
 
   void _createMenuItem() {
+    final l10n = AppLocalizations.of(context);
     if (_formKey.currentState!.validate()) {
       final name = _nameController.text;
       final description = _descriptionController.text;
@@ -874,8 +891,8 @@ class _CreateMenuItemDialogState extends ConsumerState<_CreateMenuItemDialog> {
       final selectedBusinessId = ref.read(adminMenuProvider.notifier).selectedBusinessId;
       if (selectedBusinessId == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please select a business first'),
+          SnackBar(
+            content: Text(l10n.pleaseSelectABusinessFirst),
             backgroundColor: Colors.red,
           ),
         );
@@ -895,15 +912,15 @@ class _CreateMenuItemDialogState extends ConsumerState<_CreateMenuItemDialog> {
       ).then((_) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Menu item created successfully'),
+          SnackBar(
+            content: Text(l10n.menuItemCreatedSuccessfully),
             backgroundColor: Colors.green,
           ),
         );
       }).catchError((error) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error creating menu item: $error'),
+            content: Text('${l10n.errorCreatingMenuItem} $error'),
             backgroundColor: Colors.red,
           ),
         );
@@ -952,10 +969,11 @@ class _EditMenuItemDialogState extends ConsumerState<_EditMenuItemDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final businessesAsync = ref.watch(adminBusinessesProvider);
 
     return AlertDialog(
-      title: const Text('Edit Menu Item'),
+      title: Text(l10n.editMenuItem),
       content: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -1038,7 +1056,7 @@ class _EditMenuItemDialogState extends ConsumerState<_EditMenuItemDialog> {
                   },
                 ),
                 loading: () => const LinearProgressIndicator(),
-                error: (error, stack) => Text('Error: $error'),
+                error: (error, stack) => Text('${l10n.error}: $error'),
               ),
               const SizedBox(height: 16),
               // Load categories for the item's business specifically
@@ -1050,16 +1068,16 @@ class _EditMenuItemDialogState extends ConsumerState<_EditMenuItemDialog> {
                   }
                   
                   if (snapshot.hasError) {
-                    return Text('Error loading categories: ${snapshot.error}');
+                    return Text('${l10n.errorLoadingCategories}: ${snapshot.error}');
                   }
                   
                   final categories = snapshot.data ?? [];
                   
                   return DropdownButtonFormField<String>(
                     value: _selectedCategoryId,
-                    decoration: const InputDecoration(
-                      labelText: 'Category',
-                      prefixIcon: Icon(Icons.category),
+                    decoration: InputDecoration(
+                      labelText: l10n.category,
+                      prefixIcon: const Icon(Icons.category),
                     ),
                     items: categories.map((category) => DropdownMenuItem<String>(
                       value: category.id.toString(),
@@ -1067,7 +1085,7 @@ class _EditMenuItemDialogState extends ConsumerState<_EditMenuItemDialog> {
                     )).toList(),
                     validator: (value) {
                       if (value == null) {
-                        return 'Please select a category';
+                        return l10n.pleaseSelectACategory;
                       }
                       return null;
                     },
@@ -1086,17 +1104,18 @@ class _EditMenuItemDialogState extends ConsumerState<_EditMenuItemDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(l10n.cancel),
         ),
         ElevatedButton(
           onPressed: _updateMenuItem,
-          child: const Text('Update'),
+          child: Text(l10n.update),
         ),
       ],
     );
   }
 
   void _updateMenuItem() async {
+    final l10n = AppLocalizations.of(context);
     if (_formKey.currentState!.validate()) {
       final name = _nameController.text;
       final description = _descriptionController.text;
@@ -1118,15 +1137,15 @@ class _EditMenuItemDialogState extends ConsumerState<_EditMenuItemDialog> {
         
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Menu item updated successfully'),
+          SnackBar(
+            content: Text(l10n.menuItemUpdatedSuccessfully),
             backgroundColor: Colors.green,
           ),
         );
       } catch (error) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error updating menu item: $error'),
+            content: Text('${l10n.errorUpdatingMenuItem} $error'),
             backgroundColor: Colors.red,
           ),
         );
