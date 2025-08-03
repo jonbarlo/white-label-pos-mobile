@@ -9,6 +9,7 @@ import '../../core/theme/app_theme.dart';
 import '../../shared/widgets/theme_toggle_button.dart';
 import '../../shared/utils/currency_formatter.dart';
 import '../business/business_provider.dart';
+import '../../core/localization/app_localizations.dart';
 
 class ReportsScreen extends ConsumerStatefulWidget {
   const ReportsScreen({super.key});
@@ -84,11 +85,12 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Reports & Analytics'),
+        title: Text(l10n.reportsAndAnalytics),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -102,38 +104,38 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
                 paymentMethod: _selectedPaymentMethod,
               ));
             },
-            tooltip: 'Refresh Data',
+            tooltip: l10n.refreshData,
           ),
           IconButton(
             icon: const Icon(Icons.download),
             onPressed: () {
               _showExportDialog(context);
             },
-            tooltip: 'Export Report',
+            tooltip: l10n.exportReport,
           ),
           IconButton(
             icon: const Icon(Icons.featured_play_list),
             onPressed: () {
               context.go('/feature-dashboard');
             },
-            tooltip: 'Recipe & Promotion Features',
+            tooltip: l10n.recipeAndPromotionFeatures,
           ),
           const ThemeToggleButton(),
         ],
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
+          tabs: [
             Tab(
-              icon: Icon(Icons.analytics),
-              text: 'Overview',
+              icon: const Icon(Icons.analytics),
+              text: l10n.overview,
             ),
             Tab(
-              icon: Icon(Icons.receipt_long),
-              text: 'Transactions',
+              icon: const Icon(Icons.receipt_long),
+              text: l10n.transactions,
             ),
             Tab(
-              icon: Icon(Icons.trending_up),
-              text: 'Revenue',
+              icon: const Icon(Icons.trending_up),
+              text: l10n.revenue,
             ),
           ],
           indicatorColor: Theme.of(context).colorScheme.primary,
@@ -168,7 +170,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
                     Icon(Icons.date_range, size: 16, color: theme.colorScheme.primary),
                     const SizedBox(width: 8),
                     Text(
-                      'Date Range',
+                      l10n.dateRange,
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -219,7 +221,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
                             ),
                             const SizedBox(width: 8),
                             _PeriodChip(
-                              label: 'Custom',
+                              label: l10n.custom,
                               value: 'custom',
                               selected: _selectedPeriod == 'custom',
                               onTap: _selectDateRange,
@@ -236,14 +238,14 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
                   children: [
                     Expanded(
                       child: _FilterDropdown(
-                        label: 'Status',
+                        label: l10n.status,
                         value: _selectedStatus,
-                        items: const [
-                          {'value': null, 'label': 'All Status'},
-                          {'value': 'completed', 'label': 'Completed'},
-                          {'value': 'pending', 'label': 'Pending'},
-                          {'value': 'cancelled', 'label': 'Cancelled'},
-                          {'value': 'refunded', 'label': 'Refunded'},
+                        items: [
+                          {'value': null, 'label': l10n.allStatus},
+                          {'value': 'completed', 'label': l10n.completed},
+                          {'value': 'pending', 'label': l10n.pending},
+                          {'value': 'cancelled', 'label': l10n.cancelled},
+                          {'value': 'refunded', 'label': l10n.refunded},
                         ],
                         onChanged: (value) {
                           setState(() {
@@ -255,14 +257,14 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
                     const SizedBox(width: 12),
                     Expanded(
                       child: _FilterDropdown(
-                        label: 'Payment',
+                        label: l10n.payment,
                         value: _selectedPaymentMethod,
-                        items: const [
-                          {'value': null, 'label': 'All Methods'},
-                          {'value': 'cash', 'label': 'Cash'},
-                          {'value': 'card', 'label': 'Card'},
-                          {'value': 'mobile', 'label': 'Mobile'},
-                          {'value': 'check', 'label': 'Check'},
+                        items: [
+                          {'value': null, 'label': l10n.allMethods},
+                          {'value': 'cash', 'label': l10n.cash},
+                          {'value': 'card', 'label': l10n.card},
+                          {'value': 'mobile', 'label': l10n.mobile},
+                          {'value': 'check', 'label': l10n.check},
                         ],
                         onChanged: (value) {
                           setState(() {
@@ -299,16 +301,17 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
   }
 
   void _showExportDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Export Report'),
+        title: Text(l10n.exportReport),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
               leading: const Icon(Icons.picture_as_pdf),
-              title: const Text('PDF Report'),
+              title: Text(l10n.pdfReport),
               onTap: () {
                 Navigator.pop(context);
                 _exportReport('pdf');
@@ -316,7 +319,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
             ),
             ListTile(
               leading: const Icon(Icons.table_chart),
-              title: const Text('CSV Data'),
+              title: Text(l10n.csvData),
               onTap: () {
                 Navigator.pop(context);
                 _exportReport('csv');
@@ -324,7 +327,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
             ),
             ListTile(
               leading: const Icon(Icons.table_view),
-              title: const Text('Excel Spreadsheet'),
+              title: Text(l10n.excelSpreadsheet),
               onTap: () {
                 Navigator.pop(context);
                 _exportReport('xlsx');
@@ -335,7 +338,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
         ],
       ),
@@ -463,6 +466,7 @@ class _OverviewTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final salesReportAsync = ref.watch(salesReportProvider(startDate: startDate, endDate: endDate));
     final theme = Theme.of(context);
 
@@ -475,7 +479,7 @@ class _OverviewTab extends ConsumerWidget {
             CircularProgressIndicator(color: theme.colorScheme.primary),
             const SizedBox(height: 16),
             Text(
-              'Loading overview data...',
+              l10n.loading,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -494,7 +498,7 @@ class _OverviewTab extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Failed to load overview data',
+              l10n.failedToLoadOverviewData,
               style: theme.textTheme.titleMedium?.copyWith(
                 color: theme.colorScheme.error,
               ),
@@ -513,7 +517,7 @@ class _OverviewTab extends ConsumerWidget {
                 ref.invalidate(salesReportProvider(startDate: startDate, endDate: endDate));
               },
               style: AppTheme.neutralButtonStyle,
-              child: const Text('Retry'),
+              child: Text(l10n.retry),
             ),
           ],
         ),
@@ -522,6 +526,7 @@ class _OverviewTab extends ConsumerWidget {
   }
 
   Widget _buildOverviewContent(BuildContext context, SalesReport report) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     
     return SingleChildScrollView(
@@ -534,9 +539,9 @@ class _OverviewTab extends ConsumerWidget {
             children: [
               Expanded(
                 child: _EnhancedSummaryCard(
-                  title: 'Total Sales',
+                  title: l10n.totalSales,
                   value: CurrencyFormatter.formatCRC(report.totalSales),
-                  subtitle: '${report.totalTransactions} transactions',
+                  subtitle: '${report.totalTransactions} ${l10n.transactions}',
                   icon: Icons.point_of_sale,
                   color: theme.colorScheme.primary,
                   trend: '+12.5%',
@@ -546,9 +551,9 @@ class _OverviewTab extends ConsumerWidget {
               const SizedBox(width: 16),
               Expanded(
                 child: _EnhancedSummaryCard(
-                  title: 'Average Order',
+                  title: l10n.averageOrder,
                   value: CurrencyFormatter.formatCRC(report.averageTransactionValue),
-                  subtitle: 'per transaction',
+                  subtitle: l10n.perTransaction,
                   icon: Icons.analytics,
                   color: theme.colorScheme.secondary,
                   trend: '+5.2%',
@@ -562,9 +567,9 @@ class _OverviewTab extends ConsumerWidget {
             children: [
               Expanded(
                 child: _EnhancedSummaryCard(
-                  title: 'Top Product',
-                  value: report.topSellingItems.isNotEmpty ? report.topSellingItems[0] : 'N/A',
-                  subtitle: 'Most popular item',
+                  title: l10n.topProduct,
+                  value: report.topSellingItems.isNotEmpty ? report.topSellingItems[0] : l10n.na,
+                  subtitle: l10n.mostPopularItem,
                   icon: Icons.star,
                   color: theme.colorScheme.tertiary,
                   trend: null,
@@ -574,9 +579,9 @@ class _OverviewTab extends ConsumerWidget {
               const SizedBox(width: 16),
               Expanded(
                 child: _EnhancedSummaryCard(
-                  title: 'Conversion Rate',
+                  title: l10n.conversionRate,
                   value: '${((report.totalTransactions / 100) * 100).toStringAsFixed(1)}%',
-                  subtitle: 'of visitors',
+                  subtitle: l10n.ofVisitors,
                   icon: Icons.trending_up,
                   color: Colors.green,
                   trend: '+2.1%',
@@ -604,7 +609,7 @@ class _OverviewTab extends ConsumerWidget {
                       Icon(Icons.bar_chart, color: theme.colorScheme.primary),
                       const SizedBox(width: 8),
                       Text(
-                        'Sales Trend',
+                        l10n.salesTrend,
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -634,14 +639,14 @@ class _OverviewTab extends ConsumerWidget {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Sales trend chart',
+                            l10n.salesTrendChart,
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Coming soon with real data',
+                            l10n.comingSoonWithRealData,
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                             ),
@@ -860,6 +865,7 @@ class _TransactionsTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final transactionsAsync = ref.watch(detailedTransactionsProvider(
       startDate: startDate,
       endDate: endDate,
@@ -877,7 +883,7 @@ class _TransactionsTab extends ConsumerWidget {
             CircularProgressIndicator(color: theme.colorScheme.primary),
             const SizedBox(height: 16),
             Text(
-              'Loading transactions...',
+              l10n.loadingTransactions,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -896,7 +902,7 @@ class _TransactionsTab extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Failed to load transactions',
+              l10n.failedToLoadTransactions,
               style: theme.textTheme.titleMedium?.copyWith(
                 color: theme.colorScheme.error,
               ),
@@ -920,7 +926,7 @@ class _TransactionsTab extends ConsumerWidget {
                 ));
               },
               style: AppTheme.neutralButtonStyle,
-              child: const Text('Retry'),
+              child: Text(l10n.retry),
             ),
           ],
         ),
@@ -929,6 +935,7 @@ class _TransactionsTab extends ConsumerWidget {
   }
 
   Widget _buildTransactionsContent(BuildContext context, List<Map<String, dynamic>> transactions) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     
     if (transactions.isEmpty) {
@@ -943,14 +950,14 @@ class _TransactionsTab extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'No transactions found',
+              l10n.noTransactionsFound,
               style: theme.textTheme.titleMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Try adjusting your filters or date range',
+              l10n.tryAdjustingFiltersOrDateRange,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -970,14 +977,14 @@ class _TransactionsTab extends ConsumerWidget {
               Icon(Icons.receipt_long, color: theme.colorScheme.primary),
               const SizedBox(width: 8),
               Text(
-                '${transactions.length} Transactions',
+                '${transactions.length} ${l10n.transactions}',
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const Spacer(),
               Text(
-                'Total: ${CurrencyFormatter.formatCRC(_calculateTotal(transactions))}',
+                '${l10n.total}: ${CurrencyFormatter.formatCRC(_calculateTotal(transactions))}',
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: theme.colorScheme.primary,
@@ -1566,6 +1573,7 @@ class _RevenueTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final revenueReportAsync = ref.watch(revenueReportProvider(startDate: startDate, endDate: endDate));
     final theme = Theme.of(context);
 
@@ -1578,7 +1586,7 @@ class _RevenueTab extends ConsumerWidget {
             CircularProgressIndicator(color: theme.colorScheme.primary),
             const SizedBox(height: 16),
             Text(
-              'Loading revenue data...',
+              l10n.loadingRevenueData,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -1597,7 +1605,7 @@ class _RevenueTab extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Failed to load revenue data',
+              l10n.failedToLoadRevenueData,
               style: theme.textTheme.titleMedium?.copyWith(
                 color: theme.colorScheme.error,
               ),
@@ -1616,7 +1624,7 @@ class _RevenueTab extends ConsumerWidget {
                 ref.invalidate(revenueReportProvider(startDate: startDate, endDate: endDate));
               },
               style: AppTheme.neutralButtonStyle,
-              child: const Text('Retry'),
+              child: Text(l10n.retry),
             ),
           ],
         ),
@@ -1625,6 +1633,7 @@ class _RevenueTab extends ConsumerWidget {
   }
 
   Widget _buildRevenueContent(BuildContext context, RevenueReport report) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     
     return SingleChildScrollView(
@@ -1637,9 +1646,9 @@ class _RevenueTab extends ConsumerWidget {
             children: [
               Expanded(
                 child: _EnhancedSummaryCard(
-                  title: 'Total Revenue',
+                  title: l10n.totalRevenue,
                   value: '${CurrencyFormatter.formatCRC(report.totalRevenue)}',
-                  subtitle: 'Gross income',
+                  subtitle: l10n.grossIncome,
                   icon: Icons.attach_money,
                   color: theme.colorScheme.primary,
                   trend: '+15.3%',
@@ -1649,9 +1658,9 @@ class _RevenueTab extends ConsumerWidget {
               const SizedBox(width: 16),
               Expanded(
                 child: _EnhancedSummaryCard(
-                  title: 'Gross Profit',
+                  title: l10n.grossProfit,
                   value: '${CurrencyFormatter.formatCRC(report.grossProfit)}',
-                  subtitle: 'After costs',
+                  subtitle: l10n.afterCosts,
                   icon: Icons.trending_up,
                   color: Colors.green,
                   trend: '+8.7%',
@@ -1665,9 +1674,9 @@ class _RevenueTab extends ConsumerWidget {
             children: [
               Expanded(
                 child: _EnhancedSummaryCard(
-                  title: 'Profit Margin',
+                  title: l10n.profitMargin,
                   value: '${report.profitMargin.toStringAsFixed(1)}%',
-                  subtitle: 'Profit ratio',
+                  subtitle: l10n.profitRatio,
                   icon: Icons.percent,
                   color: theme.colorScheme.secondary,
                   trend: '+2.1%',
@@ -1677,9 +1686,9 @@ class _RevenueTab extends ConsumerWidget {
               const SizedBox(width: 16),
               Expanded(
                 child: _EnhancedSummaryCard(
-                  title: 'Total Cost',
+                  title: l10n.totalCost,
                   value: '${CurrencyFormatter.formatCRC(report.totalCost)}',
-                  subtitle: 'Operating costs',
+                  subtitle: l10n.operatingCosts,
                   icon: Icons.account_balance_wallet,
                   color: theme.colorScheme.error,
                   trend: '+5.2%',
@@ -1707,7 +1716,7 @@ class _RevenueTab extends ConsumerWidget {
                       Icon(Icons.bar_chart, color: theme.colorScheme.primary),
                       const SizedBox(width: 8),
                       Text(
-                        'Revenue by Day',
+                        l10n.revenueByDay,
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -1737,14 +1746,14 @@ class _RevenueTab extends ConsumerWidget {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Revenue trend chart',
+                            l10n.revenueTrendChart,
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Coming soon with real data',
+                            l10n.comingSoonWithRealData,
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                             ),

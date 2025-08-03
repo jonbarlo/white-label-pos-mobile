@@ -661,6 +661,7 @@ class AppLocalizations {
   String get pleaseEnterAPrice => _locale.languageCode == 'en' ? 'Please enter a price' : 'Por favor ingresa un precio';
   String get pleaseEnterAValidPrice => _locale.languageCode == 'en' ? 'Please enter a valid price' : 'Por favor ingresa un precio válido';
   String get business => _locale.languageCode == 'en' ? 'Business' : 'Negocio';
+  String get na => _locale.languageCode == 'en' ? 'N/A' : 'N/A';
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {
