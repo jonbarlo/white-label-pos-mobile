@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'promotions_provider.dart';
 import 'models/promotion.dart';
 import '../../shared/widgets/theme_toggle_button.dart';
+import '../../core/localization/app_localizations.dart';
 
 class PromotionsScreen extends ConsumerWidget {
   const PromotionsScreen({super.key});
@@ -10,10 +11,11 @@ class PromotionsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final promotionsAsync = ref.watch(promotionsNotifierProvider);
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Promotions Management'),
+        title: Text(l10n.promotionsManagement),
         centerTitle: true,
         actions: [
           IconButton(
@@ -21,7 +23,7 @@ class PromotionsScreen extends ConsumerWidget {
             onPressed: () {
               ref.read(promotionsNotifierProvider.notifier).refreshPromotions();
             },
-            tooltip: 'Refresh',
+            tooltip: l10n.refresh,
           ),
           const ThemeToggleButton(),
         ],
@@ -40,7 +42,7 @@ class PromotionsScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                'Error loading promotions',
+                l10n.errorLoadingPromotions,
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 8),
@@ -54,7 +56,7 @@ class PromotionsScreen extends ConsumerWidget {
                 onPressed: () {
                   ref.read(promotionsNotifierProvider.notifier).refreshPromotions();
                 },
-                child: const Text('Retry'),
+                child: Text(l10n.retry),
               ),
             ],
           ),
@@ -70,6 +72,8 @@ class PromotionsScreen extends ConsumerWidget {
   }
 
   Widget _buildPromotionsList(BuildContext context, List<Promotion> promotions) {
+    final l10n = AppLocalizations.of(context);
+    
     if (promotions.isEmpty) {
       return Center(
         child: Column(
@@ -82,14 +86,14 @@ class PromotionsScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'No promotions yet',
+              l10n.noPromotionsYet,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 color: Colors.grey.shade600,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Create your first promotion to get started',
+              l10n.createYourFirstPromotionToGetStarted,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Colors.grey.shade500,
               ),
@@ -110,90 +114,45 @@ class PromotionsScreen extends ConsumerWidget {
   }
 
   Widget _buildPromotionCard(BuildContext context, Promotion promotion) {
-    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     
     return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: ListTile(
+        title: Text(promotion.name),
+        subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text(promotion.description),
+            const SizedBox(height: 4),
             Row(
               children: [
-                Expanded(
-                  child: Text(
-                    promotion.name,
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                _buildStatusChip(promotion.isActive ? PromotionStatus.active : PromotionStatus.inactive),
-              ],
-            ),
-            const SizedBox(height: 8),
-            if (promotion.description.isNotEmpty) ...[
-              Text(
-                promotion.description,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: Colors.grey.shade600,
-                ),
-              ),
-              const SizedBox(height: 8),
-            ],
-            Row(
-              children: [
-                _buildTypeChip(promotion.type),
+                _buildStatusChip(context, promotion.isActive ? PromotionStatus.active : PromotionStatus.inactive),
                 const SizedBox(width: 8),
-                _buildDiscountChip(promotion),
+                _buildTypeChip(context, promotion.type),
               ],
             ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Icon(Icons.calendar_today, size: 16, color: Colors.grey.shade600),
-                const SizedBox(width: 4),
-                Text(
-                  '${_formatDate(promotion.startDate)} - ${_formatDate(promotion.endDate)}',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: Colors.grey.shade600,
-                  ),
-                ),
-                const Spacer(),
-                if (promotion.maxUsesPerCustomer != null) ...[
-                  Icon(Icons.inventory, size: 16, color: Colors.grey.shade600),
-                  const SizedBox(width: 4),
-                  Text(
-                    '${promotion.usedQuantity}/${promotion.maxUsesPerCustomer} used',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                ],
-              ],
+          ],
+        ),
+        trailing: PopupMenuButton<String>(
+          onSelected: (value) {
+            switch (value) {
+              case 'edit':
+                _showEditPromotionDialog(context, promotion);
+                break;
+              case 'delete':
+                _showDeletePromotionDialog(context, promotion);
+                break;
+            }
+          },
+          itemBuilder: (context) => [
+            PopupMenuItem(
+              value: 'edit',
+              child: Text(l10n.edit),
             ),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () {
-                    _showEditPromotionDialog(context, promotion);
-                  },
-                  child: const Text('Edit'),
-                ),
-                const SizedBox(width: 8),
-                TextButton(
-                  onPressed: () {
-                    _showDeleteConfirmation(context, promotion);
-                  },
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.red,
-                  ),
-                  child: const Text('Delete'),
-                ),
-              ],
+            PopupMenuItem(
+              value: 'delete',
+              child: Text(l10n.delete),
             ),
           ],
         ),
@@ -201,29 +160,31 @@ class PromotionsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatusChip(PromotionStatus status) {
-    Color color;
-    String label;
+  Widget _buildStatusChip(BuildContext context, PromotionStatus status) {
+    final l10n = AppLocalizations.of(context);
     
+    String label;
+    Color color;
+
     switch (status) {
       case PromotionStatus.active:
+        label = l10n.active;
         color = Colors.green;
-        label = 'Active';
         break;
       case PromotionStatus.inactive:
+        label = l10n.inactive;
         color = Colors.grey;
-        label = 'Inactive';
         break;
       case PromotionStatus.scheduled:
+        label = l10n.scheduled;
         color = Colors.blue;
-        label = 'Scheduled';
         break;
       case PromotionStatus.expired:
+        label = l10n.expired;
         color = Colors.red;
-        label = 'Expired';
         break;
     }
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
@@ -242,29 +203,31 @@ class PromotionsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildTypeChip(PromotionType type) {
-    Color color;
-    String label;
+  Widget _buildTypeChip(BuildContext context, PromotionType type) {
+    final l10n = AppLocalizations.of(context);
     
+    String label;
+    Color color;
+
     switch (type) {
       case PromotionType.discount:
-        color = Colors.blue;
-        label = 'Discount';
+        label = l10n.discount;
+        color = Colors.orange;
         break;
       case PromotionType.chef_special:
-        color = Colors.orange;
-        label = 'Chef Special';
+        label = l10n.chefSpecial;
+        color = Colors.purple;
         break;
       case PromotionType.buyOneGetOne:
-        color = Colors.purple;
-        label = 'BOGO';
+        label = l10n.buyOneGetOne;
+        color = Colors.blue;
         break;
       case PromotionType.freeItem:
+        label = l10n.freeItem;
         color = Colors.green;
-        label = 'Free Item';
         break;
     }
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
@@ -281,49 +244,27 @@ class PromotionsScreen extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  Widget _buildDiscountChip(Promotion promotion) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.green.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.green.withOpacity(0.3)),
-      ),
-      child: Text(
-        promotion.discountDisplay,
-        style: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
-          color: Colors.green,
-        ),
-      ),
-    );
-  }
-
-  String _formatDate(DateTime date) {
-    return '${date.month}/${date.day}/${date.year}';
   }
 
   void _showCreatePromotionDialog(BuildContext context, WidgetRef ref) {
-    // TODO: Implement create promotion dialog
+    final l10n = AppLocalizations.of(context);
+    
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Create Promotion'),
-        content: const Text('Create promotion dialog will be implemented here.'),
+        title: Text(l10n.createPromotion),
+        content: const Text('Create promotion form will be implemented here'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () {
+              // Create promotion logic
               Navigator.of(context).pop();
-              // TODO: Implement create promotion
             },
-            child: const Text('Create'),
+            child: Text(l10n.create),
           ),
         ],
       ),
@@ -331,50 +272,50 @@ class PromotionsScreen extends ConsumerWidget {
   }
 
   void _showEditPromotionDialog(BuildContext context, Promotion promotion) {
-    // TODO: Implement edit promotion dialog
+    final l10n = AppLocalizations.of(context);
+    
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Edit Promotion'),
-        content: Text('Edit promotion dialog for: ${promotion.name}'),
+        title: Text(l10n.editPromotion),
+        content: const Text('Edit promotion form will be implemented here'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () {
+              // Save promotion logic
               Navigator.of(context).pop();
-              // TODO: Implement edit promotion
             },
-            child: const Text('Save'),
+            child: Text(l10n.save),
           ),
         ],
       ),
     );
   }
 
-  void _showDeleteConfirmation(BuildContext context, Promotion promotion) {
+  void _showDeletePromotionDialog(BuildContext context, Promotion promotion) {
+    final l10n = AppLocalizations.of(context);
+    
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Promotion'),
-        content: Text('Are you sure you want to delete "${promotion.name}"?'),
+        title: Text(l10n.deletePromotion),
+        content: Text('${l10n.areYouSureYouWantToDelete} "${promotion.name}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () {
+              // Delete promotion logic
               Navigator.of(context).pop();
-              // TODO: Implement delete promotion
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Delete'),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: Text(l10n.delete),
           ),
         ],
       ),

@@ -809,6 +809,16 @@ class AppLocalizations {
   String get unknownDate => _locale.languageCode == 'en' ? 'Unknown date' : 'Fecha desconocida';
   String get invalidDate => _locale.languageCode == 'en' ? 'Invalid date' : 'Fecha inválida';
   String get urgency => _locale.languageCode == 'en' ? 'Urgency' : 'Urgencia';
+  
+  // Promotions screen strings
+  String get promotionsManagement => _locale.languageCode == 'en' ? 'Promotions Management' : 'Gestión de Promociones';
+  String get errorLoadingPromotions => _locale.languageCode == 'en' ? 'Error loading promotions' : 'Error al cargar promociones';
+  String get noPromotionsYet => _locale.languageCode == 'en' ? 'No promotions yet' : 'Aún no hay promociones';
+  String get createYourFirstPromotionToGetStarted => _locale.languageCode == 'en' ? 'Create your first promotion to get started' : 'Crea tu primera promoción para comenzar';
+  String get scheduled => _locale.languageCode == 'en' ? 'Scheduled' : 'Programado';
+  String get expired => _locale.languageCode == 'en' ? 'Expired' : 'Expirado';
+  String get deletePromotion => _locale.languageCode == 'en' ? 'Delete Promotion' : 'Eliminar Promoción';
+  String get discount => _locale.languageCode == 'en' ? 'Discount' : 'Descuento';
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {
