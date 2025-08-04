@@ -112,7 +112,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
     final isWideScreen = MediaQuery.of(context).size.width > 800;
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final currentLanguage = ref.watch(languageNotifierProvider);
 
     // Show error dialog when login fails
@@ -316,7 +316,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Widget _buildMobileLayout(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.login),
@@ -332,7 +332,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget _buildLoginForm(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
     final businessSlug = _businessSlugController.text.trim();
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     debugPrint('🔵 LoginScreen: _buildLoginForm - businessSlug: "$businessSlug"');
     final businessAsync = businessSlug.isNotEmpty 
         ? ref.watch(businessBySlugProvider(businessSlug))
@@ -589,7 +589,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Widget _buildLoadingLogo(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         Container(
@@ -616,7 +616,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Widget _buildDefaultLogo(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         Container(

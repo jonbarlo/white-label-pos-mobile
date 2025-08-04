@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:white_label_pos_mobile/src/core/localization/app_localizations.dart';
+import '../../core/localization/app_localizations.dart';
 import 'package:white_label_pos_mobile/src/features/currency/currency_provider.dart';
 import 'package:white_label_pos_mobile/src/features/currency/models/currency.dart';
 import 'package:white_label_pos_mobile/src/shared/widgets/app_image.dart';
@@ -32,7 +32,7 @@ class _CurrencyPreferenceScreenState extends ConsumerState<CurrencyPreferenceScr
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final currenciesAsync = ref.watch(currencyNotifierProvider);
 
     return Scaffold(
@@ -57,7 +57,7 @@ class _CurrencyPreferenceScreenState extends ConsumerState<CurrencyPreferenceScr
   }
 
   Widget _buildCurrencySelection(BuildContext context, List<Currency> currencies) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -227,7 +227,7 @@ class _CurrencyPreferenceScreenState extends ConsumerState<CurrencyPreferenceScr
   }
 
   Future<void> _saveCurrencyPreference(BuildContext context) async {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     if (selectedCurrency == null) return;
 
@@ -278,7 +278,7 @@ class _CurrencyPreferenceScreenState extends ConsumerState<CurrencyPreferenceScr
   }
 
   Widget _buildErrorWidget(BuildContext context, String message) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return Center(
       child: Column(

@@ -90,7 +90,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     
     // Use Riverpod provider for merged table orders
@@ -353,7 +353,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
   }
 
   Widget _buildCustomerDetails() {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     print('🔍 DEBUG: _buildCustomerDetails called');
     print('🔍 DEBUG: _customerNameController.text: "${_customerNameController.text}"');
     print('🔍 DEBUG: _customerNotesController.text: "${_customerNotesController.text}"');
@@ -404,7 +404,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
   }
 
   Widget _buildMenuItems() {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     // Try to use waiter menu items first, fallback to POS search
     final waiterMenuItemsAsync = ref.watch(waiter_order.menuItemsProvider(null));
     
@@ -504,7 +504,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
   }
 
   Widget _buildMenuItemCard(Map<String, dynamic> item) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final name = item['name'] ?? '';
     final description = item['description'] ?? '';
     final price = (item['price'] ?? 0.0).toDouble();
@@ -600,7 +600,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
   }
 
   Widget _buildMenuItemCardFromPos(MenuItem item) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
@@ -717,7 +717,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
   }
 
   Widget _buildCart() {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       decoration: BoxDecoration(
         border: Border(
@@ -935,7 +935,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
   }
 
   Widget _buildBottomActions() {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -1130,7 +1130,7 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
   }
 
   void _submitOrder() async {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     if (_cartItems.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.pleaseAddItemsToOrder)),
@@ -1277,3 +1277,4 @@ class _OrderTakingScreenState extends ConsumerState<OrderTakingScreen> {
     }
   }
 } 
+

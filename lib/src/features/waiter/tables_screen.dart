@@ -4,6 +4,7 @@ import '../../shared/widgets/bottom_navigation.dart';
 import 'models/table.dart' as waiter_table;
 import '../floor_plan/floor_plan_provider.dart' as fp;
 import '../floor_plan/models/floor_plan.dart';
+import '../../core/localization/app_localizations.dart';
 
 class TablesScreen extends ConsumerWidget {
   const TablesScreen({super.key});
@@ -14,7 +15,7 @@ class TablesScreen extends ConsumerWidget {
     
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tables Management'),
+        title: Text(AppLocalizations.of(context)!.tablesManagement),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -31,7 +32,7 @@ class TablesScreen extends ConsumerWidget {
       body: floorPlanState.when(
         data: (result) {
           if (!result.isSuccess) {
-            return _buildErrorState(result.errorMessage ?? 'Failed to load tables');
+            return _buildErrorState(context, result.errorMessage ?? 'Failed to load tables');
           }
           final floorPlans = result.data;
           return Column(
@@ -47,7 +48,7 @@ class TablesScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => _buildErrorState(error.toString()),
+        error: (error, stack) => _buildErrorState(context, error.toString()),
       ),
       bottomNavigationBar: const BottomNavigation(),
     );
@@ -202,7 +203,7 @@ class TablesScreen extends ConsumerWidget {
     }
   }
 
-  Widget _buildErrorState(String error) {
+  Widget _buildErrorState(BuildContext context, String error) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -220,7 +221,7 @@ class TablesScreen extends ConsumerWidget {
             onPressed: () {
               // Refresh data
             },
-            child: const Text('Retry'),
+            child: Text(AppLocalizations.of(context)!.retry),
           ),
         ],
       ),

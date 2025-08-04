@@ -18,7 +18,7 @@ void main() {
   setUp(() {
     mockPosRepository = MockPosRepository();
     RiverpodTestHelper.setUpContainer([
-      posRepositoryProvider.overrideWithValue(mockPosRepository),
+      posRepositoryProvider.overrideWith((ref) => mockPosRepository),
     ]);
   });
 

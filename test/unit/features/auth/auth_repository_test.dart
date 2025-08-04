@@ -35,7 +35,7 @@ void main() {
           name: 'Test Business',
           slug: 'test-business',
           taxRate: 0.08,
-          currency: 'USD',
+          currencyId: 2, // CRC (Costa Rican Colón)
           timezone: 'UTC',
         );
         

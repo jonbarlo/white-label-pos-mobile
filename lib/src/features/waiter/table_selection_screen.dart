@@ -43,7 +43,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final tablesAsync = ref.watch(waiter.tablesProvider);
     final tableStatsAsync = ref.watch(waiter.tableStatsProvider);
 
@@ -160,7 +160,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
   }
 
   Widget _buildSearchBar() {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return Container(
       padding: const EdgeInsets.all(16),
@@ -204,7 +204,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
   }
 
   Widget _buildStatusTabs(AsyncValue<Map<String, int>> statsAsync) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return Container(
       color: Theme.of(context).colorScheme.primary,
@@ -261,7 +261,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
   }
 
   Widget _buildTablesGrid(AsyncValue<List<waiter_table.Table>> tablesAsync, waiter_table.TableStatus? filterStatus) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return tablesAsync.when(
       data: (tables) {
@@ -336,7 +336,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
   }
 
   Widget _buildEmptyState(waiter_table.TableStatus? filterStatus) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     String message;
     IconData icon;
@@ -397,7 +397,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
   }
 
   Widget _buildTableCard(waiter_table.Table table) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final statusColor = _getStatusColor(table.status);
     final canTakeOrder = table.status.canTakeOrder;
@@ -515,6 +515,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
   }
 
   void _onTableSelected(waiter_table.Table table) async {
+    final l10n = AppLocalizations.of(context)!;
     print('🔍 DEBUG: _onTableSelected called for table ${table.name} (ID: ${table.id})');
     print('🔍 DEBUG: Table status: ${table.status}');
     print('🔍 DEBUG: Table customerName: "${table.customerName}"');
@@ -605,7 +606,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
   }
 
   void _showTableDetails(waiter_table.Table table) async {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     // Fetch order details if there is a current order
     Map<String, dynamic>? orderDetails;
@@ -655,7 +656,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
   }
 
   void _showReserveTableDialog(waiter_table.Table table) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     showDialog(
       context: context,
@@ -735,7 +736,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
   }
 
   void _showSeatCustomerDialog(waiter_table.Table table) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     showDialog(
       context: context,
@@ -809,7 +810,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
   }
 
   void _clearTable(waiter_table.Table table) async {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     try {
       final container = ProviderScope.containerOf(context, listen: false);
@@ -858,7 +859,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
   }
 
   void _showCheckInDialog(waiter_table.Table table) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     showDialog(
       context: context,
@@ -951,7 +952,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
   }
 
   String _getActionText(waiter_table.Table table) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     switch (table.status) {
       case waiter_table.TableStatus.available:
@@ -968,7 +969,7 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
   }
 
   Widget _buildActionButtons(waiter_table.Table table, Color statusColor) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     switch (table.status) {
       case waiter_table.TableStatus.available:
@@ -1085,3 +1086,4 @@ class _TableSelectionScreenState extends ConsumerState<TableSelectionScreen>
     }
   }
 } 
+

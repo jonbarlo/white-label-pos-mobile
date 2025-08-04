@@ -41,6 +41,10 @@ class _FakeResult_0<T> extends _i1.SmartFake implements _i2.Result<T> {
 /// See the documentation for Mockito's code generation for more information.
 class MockLanguageRepository extends _i1.Mock
     implements _i3.LanguageRepository {
+  MockLanguageRepository() {
+    _i1.throwOnMissingStub(this);
+  }
+
   @override
   _i4.Future<_i2.Result<_i5.LanguageResponse>> getLanguage() =>
       (super.noSuchMethod(
@@ -50,15 +54,6 @@ class MockLanguageRepository extends _i1.Mock
         ),
         returnValue: _i4.Future<_i2.Result<_i5.LanguageResponse>>.value(
             _FakeResult_0<_i5.LanguageResponse>(
-          this,
-          Invocation.method(
-            #getLanguage,
-            [],
-          ),
-        )),
-        returnValueForMissingStub:
-            _i4.Future<_i2.Result<_i5.LanguageResponse>>.value(
-                _FakeResult_0<_i5.LanguageResponse>(
           this,
           Invocation.method(
             #getLanguage,
@@ -75,14 +70,6 @@ class MockLanguageRepository extends _i1.Mock
           [languageCode],
         ),
         returnValue: _i4.Future<_i2.Result<void>>.value(_FakeResult_0<void>(
-          this,
-          Invocation.method(
-            #updateLanguage,
-            [languageCode],
-          ),
-        )),
-        returnValueForMissingStub:
-            _i4.Future<_i2.Result<void>>.value(_FakeResult_0<void>(
           this,
           Invocation.method(
             #updateLanguage,

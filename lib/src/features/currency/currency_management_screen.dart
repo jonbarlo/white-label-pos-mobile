@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:white_label_pos_mobile/src/core/localization/app_localizations.dart';
+import '../../core/localization/app_localizations.dart';
 import 'package:white_label_pos_mobile/src/features/currency/currency_provider.dart';
 import 'package:white_label_pos_mobile/src/features/currency/models/currency.dart';
 
@@ -9,7 +9,7 @@ class CurrencyManagementScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final currenciesAsync = ref.watch(currencyNotifierProvider);
 
     return Scaffold(
@@ -50,7 +50,7 @@ class CurrencyManagementScreen extends ConsumerWidget {
   }
 
   Widget _buildCurrencyCard(BuildContext context, Currency currency, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     
     return Card(
@@ -106,7 +106,7 @@ class CurrencyManagementScreen extends ConsumerWidget {
   }
 
   Widget _buildExchangeRatesList(BuildContext context, Currency currency, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return FutureBuilder(
       future: ref.read(currencyNotifierProvider.notifier).getExchangeRates(currency.id),
@@ -169,7 +169,7 @@ class CurrencyManagementScreen extends ConsumerWidget {
   }
 
   Widget _buildErrorWidget(BuildContext context, String message) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return Center(
       child: Column(

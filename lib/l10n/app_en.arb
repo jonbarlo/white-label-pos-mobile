@@ -1,0 +1,4999 @@
+{
+  "@@locale": "en",
+  "appTitle": "Mobile POS",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  "login": "Login",
+  "@login": {
+    "description": "Login button text"
+  },
+  "loginFailed": "Login Failed",
+  "@loginFailed": {
+    "description": "Login failed error message"
+  },
+  "loginError": "Login Error",
+  "@loginError": {
+    "description": "Login error message"
+  },
+  "welcomeBack": "Welcome Back :)",
+  "@welcomeBack": {
+    "description": "Welcome back message"
+  },
+  "loginSubtitle": "To keep connected with us please login with your personal information",
+  "@loginSubtitle": {
+    "description": "Login subtitle message"
+  },
+  "enterBusinessSlug": "Enter your business slug",
+  "@enterBusinessSlug": {
+    "description": "Business slug hint text"
+  },
+  "enterEmail": "Enter your email",
+  "@enterEmail": {
+    "description": "Email hint text"
+  },
+  "enterPassword": "Enter your password",
+  "@enterPassword": {
+    "description": "Password hint text"
+  },
+  "quickLogin": "Quick Login (Test User)",
+  "@quickLogin": {
+    "description": "Quick login dropdown label"
+  },
+  "loginNow": "Login Now",
+  "@loginNow": {
+    "description": "Login button text"
+  },
+  "email": "Email",
+  "@email": {
+    "description": "Email field label"
+  },
+  "password": "Password",
+  "@password": {
+    "description": "Password field label"
+  },
+  "businessSlug": "Business Slug",
+  "@businessSlug": {
+    "description": "Business slug field label"
+  },
+  "dashboard": "Dashboard",
+  "@dashboard": {
+    "description": "Dashboard screen title"
+  },
+  "settings": "Settings",
+  "@settings": {
+    "description": "Settings screen title"
+  },
+  "logout": "Logout",
+  "@logout": {
+    "description": "Logout button text"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button text"
+  },
+  "confirm": "Confirm",
+  "@confirm": {
+    "description": "Confirm button text"
+  },
+  "save": "Save",
+  "@save": {
+    "description": "Save button text"
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Delete button text"
+  },
+  "back": "Back",
+  "@back": {
+    "description": "Back button"
+  },
+  "next": "Next",
+  "@next": {
+    "description": "Next button"
+  },
+  "previous": "Previous",
+  "@previous": {
+    "description": "Previous button"
+  },
+  "search": "Search",
+  "@search": {
+    "description": "Search field placeholder"
+  },
+  "filter": "Filter",
+  "@filter": {
+    "description": "Filter button"
+  },
+  "sort": "Sort",
+  "@sort": {
+    "description": "Sort button"
+  },
+  "refresh": "Refresh",
+  "@refresh": {
+    "description": "Refresh button"
+  },
+  "loading": "Loading...",
+  "@loading": {
+    "description": "Loading message"
+  },
+  "error": "Error",
+  "@error": {
+    "description": "Error message"
+  },
+  "success": "Success",
+  "@success": {
+    "description": "Success message"
+  },
+  "warning": "Warning",
+  "@warning": {
+    "description": "Warning message"
+  },
+  "info": "Information",
+  "@info": {
+    "description": "Info message"
+  },
+  "yes": "Yes",
+  "@yes": {
+    "description": "Yes button"
+  },
+  "no": "No",
+  "@no": {
+    "description": "No button"
+  },
+  "ok": "OK",
+  "@ok": {
+    "description": "OK button"
+  },
+  "close": "Close",
+  "@close": {
+    "description": "Close button"
+  },
+  "open": "Open",
+  "@open": {
+    "description": "Open button"
+  },
+  "edit": "Edit",
+  "@edit": {
+    "description": "Edit button text"
+  },
+  "add": "Add",
+  "@add": {
+    "description": "Add button text"
+  },
+  "remove": "Remove",
+  "@remove": {
+    "description": "Remove button"
+  },
+  "select": "Select",
+  "@select": {
+    "description": "Select button"
+  },
+  "deselect": "Deselect",
+  "@deselect": {
+    "description": "Deselect button"
+  },
+  "clear": "Clear",
+  "@clear": {
+    "description": "Clear button"
+  },
+  "reset": "Reset",
+  "@reset": {
+    "description": "Reset button"
+  },
+  "apply": "Apply",
+  "@apply": {
+    "description": "Apply button"
+  },
+  "submit": "Submit",
+  "@submit": {
+    "description": "Submit button"
+  },
+  "continueAction": "Continue",
+  "@continueAction": {
+    "description": "Continue button"
+  },
+  "finish": "Finish",
+  "@finish": {
+    "description": "Finish button"
+  },
+  "start": "Start",
+  "@start": {
+    "description": "Start button"
+  },
+  "stop": "Stop",
+  "@stop": {
+    "description": "Stop button"
+  },
+  "pause": "Pause",
+  "@pause": {
+    "description": "Pause button"
+  },
+  "resume": "Resume",
+  "@resume": {
+    "description": "Resume button"
+  },
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry button"
+  },
+  "pointOfSaleSystem": "Point of Sale System",
+  "@pointOfSaleSystem": {
+    "description": "Point of sale system subtitle"
+  },
+  "inventoryAlerts": "Inventory Alerts",
+  "@inventoryAlerts": {
+    "description": "Inventory alerts screen title"
+  },
+  "allAlerts": "All Alerts",
+  "@allAlerts": {
+    "description": "All alerts tab"
+  },
+  "expiringItems": "Expiring Items",
+  "@expiringItems": {
+    "description": "Expiring items tab"
+  },
+  "underperforming": "Underperforming",
+  "@underperforming": {
+    "description": "Underperforming items tab"
+  },
+  "errorCreatingPromotion": "Error creating promotion",
+  "@errorCreatingPromotion": {
+    "description": "Error message when creating promotion fails"
+  },
+  "promotionConfiguration": "Promotion Configuration",
+  "@promotionConfiguration": {
+    "description": "Promotion configuration section title"
+  },
+  "percentageDiscount": "Percentage Discount",
+  "@percentageDiscount": {
+    "description": "Percentage discount option"
+  },
+  "fixedAmountOff": "Fixed Amount Off",
+  "@fixedAmountOff": {
+    "description": "Fixed amount discount option"
+  },
+  "buyOneGetOne": "Buy One Get One",
+  "@buyOneGetOne": {
+    "description": "Buy one get one promotion option"
+  },
+  "quickActions": "Quick Actions",
+  "@quickActions": {
+    "description": "Quick actions dialog title"
+  },
+  "cookRecipe": "Cook Recipe",
+  "@cookRecipe": {
+    "description": "Cook recipe action"
+  },
+  "useExpiringItemsToCreateDishes": "Use expiring items to create dishes",
+  "@useExpiringItemsToCreateDishes": {
+    "description": "Description for cook recipe action"
+  },
+  "createPromotion": "Create Promotion",
+  "@createPromotion": {
+    "description": "Create promotion action"
+  },
+  "createSpecialOffersForItems": "Create special offers for items",
+  "@createSpecialOffersForItems": {
+    "description": "Description for create promotion action"
+  },
+  "viewAnalytics": "View Analytics",
+  "@viewAnalytics": {
+    "description": "View analytics action"
+  },
+  "checkCookingHistoryAndMetrics": "Check cooking history and metrics",
+  "@checkCookingHistoryAndMetrics": {
+    "description": "Description for view analytics action"
+  },
+  "cookingHistory": "Cooking History",
+  "@cookingHistory": {
+    "description": "Cooking history action"
+  },
+  "viewRecentCookingActivities": "View recent cooking activities",
+  "@viewRecentCookingActivities": {
+    "description": "Description for cooking history action"
+  },
+  "selectARecipeToCookUsingExpiringItems": "Select a recipe to cook using expiring items",
+  "@selectARecipeToCookUsingExpiringItems": {
+    "description": "Dialog text for recipe selection"
+  },
+  "thisFeatureWill": "This feature will:",
+  "@thisFeatureWill": {
+    "description": "Feature description prefix"
+  },
+  "automaticallySelectRecipesUsingExpiringItems": "Automatically select recipes using expiring items",
+  "@automaticallySelectRecipesUsingExpiringItems": {
+    "description": "Feature benefit description"
+  },
+  "consumeInventoryAndReduceWaste": "Consume inventory and reduce waste",
+  "@consumeInventoryAndReduceWaste": {
+    "description": "Feature benefit description"
+  },
+  "createCustomizablePromotions": "Create customizable promotions",
+  "@createCustomizablePromotions": {
+    "description": "Feature benefit description"
+  },
+  "quantityToCook": "Quantity to Cook",
+  "@quantityToCook": {
+    "description": "Quantity field label"
+  },
+  "thisWillCreateAPromotionWithTheSameQuantity": "This will create a promotion with the same quantity",
+  "@thisWillCreateAPromotionWithTheSameQuantity": {
+    "description": "Helper text for quantity field"
+  },
+  "promotionName": "Promotion Name",
+  "@promotionName": {
+    "description": "Promotion name field label"
+  },
+  "eG": "e.g.",
+  "@eG": {
+    "description": "Example abbreviation"
+  },
+  "chefSpecial": "Chef Special",
+  "@chefSpecial": {
+    "description": "Chef special promotion type"
+  },
+  "trufflePizza": "Truffle Pizza",
+  "@trufflePizza": {
+    "description": "Example dish name"
+  },
+  "promotionDescription": "Promotion Description",
+  "@promotionDescription": {
+    "description": "Promotion description field label"
+  },
+  "descriptionOfThePromotion": "Description of the promotion",
+  "@descriptionOfThePromotion": {
+    "description": "Promotion description hint"
+  },
+  "promotionType": "Promotion Type",
+  "@promotionType": {
+    "description": "Promotion type field label"
+  },
+  "discount": "Discount",
+  "@discount": {
+    "description": "Discount promotion type"
+  },
+  "flashSale": "Flash Sale",
+  "@flashSale": {
+    "description": "Flash sale promotion type"
+  },
+  "discountType": "Discount Type",
+  "@discountType": {
+    "description": "Discount type field label"
+  },
+  "freeItem": "Free Item",
+  "@freeItem": {
+    "description": "Free item discount type"
+  },
+  "discountPercentage": "Discount Percentage",
+  "@discountPercentage": {
+    "description": "Discount percentage field label"
+  },
+  "discountAmount": "Discount Amount",
+  "@discountAmount": {
+    "description": "Discount amount field label"
+  },
+  "promotionExpiresInHours": "Promotion Expires In (Hours)",
+  "@promotionExpiresInHours": {
+    "description": "Promotion expiration field label"
+  },
+  "pleaseEnterAPromotionName": "Please enter a promotion name",
+  "@pleaseEnterAPromotionName": {
+    "description": "Validation error for promotion name"
+  },
+  "pleaseEnterAValidDiscountValue": "Please enter a valid discount value",
+  "@pleaseEnterAValidDiscountValue": {
+    "description": "Validation error for discount value"
+  },
+  "successfullyCreatedPromotion": "Successfully created promotion",
+  "@successfullyCreatedPromotion": {
+    "description": "Success message for promotion creation"
+  },
+  "percentage": "Percentage",
+  "@percentage": {
+    "description": "Percentage field label"
+  },
+  "amount": "Amount",
+  "@amount": {
+    "description": "Amount field label"
+  },
+  "promotionCreatedFromInventoryAlert": "Promotion created from inventory alert",
+  "@promotionCreatedFromInventoryAlert": {
+    "description": "Description for promotion created from inventory alert"
+  },
+  "analytics": "Analytics",
+  "@analytics": {
+    "description": "Analytics screen title"
+  },
+  "features": "Features",
+  "@features": {
+    "description": "Features screen title"
+  },
+  "salesOverview": "Sales Overview",
+  "@salesOverview": {
+    "description": "Sales overview section"
+  },
+  "todaysSales": "Today's Sales",
+  "@todaysSales": {
+    "description": "Today's sales section"
+  },
+  "transactions": "Transactions",
+  "@transactions": {
+    "description": "Transactions section"
+  },
+  "avgOrder": "Avg Order",
+  "@avgOrder": {
+    "description": "Average order section"
+  },
+  "newFeaturesAvailable": "New Features Available",
+  "@newFeaturesAvailable": {
+    "description": "New features available section"
+  },
+  "exploreFeaturesDescription": "Explore our new Recipe & Promotion System with mobile notifications.",
+  "@exploreFeaturesDescription": {
+    "description": "Description for exploring features"
+  },
+  "exploreFeatures": "Explore Features",
+  "@exploreFeatures": {
+    "description": "Explore features button"
+  },
+  "recentActivity": "Recent Activity",
+  "@recentActivity": {
+    "description": "Recent activity section"
+  },
+  "languageSettings": "Language Settings",
+  "@languageSettings": {
+    "description": "Language settings screen title"
+  },
+  "languageStatus": "Language Status",
+  "@languageStatus": {
+    "description": "Language status section"
+  },
+  "currentLanguage": "Current Language",
+  "@currentLanguage": {
+    "description": "Current language field"
+  },
+  "nativeName": "Native Name",
+  "@nativeName": {
+    "description": "Native name field"
+  },
+  "selectLanguage": "Select Language",
+  "@selectLanguage": {
+    "description": "Select language field"
+  },
+  "languageChangesSaved": "Language changes saved",
+  "@languageChangesSaved": {
+    "description": "Language changes saved message"
+  },
+  "languageInfo": "Mobile POS supports Spanish and English. Default language is Spanish (Costa Rica).",
+  "@languageInfo": {
+    "description": "Language information text"
+  },
+  "languageChangesApplied": "Language changes will be saved and applied immediately.",
+  "@languageChangesApplied": {
+    "description": "Language changes applied message"
+  },
+  "profile": "Profile",
+  "@profile": {
+    "description": "Profile screen title"
+  },
+  "confirmLogout": "Confirm Logout",
+  "@confirmLogout": {
+    "description": "Confirm logout dialog title"
+  },
+  "logoutConfirmation": "Are you sure you want to logout?",
+  "@logoutConfirmation": {
+    "description": "Logout confirmation message"
+  },
+  "saving": "Saving...",
+  "@saving": {
+    "description": "Saving message"
+  },
+  "loadingProfile": "Loading profile...",
+  "@loadingProfile": {
+    "description": "Loading profile message"
+  },
+  "profileUpdatedSuccessfully": "Profile updated successfully!",
+  "@profileUpdatedSuccessfully": {
+    "description": "Profile updated success message"
+  },
+  "failedToLoadProfile": "Failed to load profile",
+  "@failedToLoadProfile": {
+    "description": "Failed to load profile message"
+  },
+  "pleaseLoginToViewProfile": "Please log in to view your profile",
+  "@pleaseLoginToViewProfile": {
+    "description": "Please login to view profile message"
+  },
+  "initializing": "Initializing...",
+  "@initializing": {
+    "description": "Initializing message"
+  },
+  "userDataNotAvailable": "User data not available",
+  "@userDataNotAvailable": {
+    "description": "User data not available message"
+  },
+  "personalInformation": "Personal Information",
+  "@personalInformation": {
+    "description": "Personal information section"
+  },
+  "workInformation": "Work Information",
+  "@workInformation": {
+    "description": "Work information section"
+  },
+  "accountSettings": "Account Settings",
+  "@accountSettings": {
+    "description": "Account settings section"
+  },
+  "supportAndHelp": "Support & Help",
+  "@supportAndHelp": {
+    "description": "Support and help section"
+  },
+  "editProfile": "Edit Profile",
+  "@editProfile": {
+    "description": "Edit profile button"
+  },
+  "changePhoto": "Change Photo",
+  "@changePhoto": {
+    "description": "Change photo button"
+  },
+  "photoUploadComingSoon": "Photo upload coming soon!",
+  "@photoUploadComingSoon": {
+    "description": "Photo upload coming soon message"
+  },
+  "fullName": "Full Name",
+  "@fullName": {
+    "description": "Full name field"
+  },
+  "enterYourName": "Enter your name",
+  "@enterYourName": {
+    "description": "Enter your name hint"
+  },
+  "phoneNumber": "Phone Number",
+  "@phoneNumber": {
+    "description": "Phone number field"
+  },
+  "saveChanges": "Save Changes",
+  "@saveChanges": {
+    "description": "Save changes button"
+  },
+  "name": "Name",
+  "@name": {
+    "description": "Name field"
+  },
+  "phone": "Phone",
+  "@phone": {
+    "description": "Phone field"
+  },
+  "role": "Role",
+  "@role": {
+    "description": "Role field"
+  },
+  "employeeId": "Employee ID",
+  "@employeeId": {
+    "description": "Employee ID field"
+  },
+  "department": "Department",
+  "@department": {
+    "description": "Department field"
+  },
+  "hireDate": "Hire Date",
+  "@hireDate": {
+    "description": "Hire date field"
+  },
+  "status": "Status",
+  "@status": {
+    "description": "Status field"
+  },
+  "quickStats": "Quick Stats",
+  "@quickStats": {
+    "description": "Quick stats section"
+  },
+  "orders": "Orders",
+  "@orders": {
+    "description": "Orders section"
+  },
+  "thisMonth": "This Month",
+  "@thisMonth": {
+    "description": "This month section"
+  },
+  "tables": "Tables",
+  "@tables": {
+    "description": "Tables section"
+  },
+  "thisWeek": "This Week",
+  "@thisWeek": {
+    "description": "This week section"
+  },
+  "tips": "Tips",
+  "@tips": {
+    "description": "Tips section"
+  },
+  "changePassword": "Change Password",
+  "@changePassword": {
+    "description": "Change password button"
+  },
+  "passwordChangeComingSoon": "Password change coming soon!",
+  "@passwordChangeComingSoon": {
+    "description": "Password change coming soon message"
+  },
+  "notificationSettings": "Notification Settings",
+  "@notificationSettings": {
+    "description": "Notification settings section"
+  },
+  "notificationSettingsComingSoon": "Notification settings coming soon!",
+  "@notificationSettingsComingSoon": {
+    "description": "Notification settings coming soon message"
+  },
+  "themeSettings": "Theme Settings",
+  "@themeSettings": {
+    "description": "Theme settings section"
+  },
+  "themeSettingsComingSoon": "Theme settings coming soon!",
+  "@themeSettingsComingSoon": {
+    "description": "Theme settings coming soon message"
+  },
+  "privacyAndSecurity": "Privacy & Security",
+  "@privacyAndSecurity": {
+    "description": "Privacy and security section"
+  },
+  "privacySettingsComingSoon": "Privacy settings coming soon!",
+  "@privacySettingsComingSoon": {
+    "description": "Privacy settings coming soon message"
+  },
+  "helpCenter": "Help Center",
+  "@helpCenter": {
+    "description": "Help center section"
+  },
+  "helpCenterComingSoon": "Help center coming soon!",
+  "@helpCenterComingSoon": {
+    "description": "Help center coming soon message"
+  },
+  "contactSupport": "Contact Support",
+  "@contactSupport": {
+    "description": "Contact support section"
+  },
+  "contactSupportComingSoon": "Contact support coming soon!",
+  "@contactSupportComingSoon": {
+    "description": "Contact support coming soon message"
+  },
+  "trainingMaterials": "Training Materials",
+  "@trainingMaterials": {
+    "description": "Training materials section"
+  },
+  "trainingMaterialsComingSoon": "Training materials coming soon!",
+  "@trainingMaterialsComingSoon": {
+    "description": "Training materials coming soon message"
+  },
+  "clearAllData": "Clear All Data",
+  "@clearAllData": {
+    "description": "Clear all data button"
+  },
+  "clearDataConfirmation": "This will clear all stored data and log you out. This action cannot be undone.",
+  "@clearDataConfirmation": {
+    "description": "Clear data confirmation message"
+  },
+  "clearStoredDataDebug": "Clear Stored Data (Debug)",
+  "@clearStoredDataDebug": {
+    "description": "Clear stored data debug button"
+  },
+  "floorPlan": "Floor Plan",
+  "@floorPlan": {
+    "description": "Floor plan screen title"
+  },
+  "messages": "Messages",
+  "@messages": {
+    "description": "Messages screen title"
+  },
+  "businessManagement": "Business Management",
+  "@businessManagement": {
+    "description": "Business management screen title"
+  },
+  "addBusiness": "Add Business",
+  "@addBusiness": {
+    "description": "Add business button"
+  },
+  "errorLoadingBusinesses": "Error loading businesses",
+  "@errorLoadingBusinesses": {
+    "description": "Error message when loading businesses fails"
+  },
+  "noBusinessesFound": "No businesses found",
+  "@noBusinessesFound": {
+    "description": "Message when no businesses are found"
+  },
+  "addFirstBusinessToGetStarted": "Add your first business to get started",
+  "@addFirstBusinessToGetStarted": {
+    "description": "Message to add first business"
+  },
+  "active": "Active",
+  "@active": {
+    "description": "Active status"
+  },
+  "inactive": "Inactive",
+  "@inactive": {
+    "description": "Inactive status"
+  },
+  "edit": "Edit",
+  "@edit": {
+    "description": "Edit button text"
+  },
+  "deleteBusiness": "Delete Business",
+  "@deleteBusiness": {
+    "description": "Delete business button"
+  },
+  "deleteBusinessConfirmation": "Are you sure you want to delete",
+  "@deleteBusinessConfirmation": {
+    "description": "Delete business confirmation message"
+  },
+  "thisActionCannotBeUndone": "This action cannot be undone.",
+  "@thisActionCannotBeUndone": {
+    "description": "Warning that action cannot be undone"
+  },
+  "floorPlanManagement": "Floor Plan Management",
+  "@floorPlanManagement": {
+    "description": "Floor plan management screen title"
+  },
+  "refresh": "Refresh",
+  "@refresh": {
+    "description": "Refresh button"
+  },
+  "overview": "Overview",
+  "@overview": {
+    "description": "Overview section"
+  },
+  "floorPlans": "Floor Plans",
+  "@floorPlans": {
+    "description": "Floor plans section"
+  },
+  "tableStatusOverview": "Table Status Overview",
+  "@tableStatusOverview": {
+    "description": "Table status overview section"
+  },
+  "realTimeRestaurantMetrics": "Real-time restaurant floor plan metrics",
+  "@realTimeRestaurantMetrics": {
+    "description": "Real-time restaurant metrics description"
+  },
+  "totalTables": "Total Tables",
+  "@totalTables": {
+    "description": "Total tables count"
+  },
+  "available": "Available",
+  "@available": {
+    "description": "Available status"
+  },
+  "occupied": "Occupied",
+  "@occupied": {
+    "description": "Occupied status"
+  },
+  "reserved": "Reserved",
+  "@reserved": {
+    "description": "Reserved status"
+  },
+  "cleaning": "Cleaning",
+  "@cleaning": {
+    "description": "Cleaning status"
+  },
+  "cart": "Cart",
+  "@cart": {
+    "description": "Cart section"
+  },
+  "cartIsEmpty": "Cart is empty",
+  "@cartIsEmpty": {
+    "description": "Cart empty message"
+  },
+  "itemNotFoundForBarcode": "Item not found for this barcode",
+  "@itemNotFoundForBarcode": {
+    "description": "Item not found for barcode message"
+  },
+  "promotion": "Promotion",
+  "@promotion": {
+    "description": "Promotion section"
+  },
+  "cashier": "Cashier",
+  "@cashier": {
+    "description": "Cashier section"
+  },
+  "menu": "Menu",
+  "@menu": {
+    "description": "Menu section"
+  },
+  "inventory": "Inventory",
+  "@inventory": {
+    "description": "Inventory section"
+  },
+  "discounts": "Discounts",
+  "@discounts": {
+    "description": "Discounts section"
+  },
+  "promotions": "Promotions",
+  "@promotions": {
+    "description": "Promotions section"
+  },
+  "scan": "Scan",
+  "@scan": {
+    "description": "Scan button"
+  },
+  "errorLoadingCategories": "Error loading categories",
+  "@errorLoadingCategories": {
+    "description": "Error message when loading categories fails"
+  },
+  "errorLoadingItems": "Error loading items",
+  "@errorLoadingItems": {
+    "description": "Error message when loading items fails"
+  },
+  "searchResult": "Search Result",
+  "@searchResult": {
+    "description": "Search result section"
+  },
+  "noItemsFound": "No items found",
+  "@noItemsFound": {
+    "description": "No items found message"
+  },
+  "tryAdjustingSearchTerms": "Try adjusting your search terms",
+  "@tryAdjustingSearchTerms": {
+    "description": "Suggestion to adjust search terms"
+  },
+  "noItemsAvailableInCategory": "No items available in this category",
+  "@noItemsAvailableInCategory": {
+    "description": "No items available in category message"
+  },
+  "actions": "Actions",
+  "@actions": {
+    "description": "Actions section"
+  },
+  "guest": "Guest",
+  "@guest": {
+    "description": "Guest label"
+  },
+  "yourCartIsEmpty": "Your cart is empty",
+  "@yourCartIsEmpty": {
+    "description": "Your cart is empty message"
+  },
+  "addItemsToGetStarted": "Add items to get started",
+  "@addItemsToGetStarted": {
+    "description": "Add items to get started message"
+  },
+  "chargeTableOrder": "Charge Table Order",
+  "@chargeTableOrder": {
+    "description": "Charge table order button"
+  },
+  "holdOrder": "Hold Order",
+  "@holdOrder": {
+    "description": "Hold order button"
+  },
+  "orderHeld": "Order held",
+  "@orderHeld": {
+    "description": "Order held message"
+  },
+  "voidOrder": "Void Order",
+  "@voidOrder": {
+    "description": "Void order button"
+  },
+  "orderVoided": "Order voided",
+  "@orderVoided": {
+    "description": "Order voided message"
+  },
+  "printReceipt": "Print Receipt",
+  "@printReceipt": {
+    "description": "Print receipt button"
+  },
+  "receiptPrinted": "Receipt printed",
+  "@receiptPrinted": {
+    "description": "Receipt printed message"
+  },
+  "emailReceipt": "Email Receipt",
+  "@emailReceipt": {
+    "description": "Email receipt button"
+  },
+  "receiptEmailed": "Receipt emailed",
+  "@receiptEmailed": {
+    "description": "Receipt emailed message"
+  },
+  "setGuestCount": "Set Guest Count",
+  "@setGuestCount": {
+    "description": "Set guest count button"
+  },
+  "customerInfo": "Customer Info",
+  "@customerInfo": {
+    "description": "Customer info section"
+  },
+  "customerInfoDialog": "Customer info dialog",
+  "@customerInfoDialog": {
+    "description": "Customer info dialog description"
+  },
+  "specialRequests": "Special Requests",
+  "@specialRequests": {
+    "description": "Special requests section"
+  },
+  "specialRequestsDialog": "Special requests dialog",
+  "@specialRequestsDialog": {
+    "description": "Special requests dialog description"
+  },
+  "total": "Total",
+  "@total": {
+    "description": "Total amount"
+  },
+  "more": "More",
+  "@more": {
+    "description": "More button"
+  },
+  "posService": "POS Service",
+  "@posService": {
+    "description": "POS service section"
+  },
+  "noRecentSales": "No recent sales",
+  "@noRecentSales": {
+    "description": "No recent sales message"
+  },
+  "salesWillAppearHere": "Sales will appear here after transactions",
+  "@salesWillAppearHere": {
+    "description": "Sales will appear here message"
+  },
+  "currentOrders": "Current Orders",
+  "@currentOrders": {
+    "description": "Current orders section"
+  },
+  "manageRestaurantOrders": "Manage restaurant orders",
+  "@manageRestaurantOrders": {
+    "description": "Manage restaurant orders description"
+  },
+  "noActiveOrders": "No Active Orders",
+  "@noActiveOrders": {
+    "description": "No active orders message"
+  },
+  "newOrdersWillAppearHere": "New orders will appear here",
+  "@newOrdersWillAppearHere": {
+    "description": "New orders will appear here message"
+  },
+  "failedToLoadOrders": "Failed to load orders",
+  "@failedToLoadOrders": {
+    "description": "Failed to load orders message"
+  },
+  "dailyTransactions": "Daily Transactions",
+  "@dailyTransactions": {
+    "description": "Daily transactions section"
+  },
+  "viewCompletedSales": "View completed sales",
+  "@viewCompletedSales": {
+    "description": "View completed sales button"
+  },
+  "noTransactionsToday": "No Transactions Today",
+  "@noTransactionsToday": {
+    "description": "No transactions today message"
+  },
+  "completedSalesWillAppearHere": "Completed sales will appear here",
+  "@completedSalesWillAppearHere": {
+    "description": "Completed sales will appear here message"
+  },
+  "failedToLoadTransactions": "Failed to load transactions",
+  "@failedToLoadTransactions": {
+    "description": "Failed to load transactions message"
+  },
+  "inventoryStatus": "Inventory Status",
+  "@inventoryStatus": {
+    "description": "Inventory status section"
+  },
+  "monitorStockLevels": "Monitor stock levels",
+  "@monitorStockLevels": {
+    "description": "Monitor stock levels description"
+  },
+  "noInventoryData": "No Inventory Data",
+  "@noInventoryData": {
+    "description": "No inventory data message"
+  },
+  "menuItemsWillAppearHere": "Menu items will appear here with stock info",
+  "@menuItemsWillAppearHere": {
+    "description": "Menu items will appear here message"
+  },
+  "failedToLoadInventory": "Failed to load inventory",
+  "@failedToLoadInventory": {
+    "description": "Failed to load inventory message"
+  },
+  "unknown": "Unknown",
+  "@unknown": {
+    "description": "Unknown status"
+  },
+  "pending": "pending",
+  "@pending": {
+    "description": "Pending status"
+  },
+  "splitPayment": "Split Payment",
+  "@splitPayment": {
+    "description": "Split payment section"
+  },
+  "customerName": "Customer Name",
+  "@customerName": {
+    "description": "Customer name field"
+  },
+  "customerPhone": "Customer Phone",
+  "@customerPhone": {
+    "description": "Customer phone field"
+  },
+  "customerEmail": "Customer Email",
+  "@customerEmail": {
+    "description": "Customer email field"
+  },
+  "notes": "Notes",
+  "@notes": {
+    "description": "Notes field"
+  },
+  "paymentMethods": "Payment Methods",
+  "@paymentMethods": {
+    "description": "Payment methods section"
+  },
+  "addPayment": "Add Payment",
+  "@addPayment": {
+    "description": "Add payment button"
+  },
+  "amount": "Amount",
+  "@amount": {
+    "description": "Amount field"
+  },
+  "amountIsRequired": "Amount is required",
+  "@amountIsRequired": {
+    "description": "Amount required validation"
+  },
+  "paymentMethod": "Payment Method",
+  "@paymentMethod": {
+    "description": "Payment method field"
+  },
+  "cash": "Cash",
+  "@cash": {
+    "description": "Cash payment method"
+  },
+  "creditCard": "Credit Card",
+  "@creditCard": {
+    "description": "Credit card payment method"
+  },
+  "debitCard": "Debit Card",
+  "@debitCard": {
+    "description": "Debit card payment method"
+  },
+  "mobilePayment": "Mobile Payment",
+  "@mobilePayment": {
+    "description": "Mobile payment method"
+  },
+  "check": "Check",
+  "@check": {
+    "description": "Check payment method"
+  },
+  "paymentMethodIsRequired": "Payment method is required",
+  "@paymentMethodIsRequired": {
+    "description": "Payment method required validation"
+  },
+  "completeSplitPayment": "Complete Split Payment",
+  "@completeSplitPayment": {
+    "description": "Complete split payment button"
+  },
+  "selectCustomer": "Select Customer",
+  "@selectCustomer": {
+    "description": "Select customer button"
+  },
+  "newCustomer": "New Customer",
+  "@newCustomer": {
+    "description": "New customer button"
+  },
+  "guestCheckout": "Guest Checkout",
+  "@guestCheckout": {
+    "description": "Guest checkout button"
+  },
+  "searchResults": "Search Results",
+  "@searchResults": {
+    "description": "Search results section"
+  },
+  "noEmail": "No email",
+  "@noEmail": {
+    "description": "No email status"
+  },
+  "noPhone": "No phone",
+  "@noPhone": {
+    "description": "No phone status"
+  },
+  "noCustomersFound": "No customers found",
+  "@noCustomersFound": {
+    "description": "No customers found message"
+  },
+  "createCustomer": "Create Customer",
+  "@createCustomer": {
+    "description": "Create customer button"
+  },
+  "splitBilling": "Split Billing",
+  "@splitBilling": {
+    "description": "Split billing section"
+  },
+  "addSplit": "Add Split",
+  "@addSplit": {
+    "description": "Add split button"
+  },
+  "removeLastSplit": "Remove Last Split",
+  "@removeLastSplit": {
+    "description": "Remove last split button"
+  },
+  "assignItemToSplit": "Assign item to split",
+  "@assignItemToSplit": {
+    "description": "Assign item to split description"
+  },
+  "newStockQuantity": "New Stock Quantity",
+  "@newStockQuantity": {
+    "description": "New stock quantity field"
+  },
+  "update": "Update",
+  "@update": {
+    "description": "Update button"
+  },
+  "card": "Card",
+  "@card": {
+    "description": "Card payment method"
+  },
+  "mobile": "Mobile",
+  "@mobile": {
+    "description": "Mobile payment method"
+  },
+  "finalizeSplit": "Finalize Split",
+  "@finalizeSplit": {
+    "description": "Finalize split button"
+  },
+  "allItems": "All Items",
+  "@allItems": {
+    "description": "All items section"
+  },
+  "lowStock": "Low Stock",
+  "@lowStock": {
+    "description": "Low stock section"
+  },
+  "categories": "Categories",
+  "@categories": {
+    "description": "Categories section"
+  },
+  "errorLoadingInventory": "Error loading inventory",
+  "@errorLoadingInventory": {
+    "description": "Error loading inventory message"
+  },
+  "noInventoryItemsFound": "No inventory items found",
+  "@noInventoryItemsFound": {
+    "description": "No inventory items found message"
+  },
+  "addYourFirstItemToGetStarted": "Add your first item to get started",
+  "@addYourFirstItemToGetStarted": {
+    "description": "Add your first item message"
+  },
+  "allItemsAreWellStocked": "All items are well stocked",
+  "@allItemsAreWellStocked": {
+    "description": "All items well stocked message"
+  },
+  "noLowStockItemsFound": "No low stock items found",
+  "@noLowStockItemsFound": {
+    "description": "No low stock items found message"
+  },
+  "noCategoriesFound": "No categories found",
+  "@noCategoriesFound": {
+    "description": "No categories found message"
+  },
+  "categoriesWillAppearHere": "Categories will appear here",
+  "@categoriesWillAppearHere": {
+    "description": "Categories will appear here message"
+  },
+  "outOfStock": "Out of Stock",
+  "@outOfStock": {
+    "description": "Out of stock status"
+  },
+  "searchInventory": "Search Inventory",
+  "@searchInventory": {
+    "description": "Search inventory button"
+  },
+  "clear": "Clear",
+  "@clear": {
+    "description": "Clear button"
+  },
+  "close": "Close",
+  "@close": {
+    "description": "Close button"
+  },
+  "filterOptions": "Filter Options",
+  "@filterOptions": {
+    "description": "Filter options section"
+  },
+  "filterOptionsWillBeImplementedHere": "Filter options will be implemented here",
+  "@filterOptionsWillBeImplementedHere": {
+    "description": "Filter options implementation message"
+  },
+  "addNewItem": "Add New Item",
+  "@addNewItem": {
+    "description": "Add new item button"
+  },
+  "addItemFormWillBeImplementedHere": "Add item form will be implemented here",
+  "@addItemFormWillBeImplementedHere": {
+    "description": "Add item form implementation message"
+  },
+  "add": "Add",
+  "@add": {
+    "description": "Add button"
+  },
+  "editItem": "Edit Item",
+  "@editItem": {
+    "description": "Edit item button"
+  },
+  "updateStock": "Update Stock",
+  "@updateStock": {
+    "description": "Update stock button"
+  },
+  "deleteItem": "Delete Item",
+  "@deleteItem": {
+    "description": "Delete item button"
+  },
+  "reportsAndAnalytics": "Reports & Analytics",
+  "@reportsAndAnalytics": {
+    "description": "Reports and analytics section"
+  },
+  "refreshData": "Refresh Data",
+  "@refreshData": {
+    "description": "Refresh data button"
+  },
+  "exportReport": "Export Report",
+  "@exportReport": {
+    "description": "Export report button"
+  },
+  "recipeAndPromotionFeatures": "Recipe & Promotion Features",
+  "@recipeAndPromotionFeatures": {
+    "description": "Recipe and promotion features section"
+  },
+  "revenue": "Revenue",
+  "@revenue": {
+    "description": "Revenue section"
+  },
+  "dateRange": "Date Range",
+  "@dateRange": {
+    "description": "Date range field"
+  },
+  "custom": "Custom",
+  "@custom": {
+    "description": "Custom option"
+  },
+  "allStatus": "All Status",
+  "@allStatus": {
+    "description": "All status option"
+  },
+  "completed": "Completed",
+  "@completed": {
+    "description": "Completed status"
+  },
+  "cancelled": "Cancelled",
+  "@cancelled": {
+    "description": "Cancelled status"
+  },
+  "refunded": "Refunded",
+  "@refunded": {
+    "description": "Refunded status"
+  },
+  "payment": "Payment",
+  "@payment": {
+    "description": "Payment section"
+  },
+  "allMethods": "All Methods",
+  "@allMethods": {
+    "description": "All methods option"
+  },
+  "pdfReport": "PDF Report",
+  "@pdfReport": {
+    "description": "PDF report option"
+  },
+  "csvData": "CSV Data",
+  "@csvData": {
+    "description": "CSV data option"
+  },
+  "excelSpreadsheet": "Excel Spreadsheet",
+  "@excelSpreadsheet": {
+    "description": "Excel spreadsheet option"
+  },
+  "exportingReportAs": "Exporting report as",
+  "@exportingReportAs": {
+    "description": "Exporting report message"
+  },
+  "loadingOverviewData": "Loading overview data...",
+  "@loadingOverviewData": {
+    "description": "Loading overview data message"
+  },
+  "failedToLoadOverviewData": "Failed to load overview data",
+  "@failedToLoadOverviewData": {
+    "description": "Failed to load overview data message"
+  },
+  "totalSales": "Total Sales",
+  "@totalSales": {
+    "description": "Total sales section"
+  },
+  "averageOrder": "Average Order",
+  "@averageOrder": {
+    "description": "Average order section"
+  },
+  "perTransaction": "per transaction",
+  "@perTransaction": {
+    "description": "Per transaction description"
+  },
+  "topProduct": "Top Product",
+  "@topProduct": {
+    "description": "Top product section"
+  },
+  "mostPopularItem": "Most popular item",
+  "@mostPopularItem": {
+    "description": "Most popular item description"
+  },
+  "conversionRate": "Conversion Rate",
+  "@conversionRate": {
+    "description": "Conversion rate section"
+  },
+  "ofVisitors": "of visitors",
+  "@ofVisitors": {
+    "description": "Of visitors description"
+  },
+  "salesTrend": "Sales Trend",
+  "@salesTrend": {
+    "description": "Sales trend section"
+  },
+  "salesTrendChart": "Sales trend chart",
+  "@salesTrendChart": {
+    "description": "Sales trend chart description"
+  },
+  "comingSoonWithRealData": "Coming soon with real data",
+  "@comingSoonWithRealData": {
+    "description": "Coming soon with real data message"
+  },
+  "topSellingItems": "Top Selling Items",
+  "@topSellingItems": {
+    "description": "Top selling items section"
+  },
+  "viewAll": "View All",
+  "@viewAll": {
+    "description": "View all button"
+  },
+  "popularItem": "Popular item",
+  "@popularItem": {
+    "description": "Popular item description"
+  },
+  "loadingTransactions": "Loading transactions...",
+  "@loadingTransactions": {
+    "description": "Loading transactions message"
+  },
+  "noTransactionsFound": "No transactions found",
+  "@noTransactionsFound": {
+    "description": "No transactions found message"
+  },
+  "tryAdjustingFiltersOrDateRange": "Try adjusting your filters or date range",
+  "@tryAdjustingFiltersOrDateRange": {
+    "description": "Try adjusting filters message"
+  },
+  "sale": "Sale",
+  "@sale": {
+    "description": "Sale label"
+  },
+  "saleNumber": "Sale #",
+  "@saleNumber": {
+    "description": "Sale number prefix"
+  },
+  "loadingRevenueData": "Loading revenue data...",
+  "@loadingRevenueData": {
+    "description": "Loading revenue data message"
+  },
+  "failedToLoadRevenueData": "Failed to load revenue data",
+  "@failedToLoadRevenueData": {
+    "description": "Failed to load revenue data message"
+  },
+  "totalRevenue": "Total Revenue",
+  "@totalRevenue": {
+    "description": "Total revenue section"
+  },
+  "grossIncome": "Gross income",
+  "@grossIncome": {
+    "description": "Gross income description"
+  },
+  "grossProfit": "Gross Profit",
+  "@grossProfit": {
+    "description": "Gross profit section"
+  },
+  "afterCosts": "After costs",
+  "@afterCosts": {
+    "description": "After costs description"
+  },
+  "profitMargin": "Profit Margin",
+  "@profitMargin": {
+    "description": "Profit margin section"
+  },
+  "profitRatio": "Profit ratio",
+  "@profitRatio": {
+    "description": "Profit ratio description"
+  },
+  "totalCost": "Total Cost",
+  "@totalCost": {
+    "description": "Total cost section"
+  },
+  "operatingCosts": "Operating costs",
+  "@operatingCosts": {
+    "description": "Operating costs description"
+  },
+  "revenueByDay": "Revenue by Day",
+  "@revenueByDay": {
+    "description": "Revenue by day section"
+  },
+  "revenueTrendChart": "Revenue trend chart",
+  "@revenueTrendChart": {
+    "description": "Revenue trend chart description"
+  },
+  "transactionDetails": "Transaction Details",
+  "@transactionDetails": {
+    "description": "Transaction details section"
+  },
+  "items": "Items",
+  "@items": {
+    "description": "Items section"
+  },
+  "noItemsFoundForThisSale": "No items found for this sale",
+  "@noItemsFoundForThisSale": {
+    "description": "No items found for sale message"
+  },
+  "loadingItems": "Loading items...",
+  "@loadingItems": {
+    "description": "Loading items message"
+  },
+  "businessAnalytics": "Business Analytics",
+  "@businessAnalytics": {
+    "description": "Business analytics section"
+  },
+  "itemAnalytics": "Item Analytics",
+  "@itemAnalytics": {
+    "description": "Item analytics section"
+  },
+  "staffAnalytics": "Staff Analytics",
+  "@staffAnalytics": {
+    "description": "Staff analytics section"
+  },
+  "customerAnalytics": "Customer Analytics",
+  "@customerAnalytics": {
+    "description": "Customer analytics section"
+  },
+  "inventoryAnalytics": "Inventory Analytics",
+  "@inventoryAnalytics": {
+    "description": "Inventory analytics section"
+  },
+  "revenueAnalytics": "Revenue Analytics",
+  "@revenueAnalytics": {
+    "description": "Revenue analytics section"
+  },
+  "performanceMetrics": "Performance Metrics",
+  "@performanceMetrics": {
+    "description": "Performance metrics section"
+  },
+  "salesMetrics": "Sales Metrics",
+  "@salesMetrics": {
+    "description": "Sales metrics section"
+  },
+  "customerMetrics": "Customer Metrics",
+  "@customerMetrics": {
+    "description": "Customer metrics section"
+  },
+  "inventoryMetrics": "Inventory Metrics",
+  "@inventoryMetrics": {
+    "description": "Inventory metrics section"
+  },
+  "staffMetrics": "Staff Metrics",
+  "@staffMetrics": {
+    "description": "Staff metrics section"
+  },
+  "revenueMetrics": "Revenue Metrics",
+  "@revenueMetrics": {
+    "description": "Revenue metrics section"
+  },
+  "dataExport": "Data Export",
+  "@dataExport": {
+    "description": "Data export section"
+  },
+  "reportGeneration": "Report Generation",
+  "@reportGeneration": {
+    "description": "Report generation section"
+  },
+  "chartVisualization": "Chart Visualization",
+  "@chartVisualization": {
+    "description": "Chart visualization section"
+  },
+  "trendAnalysis": "Trend Analysis",
+  "@trendAnalysis": {
+    "description": "Trend analysis section"
+  },
+  "comparativeAnalysis": "Comparative Analysis",
+  "@comparativeAnalysis": {
+    "description": "Comparative analysis section"
+  },
+  "forecasting": "Forecasting",
+  "@forecasting": {
+    "description": "Forecasting section"
+  },
+  "kpiDashboard": "KPI Dashboard",
+  "@kpiDashboard": {
+    "description": "KPI dashboard section"
+  },
+  "realTimeAnalytics": "Real-time Analytics",
+  "@realTimeAnalytics": {
+    "description": "Real-time analytics section"
+  },
+  "historicalData": "Historical Data",
+  "@historicalData": {
+    "description": "Historical data section"
+  },
+  "dataInsights": "Data Insights",
+  "@dataInsights": {
+    "description": "Data insights section"
+  },
+  "businessIntelligence": "Business Intelligence",
+  "@businessIntelligence": {
+    "description": "Business intelligence section"
+  },
+  "currencyManagement": "Currency Management",
+  "@currencyManagement": {
+    "description": "Currency management section"
+  },
+  "addCurrency": "Add Currency",
+  "@addCurrency": {
+    "description": "Add currency button"
+  },
+  "currencyCode": "Currency Code",
+  "@currencyCode": {
+    "description": "Currency code field"
+  },
+  "currencySymbol": "Currency Symbol",
+  "@currencySymbol": {
+    "description": "Currency symbol field"
+  },
+  "currencyName": "Currency Name",
+  "@currencyName": {
+    "description": "Currency name field"
+  },
+  "exchangeRate": "Exchange Rate",
+  "@exchangeRate": {
+    "description": "Exchange rate field"
+  },
+  "isDefault": "Is Default",
+  "@isDefault": {
+    "description": "Is default field"
+  },
+  "defaultCurrency": "Default",
+  "@defaultCurrency": {
+    "description": "Default currency label"
+  },
+  "editCurrency": "Edit Currency",
+  "@editCurrency": {
+    "description": "Edit currency button"
+  },
+  "deleteCurrency": "Delete Currency",
+  "@deleteCurrency": {
+    "description": "Delete currency button"
+  },
+  "currencyPreferences": "Currency Preferences",
+  "@currencyPreferences": {
+    "description": "Currency preferences section"
+  },
+  "orderTaking": "Order Taking",
+  "@orderTaking": {
+    "description": "Order taking section"
+  },
+  "tableSelection": "Table Selection",
+  "@tableSelection": {
+    "description": "Table selection section"
+  },
+  "waiterDashboard": "Waiter Dashboard",
+  "@waiterDashboard": {
+    "description": "Waiter dashboard section"
+  },
+  "waiterScreen": "Waiter Screen",
+  "@waiterScreen": {
+    "description": "Waiter screen section"
+  },
+  "takeOrder": "Take Order",
+  "@takeOrder": {
+    "description": "Take order button"
+  },
+  "viewOrders": "View Orders",
+  "@viewOrders": {
+    "description": "View orders button"
+  },
+  "tableStatus": "Table Status",
+  "@tableStatus": {
+    "description": "Table status section"
+  },
+  "assignTable": "Assign Table",
+  "@assignTable": {
+    "description": "Assign table button"
+  },
+  "unassignTable": "Unassign Table",
+  "@unassignTable": {
+    "description": "Unassign table button"
+  },
+  "waiterOrders": "Waiter Orders",
+  "@waiterOrders": {
+    "description": "Waiter orders section"
+  },
+  "adminDashboard": "Admin Dashboard",
+  "@adminDashboard": {
+    "description": "Admin dashboard section"
+  },
+  "menuManagement": "Menu Management",
+  "@menuManagement": {
+    "description": "Menu management section"
+  },
+  "pdfMenuGeneration": "PDF Menu Generation",
+  "@pdfMenuGeneration": {
+    "description": "PDF menu generation section"
+  },
+  "customTemplateManagement": "Custom Template Management",
+  "@customTemplateManagement": {
+    "description": "Custom template management section"
+  },
+  "generateMenu": "Generate Menu",
+  "@generateMenu": {
+    "description": "Generate menu button"
+  },
+  "templateSettings": "Template Settings",
+  "@templateSettings": {
+    "description": "Template settings section"
+  },
+  "reports": "Reports",
+  "@reports": {
+    "description": "Reports section"
+  },
+  "salesReport": "Sales Report",
+  "@salesReport": {
+    "description": "Sales report section"
+  },
+  "inventoryReport": "Inventory Report",
+  "@inventoryReport": {
+    "description": "Inventory report section"
+  },
+  "staffReport": "Staff Report",
+  "@staffReport": {
+    "description": "Staff report section"
+  },
+  "recipes": "Recipes",
+  "@recipes": {
+    "description": "Recipes section"
+  },
+  "smartSuggestions": "Smart Suggestions",
+  "@smartSuggestions": {
+    "description": "Smart suggestions section"
+  },
+  "inventoryAlerts": "Inventory Alerts",
+  "@inventoryAlerts": {
+    "description": "Inventory alerts section"
+  },
+  "onboardingPage1Title": "Welcome to Mobile POS",
+  "@onboardingPage1Title": {
+    "description": "First onboarding page title"
+  },
+  "onboardingPage1Description": "Manage your restaurant operations efficiently with our comprehensive POS system",
+  "@onboardingPage1Description": {
+    "description": "First onboarding page description"
+  },
+  "onboardingPage2Title": "Easy Order Management",
+  "@onboardingPage2Title": {
+    "description": "Second onboarding page title"
+  },
+  "onboardingPage2Description": "Take orders quickly and manage tables with our intuitive interface",
+  "@onboardingPage2Description": {
+    "description": "Second onboarding page description"
+  },
+  "onboardingPage3Title": "Real-time Kitchen Display",
+  "@onboardingPage3Title": {
+    "description": "Third onboarding page title"
+  },
+  "onboardingPage3Description": "Keep track of orders in real-time with our kitchen display system",
+  "@onboardingPage3Description": {
+    "description": "Third onboarding page description"
+  },
+  "onboardingPage4Title": "Comprehensive Reports",
+  "@onboardingPage4Title": {
+    "description": "Fourth onboarding page title"
+  },
+  "onboardingPage4Description": "Generate detailed reports and analytics to optimize your business",
+  "@onboardingPage4Description": {
+    "description": "Fourth onboarding page description"
+  },
+  "onboardingScreen": "Onboarding Screen",
+  "@onboardingScreen": {
+    "description": "Onboarding screen title"
+  },
+  "page": "Page",
+  "@page": {
+    "description": "Page label"
+  },
+  "ofText": "of",
+  "@ofText": {
+    "description": "Of text for pagination"
+  },
+  "skipOnboardingAndGoToLogin": "Skip onboarding and go to login",
+  "@skipOnboardingAndGoToLogin": {
+    "description": "Skip onboarding accessibility label"
+  },
+  "skip": "Skip",
+  "@skip": {
+    "description": "Skip button text"
+  },
+  "onboardingContentArea": "Onboarding content area",
+  "@onboardingContentArea": {
+    "description": "Onboarding content accessibility label"
+  },
+  "goToPreviousPage": "Go to previous page",
+  "@goToPreviousPage": {
+    "description": "Previous page button accessibility label"
+  },
+  "completeOnboardingAndGetStarted": "Complete onboarding and get started",
+  "@completeOnboardingAndGetStarted": {
+    "description": "Complete onboarding button accessibility label"
+  },
+  "goToNextPage": "Go to next page",
+  "@goToNextPage": {
+    "description": "Next page button accessibility label"
+  },
+  "getStarted": "Get Started",
+  "@getStarted": {
+    "description": "Get started button text"
+  },
+  "bytes": "bytes",
+  "@bytes": {
+    "description": "Bytes unit"
+  },
+  "errorGeneratingPdf": "Error generating PDF",
+  "@errorGeneratingPdf": {
+    "description": "Error message for PDF generation"
+  },
+  "permissionDeniedToOpenFile": "Permission denied to open file",
+  "@permissionDeniedToOpenFile": {
+    "description": "Permission denied error message"
+  },
+  "errorDownloadingPdf": "Error downloading PDF",
+  "@errorDownloadingPdf": {
+    "description": "Error message for PDF download"
+  },
+  "pickCategoryBackgroundColor": "Pick Category Background Color",
+  "@pickCategoryBackgroundColor": {
+    "description": "Color picker dialog title"
+  },
+  "accessDenied": "Access Denied",
+  "@accessDenied": {
+    "description": "Access denied message"
+  },
+  "thisFeatureIsOnlyAvailableToSystemAdministrators": "This feature is only available to system administrators",
+  "@thisFeatureIsOnlyAvailableToSystemAdministrators": {
+    "description": "Administrator access required message"
+  },
+  "errorLoadingTemplates": "Error loading templates",
+  "@errorLoadingTemplates": {
+    "description": "Error message for template loading"
+  },
+  "noCustomTemplates": "No custom templates",
+  "@noCustomTemplates": {
+    "description": "No templates available message"
+  },
+  "createYourFirstCustomTemplateToGetStarted": "Create your first custom template to get started",
+  "@createYourFirstCustomTemplateToGetStarted": {
+    "description": "Create first template message"
+  },
+  "defaultText": "Default",
+  "@defaultText": {
+    "description": "Default text"
+  },
+  "preview": "Preview",
+  "@preview": {
+    "description": "Preview button text"
+  },
+  "setAsDefault": "Set as Default",
+  "@setAsDefault": {
+    "description": "Set as default button text"
+  },
+  "templateSetAsDefault": "template set as default",
+  "@templateSetAsDefault": {
+    "description": "Template set as default message"
+  },
+  "errorSettingDefaultTemplate": "Error setting default template",
+  "@errorSettingDefaultTemplate": {
+    "description": "Error message for setting default template"
+  },
+  "deleteTemplate": "Delete Template",
+  "@deleteTemplate": {
+    "description": "Delete template dialog title"
+  },
+  "areYouSureYouWantToDeleteTemplate": "Are you sure you want to delete the template",
+  "@areYouSureYouWantToDeleteTemplate": {
+    "description": "Delete template confirmation message"
+  },
+  "templateDeletedSuccessfully": "template deleted successfully",
+  "@templateDeletedSuccessfully": {
+    "description": "Template deleted success message"
+  },
+  "errorDeletingTemplate": "Error deleting template",
+  "@errorDeletingTemplate": {
+    "description": "Error message for deleting template"
+  },
+  "createCustomTemplate": "Create Custom Template",
+  "@createCustomTemplate": {
+    "description": "Create template dialog title"
+  },
+  "templateName": "Template Name",
+  "@templateName": {
+    "description": "Template name field label"
+  },
+  "pleaseEnterATemplateName": "Please enter a template name",
+  "@pleaseEnterATemplateName": {
+    "description": "Template name validation message"
+  },
+  "description": "Description",
+  "@description": {
+    "description": "Description field label"
+  },
+  "htmlContent": "HTML Content",
+  "@htmlContent": {
+    "description": "HTML content field label"
+  },
+  "enterHtmlTemplateContent": "Enter HTML template content",
+  "@enterHtmlTemplateContent": {
+    "description": "HTML content field hint"
+  },
+  "pleaseEnterHtmlContent": "Please enter HTML content",
+  "@pleaseEnterHtmlContent": {
+    "description": "HTML content validation message"
+  },
+  "cssContent": "CSS Content",
+  "@cssContent": {
+    "description": "CSS content field label"
+  },
+  "enterCssStyles": "Enter CSS styles",
+  "@enterCssStyles": {
+    "description": "CSS content field hint"
+  },
+  "setAsDefaultTemplate": "Set as Default Template",
+  "@setAsDefaultTemplate": {
+    "description": "Set as default template checkbox label"
+  },
+  "create": "Create",
+  "@create": {
+    "description": "Create button text"
+  },
+  "templateCreatedSuccessfully": "Template created successfully",
+  "@templateCreatedSuccessfully": {
+    "description": "Template created success message"
+  },
+  "errorCreatingTemplate": "Error creating template",
+  "@errorCreatingTemplate": {
+    "description": "Error message for creating template"
+  },
+  "editCustomTemplate": "Edit Custom Template",
+  "@editCustomTemplate": {
+    "description": "Edit template dialog title"
+  },
+  "update": "Update",
+  "@update": {
+    "description": "Update button text"
+  },
+  "templateUpdatedSuccessfully": "Template updated successfully",
+  "@templateUpdatedSuccessfully": {
+    "description": "Template updated success message"
+  },
+  "errorUpdatingTemplate": "Error updating template",
+  "@errorUpdatingTemplate": {
+    "description": "Error message for updating template"
+  },
+  "previewTemplate": "Preview Template",
+  "@previewTemplate": {
+    "description": "Preview template dialog title"
+  },
+  "information": "Information",
+  "@information": {
+    "description": "Information section title"
+  },
+  "newText": "New",
+  "@newText": {
+    "description": "New button text"
+  },
+  "refreshRecipes": "Refresh recipes",
+  "@refreshRecipes": {
+    "description": "Refresh recipes button tooltip"
+  },
+  "all": "All",
+  "@all": {
+    "description": "All filter option"
+  },
+  "easy": "Easy",
+  "@easy": {
+    "description": "Easy difficulty level"
+  },
+  "medium": "Medium",
+  "@medium": {
+    "description": "Medium difficulty level"
+  },
+  "hard": "Hard",
+  "@hard": {
+    "description": "Hard difficulty level"
+  },
+  "searchRecipes": "Search recipes...",
+  "@searchRecipes": {
+    "description": "Search recipes field hint"
+  },
+  "activeOnly": "Active Only",
+  "@activeOnly": {
+    "description": "Active only filter option"
+  },
+  "searchingRecipes": "Searching recipes...",
+  "@searchingRecipes": {
+    "description": "Searching recipes loading message"
+  },
+  "loadingRecipes": "Loading recipes...",
+  "@loadingRecipes": {
+    "description": "Loading recipes message"
+  },
+  "unableToLoadRecipes": "Unable to load recipes",
+  "@unableToLoadRecipes": {
+    "description": "Unable to load recipes error message"
+  },
+  "checkConnectionAndTryAgain": "Check your connection and try again",
+  "@checkConnectionAndTryAgain": {
+    "description": "Connection error message"
+  },
+  "tryAgain": "Try Again",
+  "@tryAgain": {
+    "description": "Try again button text"
+  },
+  "noRecipesFound": "No recipes found",
+  "@noRecipesFound": {
+    "description": "No recipes found message"
+  },
+  "noRecipesFoundForQuery": "No recipes found for query",
+  "@noRecipesFoundForQuery": {
+    "description": "No recipes found for search query"
+  },
+  "clearSearch": "Clear Search",
+  "@clearSearch": {
+    "description": "Clear search button text"
+  },
+  "noDifficultyRecipes": "No",
+  "@noDifficultyRecipes": {
+    "description": "No difficulty recipes message prefix"
+  },
+  "tryDifferentDifficultyOrCreateNew": "Try a different difficulty or create a new recipe",
+  "@tryDifferentDifficultyOrCreateNew": {
+    "description": "Try different difficulty message"
+  },
+  "difficulty": "Difficulty",
+  "@difficulty": {
+    "description": "Difficulty label"
+  },
+  "prepTime": "Prep Time",
+  "@prepTime": {
+    "description": "Prep time label"
+  },
+  "minutes": "minutes",
+  "@minutes": {
+    "description": "Minutes unit"
+  },
+  "cookTime": "Cook Time",
+  "@cookTime": {
+    "description": "Cook time label"
+  },
+  "servings": "Servings",
+  "@servings": {
+    "description": "Servings label"
+  },
+  "ingredients": "Ingredients",
+  "@ingredients": {
+    "description": "Ingredients label"
+  },
+  "instructions": "Instructions",
+  "@instructions": {
+    "description": "Instructions label"
+  },
+  "deleteRecipe": "Delete Recipe",
+  "@deleteRecipe": {
+    "description": "Delete recipe dialog title"
+  },
+  "deleteRecipeConfirmation": "Are you sure you want to delete the recipe",
+  "@deleteRecipeConfirmation": {
+    "description": "Delete recipe confirmation message"
+  },
+  "recipeDeletedSuccessfully": "Recipe deleted successfully",
+  "@recipeDeletedSuccessfully": {
+    "description": "Recipe deleted success message"
+  },
+  "failedToDeleteRecipe": "Failed to delete recipe",
+  "@failedToDeleteRecipe": {
+    "description": "Failed to delete recipe error message"
+  },
+  "selectCustomer": "Select Customer",
+  "@selectCustomer": {
+    "description": "Select customer dialog title"
+  },
+  "search": "Search",
+  "@search": {
+    "description": "Search field hint"
+  },
+  "newCustomer": "New Customer",
+  "@newCustomer": {
+    "description": "New customer button text"
+  },
+  "guestCheckout": "Guest Checkout",
+  "@guestCheckout": {
+    "description": "Guest checkout option"
+  },
+  "email": "Email",
+  "@email": {
+    "description": "Email field label"
+  },
+  "phone": "Phone",
+  "@phone": {
+    "description": "Phone field label"
+  },
+  "searchResults": "Search Results",
+  "@searchResults": {
+    "description": "Search results section title"
+  },
+  "noEmail": "No email",
+  "@noEmail": {
+    "description": "No email placeholder"
+  },
+  "noPhone": "No phone",
+  "@noPhone": {
+    "description": "No phone placeholder"
+  },
+  "noCustomersFound": "No customers found",
+  "@noCustomersFound": {
+    "description": "No customers found message"
+  },
+  "createCustomer": "Create Customer",
+  "@createCustomer": {
+    "description": "Create customer button text"
+  },
+  "splitPayment": "Split Payment",
+  "@splitPayment": {
+    "description": "Split payment dialog title"
+  },
+  "customerName": "Customer Name",
+  "@customerName": {
+    "description": "Customer name field label"
+  },
+  "customerPhone": "Customer Phone",
+  "@customerPhone": {
+    "description": "Customer phone field label"
+  },
+  "customerEmail": "Customer Email",
+  "@customerEmail": {
+    "description": "Customer email field label"
+  },
+  "notes": "Notes",
+  "@notes": {
+    "description": "Notes field label"
+  },
+  "paymentMethods": "Payment Methods",
+  "@paymentMethods": {
+    "description": "Payment methods section title"
+  },
+  "addPayment": "Add Payment",
+  "@addPayment": {
+    "description": "Add payment button text"
+  },
+  "amount": "Amount",
+  "@amount": {
+    "description": "Amount field label"
+  },
+  "amountIsRequired": "Amount is required",
+  "@amountIsRequired": {
+    "description": "Amount validation message"
+  },
+  "paymentMethod": "Payment Method",
+  "@paymentMethod": {
+    "description": "Payment method field label"
+  },
+  "cash": "Cash",
+  "@cash": {
+    "description": "Cash payment method"
+  },
+  "creditCard": "Credit Card",
+  "@creditCard": {
+    "description": "Credit card payment method"
+  },
+  "debitCard": "Debit Card",
+  "@debitCard": {
+    "description": "Debit card payment method"
+  },
+  "mobilePayment": "Mobile Payment",
+  "@mobilePayment": {
+    "description": "Mobile payment method"
+  },
+  "check": "Check",
+  "@check": {
+    "description": "Check payment method"
+  },
+  "paymentMethodIsRequired": "Payment method is required",
+  "@paymentMethodIsRequired": {
+    "description": "Payment method validation message"
+  },
+  "completeSplitPayment": "Complete Split Payment",
+  "@completeSplitPayment": {
+    "description": "Complete split payment button text"
+  },
+  "templateSelection": "Template Selection",
+  "@templateSelection": {
+    "description": "Template selection section title"
+  },
+  "noTemplatesAvailable": "No templates available",
+  "@noTemplatesAvailable": {
+    "description": "No templates available message"
+  },
+  "failedToLoadTemplates": "Failed to load templates",
+  "@failedToLoadTemplates": {
+    "description": "Failed to load templates error message"
+  },
+  "noInventoryAlertsAvailable": "No inventory alerts available",
+  "@noInventoryAlertsAvailable": {
+    "description": "No inventory alerts available message"
+  },
+  "noExpiringItemsAlerts": "No expiring items alerts",
+  "@noExpiringItemsAlerts": {
+    "description": "No expiring items alerts message"
+  },
+  "noUnderperformingItemsAlerts": "No underperforming items alerts",
+  "@noUnderperformingItemsAlerts": {
+    "description": "No underperforming items alerts message"
+  },
+  "item": "Item",
+  "@item": {
+    "description": "Item label"
+  },
+  "viewDetails": "View Details",
+  "@viewDetails": {
+    "description": "View details button text"
+  },
+  "cookRecipeUsing": "Cook recipe using",
+  "@cookRecipeUsing": {
+    "description": "Cook recipe using message"
+  },
+  "unknownItem": "unknown item",
+  "@unknownItem": {
+    "description": "Unknown item text"
+  },
+  "thisWill": "This will",
+  "@thisWill": {
+    "description": "This will message"
+  },
+  "consumeInventoryItems": "consume inventory items",
+  "@consumeInventoryItems": {
+    "description": "Consume inventory items message"
+  },
+  "reduceWaste": "and reduce waste",
+  "@reduceWaste": {
+    "description": "Reduce waste message"
+  },
+  "barScreen": "Bar Screen",
+  "@barScreen": {
+    "description": "Bar screen title"
+  },
+  "kitchenOrders": "Kitchen Orders",
+  "@kitchenOrders": {
+    "description": "Kitchen orders title"
+  },
+  "refreshOrders": "Refresh Orders",
+  "@refreshOrders": {
+    "description": "Refresh orders button text"
+  },
+  "allCaughtUp": "All caught up!",
+  "@allCaughtUp": {
+    "description": "All caught up message"
+  },
+  "loadingKitchenOrders": "Loading kitchen orders...",
+  "@loadingKitchenOrders": {
+    "description": "Loading kitchen orders message"
+  },
+  "errorLoadingOrders": "Error loading orders",
+  "@errorLoadingOrders": {
+    "description": "Error loading orders message"
+  },
+  "pleaseCheckConnectionAndTryAgain": "Please check your connection and try again",
+  "@pleaseCheckConnectionAndTryAgain": {
+    "description": "Connection error message"
+  },
+  "order": "Order",
+  "@order": {
+    "description": "Order label"
+  },
+  "urgent": "Urgent",
+  "@urgent": {
+    "description": "Urgent label"
+  },
+  "table": "Table",
+  "@table": {
+    "description": "Table label"
+  },
+  "prepare": "Prepare",
+  "@prepare": {
+    "description": "Prepare button text"
+  },
+  "ready": "Ready",
+  "@ready": {
+    "description": "Ready status"
+  },
+  "complete": "Complete",
+  "@complete": {
+    "description": "Complete status"
+  },
+  "readOnlyMode": "Read Only Mode",
+  "@readOnlyMode": {
+    "description": "Read only mode label"
+  },
+  "orderForTable": "Order for Table",
+  "@orderForTable": {
+    "description": "Order for table title"
+  },
+  "loadingTableOrders": "Loading table orders...",
+  "@loadingTableOrders": {
+    "description": "Loading table orders message"
+  },
+  "customerDetails": "Customer Details",
+  "@customerDetails": {
+    "description": "Customer details section title"
+  },
+  "customerNameLabel": "Customer Name",
+  "@customerNameLabel": {
+    "description": "Customer name label"
+  },
+  "enterCustomerName": "Enter customer name",
+  "@enterCustomerName": {
+    "description": "Enter customer name hint"
+  },
+  "specialInstructions": "Special Instructions",
+  "@specialInstructions": {
+    "description": "Special instructions label"
+  },
+  "specialInstructionsHint": "Any special requests or notes",
+  "@specialInstructionsHint": {
+    "description": "Special instructions hint"
+  },
+  "menuItems": "Menu Items",
+  "@menuItems": {
+    "description": "Menu items section title"
+  },
+  "noMenuItemsAvailable": "No menu items available",
+  "@noMenuItemsAvailable": {
+    "description": "No menu items available message"
+  },
+  "menuItemsTemporarilyUnavailable": "Menu items temporarily unavailable",
+  "@menuItemsTemporarilyUnavailable": {
+    "description": "Menu items temporarily unavailable message"
+  },
+  "existingOrderItemsWillStillBeShown": "Existing order items will still be shown",
+  "@existingOrderItemsWillStillBeShown": {
+    "description": "Existing order items message"
+  },
+  "unavailable": "Unavailable",
+  "@unavailable": {
+    "description": "Unavailable status"
+  },
+  "orderItemsCount": "Order Items",
+  "@orderItemsCount": {
+    "description": "Order items count label"
+  },
+  "noItemsInCart": "No items in cart",
+  "@noItemsInCart": {
+    "description": "No items in cart message"
+  },
+  "subtotal": "Subtotal",
+  "@subtotal": {
+    "description": "Subtotal label"
+  },
+  "tax": "Tax",
+  "@tax": {
+    "description": "Tax label"
+  },
+  "totalWithColon": "Total:",
+  "@totalWithColon": {
+    "description": "Total with colon"
+  },
+  "submitting": "Submitting...",
+  "@submitting": {
+    "description": "Submitting message"
+  },
+  "submitOrder": "Submit Order",
+  "@submitOrder": {
+    "description": "Submit order button text"
+  },
+  "pleaseAddItemsToOrder": "Please add items to your order",
+  "@pleaseAddItemsToOrder": {
+    "description": "Please add items to order message"
+  },
+  "orderSubmittedSuccessfully": "Order submitted successfully",
+  "@orderSubmittedSuccessfully": {
+    "description": "Order submitted successfully message"
+  },
+  "failedToSubmitOrder": "Failed to submit order",
+  "@failedToSubmitOrder": {
+    "description": "Failed to submit order message"
+  },
+  "refreshTables": "Refresh Tables",
+  "@refreshTables": {
+    "description": "Refresh tables button text"
+  },
+  "noFloorPlansAvailable": "No floor plans available",
+  "@noFloorPlansAvailable": {
+    "description": "No floor plans available message"
+  },
+  "floorPlanView": "Floor Plan View",
+  "@floorPlanView": {
+    "description": "Floor plan view title"
+  },
+  "searchTables": "Search Tables",
+  "@searchTables": {
+    "description": "Search tables hint"
+  },
+  "loadingTables": "Loading tables...",
+  "@loadingTables": {
+    "description": "Loading tables message"
+  },
+  "errorLoadingTables": "Error loading tables",
+  "@errorLoadingTables": {
+    "description": "Error loading tables message"
+  },
+  "noTablesFoundMatching": "No tables found matching your search",
+  "@noTablesFoundMatching": {
+    "description": "No tables found matching search message"
+  },
+  "noAvailableTables": "No available tables",
+  "@noAvailableTables": {
+    "description": "No available tables message"
+  },
+  "noOccupiedTables": "No occupied tables",
+  "@noOccupiedTables": {
+    "description": "No occupied tables message"
+  },
+  "noReservedTables": "No reserved tables",
+  "@noReservedTables": {
+    "description": "No reserved tables message"
+  },
+  "noTablesBeingCleaned": "No tables being cleaned",
+  "@noTablesBeingCleaned": {
+    "description": "No tables being cleaned message"
+  },
+  "noTablesFound": "No tables found",
+  "@noTablesFound": {
+    "description": "No tables found message"
+  },
+  "checkBackLaterOrTryDifferentFilter": "Check back later or try a different filter",
+  "@checkBackLaterOrTryDifferentFilter": {
+    "description": "Check back later message"
+  },
+  "seats": "seats",
+  "@seats": {
+    "description": "Seats label"
+  },
+  "selectOpenOrder": "Select Open Order",
+  "@selectOpenOrder": {
+    "description": "Select open order title"
+  },
+  "details": "Details",
+  "@details": {
+    "description": "Details label"
+  },
+  "capacity": "Capacity",
+  "@capacity": {
+    "description": "Capacity label"
+  },
+  "customer": "Customer",
+  "@customer": {
+    "description": "Customer label"
+  },
+  "assignedTo": "Assigned to",
+  "@assignedTo": {
+    "description": "Assigned to label"
+  },
+  "lastActivity": "Last Activity",
+  "@lastActivity": {
+    "description": "Last activity label"
+  },
+  "reservation": "Reservation",
+  "@reservation": {
+    "description": "Reservation label"
+  },
+  "orderItems": "Order Items",
+  "@orderItems": {
+    "description": "Order items label"
+  },
+  "noItems": "No items",
+  "@noItems": {
+    "description": "No items message"
+  },
+  "reserveTable": "Reserve Table",
+  "@reserveTable": {
+    "description": "Reserve table button text"
+  },
+  "time": "Time",
+  "@time": {
+    "description": "Time label"
+  },
+  "selectTime": "Select Time",
+  "@selectTime": {
+    "description": "Select time label"
+  },
+  "placeholder": "placeholder",
+  "@placeholder": {
+    "description": "Placeholder text"
+  },
+  "reserve": "Reserve",
+  "@reserve": {
+    "description": "Reserve button text"
+  },
+  "seatCustomerAtTable": "Seat Customer at Table",
+  "@seatCustomerAtTable": {
+    "description": "Seat customer at table title"
+  },
+  "partySize": "Party Size",
+  "@partySize": {
+    "description": "Party size label"
+  },
+  "pleaseEnterValidNameAndPartySize": "Please enter a valid name and party size",
+  "@pleaseEnterValidNameAndPartySize": {
+    "description": "Please enter valid name and party size message"
+  },
+  "customerSeatedAtTable": "Customer seated at table successfully",
+  "@customerSeatedAtTable": {
+    "description": "Customer seated at table message"
+  },
+  "failedToSeatCustomer": "Failed to seat customer",
+  "@failedToSeatCustomer": {
+    "description": "Failed to seat customer message"
+  },
+  "seat": "Seat",
+  "@seat": {
+    "description": "Seat button text"
+  },
+  "clearingTable": "Clearing table...",
+  "@clearingTable": {
+    "description": "Clearing table message"
+  },
+  "clearedSuccessfully": "cleared successfully",
+  "@clearedSuccessfully": {
+    "description": "Cleared successfully message"
+  },
+  "failedToClearTable": "Failed to clear table",
+  "@failedToClearTable": {
+    "description": "Failed to clear table message"
+  },
+  "checkInReservationForTable": "Check In Reservation for Table",
+  "@checkInReservationForTable": {
+    "description": "Check in reservation for table title"
+  },
+  "reservationCheckedInForTable": "Reservation checked in for table successfully",
+  "@reservationCheckedInForTable": {
+    "description": "Reservation checked in for table message"
+  },
+  "failedToCheckIn": "Failed to check in",
+  "@failedToCheckIn": {
+    "description": "Failed to check in message"
+  },
+  "checkIn": "Check In",
+  "@checkIn": {
+    "description": "Check in button text"
+  },
+  "view": "View",
+  "@view": {
+    "description": "View button"
+  },
+  "addItems": "Add Items",
+  "@addItems": {
+    "description": "Add items button"
+  },
+  "waiter": "Waiter",
+  "@waiter": {
+    "description": "Waiter label"
+  },
+  "readyToServeCustomers": "Ready to serve customers",
+  "@readyToServeCustomers": {
+    "description": "Ready to serve customers message"
+  },
+  "activeTables": "Active Tables",
+  "@activeTables": {
+    "description": "Active tables label"
+  },
+  "pendingOrders": "Pending Orders",
+  "@pendingOrders": {
+    "description": "Pending orders label"
+  },
+  "todaysTips": "Today's Tips",
+  "@todaysTips": {
+    "description": "Today's tips label"
+  },
+  "orderHistory": "Order History",
+  "@orderHistory": {
+    "description": "Order history label"
+  },
+  "viewPastOrders": "View Past Orders",
+  "@viewPastOrders": {
+    "description": "View past orders button text"
+  },
+  "manageCustomerDetails": "Manage Customer Details",
+  "@manageCustomerDetails": {
+    "description": "Manage customer details label"
+  },
+  "customerInformation": "Customer Information",
+  "@customerInformation": {
+    "description": "Customer information label"
+  },
+  "inventoryCheck": "Inventory Check",
+  "@inventoryCheck": {
+    "description": "Inventory check label"
+  },
+  "checkItemAvailability": "Check Item Availability",
+  "@checkItemAvailability": {
+    "description": "Check item availability label"
+  },
+  "dailyReport": "Daily Report",
+  "@dailyReport": {
+    "description": "Daily report label"
+  },
+  "viewDailySummary": "View Daily Summary",
+  "@viewDailySummary": {
+    "description": "View daily summary button text"
+  },
+  "tableOrderCompleted": "Table order completed",
+  "@tableOrderCompleted": {
+    "description": "Table order completed message"
+  },
+  "orderCompletedLowercase": "order completed",
+  "@orderCompletedLowercase": {
+    "description": "Order completed lowercase message"
+  },
+  "newCustomerAtTable": "New customer at table",
+  "@newCustomerAtTable": {
+    "description": "New customer at table message"
+  },
+  "kitchenNotificationTableReady": "Kitchen notification: table ready",
+  "@kitchenNotificationTableReady": {
+    "description": "Kitchen notification table ready message"
+  },
+  "readyLowercase": "ready",
+  "@readyLowercase": {
+    "description": "Ready lowercase message"
+  },
+  "promotionUpdated": "Promotion updated",
+  "@promotionUpdated": {
+    "description": "Promotion updated message"
+  },
+  "happyHourSpecial": "Happy Hour Special",
+  "@happyHourSpecial": {
+    "description": "Happy hour special message"
+  },
+  "comingSoon": "Coming Soon",
+  "@comingSoon": {
+    "description": "Coming soon message"
+  },
+  "todaysOrders": "Today's Orders",
+  "@todaysOrders": {
+    "description": "Today's orders label"
+  },
+  "tipsEarned": "Tips Earned",
+  "@tipsEarned": {
+    "description": "Tips earned label"
+  },
+  "viewTables": "View Tables",
+  "@viewTables": {
+    "description": "View tables button text"
+  },
+  "kitchenView": "Kitchen View",
+  "@kitchenView": {
+    "description": "Kitchen view button text"
+  },
+  "messages": "Messages",
+  "@messages": {
+    "description": "Messages label"
+  },
+  "messagesAndPromotions": "Messages & Promotions",
+  "@messagesAndPromotions": {
+    "description": "Messages and promotions label"
+  },
+  "created": "Created",
+  "@created": {
+    "description": "Created label"
+  },
+  "markAsRead": "Mark as Read",
+  "@markAsRead": {
+    "description": "Mark as read button"
+  },
+  "noMessagesOrPromotions": "No messages or promotions",
+  "@noMessagesOrPromotions": {
+    "description": "No messages or promotions message"
+  },
+  "checkBackLaterForUpdates": "Check back later for updates",
+  "@checkBackLaterForUpdates": {
+    "description": "Check back later for updates message"
+  },
+  "errorLoadingMessages": "Error loading messages",
+  "@errorLoadingMessages": {
+    "description": "Error loading messages message"
+  },
+  "todaysPerformance": "Today's Performance",
+  "@todaysPerformance": {
+    "description": "Today's performance label"
+  },
+  "recentOrders": "Recent Orders",
+  "@recentOrders": {
+    "description": "Recent orders label"
+  },
+  "splitBill": "Split Bill",
+  "@splitBill": {
+    "description": "Split bill button text"
+  },
+  "salesOverview": "Sales Overview",
+  "@salesOverview": {
+    "description": "Sales overview label"
+  },
+  "todaysSales": "Today's Sales",
+  "@todaysSales": {
+    "description": "Today's sales label"
+  },
+  "transactions": "Transactions",
+  "@transactions": {
+    "description": "Transactions label"
+  },
+  "avgOrder": "Avg Order",
+  "@avgOrder": {
+    "description": "Average order label"
+  },
+  "languageSettings": "Language Settings",
+  "@languageSettings": {
+    "description": "Language settings label"
+  },
+  "languageStatus": "Language Status",
+  "@languageStatus": {
+    "description": "Language status label"
+  },
+  "currentLanguage": "Current Language",
+  "@currentLanguage": {
+    "description": "Current language label"
+  },
+  "selectLanguage": "Select Language",
+  "@selectLanguage": {
+    "description": "Select language label"
+  },
+  "information": "Information",
+  "@information": {
+    "description": "Information label"
+  },
+  "profile": "Profile",
+  "@profile": {
+    "description": "Profile label"
+  },
+  "personalInformation": "Personal Information",
+  "@personalInformation": {
+    "description": "Personal information label"
+  },
+  "workInformation": "Work Information",
+  "@workInformation": {
+    "description": "Work information label"
+  },
+  "accountSettings": "Account Settings",
+  "@accountSettings": {
+    "description": "Account settings label"
+  },
+  "supportAndHelp": "Support & Help",
+  "@supportAndHelp": {
+    "description": "Support and help label"
+  },
+  "businessManagement": "Business Management",
+  "@businessManagement": {
+    "description": "Business management label"
+  },
+  "noBusinessesFound": "No businesses found",
+  "@noBusinessesFound": {
+    "description": "No businesses found message"
+  },
+  "addFirstBusinessToGetStarted": "Add your first business to get started",
+  "@addFirstBusinessToGetStarted": {
+    "description": "Add first business message"
+  },
+  "active": "Active",
+  "@active": {
+    "description": "Active status"
+  },
+  "inactive": "Inactive",
+  "@inactive": {
+    "description": "Inactive status"
+  },
+  "edit": "Edit",
+  "@edit": {
+    "description": "Edit button text"
+  },
+  "floorPlanManagement": "Floor Plan Management",
+  "@floorPlanManagement": {
+    "description": "Floor plan management label"
+  },
+  "refresh": "Refresh",
+  "@refresh": {
+    "description": "Refresh button text"
+  },
+  "overview": "Overview",
+  "@overview": {
+    "description": "Overview label"
+  },
+  "floorPlans": "Floor Plans",
+  "@floorPlans": {
+    "description": "Floor plans label"
+  },
+  "tables": "Tables",
+  "@tables": {
+    "description": "Tables label"
+  },
+  "tableStatusOverview": "Table Status Overview",
+  "@tableStatusOverview": {
+    "description": "Table status overview label"
+  },
+  "totalTables": "Total Tables",
+  "@totalTables": {
+    "description": "Total tables label"
+  },
+  "available": "Available",
+  "@available": {
+    "description": "Available status"
+  },
+  "occupied": "Occupied",
+  "@occupied": {
+    "description": "Occupied status"
+  },
+  "reserved": "Reserved",
+  "@reserved": {
+    "description": "Reserved status"
+  },
+  "cleaning": "Cleaning",
+  "@cleaning": {
+    "description": "Cleaning status"
+  },
+  "cart": "Cart",
+  "@cart": {
+    "description": "Cart label"
+  },
+  "actions": "Actions",
+  "@actions": {
+    "description": "Actions label"
+  },
+  "guest": "Guest",
+  "@guest": {
+    "description": "Guest label"
+  },
+  "menu": "Menu",
+  "@menu": {
+    "description": "Menu label"
+  },
+  "orders": "Orders",
+  "@orders": {
+    "description": "Orders label"
+  },
+  "inventory": "Inventory",
+  "@inventory": {
+    "description": "Inventory label"
+  },
+  "more": "More",
+  "@more": {
+    "description": "More label"
+  },
+  "cashier": "Cashier",
+  "@cashier": {
+    "description": "Cashier label"
+  },
+  "posService": "POS Service",
+  "@posService": {
+    "description": "POS service label"
+  },
+  "allItems": "All Items",
+  "@allItems": {
+    "description": "All items label"
+  },
+  "lowStock": "Low Stock",
+  "@lowStock": {
+    "description": "Low stock label"
+  },
+  "categories": "Categories",
+  "@categories": {
+    "description": "Categories label"
+  },
+  "searchInventory": "Search Inventory",
+  "@searchInventory": {
+    "description": "Search inventory label"
+  },
+  "filterOptions": "Filter Options",
+  "@filterOptions": {
+    "description": "Filter options label"
+  },
+  "addNewItem": "Add New Item",
+  "@addNewItem": {
+    "description": "Add new item label"
+  },
+  "editItem": "Edit Item",
+  "@editItem": {
+    "description": "Edit item label"
+  },
+  "updateStock": "Update Stock",
+  "@updateStock": {
+    "description": "Update stock label"
+  },
+  "deleteItem": "Delete Item",
+  "@deleteItem": {
+    "description": "Delete item label"
+  },
+  "customerName": "Customer Name",
+  "@customerName": {
+    "description": "Customer name label"
+  },
+  "customerPhone": "Customer Phone",
+  "@customerPhone": {
+    "description": "Customer phone label"
+  },
+  "customerEmail": "Customer Email",
+  "@customerEmail": {
+    "description": "Customer email label"
+  },
+  "notes": "Notes",
+  "@notes": {
+    "description": "Notes label"
+  },
+  "paymentMethods": "Payment Methods",
+  "@paymentMethods": {
+    "description": "Payment methods label"
+  },
+  "addPayment": "Add Payment",
+  "@addPayment": {
+    "description": "Add payment label"
+  },
+  "amount": "Amount",
+  "@amount": {
+    "description": "Amount label"
+  },
+  "paymentMethod": "Payment Method",
+  "@paymentMethod": {
+    "description": "Payment method label"
+  },
+  "cash": "Cash",
+  "@cash": {
+    "description": "Cash payment method"
+  },
+  "creditCard": "Credit Card",
+  "@creditCard": {
+    "description": "Credit card payment method"
+  },
+  "debitCard": "Debit Card",
+  "@debitCard": {
+    "description": "Debit card payment method"
+  },
+  "mobilePayment": "Mobile Payment",
+  "@mobilePayment": {
+    "description": "Mobile payment method"
+  },
+  "check": "Check",
+  "@check": {
+    "description": "Check payment method"
+  },
+  "completeSplitPayment": "Complete Split Payment",
+  "@completeSplitPayment": {
+    "description": "Complete split payment label"
+  },
+  "selectCustomer": "Select Customer",
+  "@selectCustomer": {
+    "description": "Select customer label"
+  },
+  "newCustomer": "New Customer",
+  "@newCustomer": {
+    "description": "New customer label"
+  },
+  "guestCheckout": "Guest Checkout",
+  "@guestCheckout": {
+    "description": "Guest checkout label"
+  },
+  "phone": "Phone",
+  "@phone": {
+    "description": "Phone label"
+  },
+  "searchResults": "Search Results",
+  "@searchResults": {
+    "description": "Search results label"
+  },
+  "noEmail": "No Email",
+  "@noEmail": {
+    "description": "No email label"
+  },
+  "noPhone": "No Phone",
+  "@noPhone": {
+    "description": "No phone label"
+  },
+  "noCustomersFound": "No customers found",
+  "@noCustomersFound": {
+    "description": "No customers found message"
+  },
+  "createCustomer": "Create Customer",
+  "@createCustomer": {
+    "description": "Create customer label"
+  },
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry button text"
+  },
+  "contentOptions": "Content Options",
+  "@contentOptions": {
+    "description": "Content options section title"
+  },
+  "includePrices": "Include Prices",
+  "@includePrices": {
+    "description": "Include prices option"
+  },
+  "showItemPricesInMenu": "Show item prices in menu",
+  "@showItemPricesInMenu": {
+    "description": "Show item prices in menu description"
+  },
+  "includeDescriptions": "Include Descriptions",
+  "@includeDescriptions": {
+    "description": "Include descriptions option"
+  },
+  "showItemDescriptions": "Show item descriptions in menu",
+  "@showItemDescriptions": {
+    "description": "Show item descriptions in menu description"
+  },
+  "includeAllergens": "Include Allergens",
+  "@includeAllergens": {
+    "description": "Include allergens option"
+  },
+  "showAllergenInformation": "Show allergen information",
+  "@showAllergenInformation": {
+    "description": "Show allergen information description"
+  },
+  "includeCalories": "Include Calories",
+  "@includeCalories": {
+    "description": "Include calories option"
+  },
+  "showCalorieInformation": "Show calorie information",
+  "@showCalorieInformation": {
+    "description": "Show calorie information description"
+  },
+  "includeItemImages": "Include Item Images",
+  "@includeItemImages": {
+    "description": "Include item images option"
+  },
+  "showMenuItemImagesInPdf": "Show menu item images in PDF",
+  "@showMenuItemImagesInPdf": {
+    "description": "Show menu item images in PDF description"
+  },
+  "includeBusinessLogo": "Include Business Logo",
+  "@includeBusinessLogo": {
+    "description": "Include business logo option"
+  },
+  "showBusinessLogoInPdfHeader": "Show business logo in PDF header",
+  "@showBusinessLogoInPdfHeader": {
+    "description": "Show business logo in PDF header description"
+  },
+  "layoutOptions": "Layout Options",
+  "@layoutOptions": {
+    "description": "Layout options section title"
+  },
+  "orientation": "Orientation",
+  "@orientation": {
+    "description": "Orientation field label"
+  },
+  "portrait": "Portrait",
+  "@portrait": {
+    "description": "Portrait orientation"
+  },
+  "landscape": "Landscape",
+  "@landscape": {
+    "description": "Landscape orientation"
+  },
+  "fontSize": "Font Size",
+  "@fontSize": {
+    "description": "Font size field label"
+  },
+  "small": "Small",
+  "@small": {
+    "description": "Small font size"
+  },
+  "large": "Large",
+  "@large": {
+    "description": "Large font size"
+  },
+  "colorScheme": "Color Scheme",
+  "@colorScheme": {
+    "description": "Color scheme field label"
+  },
+  "light": "Light",
+  "@light": {
+    "description": "Light color scheme"
+  },
+  "dark": "Dark",
+  "@dark": {
+    "description": "Dark color scheme"
+  },
+  "auto": "Auto",
+  "@auto": {
+    "description": "Auto color scheme"
+  },
+  "categoryLayoutOptions": "Category Layout Options",
+  "@categoryLayoutOptions": {
+    "description": "Category layout options section title"
+  },
+  "categoryLayout": "Category Layout",
+  "@categoryLayout": {
+    "description": "Category layout field label"
+  },
+  "howCategoriesAreOrganizedInPdf": "How categories are organized in the PDF",
+  "@howCategoriesAreOrganizedInPdf": {
+    "description": "Category layout helper text"
+  },
+  "samePageCategoryItemsTogether": "Same page - category items together",
+  "@samePageCategoryItemsTogether": {
+    "description": "Same page category layout option"
+  },
+  "separatePageCategoryTitlePageItemsPages": "Separate page - category title page, items on pages",
+  "@separatePageCategoryTitlePageItemsPages": {
+    "description": "Separate page category layout option"
+  },
+  "categoryBackgroundColor": "Category Background Color",
+  "@categoryBackgroundColor": {
+    "description": "Category background color field label"
+  },
+  "hexColorCodeExample": "Hex color code (e.g., #0066CC)",
+  "@hexColorCodeExample": {
+    "description": "Hex color code example"
+  },
+  "maxItemsPerPage": "Max Items Per Page",
+  "@maxItemsPerPage": {
+    "description": "Max items per page field label"
+  },
+  "defaultColon": "Default:",
+  "@defaultColon": {
+    "description": "Default colon text"
+  },
+  "generatingPdf": "Generating PDF...",
+  "@generatingPdf": {
+    "description": "Generating PDF loading message"
+  },
+  "generatePdfMenu": "Generate PDF Menu",
+  "@generatePdfMenu": {
+    "description": "Generate PDF menu button text"
+  },
+  "pleaseSelectTemplate": "Please select a template",
+  "@pleaseSelectTemplate": {
+    "description": "Please select template message"
+  },
+  "pdfGeneratedSuccessfully": "PDF generated successfully",
+  "@pdfGeneratedSuccessfully": {
+    "description": "PDF generated successfully message"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button text"
+  },
+  "ok": "OK",
+  "@ok": {
+    "description": "OK button text"
+  },
+  "accessDeniedDescription": "This feature is only available to system administrators",
+  "onboardingPage1Title": "Welcome to Mobile POS",
+  "@onboardingPage1Title": {
+    "description": "First onboarding page title"
+  },
+  "onboardingPage1Description": "Manage your restaurant operations efficiently with our comprehensive POS system",
+  "@onboardingPage1Description": {
+    "description": "First onboarding page description"
+  },
+  "onboardingPage2Title": "Easy Order Management",
+  "@onboardingPage2Title": {
+    "description": "Second onboarding page title"
+  },
+  "onboardingPage2Description": "Take orders quickly and manage tables with our intuitive interface",
+  "@onboardingPage2Description": {
+    "description": "Second onboarding page description"
+  },
+  "onboardingPage3Title": "Real-time Kitchen Display",
+  "@onboardingPage3Title": {
+    "description": "Third onboarding page title"
+  },
+  "onboardingPage3Description": "Keep track of orders in real-time with our kitchen display system",
+  "@onboardingPage3Description": {
+    "description": "Third onboarding page description"
+  },
+  "onboardingPage4Title": "Comprehensive Reports",
+  "@onboardingPage4Title": {
+    "description": "Fourth onboarding page title"
+  },
+  "onboardingPage4Description": "Generate detailed reports and analytics to optimize your business",
+  "@onboardingPage4Description": {
+    "description": "Fourth onboarding page description"
+  },
+  "onboardingScreen": "Onboarding Screen",
+  "@onboardingScreen": {
+    "description": "Onboarding screen title"
+  },
+  "page": "Page",
+  "@page": {
+    "description": "Page label"
+  },
+  "ofText": "of",
+  "@ofText": {
+    "description": "Of text for pagination"
+  },
+  "skipOnboardingAndGoToLogin": "Skip onboarding and go to login",
+  "@skipOnboardingAndGoToLogin": {
+    "description": "Skip onboarding accessibility label"
+  },
+  "skip": "Skip",
+  "@skip": {
+    "description": "Skip button text"
+  },
+  "onboardingContentArea": "Onboarding content area",
+  "@onboardingContentArea": {
+    "description": "Onboarding content accessibility label"
+  },
+  "goToPreviousPage": "Go to previous page",
+  "@goToPreviousPage": {
+    "description": "Previous page button accessibility label"
+  },
+  "completeOnboardingAndGetStarted": "Complete onboarding and get started",
+  "@completeOnboardingAndGetStarted": {
+    "description": "Complete onboarding button accessibility label"
+  },
+  "goToNextPage": "Go to next page",
+  "@goToNextPage": {
+    "description": "Next page button accessibility label"
+  },
+  "getStarted": "Get Started",
+  "@getStarted": {
+    "description": "Get started button text"
+  },
+  "bytes": "bytes",
+  "@bytes": {
+    "description": "Bytes unit"
+  },
+  "errorGeneratingPdf": "Error generating PDF",
+  "@errorGeneratingPdf": {
+    "description": "Error message for PDF generation"
+  },
+  "permissionDeniedToOpenFile": "Permission denied to open file",
+  "@permissionDeniedToOpenFile": {
+    "description": "Permission denied error message"
+  },
+  "errorDownloadingPdf": "Error downloading PDF",
+  "@errorDownloadingPdf": {
+    "description": "Error message for PDF download"
+  },
+  "pickCategoryBackgroundColor": "Pick Category Background Color",
+  "@pickCategoryBackgroundColor": {
+    "description": "Color picker dialog title"
+  },
+  "accessDenied": "Access Denied",
+  "@accessDenied": {
+    "description": "Access denied message"
+  },
+  "thisFeatureIsOnlyAvailableToSystemAdministrators": "This feature is only available to system administrators",
+  "@thisFeatureIsOnlyAvailableToSystemAdministrators": {
+    "description": "Administrator access required message"
+  },
+  "errorLoadingTemplates": "Error loading templates",
+  "@errorLoadingTemplates": {
+    "description": "Error message for template loading"
+  },
+  "noCustomTemplates": "No custom templates",
+  "@noCustomTemplates": {
+    "description": "No templates available message"
+  },
+  "createYourFirstCustomTemplateToGetStarted": "Create your first custom template to get started",
+  "@createYourFirstCustomTemplateToGetStarted": {
+    "description": "Create first template message"
+  },
+  "defaultText": "Default",
+  "@defaultText": {
+    "description": "Default text"
+  },
+  "preview": "Preview",
+  "@preview": {
+    "description": "Preview button text"
+  },
+  "setAsDefault": "Set as Default",
+  "@setAsDefault": {
+    "description": "Set as default button text"
+  },
+  "templateSetAsDefault": "template set as default",
+  "@templateSetAsDefault": {
+    "description": "Template set as default message"
+  },
+  "errorSettingDefaultTemplate": "Error setting default template",
+  "@errorSettingDefaultTemplate": {
+    "description": "Error message for setting default template"
+  },
+  "deleteTemplate": "Delete Template",
+  "@deleteTemplate": {
+    "description": "Delete template dialog title"
+  },
+  "areYouSureYouWantToDeleteTemplate": "Are you sure you want to delete the template",
+  "@areYouSureYouWantToDeleteTemplate": {
+    "description": "Delete template confirmation message"
+  },
+  "templateDeletedSuccessfully": "template deleted successfully",
+  "@templateDeletedSuccessfully": {
+    "description": "Template deleted success message"
+  },
+  "errorDeletingTemplate": "Error deleting template",
+  "@errorDeletingTemplate": {
+    "description": "Error message for deleting template"
+  },
+  "createCustomTemplate": "Create Custom Template",
+  "@createCustomTemplate": {
+    "description": "Create template dialog title"
+  },
+  "templateName": "Template Name",
+  "@templateName": {
+    "description": "Template name field label"
+  },
+  "pleaseEnterATemplateName": "Please enter a template name",
+  "@pleaseEnterATemplateName": {
+    "description": "Template name validation message"
+  },
+  "description": "Description",
+  "@description": {
+    "description": "Description field label"
+  },
+  "htmlContent": "HTML Content",
+  "@htmlContent": {
+    "description": "HTML content field label"
+  },
+  "enterHtmlTemplateContent": "Enter HTML template content",
+  "@enterHtmlTemplateContent": {
+    "description": "HTML content field hint"
+  },
+  "pleaseEnterHtmlContent": "Please enter HTML content",
+  "@pleaseEnterHtmlContent": {
+    "description": "HTML content validation message"
+  },
+  "cssContent": "CSS Content",
+  "@cssContent": {
+    "description": "CSS content field label"
+  },
+  "enterCssStyles": "Enter CSS styles",
+  "@enterCssStyles": {
+    "description": "CSS content field hint"
+  },
+  "setAsDefaultTemplate": "Set as Default Template",
+  "@setAsDefaultTemplate": {
+    "description": "Set as default template checkbox label"
+  },
+  "create": "Create",
+  "@create": {
+    "description": "Create button text"
+  },
+  "templateCreatedSuccessfully": "Template created successfully",
+  "@templateCreatedSuccessfully": {
+    "description": "Template created success message"
+  },
+  "errorCreatingTemplate": "Error creating template",
+  "@errorCreatingTemplate": {
+    "description": "Error message for creating template"
+  },
+  "editCustomTemplate": "Edit Custom Template",
+  "@editCustomTemplate": {
+    "description": "Edit template dialog title"
+  },
+  "templateUpdatedSuccessfully": "Template updated successfully",
+  "@templateUpdatedSuccessfully": {
+    "description": "Template updated success message"
+  },
+  "errorUpdatingTemplate": "Error updating template",
+  "@errorUpdatingTemplate": {
+    "description": "Error message for updating template"
+  },
+  "previewTemplate": "Preview Template",
+  "@previewTemplate": {
+    "description": "Preview template dialog title"
+  },
+  "information": "Information",
+  "@information": {
+    "description": "Information section title"
+  },
+  "newText": "New",
+  "@newText": {
+    "description": "New button text"
+  },
+  "refreshRecipes": "Refresh recipes",
+  "@refreshRecipes": {
+    "description": "Refresh recipes button tooltip"
+  },
+  "all": "All",
+  "@all": {
+    "description": "All filter option"
+  },
+  "easy": "Easy",
+  "@easy": {
+    "description": "Easy difficulty level"
+  },
+  "medium": "Medium",
+  "@medium": {
+    "description": "Medium difficulty level"
+  },
+  "hard": "Hard",
+  "@hard": {
+    "description": "Hard difficulty level"
+  },
+  "searchRecipes": "Search recipes...",
+  "@searchRecipes": {
+    "description": "Search recipes field hint"
+  },
+  "activeOnly": "Active Only",
+  "@activeOnly": {
+    "description": "Active only filter option"
+  },
+  "searchingRecipes": "Searching recipes...",
+  "@searchingRecipes": {
+    "description": "Searching recipes loading message"
+  },
+  "loadingRecipes": "Loading recipes...",
+  "@loadingRecipes": {
+    "description": "Loading recipes message"
+  },
+  "unableToLoadRecipes": "Unable to load recipes",
+  "@unableToLoadRecipes": {
+    "description": "Unable to load recipes error message"
+  },
+  "checkConnectionAndTryAgain": "Check your connection and try again",
+  "@checkConnectionAndTryAgain": {
+    "description": "Connection error message"
+  },
+  "tryAgain": "Try Again",
+  "@tryAgain": {
+    "description": "Try again button text"
+  },
+  "noRecipesFound": "No recipes found",
+  "@noRecipesFound": {
+    "description": "No recipes found message"
+  },
+  "noRecipesFoundForQuery": "No recipes found for query",
+  "@noRecipesFoundForQuery": {
+    "description": "No recipes found for search query"
+  },
+  "clearSearch": "Clear Search",
+  "@clearSearch": {
+    "description": "Clear search button text"
+  },
+  "noDifficultyRecipes": "No",
+  "@noDifficultyRecipes": {
+    "description": "No difficulty recipes message prefix"
+  },
+  "tryDifferentDifficultyOrCreateNew": "Try a different difficulty or create a new recipe",
+  "@tryDifferentDifficultyOrCreateNew": {
+    "description": "Try different difficulty message"
+  },
+  "difficulty": "Difficulty",
+  "@difficulty": {
+    "description": "Difficulty label"
+  },
+  "prepTime": "Prep Time",
+  "@prepTime": {
+    "description": "Prep time label"
+  },
+  "minutes": "minutes",
+  "@minutes": {
+    "description": "Minutes unit"
+  },
+  "cookTime": "Cook Time",
+  "@cookTime": {
+    "description": "Cook time label"
+  },
+  "servings": "Servings",
+  "@servings": {
+    "description": "Servings label"
+  },
+  "ingredients": "Ingredients",
+  "@ingredients": {
+    "description": "Ingredients label"
+  },
+  "instructions": "Instructions",
+  "@instructions": {
+    "description": "Instructions label"
+  },
+  "deleteRecipe": "Delete Recipe",
+  "@deleteRecipe": {
+    "description": "Delete recipe dialog title"
+  },
+  "deleteRecipeConfirmation": "Are you sure you want to delete the recipe",
+  "@deleteRecipeConfirmation": {
+    "description": "Delete recipe confirmation message"
+  },
+  "recipeDeletedSuccessfully": "Recipe deleted successfully",
+  "@recipeDeletedSuccessfully": {
+    "description": "Recipe deleted success message"
+  },
+  "failedToDeleteRecipe": "Failed to delete recipe",
+  "@failedToDeleteRecipe": {
+    "description": "Failed to delete recipe error message"
+  },
+  "templateSelection": "Template Selection",
+  "@templateSelection": {
+    "description": "Template selection section title"
+  },
+  "noTemplatesAvailable": "No templates available",
+  "@noTemplatesAvailable": {
+    "description": "No templates available message"
+  },
+  "failedToLoadTemplates": "Failed to load templates",
+  "@failedToLoadTemplates": {
+    "description": "Failed to load templates error message"
+  },
+  "contentOptions": "Content Options",
+  "@contentOptions": {
+    "description": "Content options section title"
+  },
+  "includePrices": "Include Prices",
+  "@includePrices": {
+    "description": "Include prices option"
+  },
+  "showItemPricesInMenu": "Show item prices in menu",
+  "@showItemPricesInMenu": {
+    "description": "Show item prices in menu description"
+  },
+  "includeDescriptions": "Include Descriptions",
+  "@includeDescriptions": {
+    "description": "Include descriptions option"
+  },
+  "showItemDescriptions": "Show item descriptions in menu",
+  "@showItemDescriptions": {
+    "description": "Show item descriptions in menu description"
+  },
+  "includeAllergens": "Include Allergens",
+  "@includeAllergens": {
+    "description": "Include allergens option"
+  },
+  "showAllergenInformation": "Show allergen information",
+  "@showAllergenInformation": {
+    "description": "Show allergen information description"
+  },
+  "includeCalories": "Include Calories",
+  "@includeCalories": {
+    "description": "Include calories option"
+  },
+  "showCalorieInformation": "Show calorie information",
+  "@showCalorieInformation": {
+    "description": "Show calorie information description"
+  },
+  "includeItemImages": "Include Item Images",
+  "@includeItemImages": {
+    "description": "Include item images option"
+  },
+  "showMenuItemImagesInPdf": "Show menu item images in PDF",
+  "@showMenuItemImagesInPdf": {
+    "description": "Show menu item images in PDF description"
+  },
+  "includeBusinessLogo": "Include Business Logo",
+  "@includeBusinessLogo": {
+    "description": "Include business logo option"
+  },
+  "showBusinessLogoInPdfHeader": "Show business logo in PDF header",
+  "@showBusinessLogoInPdfHeader": {
+    "description": "Show business logo in PDF header description"
+  },
+  "layoutOptions": "Layout Options",
+  "@layoutOptions": {
+    "description": "Layout options section title"
+  },
+  "orientation": "Orientation",
+  "@orientation": {
+    "description": "Orientation field label"
+  },
+  "portrait": "Portrait",
+  "@portrait": {
+    "description": "Portrait orientation"
+  },
+  "landscape": "Landscape",
+  "@landscape": {
+    "description": "Landscape orientation"
+  },
+  "fontSize": "Font Size",
+  "@fontSize": {
+    "description": "Font size field label"
+  },
+  "small": "Small",
+  "@small": {
+    "description": "Small font size"
+  },
+  "large": "Large",
+  "@large": {
+    "description": "Large font size"
+  },
+  "colorScheme": "Color Scheme",
+  "@colorScheme": {
+    "description": "Color scheme field label"
+  },
+  "light": "Light",
+  "@light": {
+    "description": "Light color scheme"
+  },
+  "dark": "Dark",
+  "@dark": {
+    "description": "Dark color scheme"
+  },
+  "auto": "Auto",
+  "@auto": {
+    "description": "Auto color scheme"
+  },
+  "categoryLayoutOptions": "Category Layout Options",
+  "@categoryLayoutOptions": {
+    "description": "Category layout options section title"
+  },
+  "categoryLayout": "Category Layout",
+  "@categoryLayout": {
+    "description": "Category layout field label"
+  },
+  "howCategoriesAreOrganizedInPdf": "How categories are organized in the PDF",
+  "@howCategoriesAreOrganizedInPdf": {
+    "description": "Category layout helper text"
+  },
+  "samePageCategoryItemsTogether": "Same page - category items together",
+  "@samePageCategoryItemsTogether": {
+    "description": "Same page category layout option"
+  },
+  "separatePageCategoryTitlePageItemsPages": "Separate page - category title page, items on pages",
+  "@separatePageCategoryTitlePageItemsPages": {
+    "description": "Separate page category layout option"
+  },
+  "categoryBackgroundColor": "Category Background Color",
+  "@categoryBackgroundColor": {
+    "description": "Category background color field label"
+  },
+  "hexColorCodeExample": "Hex color code (e.g., #0066CC)",
+  "@hexColorCodeExample": {
+    "description": "Hex color code example"
+  },
+  "maxItemsPerPage": "Max Items Per Page",
+  "@maxItemsPerPage": {
+    "description": "Max items per page field label"
+  },
+  "defaultColon": "Default:",
+  "@defaultColon": {
+    "description": "Default colon text"
+  },
+  "generatingPdf": "Generating PDF...",
+  "@generatingPdf": {
+    "description": "Generating PDF loading message"
+  },
+  "generatePdfMenu": "Generate PDF Menu",
+  "@generatePdfMenu": {
+    "description": "Generate PDF menu button text"
+  },
+  "pleaseSelectTemplate": "Please select a template",
+  "@pleaseSelectTemplate": {
+    "description": "Please select template message"
+  },
+  "pdfGeneratedSuccessfully": "PDF generated successfully",
+  "@pdfGeneratedSuccessfully": {
+    "description": "PDF generated successfully message"
+  },
+  "goBack": "Go Back",
+  "@goBack": {
+    "description": "Go back button text"
+  },
+  "addMenuItem": "Add Menu Item",
+  "@addMenuItem": {
+    "description": "Add menu item button text"
+  },
+  "selectBusiness": "Select Business",
+  "@selectBusiness": {
+    "description": "Select business field label"
+  },
+  "selectOneBusiness": "Select one business",
+  "@selectOneBusiness": {
+    "description": "Select one business message"
+  },
+  "searchMenuItems": "Search menu items",
+  "@searchMenuItems": {
+    "description": "Search menu items field label"
+  },
+  "category": "Category",
+  "@category": {
+    "description": "Category field label"
+  },
+  "allCategories": "All Categories",
+  "@allCategories": {
+    "description": "All categories option"
+  },
+  "availableOnly": "Available Only",
+  "@availableOnly": {
+    "description": "Available only filter option"
+  },
+  "clearFilters": "Clear Filters",
+  "@clearFilters": {
+    "description": "Clear filters button text"
+  },
+  "selectABusiness": "Select a business",
+  "@selectABusiness": {
+    "description": "Select a business message"
+  },
+  "pleaseSelectABusinessFromDropdown": "Please select a business from the dropdown",
+  "@pleaseSelectABusinessFromDropdown": {
+    "description": "Please select a business from dropdown message"
+  },
+  "errorLoadingMenuItems": "Error loading menu items",
+  "@errorLoadingMenuItems": {
+    "description": "Error loading menu items message"
+  },
+  "noMenuItemsFound": "No menu items found",
+  "@noMenuItemsFound": {
+    "description": "No menu items found message"
+  },
+  "tryAdjustingFiltersOrAddNewMenuItem": "Try adjusting filters or add a new menu item",
+  "@tryAdjustingFiltersOrAddNewMenuItem": {
+    "description": "Try adjusting filters or add new menu item message"
+  },
+  "categoryId": "Category ID",
+  "@categoryId": {
+    "description": "Category ID field label"
+  },
+  "makeUnavailable": "Make Unavailable",
+  "@makeUnavailable": {
+    "description": "Make unavailable button text"
+  },
+  "deleteMenuItem": "Delete Menu Item",
+  "@deleteMenuItem": {
+    "description": "Delete menu item dialog title"
+  },
+  "menuItemDeletedSuccessfully": "Menu item deleted successfully",
+  "@menuItemDeletedSuccessfully": {
+    "description": "Menu item deleted success message"
+  },
+  "errorDeletingMenuItem": "Error deleting menu item",
+  "@errorDeletingMenuItem": {
+    "description": "Error deleting menu item message"
+  },
+  "menuItemMadeUnavailable": "made unavailable",
+  "@menuItemMadeUnavailable": {
+    "description": "Menu item made unavailable message"
+  },
+  "menuItemMadeAvailable": "made available",
+  "@menuItemMadeAvailable": {
+    "description": "Menu item made available message"
+  },
+  "successfully": "successfully",
+  "@successfully": {
+    "description": "Successfully message"
+  },
+  "errorUpdatingMenuItemAvailability": "Error updating menu item availability",
+  "@errorUpdatingMenuItemAvailability": {
+    "description": "Error updating menu item availability message"
+  },
+  "createMenuItem": "Create Menu Item",
+  "@createMenuItem": {
+    "description": "Create menu item dialog title"
+  },
+  "business": "Business",
+  "@business": {
+    "description": "Business field label"
+  },
+  "pleaseSelectACategory": "Please select a category",
+  "@pleaseSelectACategory": {
+    "description": "Please select a category message"
+  },
+  "pleaseSelectABusinessFirst": "Please select a business first",
+  "@pleaseSelectABusinessFirst": {
+    "description": "Please select a business first message"
+  },
+  "menuItemCreatedSuccessfully": "Menu item created successfully",
+  "@menuItemCreatedSuccessfully": {
+    "description": "Menu item created success message"
+  },
+  "errorCreatingMenuItem": "Error creating menu item",
+  "@errorCreatingMenuItem": {
+    "description": "Error creating menu item message"
+  },
+  "editMenuItem": "Edit Menu Item",
+  "@editMenuItem": {
+    "description": "Edit menu item dialog title"
+  },
+  "menuItemUpdatedSuccessfully": "Menu item updated successfully",
+  "@menuItemUpdatedSuccessfully": {
+    "description": "Menu item updated success message"
+  },
+  "errorUpdatingMenuItem": "Error updating menu item",
+  "@errorUpdatingMenuItem": {
+    "description": "Error updating menu item message"
+  },
+  "@accessDeniedDescription": {
+    "description": "Access denied description"
+  },
+  "systemAdministration": "System Administration",
+  "@systemAdministration": {
+    "description": "System administration title"
+  },
+  "multiTenantPosManagement": "Multi-Tenant POS Management",
+  "@multiTenantPosManagement": {
+    "description": "Multi-tenant POS management title"
+  },
+  "multiTenantPosDescription": "Manage multiple businesses and their POS systems",
+  "@multiTenantPosDescription": {
+    "description": "Multi-tenant POS description"
+  },
+  "systemOverview": "System Overview",
+  "@systemOverview": {
+    "description": "System overview title"
+  },
+  "totalBusinesses": "Total Businesses",
+  "@totalBusinesses": {
+    "description": "Total businesses label"
+  },
+  "activeUsers": "Active Users",
+  "@activeUsers": {
+    "description": "Active users label"
+  },
+  "menuItems": "Menu Items",
+  "@menuItems": {
+    "description": "Menu items label"
+  },
+  "orderForTable": "Order for Table",
+  "@orderForTable": {
+    "description": "Order for table label"
+  },
+  "refreshOrders": "Refresh Orders",
+  "@refreshOrders": {
+    "description": "Refresh orders button"
+  },
+  "loadingTableOrders": "Loading table orders...",
+  "@loadingTableOrders": {
+    "description": "Loading table orders message"
+  },
+  "errorLoadingOrders": "Error loading orders",
+  "@errorLoadingOrders": {
+    "description": "Error loading orders message"
+  },
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry button"
+  },
+  "customerDetails": "Customer Details",
+  "@customerDetails": {
+    "description": "Customer details label"
+  },
+  "customerNameLabel": "Customer Name",
+  "@customerNameLabel": {
+    "description": "Customer name label"
+  },
+  "enterCustomerName": "Enter customer name",
+  "@enterCustomerName": {
+    "description": "Enter customer name hint"
+  },
+  "specialInstructions": "Special Instructions",
+  "@specialInstructions": {
+    "description": "Special instructions label"
+  },
+  "specialInstructionsHint": "Any special instructions for the order",
+  "@specialInstructionsHint": {
+    "description": "Special instructions hint"
+  },
+  "noMenuItemsAvailable": "No menu items available",
+  "@noMenuItemsAvailable": {
+    "description": "No menu items available message"
+  },
+  "menuItemsTemporarilyUnavailable": "Menu items temporarily unavailable",
+  "@menuItemsTemporarilyUnavailable": {
+    "description": "Menu items temporarily unavailable message"
+  },
+  "existingOrderItemsWillStillBeShown": "Existing order items will still be shown",
+  "@existingOrderItemsWillStillBeShown": {
+    "description": "Existing order items message"
+  },
+  "orderItemsCount": "Order Items Count",
+  "@orderItemsCount": {
+    "description": "Order items count label"
+  },
+  "noItemsInCart": "No items in cart",
+  "@noItemsInCart": {
+    "description": "No items in cart message"
+  },
+  "subtotal": "Subtotal",
+  "@subtotal": {
+    "description": "Subtotal label"
+  },
+  "tax": "Tax",
+  "@tax": {
+    "description": "Tax label"
+  },
+  "totalWithColon": "Total:",
+  "@totalWithColon": {
+    "description": "Total with colon"
+  },
+  "pleaseAddItemsToOrder": "Please add items to your order",
+  "@pleaseAddItemsToOrder": {
+    "description": "Please add items to order message"
+  },
+  "orderSubmittedSuccessfully": "Order submitted successfully",
+  "@orderSubmittedSuccessfully": {
+    "description": "Order submitted successfully message"
+  },
+  "failedToSubmitOrder": "Failed to submit order",
+  "@failedToSubmitOrder": {
+    "description": "Failed to submit order message"
+  },
+  "guest": "Guest",
+  "@guest": {
+    "description": "Guest label"
+  },
+  "kitchenOrders": "Kitchen Orders",
+  "@kitchenOrders": {
+    "description": "Kitchen orders title"
+  },
+  "refreshOrders": "Refresh Orders",
+  "@refreshOrders": {
+    "description": "Refresh orders button"
+  },
+  "allCaughtUp": "All caught up!",
+  "@allCaughtUp": {
+    "description": "All caught up message"
+  },
+  "loadingKitchenOrders": "Loading kitchen orders...",
+  "@loadingKitchenOrders": {
+    "description": "Loading kitchen orders message"
+  },
+  "pleaseCheckConnectionAndTryAgain": "Please check your connection and try again",
+  "@pleaseCheckConnectionAndTryAgain": {
+    "description": "Check connection message"
+  },
+  "order": "Order",
+  "@order": {
+    "description": "Order label"
+  },
+  "urgent": "Urgent",
+  "@urgent": {
+    "description": "Urgent label"
+  },
+  "table": "Table",
+  "@table": {
+    "description": "Table label"
+  },
+  "readOnlyMode": "Read Only Mode",
+  "@readOnlyMode": {
+    "description": "Read only mode label"
+  },
+  "tables": "Tables",
+  "@tables": {
+    "description": "Tables label"
+  },
+  "refreshTables": "Refresh Tables",
+  "@refreshTables": {
+    "description": "Refresh tables button"
+  },
+  "noFloorPlansAvailable": "No floor plans available",
+  "@noFloorPlansAvailable": {
+    "description": "No floor plans available message"
+  },
+  "floorPlanView": "Floor Plan View",
+  "@floorPlanView": {
+    "description": "Floor plan view label"
+  },
+  "searchTables": "Search Tables",
+  "@searchTables": {
+    "description": "Search tables label"
+  },
+  "all": "All",
+  "@all": {
+    "description": "All label"
+  },
+  "available": "Available",
+  "@available": {
+    "description": "Available label"
+  },
+  "occupied": "Occupied",
+  "@occupied": {
+    "description": "Occupied label"
+  },
+  "reserved": "Reserved",
+  "@reserved": {
+    "description": "Reserved label"
+  },
+  "cleaning": "Cleaning",
+  "@cleaning": {
+    "description": "Cleaning label"
+  },
+  "loadingTables": "Loading tables...",
+  "@loadingTables": {
+    "description": "Loading tables message"
+  },
+  "errorLoadingTables": "Error loading tables",
+  "@errorLoadingTables": {
+    "description": "Error loading tables message"
+  },
+  "noTablesFoundMatching": "No tables found matching your search",
+  "@noTablesFoundMatching": {
+    "description": "No tables found matching search"
+  },
+  "noAvailableTables": "No available tables",
+  "@noAvailableTables": {
+    "description": "No available tables message"
+  },
+  "noOccupiedTables": "No occupied tables",
+  "@noOccupiedTables": {
+    "description": "No occupied tables message"
+  },
+  "noReservedTables": "No reserved tables",
+  "@noReservedTables": {
+    "description": "No reserved tables message"
+  },
+  "noTablesBeingCleaned": "No tables being cleaned",
+  "@noTablesBeingCleaned": {
+    "description": "No tables being cleaned message"
+  },
+  "noTablesFound": "No tables found",
+  "@noTablesFound": {
+    "description": "No tables found message"
+  },
+  "checkBackLaterOrTryDifferentFilter": "Check back later or try a different filter",
+  "@checkBackLaterOrTryDifferentFilter": {
+    "description": "Check back later message"
+  },
+  "seats": "Seats",
+  "@seats": {
+    "description": "Seats label"
+  },
+  "details": "Details",
+  "@details": {
+    "description": "Details label"
+  },
+  "status": "Status",
+  "@status": {
+    "description": "Status label"
+  },
+  "capacity": "Capacity",
+  "@capacity": {
+    "description": "Capacity label"
+  },
+  "customer": "Customer",
+  "@customer": {
+    "description": "Customer label"
+  },
+  "assignedTo": "Assigned To",
+  "@assignedTo": {
+    "description": "Assigned to label"
+  },
+  "notes": "Notes",
+  "@notes": {
+    "description": "Notes label"
+  },
+  "lastActivity": "Last Activity",
+  "@lastActivity": {
+    "description": "Last activity label"
+  },
+  "reservation": "Reservation",
+  "@reservation": {
+    "description": "Reservation label"
+  },
+  "orderItems": "Order Items",
+  "@orderItems": {
+    "description": "Order items label"
+  },
+  "noItems": "No Items",
+  "@noItems": {
+    "description": "No items label"
+  },
+  "total": "Total",
+  "@total": {
+    "description": "Total label"
+  },
+  "close": "Close",
+  "@close": {
+    "description": "Close button"
+  },
+  "reserveTable": "Reserve Table",
+  "@reserveTable": {
+    "description": "Reserve table button"
+  },
+  "customerName": "Customer Name",
+  "@customerName": {
+    "description": "Customer name label"
+  },
+  "time": "Time",
+  "@time": {
+    "description": "Time label"
+  },
+  "selectTime": "Select Time",
+  "@selectTime": {
+    "description": "Select time label"
+  },
+  "placeholder": "Placeholder",
+  "@placeholder": {
+    "description": "Placeholder text"
+  },
+  "reserve": "Reserve",
+  "@reserve": {
+    "description": "Reserve button"
+  },
+  "seatCustomerAtTable": "Seat Customer at Table",
+  "@seatCustomerAtTable": {
+    "description": "Seat customer at table button"
+  },
+  "partySize": "Party Size",
+  "@partySize": {
+    "description": "Party size label"
+  },
+  "pleaseEnterValidNameAndPartySize": "Please enter a valid name and party size",
+  "@pleaseEnterValidNameAndPartySize": {
+    "description": "Please enter valid name and party size message"
+  },
+  "customerSeatedAtTable": "Customer seated at table successfully",
+  "@customerSeatedAtTable": {
+    "description": "Customer seated at table message"
+  },
+  "failedToSeatCustomer": "Failed to seat customer",
+  "@failedToSeatCustomer": {
+    "description": "Failed to seat customer message"
+  },
+  "seat": "Seat",
+  "@seat": {
+    "description": "Seat button"
+  },
+  "clearingTable": "Clearing table...",
+  "@clearingTable": {
+    "description": "Clearing table message"
+  },
+  "clearedSuccessfully": "cleared successfully",
+  "@clearedSuccessfully": {
+    "description": "Cleared successfully message"
+  },
+  "failedToClearTable": "Failed to clear table",
+  "@failedToClearTable": {
+    "description": "Failed to clear table message"
+  },
+  "checkInReservationForTable": "Check In Reservation for Table",
+  "@checkInReservationForTable": {
+    "description": "Check in reservation for table button"
+  },
+  "checkIn": "Check In",
+  "@checkIn": {
+    "description": "Check in button"
+  },
+  "reservationCheckedInForTable": "Reservation checked in for table successfully",
+  "@reservationCheckedInForTable": {
+    "description": "Reservation checked in message"
+  },
+  "failedToCheckIn": "Failed to check in",
+  "@failedToCheckIn": {
+    "description": "Failed to check in message"
+  },
+  "view": "View",
+  "@view": {
+    "description": "View button"
+  },
+  "ready": "Ready",
+  "@ready": {
+    "description": "Ready label"
+  },
+  "addItems": "Add Items",
+  "@addItems": {
+    "description": "Add items button"
+  },
+  "start": "Start",
+  "@start": {
+    "description": "Start button"
+  },
+  "waiterDashboard": "Waiter Dashboard",
+  "@waiterDashboard": {
+    "description": "Waiter dashboard title"
+  },
+  "welcomeBack": "Welcome Back",
+  "@welcomeBack": {
+    "description": "Welcome back message"
+  },
+  "waiter": "Waiter",
+  "@waiter": {
+    "description": "Waiter label"
+  },
+  "readyToServeCustomers": "Ready to serve customers",
+  "@readyToServeCustomers": {
+    "description": "Ready to serve customers message"
+  },
+  "activeTables": "Active Tables",
+  "@activeTables": {
+    "description": "Active tables label"
+  },
+  "pendingOrders": "Pending Orders",
+  "@pendingOrders": {
+    "description": "Pending orders label"
+  },
+  "todaysTips": "Today's Tips",
+  "@todaysTips": {
+    "description": "Today's tips label"
+  },
+  "quickActions": "Quick Actions",
+  "@quickActions": {
+    "description": "Quick actions label"
+  },
+  "orderHistory": "Order History",
+  "@orderHistory": {
+    "description": "Order history label"
+  },
+  "viewPastOrders": "View Past Orders",
+  "@viewPastOrders": {
+    "description": "View past orders button"
+  },
+  "customerInfo": "Customer Info",
+  "@customerInfo": {
+    "description": "Customer info label"
+  },
+  "manageCustomerDetails": "Manage Customer Details",
+  "@manageCustomerDetails": {
+    "description": "Manage customer details button"
+  },
+  "customerInformation": "Customer Information",
+  "@customerInformation": {
+    "description": "Customer information label"
+  },
+  "inventoryCheck": "Inventory Check",
+  "@inventoryCheck": {
+    "description": "Inventory check label"
+  },
+  "checkItemAvailability": "Check Item Availability",
+  "@checkItemAvailability": {
+    "description": "Check item availability button"
+  },
+  "dailyReport": "Daily Report",
+  "@dailyReport": {
+    "description": "Daily report label"
+  },
+  "viewDailySummary": "View Daily Summary",
+  "@viewDailySummary": {
+    "description": "View daily summary button"
+  },
+  "recentActivity": "Recent Activity",
+  "@recentActivity": {
+    "description": "Recent activity label"
+  },
+  "tableOrderCompleted": "Table order completed",
+  "@tableOrderCompleted": {
+    "description": "Table order completed message"
+  },
+  "orderCompletedLowercase": "completed",
+  "@orderCompletedLowercase": {
+    "description": "Order completed lowercase"
+  },
+  "newCustomerAtTable": "New customer at table",
+  "@newCustomerAtTable": {
+    "description": "New customer at table message"
+  },
+  "kitchenNotificationTableReady": "Kitchen notification: table ready",
+  "@kitchenNotificationTableReady": {
+    "description": "Kitchen notification table ready message"
+  },
+  "readyLowercase": "ready",
+  "@readyLowercase": {
+    "description": "Ready lowercase"
+  },
+  "promotionUpdated": "Promotion updated",
+  "@promotionUpdated": {
+    "description": "Promotion updated message"
+  },
+  "happyHourSpecial": "Happy Hour Special",
+  "@happyHourSpecial": {
+    "description": "Happy hour special label"
+  },
+  "comingSoon": "Coming Soon",
+  "@comingSoon": {
+    "description": "Coming soon label"
+  },
+  "smartRecipeSuggestions": "Smart Recipe Suggestions",
+  "@smartRecipeSuggestions": {
+    "description": "Smart recipe suggestions label"
+  },
+  "cooked": "Cooked",
+  "@cooked": {
+    "description": "Cooked label"
+  },
+  "wastePrevention": "Waste Prevention",
+  "@wastePrevention": {
+    "description": "Waste prevention label"
+  },
+  "noPendingSuggestionsAvailable": "No pending suggestions available",
+  "@noPendingSuggestionsAvailable": {
+    "description": "No pending suggestions available message"
+  },
+  "highUrgency": "High Urgency",
+  "@highUrgency": {
+    "description": "High urgency label"
+  },
+  "mediumUrgency": "Medium Urgency",
+  "@mediumUrgency": {
+    "description": "Medium urgency label"
+  },
+  "lowUrgency": "Low Urgency",
+  "@lowUrgency": {
+    "description": "Low urgency label"
+  },
+  "noCookedSuggestionsAvailable": "No cooked suggestions available",
+  "@noCookedSuggestionsAvailable": {
+    "description": "No cooked suggestions available message"
+  },
+  "noSuggestionsAvailable": "No suggestions available",
+  "@noSuggestionsAvailable": {
+    "description": "No suggestions available message"
+  },
+  "errorLoadingWastePreventionData": "Error loading waste prevention data",
+  "@errorLoadingWastePreventionData": {
+    "description": "Error loading waste prevention data message"
+  },
+  "noSmartRecipeSuggestionsAvailable": "No smart recipe suggestions available",
+  "@noSmartRecipeSuggestionsAvailable": {
+    "description": "No smart recipe suggestions available message"
+  },
+  "confidence": "Confidence",
+  "@confidence": {
+    "description": "Confidence label"
+  },
+  "potentialSavings": "Potential Savings",
+  "@potentialSavings": {
+    "description": "Potential savings label"
+  },
+  "matchingIngredients": "Matching Ingredients",
+  "@matchingIngredients": {
+    "description": "Matching ingredients label"
+  },
+  "alreadyCooked": "Already Cooked",
+  "@alreadyCooked": {
+    "description": "Already cooked label"
+  },
+  "cookedOn": "Cooked On",
+  "@cookedOn": {
+    "description": "Cooked on label"
+  },
+  "ingredientsUsed": "Ingredients Used",
+  "@ingredientsUsed": {
+    "description": "Ingredients used label"
+  },
+  "recipeCookedSuccessfully": "Recipe cooked successfully",
+  "@recipeCookedSuccessfully": {
+    "description": "Recipe cooked successfully message"
+  },
+  "cookRecipeTitle": "Cook Recipe",
+  "@cookRecipeTitle": {
+    "description": "Cook recipe title"
+  },
+  "cookRecipeUsing": "Cook recipe using",
+  "@cookRecipeUsing": {
+    "description": "Cook recipe using message"
+  },
+  "thisWill": "This will",
+  "@thisWill": {
+    "description": "This will message"
+  },
+  "recipeConfiguration": "Recipe Configuration",
+  "@recipeConfiguration": {
+    "description": "Recipe configuration label"
+  },
+  "thisWillCreatePromotionWithSameQuantity": "This will create a promotion with the same quantity",
+  "@thisWillCreatePromotionWithSameQuantity": {
+    "description": "This will create promotion message"
+  },
+  "chefSpecialExample": "Chef's Special Example",
+  "@chefSpecialExample": {
+    "description": "Chef special example label"
+  },
+  "quantityMustBeGreaterThan0": "Quantity must be greater than 0",
+  "@quantityMustBeGreaterThan0": {
+    "description": "Quantity must be greater than 0 message"
+  },
+  "createPromotionFor": "Create Promotion for",
+  "@createPromotionFor": {
+    "description": "Create promotion for label"
+  },
+  "createAPromotionToHelpMoveInventory": "Create a promotion to help move inventory",
+  "@createAPromotionToHelpMoveInventory": {
+    "description": "Create promotion to help move inventory message"
+  },
+  "chefSpecialDiscountExample": "Chef's Special Discount Example",
+  "@chefSpecialDiscountExample": {
+    "description": "Chef special discount example label"
+  },
+  "cookingRecipe": "Cooking recipe...",
+  "@cookingRecipe": {
+    "description": "Cooking recipe message"
+  },
+  "recipe": "Recipe",
+  "@recipe": {
+    "description": "Recipe label"
+  },
+  "quantityCooked": "Quantity Cooked",
+  "@quantityCooked": {
+    "description": "Quantity cooked label"
+  },
+  "costSavings": "Cost Savings",
+  "@costSavings": {
+    "description": "Cost savings label"
+  },
+  "failedToCookRecipe": "Failed to cook recipe",
+  "@failedToCookRecipe": {
+    "description": "Failed to cook recipe message"
+  },
+  "na": "N/A",
+  "@na": {
+    "description": "Not available label"
+  },
+  "unknownItem": "Unknown Item",
+  "@unknownItem": {
+    "description": "Unknown item label"
+  },
+  "promotionsManagement": "Promotions Management",
+  "@promotionsManagement": {
+    "description": "Promotions management screen title"
+  },
+  "errorLoadingPromotions": "Error loading promotions",
+  "@errorLoadingPromotions": {
+    "description": "Error loading promotions message"
+  },
+  "noPromotionsYet": "No promotions yet",
+  "@noPromotionsYet": {
+    "description": "No promotions yet message"
+  },
+  "createYourFirstPromotionToGetStarted": "Create your first promotion to get started",
+  "@createYourFirstPromotionToGetStarted": {
+    "description": "Create first promotion message"
+  },
+  "scheduled": "Scheduled",
+  "@scheduled": {
+    "description": "Scheduled status"
+  },
+  "expired": "Expired",
+  "@expired": {
+    "description": "Expired status"
+  },
+  "createPromotionFormWillBeImplemented": "Create promotion form will be implemented here",
+  "@createPromotionFormWillBeImplemented": {
+    "description": "Create promotion form placeholder"
+  },
+  "editPromotion": "Edit Promotion",
+  "@editPromotion": {
+    "description": "Edit promotion title"
+  },
+  "editPromotionFormWillBeImplemented": "Edit promotion form will be implemented here",
+  "@editPromotionFormWillBeImplemented": {
+    "description": "Edit promotion form placeholder"
+  },
+  "deletePromotion": "Delete Promotion",
+  "@deletePromotion": {
+    "description": "Delete promotion title"
+  },
+  "areYouSureYouWantToDelete": "Are you sure you want to delete",
+  "@areYouSureYouWantToDelete": {
+    "description": "Delete confirmation message"
+  },
+  "createChefSpecialPromotion": "Create Chef Special Promotion",
+  "@createChefSpecialPromotion": {
+    "description": "Create chef special promotion title"
+  },
+  "availableRecipes": "Available Recipes",
+  "@availableRecipes": {
+    "description": "Available recipes section title"
+  },
+  "errorLoadingRecipes": "Error loading recipes",
+  "@errorLoadingRecipes": {
+    "description": "Error loading recipes message"
+  },
+  "noRecipeSuggestionsAvailable": "No recipe suggestions available",
+  "@noRecipeSuggestionsAvailable": {
+    "description": "No recipe suggestions available message"
+  },
+  "quantity": "Quantity",
+  "@quantity": {
+    "description": "Quantity field label"
+  },
+  "wasteReduction": "Waste Reduction",
+  "@wasteReduction": {
+    "description": "Waste reduction section title"
+  },
+  "promotionCreated": "Promotion created",
+  "@promotionCreated": {
+    "description": "Promotion created message"
+  },
+  "type": "Type",
+  "@type": {
+    "description": "Type field label"
+  },
+  "quantityTracking": "Quantity Tracking",
+  "@quantityTracking": {
+    "description": "Quantity tracking section title"
+  },
+  "totalQuantity": "Total Quantity",
+  "@totalQuantity": {
+    "description": "Total quantity label"
+  },
+  "usedQuantity": "Used Quantity",
+  "@usedQuantity": {
+    "description": "Used quantity label"
+  },
+  "remaining": "Remaining",
+  "@remaining": {
+    "description": "Remaining label"
+  },
+  "expires": "Expires",
+  "@expires": {
+    "description": "Expires label"
+  },
+  "specialOffer": "Special Offer",
+  "@specialOffer": {
+    "description": "Special offer label"
+  },
+  "selectedItems": "Selected Items",
+  "@selectedItems": {
+    "description": "Selected items label"
+  },
+  "noDescription": "No description",
+  "@noDescription": {
+    "description": "No description placeholder"
+  },
+  "cook": "Cook",
+  "@cook": {
+    "description": "Cook button text"
+  },
+  "freshlyPrepared": "Freshly prepared",
+  "@freshlyPrepared": {
+    "description": "Freshly prepared description"
+  },
+  "usingPremiumIngredients": "using premium ingredients",
+  "@usingPremiumIngredients": {
+    "description": "Using premium ingredients description"
+  },
+  "createPromotionWithQuantityTracking": "Create promotion with quantity tracking",
+  "@createPromotionWithQuantityTracking": {
+    "description": "Create promotion with quantity tracking description"
+  },
+  "createAPromotionForExpiringOrUnderperformingItems": "Create a promotion for expiring or underperforming items",
+  "@createAPromotionForExpiringOrUnderperformingItems": {
+    "description": "Create promotion for expiring items description"
+  },
+  "createTargetedPromotions": "Create targeted promotions",
+  "@createTargetedPromotions": {
+    "description": "Create targeted promotions description"
+  },
+  "helpMoveInventory": "help move inventory",
+  "@helpMoveInventory": {
+    "description": "Help move inventory description"
+  },
+  "increaseSalesAndReduceWaste": "increase sales and reduce waste",
+  "@increaseSalesAndReduceWaste": {
+    "description": "Increase sales and reduce waste description"
+  },
+  "cookingAnalytics": "Cooking Analytics",
+  "@cookingAnalytics": {
+    "description": "Cooking analytics section title"
+  },
+  "errorLoadingAnalytics": "Error loading analytics",
+  "@errorLoadingAnalytics": {
+    "description": "Error loading analytics message"
+  },
+  "totalRecipesCooked": "Total Recipes Cooked",
+  "@totalRecipesCooked": {
+    "description": "Total recipes cooked label"
+  },
+  "wasteReduced": "Waste Reduced",
+  "@wasteReduced": {
+    "description": "Waste reduced label"
+  },
+  "promotionsCreated": "Promotions Created",
+  "@promotionsCreated": {
+    "description": "Promotions created label"
+  },
+  "errorLoadingHistory": "Error loading history",
+  "@errorLoadingHistory": {
+    "description": "Error loading history message"
+  },
+  "noCookingHistoryYet": "No cooking history yet",
+  "@noCookingHistoryYet": {
+    "description": "No cooking history yet message"
+  },
+  "startCookingRecipesToSeeYourHistoryHere": "Start cooking recipes to see your history here",
+  "@startCookingRecipesToSeeYourHistoryHere": {
+    "description": "Start cooking recipes message"
+  },
+  "unknownRecipe": "Unknown recipe",
+  "@unknownRecipe": {
+    "description": "Unknown recipe placeholder"
+  },
+  "date": "Date",
+  "@date": {
+    "description": "Date field label"
+  },
+  "unknownDate": "Unknown date",
+  "@unknownDate": {
+    "description": "Unknown date placeholder"
+  },
+  "invalidDate": "Invalid date",
+  "@invalidDate": {
+    "description": "Invalid date message"
+  },
+  "urgency": "Urgency",
+  "@urgency": {
+    "description": "Urgency field label"
+  },
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry button text"
+  },
+  "order": "Order",
+  "@order": {
+    "description": "Order label"
+  },
+  "table": "Table",
+  "@table": {
+    "description": "Table label"
+  },
+  "details": "Details",
+  "@details": {
+    "description": "Details label"
+  },
+  "status": "Status",
+  "@status": {
+    "description": "Status label"
+  },
+  "capacity": "Capacity",
+  "@capacity": {
+    "description": "Capacity label"
+  },
+  "seats": "seats",
+  "@seats": {
+    "description": "Seats label"
+  },
+  "customer": "Customer",
+  "@customer": {
+    "description": "Customer label"
+  },
+  "assignedTo": "Assigned to",
+  "@assignedTo": {
+    "description": "Assigned to label"
+  },
+  "notes": "Notes",
+  "@notes": {
+    "description": "Notes label"
+  },
+  "lastActivity": "Last Activity",
+  "@lastActivity": {
+    "description": "Last activity label"
+  },
+  "reservation": "Reservation",
+  "@reservation": {
+    "description": "Reservation label"
+  },
+  "reserveTable": "Reserve Table",
+  "@reserveTable": {
+    "description": "Reserve table action"
+  },
+  "time": "Time",
+  "@time": {
+    "description": "Time label"
+  },
+  "reserved": "reserved",
+  "@reserved": {
+    "description": "Reserved status"
+  },
+  "placeholder": "placeholder",
+  "@placeholder": {
+    "description": "Placeholder text"
+  },
+  "seatCustomerAtTable": "Seat Customer at Table",
+  "@seatCustomerAtTable": {
+    "description": "Seat customer at table action"
+  },
+  "customerSeatedAtTable": "Customer seated at table",
+  "@customerSeatedAtTable": {
+    "description": "Customer seated at table message"
+  },
+  "failedToSeatCustomer": "Failed to seat customer",
+  "@failedToSeatCustomer": {
+    "description": "Failed to seat customer error"
+  },
+  "clearingTable": "Clearing table",
+  "@clearingTable": {
+    "description": "Clearing table action"
+  },
+  "clearedSuccessfully": "cleared successfully",
+  "@clearedSuccessfully": {
+    "description": "Table cleared successfully message"
+  },
+  "failedToClearTable": "Failed to clear table",
+  "@failedToClearTable": {
+    "description": "Failed to clear table error"
+  },
+  "checkInReservationForTable": "Check in Reservation for Table",
+  "@checkInReservationForTable": {
+    "description": "Check in reservation for table action"
+  },
+  "reservationCheckedInForTable": "Reservation checked in for table",
+  "@reservationCheckedInForTable": {
+    "description": "Reservation checked in for table message"
+  },
+  "failedToCheckIn": "Failed to check in",
+  "@failedToCheckIn": {
+    "description": "Failed to check in error"
+  },
+  "reportsAndAnalytics": "Reports & Analytics",
+  "@reportsAndAnalytics": {
+    "description": "Reports and analytics screen title"
+  },
+  "refreshData": "Refresh Data",
+  "@refreshData": {
+    "description": "Refresh data action"
+  },
+  "exportReport": "Export Report",
+  "@exportReport": {
+    "description": "Export report action"
+  },
+  "recipeAndPromotionFeatures": "Recipe & Promotion Features",
+  "@recipeAndPromotionFeatures": {
+    "description": "Recipe and promotion features label"
+  },
+  "overview": "Overview",
+  "@overview": {
+    "description": "Overview section"
+  },
+  "transactions": "Transactions",
+  "@transactions": {
+    "description": "Transactions section"
+  },
+  "revenue": "Revenue",
+  "@revenue": {
+    "description": "Revenue section"
+  },
+  "dateRange": "Date Range",
+  "@dateRange": {
+    "description": "Date range label"
+  },
+  "custom": "Custom",
+  "@custom": {
+    "description": "Custom option"
+  },
+  "allStatus": "All Status",
+  "@allStatus": {
+    "description": "All status filter"
+  },
+  "completed": "Completed",
+  "@completed": {
+    "description": "Completed status"
+  },
+  "pending": "Pending",
+  "@pending": {
+    "description": "Pending status"
+  },
+  "cancelled": "Cancelled",
+  "@cancelled": {
+    "description": "Cancelled status"
+  },
+  "refunded": "Refunded",
+  "@refunded": {
+    "description": "Refunded status"
+  },
+  "payment": "Payment",
+  "@payment": {
+    "description": "Payment label"
+  },
+  "allMethods": "All Methods",
+  "@allMethods": {
+    "description": "All payment methods filter"
+  },
+  "cash": "Cash",
+  "@cash": {
+    "description": "Cash payment method"
+  },
+  "card": "Card",
+  "@card": {
+    "description": "Card payment method"
+  },
+  "mobile": "Mobile",
+  "@mobile": {
+    "description": "Mobile payment method"
+  },
+  "check": "Check",
+  "@check": {
+    "description": "Check payment method"
+  },
+  "floorPlanEditor": "Floor Plan Editor",
+  "@floorPlanEditor": {
+    "description": "Floor plan editor screen title"
+  },
+  "ok": "OK",
+  "@ok": {
+    "description": "OK button text"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button text"
+  },
+  "close": "Close",
+  "@close": {
+    "description": "Close button text"
+  },
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry button text"
+  },
+  "add": "Add",
+  "@add": {
+    "description": "Add button text"
+  },
+  "edit": "Edit",
+  "@edit": {
+    "description": "Edit button text"
+  },
+  "update": "Update",
+  "@update": {
+    "description": "Update button text"
+  },
+  "send": "Send",
+  "@send": {
+    "description": "Send button text"
+  },
+  "reply": "Reply",
+  "@reply": {
+    "description": "Reply button text"
+  },
+  "call": "Call",
+  "@call": {
+    "description": "Call button text"
+  },
+  "back": "Back",
+  "@back": {
+    "description": "Back button text"
+  },
+  "continueAction": "Continue",
+  "@continueAction": {
+    "description": "Continue button text"
+  },
+  "restartApp": "Restart App",
+  "@restartApp": {
+    "description": "Restart app button text"
+  },
+  "clearData": "Clear Data",
+  "@clearData": {
+    "description": "Clear data button text"
+  },
+  "clearTable": "Clear Table",
+  "@clearTable": {
+    "description": "Clear table button text"
+  },
+  "seatCustomer": "Seat Customer",
+  "@seatCustomer": {
+    "description": "Seat customer button text"
+  },
+  "makeReservation": "Make Reservation",
+  "@makeReservation": {
+    "description": "Make reservation button text"
+  },
+  "tablesManagement": "Tables Management",
+  "@tablesManagement": {
+    "description": "Tables management screen title"
+  },
+  "messages": "Messages",
+  "@messages": {
+    "description": "Messages screen title"
+  },
+  "newMessage": "New Message",
+  "@newMessage": {
+    "description": "New message dialog title"
+  },
+  "emergencyCall": "Emergency Call",
+  "@emergencyCall": {
+    "description": "Emergency call dialog title"
+  },
+  "emergencyCallConfirmation": "Are you sure you want to make an emergency call?",
+  "@emergencyCallConfirmation": {
+    "description": "Emergency call confirmation message"
+  },
+  "preparing": "PREPARING",
+  "@preparing": {
+    "description": "Preparing status"
+  },
+  "ready": "READY",
+  "@ready": {
+    "description": "Ready status"
+  },
+  "language": "Language",
+  "@language": {
+    "description": "Language settings screen title"
+  },
+  "languageUpdated": "Language Updated",
+  "@languageUpdated": {
+    "description": "Language updated message"
+  },
+  "floorPlanViewer": "Floor Plan Viewer",
+  "@floorPlanViewer": {
+    "description": "Floor plan viewer screen title"
+  },
+  "clearTableConfirmation": "Are you sure you want to clear this table? This will mark it as available.",
+  "@clearTableConfirmation": {
+    "description": "Clear table confirmation message"
+  },
+  "splitBilling": "Split Billing",
+  "@splitBilling": {
+    "description": "Split billing screen title"
+  },
+  "addSplit": "Add Split",
+  "@addSplit": {
+    "description": "Add split button text"
+  },
+  "removeLastSplit": "Remove Last Split",
+  "@removeLastSplit": {
+    "description": "Remove last split button text"
+  },
+  "unassignedItems": "Unassigned Items:",
+  "@unassignedItems": {
+    "description": "Unassigned items label"
+  },
+  "assignItemToSplit": "Assign item to split",
+  "@assignItemToSplit": {
+    "description": "Assign item to split hint text"
+  },
+  "noItemsAssigned": "No items assigned.",
+  "@noItemsAssigned": {
+    "description": "No items assigned message"
+  },
+  "finalizeSplit": "Finalize Split",
+  "@finalizeSplit": {
+    "description": "Finalize split button text"
+  },
+  "checkout": "Checkout",
+  "@checkout": {
+    "description": "Checkout button text"
+  },
+  "completeSale": "Complete Sale",
+  "@completeSale": {
+    "description": "Complete sale button text"
+  },
+  "splitPayment": "Split Payment",
+  "@splitPayment": {
+    "description": "Split payment button text"
+  },
+  "scanBarcode": "Scan Barcode",
+  "@scanBarcode": {
+    "description": "Scan barcode dialog title"
+  },
+  "enterBarcodeManually": "Enter barcode manually or use camera scanner:",
+  "@enterBarcodeManually": {
+    "description": "Enter barcode manually instruction"
+  },
+  "scan": "Scan",
+  "@scan": {
+    "description": "Scan button text"
+  },
+  "availableDiscounts": "Available Discounts",
+  "@availableDiscounts": {
+    "description": "Available discounts dialog title"
+  },
+  "setGuestCount": "Set Guest Count",
+  "@setGuestCount": {
+    "description": "Set guest count dialog title"
+  },
+  "howManyGuests": "How many guests will be dining?",
+  "@howManyGuests": {
+    "description": "How many guests question"
+  },
+  "set": "Set",
+  "@set": {
+    "description": "Set button text"
+  },
+  "selectPromotion": "Select Promotion",
+  "@selectPromotion": {
+    "description": "Select promotion dialog title"
+  },
+  "networkError": "Network Error",
+  "@networkError": {
+    "description": "Network error dialog title"
+  },
+  "error": "Error",
+  "@error": {
+    "description": "Error dialog title"
+  },
+  "easy": "Easy",
+  "@easy": {
+    "description": "Easy difficulty level"
+  },
+  "medium": "Medium",
+  "@medium": {
+    "description": "Medium difficulty level"
+  },
+  "hard": "Hard",
+  "@hard": {
+    "description": "Hard difficulty level"
+  },
+  "active": "Active",
+  "@active": {
+    "description": "Active status"
+  },
+  "addStep": "Add Step",
+  "@addStep": {
+    "description": "Add step button text"
+  },
+  "positionPixels": "Position (pixels)",
+  "@positionPixels": {
+    "description": "Position in pixels label"
+  },
+  "sizePixels": "Size (pixels)",
+  "@sizePixels": {
+    "description": "Size in pixels label"
+  },
+  "addTable": "Add Table",
+  "@addTable": {
+    "description": "Add table button text"
+  },
+  "cookRecipe": "Cook Recipe",
+  "@cookRecipe": {
+    "description": "Cook recipe button text"
+  },
+  "createPromotion": "Create Promotion",
+  "@createPromotion": {
+    "description": "Create promotion button text"
+  },
+  "promotionCreated": "Promotion Created:",
+  "@promotionCreated": {
+    "description": "Promotion created label"
+  },
+  "quantityTracking": "Quantity Tracking:",
+  "@quantityTracking": {
+    "description": "Quantity tracking label"
+  },
+  "consumeInventoryItems": "• Consume inventory items",
+  "@consumeInventoryItems": {
+    "description": "Consume inventory items bullet point"
+  },
+  "reduceWaste": "• Reduce waste",
+  "@reduceWaste": {
+    "description": "Reduce waste bullet point"
+  },
+  "createPromotionWithQuantityTracking": "• Create a promotion with quantity tracking",
+  "@createPromotionWithQuantityTracking": {
+    "description": "Create promotion with quantity tracking bullet point"
+  },
+  "i18nTestScreen": "i18n Test Screen",
+  "@i18nTestScreen": {
+    "description": "i18n test screen title"
+  },
+  "spanishCostaRica": "Spanish (es-CR)",
+  "@spanishCostaRica": {
+    "description": "Spanish Costa Rica language option"
+  },
+  "englishUS": "English (en-US)",
+  "@englishUS": {
+    "description": "English US language option"
+  },
+  "languageSwitching": "• Language switching",
+  "@languageSwitching": {
+    "description": "Language switching bullet point"
+  },
+  "languagePersistence": "• Language persistence",
+  "@languagePersistence": {
+    "description": "Language persistence bullet point"
+  },
+  "localeManagement": "• Locale management",
+  "@localeManagement": {
+    "description": "Locale management bullet point"
+  },
+  "translationDisplay": "• Translation display",
+  "@translationDisplay": {
+    "description": "Translation display bullet point"
+  },
+  "languageTesting": "Language Testing",
+  "@languageTesting": {
+    "description": "Language testing screen title"
+  },
+  "switchToSpanish": "Switch to Spanish",
+  "@switchToSpanish": {
+    "description": "Switch to Spanish button text"
+  },
+  "switchToEnglish": "Switch to English",
+  "@switchToEnglish": {
+    "description": "Switch to English button text"
+  },
+  "testLanguageSwitching": "Test Language Switching",
+  "@testLanguageSwitching": {
+    "description": "Test language switching button text"
+  },
+  "testDefaultLanguage": "Test Default Language (Spanish)",
+  "@testDefaultLanguage": {
+    "description": "Test default language button text"
+  },
+  "testErrorMessages": "Test Error Messages (Spanish)",
+  "@testErrorMessages": {
+    "description": "Test error messages button text"
+  },
+  "testSuccessMessages": "Test Success Messages (Spanish)",
+  "@testSuccessMessages": {
+    "description": "Test success messages button text"
+  }
+} 

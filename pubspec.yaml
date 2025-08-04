@@ -110,7 +110,6 @@ dev_dependencies:
 
   # i18n Generation
   flutter_gen_runner: ^5.4.0
-  intl_utils: ^2.8.5
 
   # Linting
   flutter_lints: ^3.0.0
@@ -120,6 +119,7 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  generate: true
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
@@ -161,11 +161,4 @@ flutter:
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
 
-# Flutter Intl configuration
-flutter_intl:
-  enabled: true
-  class_name: AppLocalizations
-  main_locale: es_CR
-  arb_dir: lib/l10n
-  output_dir: lib/src/core/localization
-  use_deferred_loading: false
+

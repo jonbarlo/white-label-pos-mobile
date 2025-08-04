@@ -4,6 +4,7 @@ import '../../shared/widgets/app_button.dart';
 import '../../shared/widgets/app_text_field.dart';
 import '../../shared/utils/currency_formatter.dart';
 import '../business/business_provider.dart';
+import '../../core/localization/app_localizations.dart';
 import 'models/split_payment.dart';
 import 'models/cart_item.dart';
 
@@ -104,6 +105,7 @@ class _SplitPaymentDialogState extends ConsumerState<SplitPaymentDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Dialog(
       child: Container(
         width: MediaQuery.of(context).size.width * 0.9,
@@ -114,9 +116,9 @@ class _SplitPaymentDialogState extends ConsumerState<SplitPaymentDialog> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Split Payment',
-                  style: TextStyle(
+                Text(
+                  l10n.splitPayment,
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
@@ -175,31 +177,31 @@ class _SplitPaymentDialogState extends ConsumerState<SplitPaymentDialog> {
                       const SizedBox(height: 16),
                       
                       // Customer information (optional)
-                      const Text(
+                      Text(
                         'Customer Information (Optional)',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 8),
                       AppTextField(
-                        label: 'Customer Name',
+                        label: l10n.customerName,
                         onChanged: (value) => _customerName = value,
                       ),
                       const SizedBox(height: 8),
                       AppTextField(
-                        label: 'Customer Phone',
+                        label: l10n.customerPhone,
                         onChanged: (value) => _customerPhone = value,
                       ),
                       const SizedBox(height: 8),
                       AppTextField(
-                        label: 'Customer Email',
+                        label: l10n.customerEmail,
                         onChanged: (value) => _customerEmail = value,
                       ),
                       const SizedBox(height: 8),
                       AppTextField(
-                        label: 'Notes',
+                        label: l10n.notes,
                         onChanged: (value) => _notes = value,
                         maxLines: 2,
                       ),
@@ -209,9 +211,9 @@ class _SplitPaymentDialogState extends ConsumerState<SplitPaymentDialog> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            'Payment Methods',
-                            style: TextStyle(
+                          Text(
+                            l10n.paymentMethods,
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
@@ -219,7 +221,7 @@ class _SplitPaymentDialogState extends ConsumerState<SplitPaymentDialog> {
                           TextButton.icon(
                             onPressed: _addPaymentEntry,
                             icon: const Icon(Icons.add),
-                            label: const Text('Add Payment'),
+                            label: Text(l10n.addPayment),
                           ),
                         ],
                       ),
@@ -257,12 +259,12 @@ class _SplitPaymentDialogState extends ConsumerState<SplitPaymentDialog> {
                                 
                                 // Amount field
                                 AppTextField(
-                                  label: 'Amount',
+                                  label: l10n.amount,
                                   keyboardType: TextInputType.number,
                                   initialValue: payment.amount > 0 ? payment.amount.toString() : '',
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
-                                      return 'Amount is required';
+                                      return l10n.amountIsRequired;
                                     }
                                     final amount = double.tryParse(value);
                                     if (amount == null || amount <= 0) {
@@ -279,21 +281,21 @@ class _SplitPaymentDialogState extends ConsumerState<SplitPaymentDialog> {
                                 
                                 // Payment method dropdown
                                 DropdownButtonFormField<String>(
-                                  decoration: const InputDecoration(
-                                    labelText: 'Payment Method',
-                                    border: OutlineInputBorder(),
+                                  decoration: InputDecoration(
+                                    labelText: l10n.paymentMethod,
+                                    border: const OutlineInputBorder(),
                                   ),
                                   value: payment.method.isNotEmpty ? payment.method : null,
-                                  items: const [
-                                    DropdownMenuItem(value: 'cash', child: Text('Cash')),
-                                    DropdownMenuItem(value: 'credit_card', child: Text('Credit Card')),
-                                    DropdownMenuItem(value: 'debit_card', child: Text('Debit Card')),
-                                    DropdownMenuItem(value: 'mobile_payment', child: Text('Mobile Payment')),
-                                    DropdownMenuItem(value: 'check', child: Text('Check')),
+                                  items: [
+                                    DropdownMenuItem(value: 'cash', child: Text(l10n.cash)),
+                                    DropdownMenuItem(value: 'credit_card', child: Text(l10n.creditCard)),
+                                    DropdownMenuItem(value: 'debit_card', child: Text(l10n.debitCard)),
+                                    DropdownMenuItem(value: 'mobile_payment', child: Text(l10n.mobilePayment)),
+                                    DropdownMenuItem(value: 'check', child: Text(l10n.check)),
                                   ],
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
-                                      return 'Payment method is required';
+                                      return l10n.paymentMethodIsRequired;
                                     }
                                     return null;
                                   },
@@ -340,7 +342,7 @@ class _SplitPaymentDialogState extends ConsumerState<SplitPaymentDialog> {
               children: [
                 Expanded(
                   child: AppButton(
-                    text: 'Cancel',
+                    text: l10n.cancel,
                     onPressed: () => Navigator.of(context).pop(),
                     type: AppButtonType.secondary,
                   ),
@@ -348,7 +350,7 @@ class _SplitPaymentDialogState extends ConsumerState<SplitPaymentDialog> {
                 const SizedBox(width: 16),
                 Expanded(
                   child: AppButton(
-                    text: 'Complete Split Payment',
+                    text: l10n.completeSplitPayment,
                     onPressed: _isValid ? _completeSplitPayment : null,
                   ),
                 ),

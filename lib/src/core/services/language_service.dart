@@ -24,8 +24,8 @@ class LanguageService {
     switch (languageCode) {
       case 'es_CR':
         return const Locale('es', 'CR');
-      case 'en_US':
-        return const Locale('en', 'US');
+      case 'en':
+        return const Locale('en');
       default:
         return const Locale('es', 'CR'); // Default to Spanish
     }
@@ -35,8 +35,8 @@ class LanguageService {
   static String getLanguageCodeFromLocale(Locale locale) {
     if (locale.languageCode == 'es' && locale.countryCode == 'CR') {
       return 'es_CR';
-    } else if (locale.languageCode == 'en' && locale.countryCode == 'US') {
-      return 'en_US';
+    } else if (locale.languageCode == 'en') {
+      return 'en';
     }
     return _defaultLanguage;
   }
@@ -46,8 +46,8 @@ class LanguageService {
     switch (languageCode) {
       case 'es_CR':
         return 'Español (Costa Rica)';
-      case 'en_US':
-        return 'English (US)';
+      case 'en':
+        return 'English';
       default:
         return 'Español (Costa Rica)';
     }
@@ -58,7 +58,7 @@ class LanguageService {
     switch (languageCode) {
       case 'es_CR':
         return 'Español';
-      case 'en_US':
+      case 'en':
         return 'English';
       default:
         return 'Español';
@@ -74,8 +74,8 @@ class LanguageService {
         'nativeName': 'Español',
       },
       {
-        'code': 'en_US',
-        'name': 'English (US)',
+        'code': 'en',
+        'name': 'English',
         'nativeName': 'English',
       },
     ];

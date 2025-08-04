@@ -76,7 +76,7 @@ class MainApp extends ConsumerWidget {
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () => ref.invalidate(appInitializationProvider),
-                  child: const Text('Retry'),
+                  child: Text(AppLocalizations.of(context)?.retry ?? 'Retry'),
                 ),
               ],
             ),

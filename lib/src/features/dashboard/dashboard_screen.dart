@@ -9,6 +9,7 @@ import '../business/business_provider.dart';
 import '../pos/pos_provider.dart';
 import '../pos/models/sale.dart';
 import '../../core/navigation/app_router.dart';
+import '../../core/localization/app_localizations.dart';
 import '../auth/auth_provider.dart';
 import '../auth/models/user.dart';
 import 'waitstaff_dashboard_screen.dart';
@@ -69,20 +70,22 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     // Get recent sales
     final recentSales = ref.watch(recentSalesNotifierProvider);
 
+    final l10n = AppLocalizations.of(context)!;
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dashboard'),
+        title: Text(l10n.dashboard),
         centerTitle: true,
         actions: [
           IconButton(
             onPressed: () => context.go(AppRouter.analyticsRoute),
             icon: const Icon(Icons.analytics),
-            tooltip: 'Analytics Dashboard',
+            tooltip: l10n.analytics,
           ),
           IconButton(
             onPressed: () => context.go(AppRouter.featureDashboardRoute),
             icon: const Icon(Icons.featured_play_list),
-            tooltip: 'Recipe & Promotion Features',
+            tooltip: l10n.features,
           ),
           const ThemeToggleButton(),
         ],
@@ -105,7 +108,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             children: [
               // Key Metrics Section
               Text(
-                'Sales Overview',
+                l10n.salesOverview,
                 style: theme.textTheme.headlineLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -118,7 +121,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   Expanded(
                     flex: 2,
                     child: _buildMetricCard(
-                      'Today\'s Sales',
+                      l10n.todaysSales,
                       todaySalesAsync.when(
                         data: (salesSummary) {
                           final totalSales = salesSummary['totalSales'] as double? ?? 0.0;
@@ -154,7 +157,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _buildMetricCard(
-                      'Transactions',
+                      l10n.transactions,
                       '${recentSales.where((sale) {
                         final today = DateTime.now();
                         final todayStart = DateTime(today.year, today.month, today.day);
@@ -169,7 +172,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _buildMetricCard(
-                      'Avg Order',
+                      l10n.avgOrder,
                       () {
                         final today = DateTime.now();
                         final todayStart = DateTime(today.year, today.month, today.day);
@@ -212,7 +215,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                           Icon(Icons.featured_play_list, color: theme.colorScheme.primary),
                           const SizedBox(width: 8),
                           Text(
-                            'New Features Available',
+                            l10n.newFeaturesAvailable,
                             style: theme.textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
@@ -221,7 +224,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'Explore our new Recipe & Promotion System with mobile notifications.',
+                        l10n.exploreFeaturesDescription,
                         style: theme.textTheme.bodyMedium,
                       ),
                       const SizedBox(height: 12),
@@ -235,7 +238,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                                 context.go(AppRouter.featureDashboardRoute);
                               },
                               icon: const Icon(Icons.explore, size: 18),
-                              label: const Text('Explore Features'),
+                              label: Text(l10n.exploreFeatures),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: theme.colorScheme.primary,
                                 foregroundColor: theme.colorScheme.onPrimary,
@@ -247,7 +250,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                             child: OutlinedButton.icon(
                               onPressed: () => context.go(AppRouter.analyticsRoute),
                               icon: const Icon(Icons.analytics, size: 18),
-                              label: const Text('View Analytics'),
+                              label: Text(l10n.viewAnalytics),
                             ),
                           ),
                         ],
@@ -262,7 +265,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               Row(
                 children: [
                   Text(
-                    'Recent Activity',
+                    l10n.recentActivity,
                     style: theme.textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),

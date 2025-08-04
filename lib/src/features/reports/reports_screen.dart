@@ -85,7 +85,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     
     return Scaffold(
@@ -301,7 +301,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
   }
 
   void _showExportDialog(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -466,7 +466,7 @@ class _OverviewTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final salesReportAsync = ref.watch(salesReportProvider(startDate: startDate, endDate: endDate));
     final theme = Theme.of(context);
 
@@ -526,7 +526,7 @@ class _OverviewTab extends ConsumerWidget {
   }
 
   Widget _buildOverviewContent(BuildContext context, SalesReport report) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     
     return SingleChildScrollView(
@@ -679,7 +679,7 @@ class _OverviewTab extends ConsumerWidget {
                         Icon(Icons.star, color: theme.colorScheme.primary),
                         const SizedBox(width: 8),
                         Text(
-                          'Top Selling Items',
+                          l10n.topSellingItems,
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -687,7 +687,7 @@ class _OverviewTab extends ConsumerWidget {
                         const Spacer(),
                         TextButton(
                           onPressed: () {},
-                          child: const Text('View All'),
+                          child: Text(l10n.viewAll),
                         ),
                       ],
                     ),
@@ -721,7 +721,7 @@ class _OverviewTab extends ConsumerWidget {
                                   ),
                                 ),
                                 Text(
-                                  'Popular item',
+                                  l10n.popularItem,
                                   style: theme.textTheme.bodySmall?.copyWith(
                                     color: theme.colorScheme.onSurfaceVariant,
                                   ),
@@ -865,7 +865,7 @@ class _TransactionsTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final transactionsAsync = ref.watch(detailedTransactionsProvider(
       startDate: startDate,
       endDate: endDate,
@@ -935,7 +935,7 @@ class _TransactionsTab extends ConsumerWidget {
   }
 
   Widget _buildTransactionsContent(BuildContext context, List<Map<String, dynamic>> transactions) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     
     if (transactions.isEmpty) {
@@ -1195,6 +1195,7 @@ class _TransactionDetailsSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final totalValue = transaction['finalAmount'] as num? ?? 0.0;
     final amount = (totalValue is num) ? totalValue.toDouble() : double.tryParse(totalValue.toString()) ?? 0.0;
@@ -1283,18 +1284,18 @@ class _TransactionDetailsSheet extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _DetailRow(
-                    label: 'Status',
+                    label: l10n.status,
                     value: status.toUpperCase(),
                     color: _getStatusColor(status),
                   ),
                   _DetailRow(
-                    label: 'Payment Method',
+                    label: l10n.paymentMethod,
                     value: paymentMethod.toUpperCase(),
                   ),
                   if (notes.isNotEmpty) ...[
                     const SizedBox(height: 16),
                     Text(
-                      'Notes',
+                      l10n.notes,
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -1313,7 +1314,7 @@ class _TransactionDetailsSheet extends ConsumerWidget {
                   
                   // Items section with actual data
                   Text(
-                    'Items',
+                    l10n.items,
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -1330,7 +1331,7 @@ class _TransactionDetailsSheet extends ConsumerWidget {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            'No items found for this sale',
+                            l10n.noItemsFoundForThisSale,
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                             ),
@@ -1347,7 +1348,7 @@ class _TransactionDetailsSheet extends ConsumerWidget {
                           children: saleItems.map<Widget>((saleItem) {
                             final saleItemMap = saleItem as Map<String, dynamic>;
                             final item = saleItemMap['item'] as Map<String, dynamic>? ?? {};
-                            final itemName = item['name']?.toString() ?? 'Unknown Item';
+                            final itemName = item['name']?.toString() ?? l10n.unknownItem;
                             final quantity = (saleItemMap['quantity'] as num?)?.toInt() ?? 0;
                             final unitPrice = (saleItemMap['unitPrice'] as num?)?.toDouble() ?? 0.0;
                             final totalPrice = (saleItemMap['totalPrice'] as num?)?.toDouble() ?? 0.0;
@@ -1419,25 +1420,25 @@ class _TransactionDetailsSheet extends ConsumerWidget {
                         color: theme.colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Row(
-                        children: [
-                          SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: theme.colorScheme.primary,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            'Loading items...',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
+                                        child: Row(
+                    children: [
+                      SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: theme.colorScheme.primary,
+                        ),
                       ),
+                      const SizedBox(width: 12),
+                      Text(
+                        l10n.loadingItems,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
                     ),
                     error: (error, stackTrace) => Container(
                       padding: const EdgeInsets.all(12),
@@ -1469,7 +1470,7 @@ class _TransactionDetailsSheet extends ConsumerWidget {
                       Navigator.pop(context);
                     },
                     icon: const Icon(Icons.close),
-                    label: const Text('Close'),
+                    label: Text(l10n.close),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -1480,7 +1481,7 @@ class _TransactionDetailsSheet extends ConsumerWidget {
                       Navigator.pop(context);
                     },
                     icon: const Icon(Icons.print),
-                    label: const Text('Print Receipt'),
+                    label: Text(l10n.printReceipt),
                   ),
                 ),
               ],
@@ -1573,7 +1574,7 @@ class _RevenueTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final revenueReportAsync = ref.watch(revenueReportProvider(startDate: startDate, endDate: endDate));
     final theme = Theme.of(context);
 
@@ -1633,7 +1634,7 @@ class _RevenueTab extends ConsumerWidget {
   }
 
   Widget _buildRevenueContent(BuildContext context, RevenueReport report) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     
     return SingleChildScrollView(

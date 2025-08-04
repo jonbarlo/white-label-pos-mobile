@@ -17,7 +17,7 @@ class _CurrencyCrudScreenState extends ConsumerState<CurrencyCrudScreen> {
   @override
   Widget build(BuildContext context) {
     final currenciesAsync = ref.watch(currencyNotifierProvider);
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
@@ -65,7 +65,7 @@ class _CurrencyCrudScreenState extends ConsumerState<CurrencyCrudScreen> {
 
   Widget _buildCurrencyCard(BuildContext context, Currency currency) {
     final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -185,7 +185,7 @@ class _CurrencyCrudScreenState extends ConsumerState<CurrencyCrudScreen> {
   }
 
   void _showCreateCurrencyDialog(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final nameController = TextEditingController();
     final codeController = TextEditingController();
     final symbolController = TextEditingController();

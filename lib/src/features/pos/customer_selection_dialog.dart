@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:white_label_pos_mobile/src/features/pos/models/customer.dart';
+import '../../core/localization/app_localizations.dart';
 
 class CustomerSelectionDialog extends ConsumerStatefulWidget {
   final String? initialCustomerName;
@@ -137,6 +138,7 @@ class _CustomerSelectionDialogState extends ConsumerState<CustomerSelectionDialo
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Dialog(
       child: Container(
         width: 400,
@@ -148,9 +150,9 @@ class _CustomerSelectionDialogState extends ConsumerState<CustomerSelectionDialo
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Select Customer',
-                  style: TextStyle(
+                Text(
+                  l10n.selectCustomer,
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
@@ -167,7 +169,7 @@ class _CustomerSelectionDialogState extends ConsumerState<CustomerSelectionDialo
             TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Search customers by name, email, or phone...',
+                hintText: l10n.search,
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: _isSearching
                     ? const SizedBox(
@@ -194,7 +196,7 @@ class _CustomerSelectionDialogState extends ConsumerState<CustomerSelectionDialo
                   child: OutlinedButton.icon(
                     onPressed: _toggleNewCustomerForm,
                     icon: const Icon(Icons.person_add),
-                    label: const Text('New Customer'),
+                    label: Text(l10n.newCustomer),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -202,7 +204,7 @@ class _CustomerSelectionDialogState extends ConsumerState<CustomerSelectionDialo
                   child: OutlinedButton.icon(
                     onPressed: _continueAsGuest,
                     icon: const Icon(Icons.person_off),
-                    label: const Text('Guest Checkout'),
+                    label: Text(l10n.guestCheckout),
                   ),
                 ),
               ],
@@ -211,9 +213,9 @@ class _CustomerSelectionDialogState extends ConsumerState<CustomerSelectionDialo
             
             // Search Results or New Customer Form
             if (_showNewCustomerForm) ...[
-              const Text(
-                'New Customer',
-                style: TextStyle(
+              Text(
+                l10n.newCustomer,
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
@@ -229,25 +231,25 @@ class _CustomerSelectionDialogState extends ConsumerState<CustomerSelectionDialo
               const SizedBox(height: 10),
               TextField(
                 controller: _emailController,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.email,
+                  border: const OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 10),
               TextField(
                 controller: _phoneController,
-                decoration: const InputDecoration(
-                  labelText: 'Phone',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.phone,
+                  border: const OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.phone,
               ),
             ] else if (_searchResults.isNotEmpty) ...[
-              const Text(
-                'Search Results',
-                style: TextStyle(
+              Text(
+                l10n.searchResults,
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
@@ -270,7 +272,7 @@ class _CustomerSelectionDialogState extends ConsumerState<CustomerSelectionDialo
                         child: Text(customer.name[0].toUpperCase()),
                       ),
                       title: Text(customer.name),
-                      subtitle: Text('${customer.email ?? 'No email'}\n${customer.phone ?? 'No phone'}'),
+                      subtitle: Text('${customer.email ?? l10n.noEmail}\n${customer.phone ?? l10n.noPhone}'),
                       selected: isSelected,
                       onTap: () => _selectCustomer(customer),
                     );
@@ -278,10 +280,10 @@ class _CustomerSelectionDialogState extends ConsumerState<CustomerSelectionDialo
                 ),
               ),
             ] else if (_searchController.text.isNotEmpty && !_isSearching) ...[
-              const Center(
+              Center(
                 child: Padding(
-                  padding: EdgeInsets.all(20),
-                  child: Text('No customers found'),
+                  padding: const EdgeInsets.all(20),
+                  child: Text(l10n.noCustomersFound),
                 ),
               ),
             ],
@@ -295,7 +297,7 @@ class _CustomerSelectionDialogState extends ConsumerState<CustomerSelectionDialo
                 onPressed: (_selectedCustomer != null || _showNewCustomerForm) 
                     ? () => _confirmSelection() 
                     : null,
-                child: Text(_showNewCustomerForm ? 'Create Customer' : 'Select Customer'),
+                child: Text(_showNewCustomerForm ? l10n.createCustomer : l10n.selectCustomer),
               ),
             ),
           ],

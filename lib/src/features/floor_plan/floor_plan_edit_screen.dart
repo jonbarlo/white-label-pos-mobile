@@ -4,6 +4,7 @@ import 'floor_plan_provider.dart';
 import 'models/floor_plan.dart';
 import '../../core/theme/app_theme.dart';
 import '../../shared/models/result.dart';
+import '../../core/localization/app_localizations.dart';
 
 class FloorPlanEditScreen extends ConsumerStatefulWidget {
   final int floorPlanId;
@@ -76,7 +77,7 @@ class _FloorPlanEditScreenState extends ConsumerState<FloorPlanEditScreen> {
     if (_error != null) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Floor Plan Editor'),
+          title: Text(AppLocalizations.of(context)!.floorPlanEditor),
           backgroundColor: Theme.of(context).colorScheme.primary,
           foregroundColor: Colors.white,
         ),

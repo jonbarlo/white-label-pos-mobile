@@ -1,35 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../core/localization/app_localizations.dart';
 
 class BottomNavigation extends StatelessWidget {
   const BottomNavigation({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
       currentIndex: _getCurrentIndex(context),
       onTap: (index) => _onTap(context, index),
-      items: const [
+      items: [
         BottomNavigationBarItem(
-          icon: Icon(Icons.dashboard),
-          label: 'Dashboard',
+          icon: const Icon(Icons.dashboard),
+          label: l10n.dashboard,
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.table_restaurant),
-          label: 'Tables',
+          icon: const Icon(Icons.table_restaurant),
+          label: l10n.tables,
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.map),
-          label: 'Floor Plan',
+          icon: const Icon(Icons.map),
+          label: l10n.floorPlan,
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.message),
-          label: 'Messages',
+          icon: const Icon(Icons.message),
+          label: l10n.messages,
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.person),
-          label: 'Profile',
+          icon: const Icon(Icons.person),
+          label: l10n.profile,
         ),
       ],
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/widgets/bottom_navigation.dart';
+import '../../core/localization/app_localizations.dart';
 
 class MessagesScreen extends ConsumerWidget {
   const MessagesScreen({super.key});
@@ -11,7 +12,7 @@ class MessagesScreen extends ConsumerWidget {
     
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Messages'),
+        title: Text(AppLocalizations.of(context)!.messages),
         // Remove hardcoded colors - let theme handle it
         elevation: 0,
         actions: [
@@ -286,14 +287,14 @@ class MessagesScreen extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+            child: Text(AppLocalizations.of(context)!.close),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.of(context).pop();
               _replyToMessage(context, message);
             },
-            child: const Text('Reply'),
+            child: Text(AppLocalizations.of(context)!.reply),
           ),
         ],
       ),
@@ -304,7 +305,7 @@ class MessagesScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('New Message'),
+        title: Text(AppLocalizations.of(context)!.newMessage),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -333,7 +334,7 @@ class MessagesScreen extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -342,7 +343,7 @@ class MessagesScreen extends ConsumerWidget {
                 const SnackBar(content: Text('Message sent!')),
               );
             },
-            child: const Text('Send'),
+            child: Text(AppLocalizations.of(context)!.send),
           ),
         ],
       ),
@@ -411,7 +412,7 @@ class MessagesScreen extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+            child: Text(AppLocalizations.of(context)!.close),
           ),
         ],
       ),

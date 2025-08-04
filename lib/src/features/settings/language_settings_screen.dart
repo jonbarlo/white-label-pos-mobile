@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/services/language_service.dart';
 import '../../core/services/navigation_service.dart';
+import '../../core/localization/app_localizations.dart';
 
 class LanguageSettingsScreen extends ConsumerWidget {
   const LanguageSettingsScreen({super.key});
@@ -10,10 +11,11 @@ class LanguageSettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentLanguage = ref.watch(languageNotifierProvider);
     final languageNotifier = ref.read(languageNotifierProvider.notifier);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Language Settings'),
+        title: Text(l10n.languageSettings),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
         leading: IconButton(
@@ -34,13 +36,13 @@ class LanguageSettingsScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Language Status',
+                      l10n.languageStatus,
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     const SizedBox(height: 8),
-                    Text('Current Language: ${LanguageService.getLanguageDisplayName(currentLanguage)}'),
+                    Text('${l10n.currentLanguage}: ${LanguageService.getLanguageDisplayName(currentLanguage)}'),
                     const SizedBox(height: 4),
-                    Text('Native Name: ${LanguageService.getLanguageNativeName(currentLanguage)}'),
+                    Text('${l10n.nativeName}: ${LanguageService.getLanguageNativeName(currentLanguage)}'),
                   ],
                 ),
               ),
@@ -55,7 +57,7 @@ class LanguageSettingsScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Select Language',
+                      l10n.selectLanguage,
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     const SizedBox(height: 16),
@@ -70,8 +72,8 @@ class LanguageSettingsScreen extends ConsumerWidget {
                               await languageNotifier.setLanguage(value);
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Language changes saved'),
+                                  SnackBar(
+                                    content: Text(l10n.languageChangesSaved),
                                     backgroundColor: Colors.green,
                                   ),
                                 );
@@ -86,14 +88,14 @@ class LanguageSettingsScreen extends ConsumerWidget {
                           : null,
                         onTap: () async {
                           await languageNotifier.setLanguage(language['code']!);
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Language changes saved'),
-                                backgroundColor: Colors.green,
-                              ),
-                            );
-                          }
+                                                      if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(l10n.languageChangesSaved),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                            }
                         },
                       );
                     }).toList(),
@@ -111,19 +113,18 @@ class LanguageSettingsScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Information',
+                      l10n.information,
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      'Mobile POS supports Spanish and English. '
-                      'Default language is Spanish (Costa Rica).',
-                      style: TextStyle(fontSize: 16),
+                    Text(
+                      l10n.languageInfo,
+                      style: const TextStyle(fontSize: 16),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      'Language changes will be saved and applied immediately.',
-                      style: TextStyle(fontSize: 16),
+                    Text(
+                      l10n.languageChangesApplied,
+                      style: const TextStyle(fontSize: 16),
                     ),
                   ],
                 ),
@@ -136,7 +137,7 @@ class LanguageSettingsScreen extends ConsumerWidget {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () => NavigationService.goBack(context),
-                child: const Text('Back'),
+                child: Text(l10n.back),
               ),
             ),
           ],

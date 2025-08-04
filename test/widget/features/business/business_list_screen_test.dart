@@ -6,7 +6,7 @@ import 'package:riverpod/riverpod.dart';
 import 'package:white_label_pos_mobile/src/features/business/business_list_screen.dart';
 import 'package:white_label_pos_mobile/src/features/business/business_repository.dart';
 import 'package:white_label_pos_mobile/src/features/business/models/business.dart';
-import 'package:white_label_pos_mobile/test/helpers/riverpod_test_helper.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'business_list_screen_test.mocks.dart';
 
@@ -85,7 +85,7 @@ void main() {
           type: BusinessType.restaurant,
           description: 'A test restaurant',
           taxRate: 8.5,
-          currency: 'USD',
+          currencyId: 2,
           timezone: 'America/New_York',
           isActive: true,
           createdAt: DateTime.now(),

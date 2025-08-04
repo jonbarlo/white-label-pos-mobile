@@ -42,7 +42,7 @@ class _WaiterDashboardScreenState extends ConsumerState<WaiterDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     
     return Scaffold(
@@ -88,7 +88,7 @@ class WaiterHomeTab extends ConsumerStatefulWidget {
 class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final user = ref.watch(authNotifierProvider).user;
     
@@ -126,7 +126,7 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
   }
 
   Widget _buildWelcomeSection(user, ThemeData theme) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       child: Container(
         padding: const EdgeInsets.all(20),
@@ -195,7 +195,7 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
   }
 
     Widget _buildQuickStats(ThemeData theme) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
         Expanded(
@@ -267,7 +267,7 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
   }
 
   Widget _buildMainActions(ThemeData theme) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -364,7 +364,7 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
   }
 
   Widget _buildRecentActivity(ThemeData theme) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -448,7 +448,7 @@ class _WaiterHomeTabState extends ConsumerState<WaiterHomeTab> {
   }
 
   void _showComingSoon(String feature) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('$feature - ${l10n.comingSoon}!'),

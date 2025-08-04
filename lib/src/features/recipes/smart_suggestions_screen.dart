@@ -38,7 +38,7 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
     final cookedSuggestionsAsync = ref.watch(cookedSuggestionsProvider);
     final allSuggestionsAsync = ref.watch(allSuggestionsProvider);
     final wastePreventionAsync = ref.watch(wastePreventionSuggestionsProvider);
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
@@ -66,7 +66,7 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
   }
 
   Widget _buildPendingTab(AsyncValue<List<SmartRecipeSuggestion>> suggestionsAsync) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return suggestionsAsync.when(
       data: (suggestions) {
@@ -106,7 +106,7 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
   }
 
   Widget _buildCookedTab(AsyncValue<List<SmartRecipeSuggestion>> suggestionsAsync) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return suggestionsAsync.when(
       data: (suggestions) {
@@ -138,7 +138,7 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
   }
 
   Widget _buildAllTab(AsyncValue<List<SmartRecipeSuggestion>> suggestionsAsync) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return suggestionsAsync.when(
       data: (suggestions) {
@@ -169,7 +169,7 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
   }
 
   Widget _buildWastePreventionTab(AsyncValue<Map<String, dynamic>> wastePreventionAsync) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return wastePreventionAsync.when(
       data: (data) {
@@ -242,7 +242,7 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
   }
 
   Widget _buildUrgencyTab(AsyncValue<List<SmartRecipeSuggestion>> suggestionsAsync) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return suggestionsAsync.when(
       data: (suggestions) {
@@ -282,7 +282,7 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
   }
 
   Widget _buildSavingsTab(AsyncValue<List<SmartRecipeSuggestion>> suggestionsAsync) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return suggestionsAsync.when(
       data: (suggestions) {
@@ -338,7 +338,7 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
   }
 
   Widget _buildSuggestionCard(SmartRecipeSuggestion suggestion) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -471,7 +471,7 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
   }
 
   Widget _buildCookedSuggestionCard(SmartRecipeSuggestion suggestion) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -614,6 +614,7 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
   }
 
   void _cookRecipe(SmartRecipeSuggestion suggestion) {
+    final l10n = AppLocalizations.of(context)!;
     final nameController = TextEditingController(text: 'Chef\'s Special: ${suggestion.recipe.name}');
     final descriptionController = TextEditingController(text: 'Freshly prepared ${suggestion.recipe.name.toLowerCase()} using premium ingredients');
     final discountValueController = TextEditingController(text: '25');
@@ -626,64 +627,64 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: Text('Cook ${suggestion.recipe.name}'),
+                      title: Text('${l10n.cookRecipeTitle} ${suggestion.recipe.name}'),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Cook recipe using: ${suggestion.recipe.name}'),
+                Text('${l10n.cookRecipeUsing} ${suggestion.recipe.name}'),
                 const SizedBox(height: 16),
-                const Text('This will:'),
+                Text(l10n.thisWill),
                 const Text('• Consume inventory items'),
                 const Text('• Reduce waste'),
                 const Text('• Create a promotion with quantity tracking'),
                 const SizedBox(height: 16),
-                const Text('Recipe Configuration:', style: TextStyle(fontWeight: FontWeight.bold)),
+                Text(l10n.recipeConfiguration, style: const TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 TextField(
                   controller: quantityController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Quantity to Cook',
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    labelText: l10n.quantityToCook,
                     hintText: '1',
-                    helperText: 'This will create a promotion with the same quantity',
+                    helperText: l10n.thisWillCreatePromotionWithSameQuantity,
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Text('Promotion Configuration:', style: TextStyle(fontWeight: FontWeight.bold)),
+                Text(l10n.promotionConfiguration, style: const TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 TextField(
                   controller: nameController,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Promotion Name',
-                    hintText: 'e.g., Chef\'s Special: Truffle Pizza',
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    labelText: l10n.promotionName,
+                    hintText: '${l10n.eG}, ${l10n.chefSpecialExample}',
                   ),
                 ),
                 const SizedBox(height: 8),
                 TextField(
                   controller: descriptionController,
                   maxLines: 2,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Promotion Description',
-                    hintText: 'Description of the promotion',
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    labelText: l10n.promotionDescription,
+                    hintText: l10n.descriptionOfThePromotion,
                   ),
                 ),
                 const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Promotion Type',
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    labelText: l10n.promotionType,
                   ),
                   value: selectedPromotionType,
-                  items: const [
-                    DropdownMenuItem(value: 'chef_special', child: Text('Chef\'s Special')),
-                    DropdownMenuItem(value: 'discount', child: Text('Discount')),
-                    DropdownMenuItem(value: 'bogo', child: Text('Buy One Get One')),
-                    DropdownMenuItem(value: 'flash_sale', child: Text('Flash Sale')),
+                  items: [
+                    DropdownMenuItem(value: 'chef_special', child: Text(l10n.chefSpecial)),
+                    DropdownMenuItem(value: 'discount', child: Text(l10n.discount)),
+                    DropdownMenuItem(value: 'bogo', child: Text(l10n.buyOneGetOne)),
+                    DropdownMenuItem(value: 'flash_sale', child: Text(l10n.flashSale)),
                   ],
                   onChanged: (value) {
                     setState(() {
@@ -693,16 +694,16 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
                 ),
                 const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Discount Type',
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    labelText: l10n.discountType,
                   ),
                   value: selectedDiscountType,
-                  items: const [
-                    DropdownMenuItem(value: 'percentage', child: Text('Percentage Discount')),
-                    DropdownMenuItem(value: 'fixed', child: Text('Fixed Amount Off')),
-                    DropdownMenuItem(value: 'free_item', child: Text('Free Item')),
-                    DropdownMenuItem(value: 'bogo', child: Text('Buy One Get One')),
+                  items: [
+                    DropdownMenuItem(value: 'percentage', child: Text(l10n.percentageDiscount)),
+                    DropdownMenuItem(value: 'fixed', child: Text(l10n.fixedAmountOff)),
+                    DropdownMenuItem(value: 'free_item', child: Text(l10n.freeItem)),
+                    DropdownMenuItem(value: 'bogo', child: Text(l10n.buyOneGetOne)),
                   ],
                   onChanged: (value) {
                     setState(() {
@@ -716,7 +717,7 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                     border: const OutlineInputBorder(),
-                    labelText: selectedDiscountType == 'percentage' ? 'Discount Percentage (%)' : 'Discount Amount (\$)',
+                    labelText: selectedDiscountType == 'percentage' ? l10n.discountPercentage : l10n.discountAmount,
                     hintText: selectedDiscountType == 'percentage' ? '25' : '5.00',
                   ),
                 ),
@@ -724,9 +725,9 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
                 TextField(
                   controller: expiresHoursController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Promotion Expires In (Hours)',
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    labelText: l10n.promotionExpiresInHours,
                     hintText: '48',
                   ),
                 ),
@@ -736,7 +737,7 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
+              child: Text(l10n.cancel),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -748,14 +749,14 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
                 
                 if (name.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Please enter a promotion name')),
+                    SnackBar(content: Text(l10n.pleaseEnterAPromotionName)),
                   );
                   return;
                 }
                 
                 if (quantity <= 0) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Quantity must be greater than 0')),
+                    SnackBar(content: Text(l10n.quantityMustBeGreaterThan0)),
                   );
                   return;
                 }
@@ -772,7 +773,7 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
                   promotionExpiresInHours: expiresHours,
                 );
               },
-              child: const Text('Cook Recipe'),
+              child: Text(l10n.cookRecipe),
             ),
           ],
         ),
@@ -781,6 +782,7 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
   }
 
   void _createPromotion(SmartRecipeSuggestion suggestion) {
+    final l10n = AppLocalizations.of(context)!;
     final nameController = TextEditingController(text: 'Chef\'s Special: ${suggestion.recipe.name}');
     final valueController = TextEditingController(text: '15');
     String selectedType = 'percentage';
@@ -790,32 +792,32 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: Text('Create Promotion for ${suggestion.recipe.name}'),
+          title: Text('${l10n.createPromotionFor} ${suggestion.recipe.name}'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('Create a promotion to help move inventory:'),
+              Text(l10n.createAPromotionToHelpMoveInventory),
               const SizedBox(height: 16),
               TextField(
                 controller: nameController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Promotion Name',
-                  hintText: 'e.g., Chef\'s Special - 15% Off',
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
+                  labelText: l10n.promotionName,
+                  hintText: '${l10n.eG}, ${l10n.chefSpecialDiscountExample}',
                 ),
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Promotion Type',
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
+                  labelText: l10n.promotionType,
                 ),
                 value: selectedPromotionType,
-                items: const [
-                  DropdownMenuItem(value: 'discount', child: Text('Discount')),
-                  DropdownMenuItem(value: 'chef_special', child: Text('Chef\'s Special')),
-                  DropdownMenuItem(value: 'bogo', child: Text('Buy One Get One')),
-                  DropdownMenuItem(value: 'flash_sale', child: Text('Flash Sale')),
+                items: [
+                  DropdownMenuItem(value: 'discount', child: Text(l10n.discount)),
+                  DropdownMenuItem(value: 'chef_special', child: Text(l10n.chefSpecial)),
+                  DropdownMenuItem(value: 'bogo', child: Text(l10n.buyOneGetOne)),
+                  DropdownMenuItem(value: 'flash_sale', child: Text(l10n.flashSale)),
                 ],
                 onChanged: (value) {
                   setState(() {
@@ -825,15 +827,15 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Discount Type',
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
+                  labelText: l10n.discountType,
                 ),
                 value: selectedType,
-                items: const [
-                  DropdownMenuItem(value: 'percentage', child: Text('Percentage Discount')),
-                  DropdownMenuItem(value: 'fixed', child: Text('Fixed Amount Off')),
-                  DropdownMenuItem(value: 'buyOneGetOne', child: Text('Buy One Get One')),
+                items: [
+                  DropdownMenuItem(value: 'percentage', child: Text(l10n.percentageDiscount)),
+                  DropdownMenuItem(value: 'fixed', child: Text(l10n.fixedAmountOff)),
+                  DropdownMenuItem(value: 'buyOneGetOne', child: Text(l10n.buyOneGetOne)),
                 ],
                 onChanged: (value) {
                   setState(() {
@@ -847,7 +849,7 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   border: const OutlineInputBorder(),
-                  labelText: selectedType == 'percentage' ? 'Percentage (%)' : 'Amount (\$)',
+                  labelText: selectedType == 'percentage' ? l10n.percentage : l10n.amount,
                   hintText: selectedType == 'percentage' ? '15' : '5.00',
                 ),
               ),
@@ -856,7 +858,7 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
+              child: Text(l10n.cancel),
             ),
             ElevatedButton(
               onPressed: () {
@@ -865,20 +867,20 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
                 
                 if (name.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Please enter a promotion name'),
-                      backgroundColor: Colors.red,
-                    ),
+                                      SnackBar(
+                    content: Text(l10n.pleaseEnterAPromotionName),
+                    backgroundColor: Colors.red,
+                  ),
                   );
                   return;
                 }
                 
                 if (value <= 0) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Please enter a valid discount value'),
-                      backgroundColor: Colors.red,
-                    ),
+                                      SnackBar(
+                    content: Text(l10n.pleaseEnterAValidDiscountValue),
+                    backgroundColor: Colors.red,
+                  ),
                   );
                   return;
                 }
@@ -890,7 +892,7 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
                 backgroundColor: Colors.orange,
                 foregroundColor: Colors.white,
               ),
-              child: const Text('Create Promotion'),
+              child: Text(l10n.createPromotion),
             ),
           ],
         ),
@@ -907,6 +909,7 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
     required double discountValue,
     required int promotionExpiresInHours,
   }) async {
+    final l10n = AppLocalizations.of(context)!;
     try {
       final repository = ref.read(smartRecipeRepositoryProvider);
       
@@ -914,12 +917,12 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const AlertDialog(
+        builder: (context) => AlertDialog(
           content: Row(
             children: [
-              CircularProgressIndicator(),
-              SizedBox(width: 16),
-              Text('Cooking recipe...'),
+              const CircularProgressIndicator(),
+              const SizedBox(width: 16),
+              Text(l10n.cookingRecipe),
             ],
           ),
         ),
@@ -944,16 +947,16 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Recipe Cooked Successfully!'),
+          title: Text(l10n.recipeCookedSuccessfully),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Recipe: ${suggestion.recipe.name}'),
+              Text('${l10n.recipe}: ${suggestion.recipe.name}'),
               const SizedBox(height: 8),
               if (result['cookingResult'] != null) ...[
-                Text('Quantity Cooked: ${result['cookingResult']['quantity']?.toString() ?? '0'}'),
-                Text('Cost Savings: ${CurrencyFormatter.formatCRC(result['cookingResult']['costSavings'] ?? 0.0)}'),
+                Text('${l10n.quantityCooked}: ${result['cookingResult']['quantity']?.toString() ?? '0'}'),
+                Text('${l10n.costSavings}: ${CurrencyFormatter.formatCRC(result['cookingResult']['costSavings'] ?? 0.0)}'),
                 Text('Waste Reduction: ${result['cookingResult']['wasteReduction']?.toString() ?? '0'} items'),
               ],
               const SizedBox(height: 8),
@@ -983,7 +986,7 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
                 ref.invalidate(activePromotionsProvider);
                 ref.invalidate(promotionsNotifierProvider);
               },
-              child: const Text('OK'),
+              child: Text(l10n.ok),
             ),
           ],
         ),
@@ -996,12 +999,12 @@ class _SmartSuggestionsScreenState extends ConsumerState<SmartSuggestionsScreen>
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Error'),
-          content: Text('Failed to cook recipe: $e'),
+          title: Text(l10n.error),
+          content: Text('${l10n.failedToCookRecipe}: $e'),
           actions: [
             ElevatedButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('OK'),
+              child: Text(l10n.ok),
             ),
           ],
         ),

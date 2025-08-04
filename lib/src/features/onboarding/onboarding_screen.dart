@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/navigation/app_router.dart';
+import '../../core/localization/app_localizations.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   final VoidCallback? onOnboardingComplete;
@@ -19,32 +20,34 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  final List<OnboardingPage> _pages = [
-    OnboardingPage(
-      title: 'Welcome to White Label POS',
-      description: 'Your complete point of sale solution for modern businesses. Manage sales, inventory, and customers all in one place.',
-      icon: Icons.store,
-      color: Colors.blue,
-    ),
-    OnboardingPage(
-      title: 'Fast & Easy Sales',
-      description: 'Process transactions quickly with our intuitive POS interface. Support for barcode scanning and multiple payment methods.',
-      icon: Icons.point_of_sale,
-      color: Colors.green,
-    ),
-    OnboardingPage(
-      title: 'Inventory Management',
-      description: 'Keep track of your stock levels, set up low stock alerts, and manage your product catalog efficiently.',
-      icon: Icons.inventory,
-      color: Colors.orange,
-    ),
-    OnboardingPage(
-      title: 'Powerful Analytics',
-      description: 'Get insights into your business performance with detailed reports and analytics.',
-      icon: Icons.analytics,
-      color: Colors.purple,
-    ),
-  ];
+  List<OnboardingPage> _getPages(AppLocalizations? l10n) {
+    return [
+      OnboardingPage(
+        title: l10n?.onboardingPage1Title ?? 'Welcome to Mobile POS',
+        description: l10n?.onboardingPage1Description ?? 'Manage your restaurant operations efficiently with our comprehensive POS system',
+        icon: Icons.store,
+        color: Colors.blue,
+      ),
+      OnboardingPage(
+        title: l10n?.onboardingPage2Title ?? 'Easy Order Management',
+        description: l10n?.onboardingPage2Description ?? 'Take orders quickly and manage tables with our intuitive interface',
+        icon: Icons.point_of_sale,
+        color: Colors.green,
+      ),
+      OnboardingPage(
+        title: l10n?.onboardingPage3Title ?? 'Real-time Kitchen Display',
+        description: l10n?.onboardingPage3Description ?? 'Keep track of orders in real-time with our kitchen display system',
+        icon: Icons.inventory,
+        color: Colors.orange,
+      ),
+      OnboardingPage(
+        title: l10n?.onboardingPage4Title ?? 'Comprehensive Reports',
+        description: l10n?.onboardingPage4Description ?? 'Generate detailed reports and analytics to optimize your business',
+        icon: Icons.analytics,
+        color: Colors.purple,
+      ),
+    ];
+  }
 
   @override
   void dispose() {
@@ -59,7 +62,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 
   void _nextPage() {
-    if (_currentPage < _pages.length - 1) {
+    final l10n = AppLocalizations.of(context)!;
+    final pages = _getPages(l10n);
+    if (_currentPage < pages.length - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
@@ -86,30 +91,26 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final pages = _getPages(l10n);
     
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       body: SafeArea(
         child: Semantics(
-          label: 'Onboarding screen, page ${_currentPage + 1} of ${_pages.length}',
+          label: '${l10n.onboardingScreen}, ${l10n.page} ${_currentPage + 1} ${l10n.ofText} ${pages.length}',
           child: Column(
             children: [
               // Skip button
               Align(
                 alignment: Alignment.topRight,
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(16),
                   child: Semantics(
-                    label: 'Skip onboarding and go to login',
-                    button: true,
+                    label: l10n.skipOnboardingAndGoToLogin,
                     child: TextButton(
                       onPressed: _skipOnboarding,
-                      child: Text(
-                        'Skip',
-                        style: theme.textTheme.labelLarge?.copyWith(
-                          color: theme.colorScheme.primary,
-                        ),
-                      ),
+                      child: Text(l10n.skip),
                     ),
                   ),
                 ),
@@ -118,104 +119,82 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               // Page content
               Expanded(
                 child: Semantics(
-                  label: 'Onboarding content area',
+                  label: l10n.onboardingContentArea,
                   child: PageView.builder(
                     controller: _pageController,
                     onPageChanged: _onPageChanged,
-                    itemCount: _pages.length,
+                    itemCount: pages.length,
                     itemBuilder: (context, index) {
-                      final page = _pages[index];
-                      return _OnboardingPageView(
-                        page: page,
-                        pageNumber: index + 1,
-                        totalPages: _pages.length,
-                      );
+                      final page = pages[index];
+                      return _buildOnboardingPage(page, theme);
                     },
                   ),
                 ),
               ),
               
-              // Bottom section with indicators and buttons
+              // Navigation buttons
               Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
+                padding: const EdgeInsets.all(24),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Page indicators
-                    Semantics(
-                      label: 'Page ${_currentPage + 1} of ${_pages.length}',
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(
-                          _pages.length,
-                          (index) => Semantics(
-                            label: index == _currentPage 
-                                ? 'Current page ${index + 1}'
-                                : 'Page ${index + 1}',
-                            excludeSemantics: true,
-                            child: AnimatedContainer(
+                    // Back button
+                    if (_currentPage > 0)
+                      Semantics(
+                        label: l10n.goToPreviousPage,
+                        child: TextButton(
+                          onPressed: () {
+                            _pageController.previousPage(
                               duration: const Duration(milliseconds: 300),
-                              margin: const EdgeInsets.symmetric(horizontal: 4),
-                              width: _currentPage == index ? 24 : 8,
-                              height: 8,
-                              decoration: BoxDecoration(
-                                color: _currentPage == index
-                                    ? theme.colorScheme.primary
-                                    : theme.colorScheme.primary.withValues(alpha: 0.3),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                            ),
+                              curve: Curves.easeInOut,
+                            );
+                          },
+                          child: Text(l10n.back),
+                        ),
+                      )
+                    else
+                      const SizedBox(width: 80),
+                    
+                    // Page indicators
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(
+                        pages.length,
+                        (index) => Container(
+                          width: 8,
+                          height: 8,
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: _currentPage == index
+                                ? theme.colorScheme.primary
+                                : theme.colorScheme.outline.withOpacity(0.3),
                           ),
                         ),
                       ),
                     ),
                     
-                    const SizedBox(height: 32),
-                    
-                    // Action buttons
-                    Row(
-                      children: [
-                        // Back button (only show if not on first page)
-                        if (_currentPage > 0)
-                          Expanded(
-                            child: Semantics(
-                              label: 'Go to previous page',
-                              button: true,
-                              child: OutlinedButton(
-                                onPressed: () {
-                                  _pageController.previousPage(
-                                    duration: const Duration(milliseconds: 300),
-                                    curve: Curves.easeInOut,
-                                  );
-                                },
-                                child: Text(
-                                  'Back',
-                                  style: theme.textTheme.labelLarge,
-                                ),
-                              ),
-                            ),
-                          ),
-                        
-                        if (_currentPage > 0) const SizedBox(width: 16),
-                        
-                        // Next/Get Started button
-                        Expanded(
-                          child: Semantics(
-                            label: _currentPage == _pages.length - 1 
-                                ? 'Complete onboarding and get started'
-                                : 'Go to next page',
-                            button: true,
-                            child: ElevatedButton(
-                              onPressed: _nextPage,
-                              child: Text(
-                                _currentPage == _pages.length - 1 ? 'Get Started' : 'Next',
-                                style: theme.textTheme.labelLarge?.copyWith(
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
+                    // Next/Get Started button
+                    Semantics(
+                      label: _currentPage == pages.length - 1 
+                          ? l10n.completeOnboardingAndGetStarted
+                          : l10n.goToNextPage,
+                      child: ElevatedButton(
+                        onPressed: _nextPage,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.colorScheme.primary,
+                          foregroundColor: theme.colorScheme.onPrimary,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
                           ),
                         ),
-                      ],
+                        child: Text(
+                          _currentPage == pages.length - 1 
+                              ? l10n.getStarted 
+                              : l10n.next,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -223,6 +202,57 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildOnboardingPage(OnboardingPage page, ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
+    
+    return Padding(
+      padding: const EdgeInsets.all(32),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Icon
+          Container(
+            width: 120,
+            height: 120,
+            decoration: BoxDecoration(
+              color: page.color.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              page.icon,
+              size: 60,
+              color: page.color,
+            ),
+          ),
+          
+          const SizedBox(height: 32),
+          
+          // Title
+          Text(
+            page.title,
+            style: theme.textTheme.headlineMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.onSurface,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          
+          const SizedBox(height: 16),
+          
+          // Description
+          Text(
+            page.description,
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+              height: 1.5,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }
@@ -234,88 +264,10 @@ class OnboardingPage {
   final IconData icon;
   final Color color;
 
-  OnboardingPage({
+  const OnboardingPage({
     required this.title,
     required this.description,
     required this.icon,
     required this.color,
   });
-}
-
-class _OnboardingPageView extends StatelessWidget {
-  final OnboardingPage page;
-  final int pageNumber;
-  final int totalPages;
-
-  const _OnboardingPageView({
-    required this.page,
-    required this.pageNumber,
-    required this.totalPages,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    
-    return Semantics(
-      label: 'Onboarding page $pageNumber of $totalPages: ${page.title}',
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Icon
-            Semantics(
-              label: '${page.title} icon',
-              excludeSemantics: true,
-              child: Container(
-                width: 120,
-                height: 120,
-                decoration: BoxDecoration(
-                  color: page.color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(60),
-                ),
-                child: Icon(
-                  page.icon,
-                  size: 60,
-                  color: page.color,
-                ),
-              ),
-            ),
-            
-            const SizedBox(height: 48),
-            
-            // Title
-            Semantics(
-              label: 'Page title: ${page.title}',
-              header: true,
-              child: Text(
-                page.title,
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.onSurface,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            
-            const SizedBox(height: 16),
-            
-            // Description
-            Semantics(
-              label: 'Page description: ${page.description}',
-              child: Text(
-                page.description,
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                  height: 1.5,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 } 

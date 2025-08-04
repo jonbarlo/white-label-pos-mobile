@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:white_label_pos_mobile/src/features/inventory/inventory_provider.dart';
 import 'package:white_label_pos_mobile/src/features/inventory/models/inventory_item.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/localization/app_localizations.dart';
 import '../../shared/widgets/theme_toggle_button.dart';
 import '../../shared/widgets/app_image.dart';
 import '../../shared/utils/currency_formatter.dart';
@@ -39,16 +40,17 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
   @override
   Widget build(BuildContext context) {
     final inventoryState = ref.watch(inventoryProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Inventory'),
+        title: Text(l10n.inventory),
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
-            Tab(text: 'All Items'),
-            Tab(text: 'Low Stock'),
-            Tab(text: 'Categories'),
+          tabs: [
+            Tab(text: l10n.allItems),
+            Tab(text: l10n.lowStock),
+            Tab(text: l10n.categories),
           ],
         ),
         actions: [
@@ -85,6 +87,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
   }
 
   Widget _buildAllItemsTab(InventoryState state) {
+    final l10n = AppLocalizations.of(context)!;
     if (state.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -97,7 +100,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
             Icon(Icons.error_outline, size: 64, color: Theme.of(context).colorScheme.error),
             const SizedBox(height: 16),
             Text(
-              'Error loading inventory',
+              l10n.errorLoadingInventory,
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 8),
@@ -107,7 +110,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
               onPressed: () {
                 ref.read(inventoryProvider.notifier).loadInventoryItems();
               },
-              child: const Text('Retry'),
+              child: Text(l10n.retry),
             ),
           ],
         ),
@@ -124,12 +127,12 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
             Icon(Icons.inventory_2_outlined, size: 64, color: Theme.of(context).textTheme.bodySmall?.color),
             const SizedBox(height: 16),
             Text(
-              'No inventory items found',
+              l10n.noInventoryItemsFound,
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 8),
             Text(
-              'Add your first item to get started',
+              l10n.addYourFirstItemToGetStarted,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).textTheme.bodySmall?.color,
               ),
@@ -154,6 +157,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
   }
 
   Widget _buildLowStockTab(InventoryState state) {
+    final l10n = AppLocalizations.of(context)!;
     if (state.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -168,12 +172,12 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
             const Icon(Icons.check_circle_outline, size: 64, color: Colors.green),
             const SizedBox(height: 16),
             Text(
-              'All items are well stocked',
+              l10n.allItemsAreWellStocked,
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 8),
             Text(
-              'No low stock items found',
+              l10n.noLowStockItemsFound,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).textTheme.bodySmall?.color,
               ),
@@ -198,6 +202,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
   }
 
   Widget _buildCategoriesTab() {
+    final l10n = AppLocalizations.of(context)!;
     return Consumer(
       builder: (context, ref, child) {
         final categoriesAsync = ref.watch(categoriesProvider);
@@ -212,12 +217,12 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
                     Icon(Icons.category_outlined, size: 64, color: Theme.of(context).textTheme.bodySmall?.color),
                     const SizedBox(height: 16),
                     Text(
-                      'No categories found',
+                      l10n.noCategoriesFound,
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Categories will appear here',
+                      l10n.categoriesWillAppearHere,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Theme.of(context).textTheme.bodySmall?.color,
                       ),
@@ -251,7 +256,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
                 Icon(Icons.error_outline, size: 64, color: Theme.of(context).colorScheme.error),
                 const SizedBox(height: 16),
                 Text(
-                  'Error loading categories',
+                  l10n.errorLoadingCategories,
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 const SizedBox(height: 8),
@@ -338,14 +343,15 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
   }
 
   void _showSearchDialog() {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Search Inventory'),
+        title: Text(l10n.searchInventory),
         content: TextField(
           controller: _searchController,
           decoration: InputDecoration(
-            hintText: 'Search by name, SKU, or barcode...',
+            hintText: l10n.search,
             prefixIcon: const Icon(Icons.search),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
@@ -362,11 +368,11 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
               ref.read(inventoryProvider.notifier).clearSearch();
               Navigator.of(context).pop();
             },
-            child: const Text('Clear'),
+            child: Text(l10n.clear),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+            child: Text(l10n.close),
           ),
         ],
       ),
@@ -374,20 +380,21 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
   }
 
   void _showFilterDialog() {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Filter Options'),
-        content: const Column(
+        title: Text(l10n.filterOptions),
+        content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Filter options will be implemented here'),
+            Text(l10n.filterOptionsWillBeImplementedHere),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+            child: Text(l10n.close),
           ),
         ],
       ),
@@ -395,27 +402,28 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
   }
 
   void _showAddItemDialog() {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Add New Item'),
-        content: const Column(
+        title: Text(l10n.addNewItem),
+        content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Add item form will be implemented here'),
+            Text(l10n.addItemFormWillBeImplementedHere),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () {
               // TODO: Implement add item functionality
               Navigator.of(context).pop();
             },
-            child: const Text('Add'),
+            child: Text(l10n.add),
           ),
         ],
       ),
@@ -423,6 +431,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
   }
 
   void _showItemDetailsDialog(InventoryItem item) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -445,7 +454,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+            child: Text(l10n.close),
           ),
         ],
       ),
@@ -453,6 +462,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
   }
 
   void _showItemOptionsDialog(InventoryItem item) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -462,7 +472,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
           children: [
             ListTile(
               leading: const Icon(Icons.edit),
-              title: const Text('Edit Item'),
+              title: Text(l10n.editItem),
               onTap: () {
                 Navigator.of(context).pop();
                 // TODO: Implement edit functionality
@@ -470,7 +480,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
             ),
             ListTile(
               leading: const Icon(Icons.inventory),
-              title: const Text('Update Stock'),
+              title: Text(l10n.updateStock),
               onTap: () {
                 Navigator.of(context).pop();
                 _showUpdateStockDialog(item);
@@ -478,7 +488,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
             ),
             ListTile(
               leading: const Icon(Icons.delete, color: Colors.red),
-              title: const Text('Delete Item', style: TextStyle(color: Colors.red)),
+              title: Text(l10n.deleteItem, style: const TextStyle(color: Colors.red)),
               onTap: () {
                 Navigator.of(context).pop();
                 _showDeleteConfirmationDialog(item);
@@ -489,7 +499,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
         ],
       ),
@@ -497,6 +507,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
   }
 
   void _showUpdateStockDialog(InventoryItem item) {
+    final l10n = AppLocalizations.of(context)!;
     final stockController = TextEditingController(text: item.stockQuantity.toString());
     
     showDialog(
@@ -507,7 +518,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
           controller: stockController,
           keyboardType: TextInputType.number,
           decoration: InputDecoration(
-            labelText: 'New Stock Quantity',
+            labelText: l10n.newStockQuantity,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
             ),
@@ -516,7 +527,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -526,7 +537,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
               }
               Navigator.of(context).pop();
             },
-            child: const Text('Update'),
+            child: Text(l10n.update),
           ),
         ],
       ),
@@ -534,15 +545,16 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
   }
 
   void _showDeleteConfirmationDialog(InventoryItem item) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Item'),
+        title: Text(l10n.deleteItem),
         content: Text('Are you sure you want to delete "${item.name}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -550,7 +562,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
               Navigator.of(context).pop();
             },
             style: AppTheme.neutralButtonStyle,
-            child: const Text('Delete'),
+            child: Text(l10n.delete),
           ),
         ],
       ),

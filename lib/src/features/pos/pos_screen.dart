@@ -11,6 +11,7 @@ import 'package:white_label_pos_mobile/src/features/auth/auth_provider.dart';
 import 'package:white_label_pos_mobile/src/features/auth/models/user.dart';
 import 'package:white_label_pos_mobile/src/features/promotions/promotions_provider.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/localization/app_localizations.dart';
 
 import '../../shared/widgets/app_image.dart';
 import '../../core/services/navigation_service.dart';
@@ -31,7 +32,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
   late TabController _tabController;
   final TextEditingController _searchController = TextEditingController();
   PaymentMethod _selectedPaymentMethod = PaymentMethod.cash;
-  String _selectedCategory = 'All';
+  String _selectedCategory = ''; // Will be set with localized string
   bool _isSearching = false;
   int _currentOrderNumber = DateTime.now().millisecondsSinceEpoch ~/ 1000 % 10000; // Dynamic order number based on timestamp
   String _selectedTab = 'Cart'; // Track selected tab for better UX
@@ -39,7 +40,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
   // Table information for dynamic header
   String? _selectedTableNumber;
   String? _selectedTableWaitstaff;
-  String _serviceType = 'POS Service'; // Default service type
+  String _serviceType = ''; // Will be set with localized string
 
   // Section management for bottom navigation
   String _currentSection = 'Menu'; // Menu, Orders, Transactions, Inventory
@@ -239,10 +240,11 @@ class _PosScreenState extends ConsumerState<PosScreen>
   void _showCheckoutDialog() {
     // Use the appropriate cart based on context
     final cart = _getCurrentCart();
+    final l10n = AppLocalizations.of(context)!;
     if (cart.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Cart is empty'),
+        SnackBar(
+          content: Text(l10n.cartIsEmpty),
           backgroundColor: Colors.orange,
         ),
       );
@@ -291,9 +293,10 @@ class _PosScreenState extends ConsumerState<PosScreen>
         _addToCart(item);
       } else {
         if (mounted) {
+          final l10n = AppLocalizations.of(context)!;
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Item not found for this barcode'),
+            SnackBar(
+              content: Text(l10n.itemNotFoundForBarcode),
               backgroundColor: Colors.orange,
             ),
           );
@@ -391,7 +394,16 @@ class _PosScreenState extends ConsumerState<PosScreen>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final authState = ref.watch(authNotifierProvider);
-    final cashierName = authState.user?.name ?? 'Cashier';
+    final l10n = AppLocalizations.of(context)!;
+    final cashierName = authState.user?.name ?? l10n.cashier;
+    
+    // Initialize localized strings
+    if (_selectedCategory.isEmpty) {
+      _selectedCategory = 'All'; // This will be replaced with localized string in the UI
+    }
+    if (_serviceType.isEmpty) {
+      _serviceType = l10n.posService;
+    }
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
@@ -444,6 +456,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
   }
 
   Widget _buildPosHeader(ThemeData theme, String cashierName) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
@@ -481,7 +494,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
               Text(
                 _selectedTableNumber != null 
                   ? 'Waitstaff: ${_selectedTableWaitstaff ?? "Unassigned"}'
-                  : _serviceType,
+                  : l10n.posService,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
@@ -506,7 +519,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
               controller: _searchController,
               onChanged: _onSearchChanged,
               decoration: InputDecoration(
-                hintText: 'Search menu items...',
+                hintText: l10n.search,
                 hintStyle: TextStyle(
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   fontSize: 14,
@@ -543,21 +556,21 @@ class _PosScreenState extends ConsumerState<PosScreen>
               _buildHeaderActionButton(
                 theme,
                 Icons.percent,
-                'Discounts',
+                l10n.discounts,
                 _showDiscountsDialog,
               ),
               const SizedBox(width: 8),
               _buildHeaderActionButton(
                 theme,
                 Icons.local_offer,
-                'Promotions',
+                l10n.promotions,
                 _showPromotionsDialog,
               ),
               const SizedBox(width: 8),
               _buildHeaderActionButton(
                 theme,
                 Icons.qr_code_scanner,
-                'Scan',
+                l10n.scan,
                 _onScanBarcode,
               ),
             ],
@@ -934,6 +947,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
   }
 
   Widget _buildCartTabHeader(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
@@ -945,9 +959,9 @@ class _PosScreenState extends ConsumerState<PosScreen>
       ),
       child: Row(
         children: [
-                        _buildTabButton(theme, 'Cart', _selectedTab == 'Cart'),
-          _buildTabButton(theme, 'Actions', _selectedTab == 'Actions'),
-          _buildTabButton(theme, 'Guest', _selectedTab == 'Guest'),
+                        _buildTabButton(theme, l10n.cart, _selectedTab == 'Cart'),
+          _buildTabButton(theme, l10n.actions, _selectedTab == 'Actions'),
+          _buildTabButton(theme, l10n.guest, _selectedTab == 'Guest'),
         ],
       ),
     );
@@ -988,6 +1002,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
     // Get the appropriate cart based on context
     final cart = _getCurrentCart();
     final total = cart.fold(0.0, (sum, item) => sum + item.total);
+    final l10n = AppLocalizations.of(context)!;
     
     // Debug: Log cart state
     print('🔍 DEBUG: _buildCartTab - Current cart has ${cart.length} items');
@@ -1011,14 +1026,14 @@ class _PosScreenState extends ConsumerState<PosScreen>
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Your cart is empty',
+                        l10n.yourCartIsEmpty,
                         style: theme.textTheme.titleMedium?.copyWith(
                           color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Add items to get started',
+                        l10n.addItemsToGetStarted,
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                         ),
@@ -1043,61 +1058,62 @@ class _PosScreenState extends ConsumerState<PosScreen>
   }
 
   Widget _buildCartActionsTab(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
           _buildActionButton(
             theme,
-            'Charge Table Order',
+            l10n.chargeTableOrder,
             Icons.table_restaurant,
             () => _showTableOrdersDialog(),
           ),
           const SizedBox(height: 12),
           _buildActionButton(
             theme,
-            'Hold Order',
+            l10n.holdOrder,
             Icons.pause,
             () {
               // TODO: Implement hold order functionality
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Order held')),
+                SnackBar(content: Text(l10n.orderHeld)),
               );
             },
           ),
           const SizedBox(height: 12),
           _buildActionButton(
             theme,
-            'Void Order',
+            l10n.voidOrder,
             Icons.cancel,
             () {
               ref.read(cartNotifierProvider.notifier).clearCart();
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Order voided')),
+                SnackBar(content: Text(l10n.orderVoided)),
               );
             },
           ),
           const SizedBox(height: 12),
           _buildActionButton(
             theme,
-            'Print Receipt',
+            l10n.printReceipt,
             Icons.print,
             () {
               // TODO: Implement print functionality
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Receipt printed')),
+                SnackBar(content: Text(l10n.receiptPrinted)),
               );
             },
           ),
           const SizedBox(height: 12),
           _buildActionButton(
             theme,
-            'Email Receipt',
+            l10n.emailReceipt,
             Icons.email,
             () {
               // TODO: Implement email functionality
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Receipt emailed')),
+                SnackBar(content: Text(l10n.receiptEmailed)),
               );
             },
           ),
@@ -1107,37 +1123,38 @@ class _PosScreenState extends ConsumerState<PosScreen>
   }
 
   Widget _buildCartGuestTab(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
           _buildActionButton(
             theme,
-            'Set Guest Count',
+            l10n.setGuestCount,
             Icons.people,
             _showGuestDialog,
           ),
           const SizedBox(height: 12),
           _buildActionButton(
             theme,
-            'Customer Info',
+            l10n.customerInfo,
             Icons.person,
             () {
               // TODO: Implement customer info functionality
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Customer info dialog')),
+                SnackBar(content: Text(l10n.customerInfoDialog)),
               );
             },
           ),
           const SizedBox(height: 12),
           _buildActionButton(
             theme,
-            'Special Requests',
+            l10n.specialRequests,
             Icons.note_add,
             () {
               // TODO: Implement special requests functionality
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Special requests dialog')),
+                SnackBar(content: Text(l10n.specialRequestsDialog)),
               );
             },
           ),
@@ -1285,6 +1302,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
   }
 
   Widget _buildCartSummary(ThemeData theme, double total) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -1302,7 +1320,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Total',
+                l10n.total,
                 style: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -1351,7 +1369,8 @@ class _PosScreenState extends ConsumerState<PosScreen>
 
   Widget _buildBottomNavigation(ThemeData theme) {
     final authState = ref.watch(authNotifierProvider);
-    final cashierName = authState.user?.name ?? 'Cashier';
+    final l10n = AppLocalizations.of(context)!;
+    final cashierName = authState.user?.name ?? l10n.cashier;
     
     return Container(
       height: 70,
@@ -1380,35 +1399,35 @@ class _PosScreenState extends ConsumerState<PosScreen>
           _buildBottomNavItem(
             theme,
             Icons.restaurant_menu,
-            'Menu',
+            l10n.menu,
             () => setState(() => _currentSection = 'Menu'),
             isSelected: _currentSection == 'Menu',
           ),
           _buildBottomNavItem(
             theme,
             Icons.receipt_long,
-            'Orders',
+            l10n.orders,
             () => setState(() => _currentSection = 'Orders'),
             isSelected: _currentSection == 'Orders',
           ),
           _buildBottomNavItem(
             theme,
             Icons.analytics,
-            'Transactions',
+            l10n.transactions,
             () => setState(() => _currentSection = 'Transactions'),
             isSelected: _currentSection == 'Transactions',
           ),
           _buildBottomNavItem(
             theme,
             Icons.inventory,
-            'Inventory',
+            l10n.inventory,
             () => setState(() => _currentSection = 'Inventory'),
             isSelected: _currentSection == 'Inventory',
           ),
           _buildBottomNavItem(
             theme,
             Icons.more_horiz,
-            'More',
+            l10n.more,
             () => context.go('/settings'),
             isSelected: false,
           ),
@@ -1669,10 +1688,11 @@ class _PosScreenState extends ConsumerState<PosScreen>
 
    // Section builders for bottom navigation
   Widget _buildOrdersSection(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         // Section header
-        _buildSectionHeader(theme, 'Current Orders', 'Manage restaurant orders'),
+        _buildSectionHeader(theme, l10n.currentOrders, l10n.manageRestaurantOrders),
         
         // Orders list
         Expanded(
@@ -1686,8 +1706,8 @@ class _PosScreenState extends ConsumerState<PosScreen>
                     return _buildEmptyStateSection(
                       theme,
                       Icons.receipt_long,
-                      'No Active Orders',
-                      'New orders will appear here',
+                      l10n.noActiveOrders,
+                      l10n.newOrdersWillAppearHere,
                     );
                   }
                   
@@ -1703,7 +1723,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
                 loading: () => const Center(child: LoadingIndicator()),
                 error: (error, stackTrace) => _buildErrorState(
                   theme,
-                  'Failed to load orders',
+                  l10n.failedToLoadOrders,
                   error.toString(),
                 ),
               );
@@ -1715,10 +1735,11 @@ class _PosScreenState extends ConsumerState<PosScreen>
   }
 
   Widget _buildTransactionsSection(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         // Section header
-        _buildSectionHeader(theme, 'Daily Transactions', 'View completed sales'),
+        _buildSectionHeader(theme, l10n.dailyTransactions, l10n.viewCompletedSales),
         
         // Transactions list
         Expanded(
@@ -1732,8 +1753,8 @@ class _PosScreenState extends ConsumerState<PosScreen>
                     return _buildEmptyStateSection(
                       theme,
                       Icons.analytics,
-                      'No Transactions Today',
-                      'Completed sales will appear here',
+                      l10n.noTransactionsToday,
+                      l10n.completedSalesWillAppearHere,
                     );
                   }
                   
@@ -1749,7 +1770,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
                 loading: () => const Center(child: LoadingIndicator()),
                 error: (error, stackTrace) => _buildErrorState(
                   theme,
-                  'Failed to load transactions',
+                  l10n.failedToLoadTransactions,
                   error.toString(),
                 ),
               );
@@ -1761,10 +1782,11 @@ class _PosScreenState extends ConsumerState<PosScreen>
   }
 
   Widget _buildInventorySection(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         // Section header
-        _buildSectionHeader(theme, 'Inventory Status', 'Monitor stock levels'),
+        _buildSectionHeader(theme, l10n.inventoryStatus, l10n.monitorStockLevels),
         
         // Inventory list
         Expanded(
@@ -1778,8 +1800,8 @@ class _PosScreenState extends ConsumerState<PosScreen>
                     return _buildEmptyStateSection(
                       theme,
                       Icons.inventory,
-                      'No Inventory Data',
-                      'Menu items will appear here with stock info',
+                      l10n.noInventoryData,
+                      l10n.menuItemsWillAppearHere,
                     );
                   }
                   
@@ -1795,7 +1817,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
                 loading: () => const Center(child: LoadingIndicator()),
                 error: (error, stackTrace) => _buildErrorState(
                   theme,
-                  'Failed to load inventory',
+                  l10n.failedToLoadInventory,
                   error.toString(),
                 ),
               );
@@ -1911,11 +1933,12 @@ class _PosScreenState extends ConsumerState<PosScreen>
   }
 
   Widget _buildOrderCard(ThemeData theme, Map<String, dynamic> order) {
-    final tableNumber = order['tableNumber']?.toString() ?? 'Unknown';
+    final l10n = AppLocalizations.of(context)!;
+    final tableNumber = order['tableNumber']?.toString() ?? l10n.unknown;
     final guestCount = order['guestCount'] ?? order['items']?.length ?? 1;
-    final waitstaff = order['waitstaff']?.toString() ?? 'Unknown';
+    final waitstaff = order['waitstaff']?.toString() ?? l10n.unknown;
     final total = (order['total'] ?? 0.0).toDouble();
-    final status = order['status']?.toString() ?? 'pending';
+    final status = order['status']?.toString() ?? l10n.pending;
     final items = order['items'] as List<dynamic>? ?? [];
     final orderTime = order['orderTime']?.toString() ?? '';
     final createdAt = DateTime.tryParse(orderTime) ?? DateTime.now();
@@ -2390,6 +2413,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
 
   // Waitstaff to POS charging flow
    void _showTableOrdersDialog() {
+     final l10n = AppLocalizations.of(context)!;
      showDialog(
        context: context,
        builder: (context) => _TableOrdersDialog(
@@ -4250,6 +4274,7 @@ class _TableOrdersDialog extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final tableOrdersAsync = ref.watch(tableOrdersReadyToChargeProvider);
     
     return Dialog(
@@ -4352,9 +4377,9 @@ class _TableOrdersDialog extends ConsumerWidget {
 
                     return TableOrder(
                       id: data['id'] ?? 0,
-                      tableNumber: data['tableNumber'] ?? 'Unknown',
+                      tableNumber: data['tableNumber'] ?? l10n.unknown,
                       guestCount: data['guestCount'] ?? 1,
-                      waitstaff: data['waitstaff'] ?? 'Unknown Server',
+                      waitstaff: data['waitstaff'] ?? l10n.unknown,
                       total: (data['total'] ?? 0.0).toDouble(),
                       status: data['status'] ?? 'ready_to_pay',
                       items: items,
@@ -4664,8 +4689,9 @@ class _SettleOrderDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final tableNumber = order['tableNumber']?.toString() ?? 'Unknown';
-    final waitstaff = order['waitstaff']?.toString() ?? 'Unknown';
+    final l10n = AppLocalizations.of(context)!;
+    final tableNumber = order['tableNumber']?.toString() ?? l10n.unknown;
+    final waitstaff = order['waitstaff']?.toString() ?? l10n.unknown;
     final total = (order['total'] ?? 0.0).toDouble();
     final items = order['items'] as List<dynamic>? ?? [];
     final orderTime = order['orderTime']?.toString() ?? '';
@@ -4752,7 +4778,7 @@ class _SettleOrderDialog extends StatelessWidget {
                   itemCount: items.length,
                   itemBuilder: (context, index) {
                     final item = items[index];
-                    final itemName = item['name'] ?? item['itemName'] ?? 'Unknown Item';
+                    final itemName = item['name'] ?? item['itemName'] ?? l10n.unknown;
                     final quantity = item['quantity'] ?? 1;
                     final price = (item['price'] ?? item['unitPrice'] ?? 0.0).toDouble();
                     
@@ -5084,3 +5110,4 @@ class _PromotionsDialog extends ConsumerWidget {
     );
   }
 }
+

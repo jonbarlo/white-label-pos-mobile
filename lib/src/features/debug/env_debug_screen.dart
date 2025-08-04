@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/config/env_provider.dart';
+import '../../core/localization/app_localizations.dart';
 
 class EnvDebugScreen extends ConsumerWidget {
   const EnvDebugScreen({super.key});
@@ -12,10 +13,11 @@ class EnvDebugScreen extends ConsumerWidget {
     final isDebug = ref.watch(isDebugModeProvider);
     final isBarcodeEnabled = ref.watch(isBarcodeScanningEnabledProvider);
     final configAsync = ref.watch(environmentConfigProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Environment Debug'),
+        title: Text(l10n.environmentDebug),
         centerTitle: true,
       ),
       body: Padding(
@@ -30,14 +32,14 @@ class EnvDebugScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Current Environment Settings',
+                      l10n.currentEnvironmentSettings,
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
                     const SizedBox(height: 16),
-                    _buildInfoRow('API Base URL', apiUrl),
-                    _buildInfoRow('App Name', appName),
-                    _buildInfoRow('Debug Mode', isDebug.toString()),
-                    _buildInfoRow('Barcode Scanning', isBarcodeEnabled.toString()),
+                    _buildInfoRow(l10n.apiBaseUrl, apiUrl),
+                    _buildInfoRow(l10n.appName, appName),
+                    _buildInfoRow(l10n.debugMode, isDebug.toString()),
+                    _buildInfoRow(l10n.barcodeScanning, isBarcodeEnabled.toString()),
                   ],
                 ),
               ),
@@ -50,7 +52,7 @@ class EnvDebugScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Full Configuration',
+                      l10n.fullConfiguration,
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
                     const SizedBox(height: 16),
@@ -62,7 +64,7 @@ class EnvDebugScreen extends ConsumerWidget {
                       ),
                       loading: () => const Center(child: CircularProgressIndicator()),
                       error: (error, stack) => Text(
-                        'Error loading config: $error',
+                        '${l10n.errorLoadingConfig}: $error',
                         style: TextStyle(color: Theme.of(context).colorScheme.error),
                       ),
                     ),
@@ -78,19 +80,19 @@ class EnvDebugScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Environment Files',
+                      l10n.environmentFiles,
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
                     const SizedBox(height: 16),
-                    const Text('Available environment files:'),
+                    Text(l10n.availableEnvironmentFiles),
                     const SizedBox(height: 8),
-                    const Text('• .env (default)'),
-                    const Text('• .env.development'),
-                    const Text('• .env.staging'),
-                    const Text('• .env.production'),
+                    Text(l10n.envDefault),
+                    Text(l10n.envDevelopment),
+                    Text(l10n.envStaging),
+                    Text(l10n.envProduction),
                     const SizedBox(height: 8),
                     Text(
-                      'To switch environments, set the ENVIRONMENT variable:',
+                      l10n.toSwitchEnvironmentsSetEnvironmentVariable,
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                     const SizedBox(height: 4),
@@ -100,9 +102,9 @@ class EnvDebugScreen extends ConsumerWidget {
                         color: Theme.of(context).colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(4),
                       ),
-                      child: const Text(
-                        'flutter run --dart-define=ENVIRONMENT=development',
-                        style: TextStyle(fontFamily: 'monospace'),
+                      child: Text(
+                        l10n.flutterRunCommand,
+                        style: const TextStyle(fontFamily: 'monospace'),
                       ),
                     ),
                   ],

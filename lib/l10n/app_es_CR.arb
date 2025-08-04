@@ -219,5 +219,1797 @@
   "pointOfSaleSystem": "Sistema de Punto de Venta",
   "@pointOfSaleSystem": {
     "description": "Point of sale system subtitle"
+  },
+  "inventoryAlerts": "Alertas de Inventario",
+  "@inventoryAlerts": {
+    "description": "Inventory alerts screen title"
+  },
+  "allAlerts": "Todas las Alertas",
+  "@allAlerts": {
+    "description": "All alerts tab"
+  },
+  "expiringItems": "Artículos por Vencer",
+  "@expiringItems": {
+    "description": "Expiring items tab"
+  },
+  "underperforming": "Bajo Rendimiento",
+  "@underperforming": {
+    "description": "Underperforming items tab"
+  },
+  "errorCreatingPromotion": "Error al crear promoción",
+  "@errorCreatingPromotion": {
+    "description": "Error message when creating promotion fails"
+  },
+  "promotionConfiguration": "Configuración de Promoción",
+  "@promotionConfiguration": {
+    "description": "Promotion configuration section title"
+  },
+  "percentageDiscount": "Descuento Porcentual",
+  "@percentageDiscount": {
+    "description": "Percentage discount option"
+  },
+  "fixedAmountOff": "Monto Fijo de Descuento",
+  "@fixedAmountOff": {
+    "description": "Fixed amount discount option"
+  },
+  "buyOneGetOne": "Compra Uno Lleva Otro",
+  "@buyOneGetOne": {
+    "description": "Buy one get one promotion option"
+  },
+  "quickActions": "Acciones Rápidas",
+  "@quickActions": {
+    "description": "Quick actions dialog title"
+  },
+  "cookRecipe": "Cocinar Receta",
+  "@cookRecipe": {
+    "description": "Cook recipe action"
+  },
+  "useExpiringItemsToCreateDishes": "Usar artículos por vencer para crear platos",
+  "@useExpiringItemsToCreateDishes": {
+    "description": "Description for cook recipe action"
+  },
+  "createPromotion": "Crear Promoción",
+  "@createPromotion": {
+    "description": "Create promotion action"
+  },
+  "createSpecialOffersForItems": "Crear ofertas especiales para artículos",
+  "@createSpecialOffersForItems": {
+    "description": "Description for create promotion action"
+  },
+  "viewAnalytics": "Ver Analíticas",
+  "@viewAnalytics": {
+    "description": "View analytics action"
+  },
+  "checkCookingHistoryAndMetrics": "Revisar historial de cocina y métricas",
+  "@checkCookingHistoryAndMetrics": {
+    "description": "Description for view analytics action"
+  },
+  "cookingHistory": "Historial de Cocina",
+  "@cookingHistory": {
+    "description": "Cooking history action"
+  },
+  "viewRecentCookingActivities": "Ver actividades recientes de cocina",
+  "@viewRecentCookingActivities": {
+    "description": "Description for cooking history action"
+  },
+  "selectARecipeToCookUsingExpiringItems": "Selecciona una receta para cocinar usando artículos por vencer",
+  "@selectARecipeToCookUsingExpiringItems": {
+    "description": "Dialog text for recipe selection"
+  },
+  "thisFeatureWill": "Esta función:",
+  "@thisFeatureWill": {
+    "description": "Feature description prefix"
+  },
+  "automaticallySelectRecipesUsingExpiringItems": "Seleccionará automáticamente recetas usando artículos por vencer",
+  "@automaticallySelectRecipesUsingExpiringItems": {
+    "description": "Feature benefit description"
+  },
+  "consumeInventoryAndReduceWaste": "Consumirá inventario y reducirá desperdicios",
+  "@consumeInventoryAndReduceWaste": {
+    "description": "Feature benefit description"
+  },
+  "createCustomizablePromotions": "Creará promociones personalizables",
+  "@createCustomizablePromotions": {
+    "description": "Feature benefit description"
+  },
+  "quantityToCook": "Cantidad a Cocinar",
+  "@quantityToCook": {
+    "description": "Quantity field label"
+  },
+  "thisWillCreateAPromotionWithTheSameQuantity": "Esto creará una promoción con la misma cantidad",
+  "@thisWillCreateAPromotionWithTheSameQuantity": {
+    "description": "Helper text for quantity field"
+  },
+  "promotionName": "Nombre de la Promoción",
+  "@promotionName": {
+    "description": "Promotion name field label"
+  },
+  "eG": "ej.",
+  "@eG": {
+    "description": "Example abbreviation"
+  },
+  "chefSpecial": "Especial del Chef",
+  "@chefSpecial": {
+    "description": "Chef special promotion type"
+  },
+  "trufflePizza": "Pizza de Trufa",
+  "@trufflePizza": {
+    "description": "Example dish name"
+  },
+  "promotionDescription": "Descripción de la Promoción",
+  "@promotionDescription": {
+    "description": "Promotion description field label"
+  },
+  "descriptionOfThePromotion": "Descripción de la promoción",
+  "@descriptionOfThePromotion": {
+    "description": "Promotion description hint"
+  },
+  "promotionType": "Tipo de Promoción",
+  "@promotionType": {
+    "description": "Promotion type field label"
+  },
+  "discount": "Descuento",
+  "@discount": {
+    "description": "Discount promotion type"
+  },
+  "flashSale": "Venta Flash",
+  "@flashSale": {
+    "description": "Flash sale promotion type"
+  },
+  "discountType": "Tipo de Descuento",
+  "@discountType": {
+    "description": "Discount type field label"
+  },
+  "freeItem": "Artículo Gratis",
+  "@freeItem": {
+    "description": "Free item discount type"
+  },
+  "discountPercentage": "Porcentaje de Descuento",
+  "@discountPercentage": {
+    "description": "Discount percentage field label"
+  },
+  "discountAmount": "Monto de Descuento",
+  "@discountAmount": {
+    "description": "Discount amount field label"
+  },
+  "promotionExpiresInHours": "La Promoción Expira En (Horas)",
+  "@promotionExpiresInHours": {
+    "description": "Promotion expiration field label"
+  },
+  "pleaseEnterAPromotionName": "Por favor ingresa un nombre para la promoción",
+  "@pleaseEnterAPromotionName": {
+    "description": "Validation error for promotion name"
+  },
+  "pleaseEnterAValidDiscountValue": "Por favor ingresa un valor de descuento válido",
+  "@pleaseEnterAValidDiscountValue": {
+    "description": "Validation error for discount value"
+  },
+  "successfullyCreatedPromotion": "Promoción creada exitosamente",
+  "@successfullyCreatedPromotion": {
+    "description": "Success message for promotion creation"
+  },
+  "percentage": "Porcentaje",
+  "@percentage": {
+    "description": "Percentage field label"
+  },
+  "amount": "Monto",
+  "@amount": {
+    "description": "Amount field label"
+  },
+  "promotionCreatedFromInventoryAlert": "Promoción creada desde alerta de inventario",
+  "@promotionCreatedFromInventoryAlert": {
+    "description": "Description for promotion created from inventory alert"
+  },
+  "analytics": "Análisis",
+  "@analytics": {
+    "description": "Analytics screen title"
+  },
+  "features": "Características",
+  "@features": {
+    "description": "Features screen title"
+  },
+  "salesOverview": "Resumen de Ventas",
+  "@salesOverview": {
+    "description": "Sales overview section"
+  },
+  "todaysSales": "Ventas de Hoy",
+  "@todaysSales": {
+    "description": "Today's sales section"
+  },
+  "transactions": "Transacciones",
+  "@transactions": {
+    "description": "Transactions section"
+  },
+  "avgOrder": "Pedido Promedio",
+  "@avgOrder": {
+    "description": "Average order section"
+  },
+  "newFeaturesAvailable": "Nuevas Características Disponibles",
+  "@newFeaturesAvailable": {
+    "description": "New features available section"
+  },
+  "exploreFeaturesDescription": "Explora nuestro nuevo Sistema de Recetas y Promociones con notificaciones móviles.",
+  "@exploreFeaturesDescription": {
+    "description": "Description for exploring features"
+  },
+  "exploreFeatures": "Explorar Características",
+  "@exploreFeatures": {
+    "description": "Explore features button"
+  },
+  "recentActivity": "Actividad Reciente",
+  "@recentActivity": {
+    "description": "Recent activity section"
+  },
+  "languageSettings": "Configuración de Idioma",
+  "@languageSettings": {
+    "description": "Language settings screen title"
+  },
+  "languageStatus": "Estado del Idioma",
+  "@languageStatus": {
+    "description": "Language status section"
+  },
+  "currentLanguage": "Idioma Actual",
+  "@currentLanguage": {
+    "description": "Current language field"
+  },
+  "nativeName": "Nombre Nativo",
+  "@nativeName": {
+    "description": "Native name field"
+  },
+  "selectLanguage": "Seleccionar Idioma",
+  "@selectLanguage": {
+    "description": "Select language field"
+  },
+  "languageChangesSaved": "Cambios de idioma guardados",
+  "@languageChangesSaved": {
+    "description": "Language changes saved message"
+  },
+  "languageInfo": "POS Móvil soporta Español e Inglés. El idioma predeterminado es Español (Costa Rica).",
+  "@languageInfo": {
+    "description": "Language information text"
+  },
+  "languageChangesApplied": "Los cambios de idioma se guardarán y aplicarán inmediatamente.",
+  "@languageChangesApplied": {
+    "description": "Language changes applied message"
+  },
+  "profile": "Perfil",
+  "@profile": {
+    "description": "Profile screen title"
+  },
+  "confirmLogout": "Confirmar Cierre de Sesión",
+  "@confirmLogout": {
+    "description": "Confirm logout dialog title"
+  },
+  "logoutConfirmation": "¿Estás seguro de que quieres cerrar sesión?",
+  "@logoutConfirmation": {
+    "description": "Logout confirmation message"
+  },
+  "saving": "Guardando...",
+  "@saving": {
+    "description": "Saving message"
+  },
+  "loadingProfile": "Cargando perfil...",
+  "@loadingProfile": {
+    "description": "Loading profile message"
+  },
+  "profileUpdatedSuccessfully": "¡Perfil actualizado exitosamente!",
+  "@profileUpdatedSuccessfully": {
+    "description": "Profile updated success message"
+  },
+  "failedToLoadProfile": "Error al cargar el perfil",
+  "@failedToLoadProfile": {
+    "description": "Failed to load profile message"
+  },
+  "pleaseLoginToViewProfile": "Por favor inicia sesión para ver tu perfil",
+  "@pleaseLoginToViewProfile": {
+    "description": "Please login to view profile message"
+  },
+  "initializing": "Inicializando...",
+  "@initializing": {
+    "description": "Initializing message"
+  },
+  "userDataNotAvailable": "Datos de usuario no disponibles",
+  "@userDataNotAvailable": {
+    "description": "User data not available message"
+  },
+  "personalInformation": "Información Personal",
+  "@personalInformation": {
+    "description": "Personal information section"
+  },
+  "workInformation": "Información Laboral",
+  "@workInformation": {
+    "description": "Work information section"
+  },
+  "accountSettings": "Configuración de Cuenta",
+  "@accountSettings": {
+    "description": "Account settings section"
+  },
+  "supportAndHelp": "Soporte y Ayuda",
+  "@supportAndHelp": {
+    "description": "Support and help section"
+  },
+  "editProfile": "Editar Perfil",
+  "@editProfile": {
+    "description": "Edit profile button"
+  },
+  "changePhoto": "Cambiar Foto",
+  "@changePhoto": {
+    "description": "Change photo button"
+  },
+  "photoUploadComingSoon": "¡Subida de fotos próximamente!",
+  "@photoUploadComingSoon": {
+    "description": "Photo upload coming soon message"
+  },
+  "fullName": "Nombre Completo",
+  "@fullName": {
+    "description": "Full name field"
+  },
+  "enterYourName": "Ingresa tu nombre",
+  "@enterYourName": {
+    "description": "Enter your name hint"
+  },
+  "phoneNumber": "Número de Teléfono",
+  "@phoneNumber": {
+    "description": "Phone number field"
+  },
+  "saveChanges": "Guardar Cambios",
+  "@saveChanges": {
+    "description": "Save changes button"
+  },
+  "name": "Nombre",
+  "@name": {
+    "description": "Name field"
+  },
+  "phone": "Teléfono",
+  "@phone": {
+    "description": "Phone field"
+  },
+  "role": "Rol",
+  "@role": {
+    "description": "Role field"
+  },
+  "employeeId": "ID de Empleado",
+  "@employeeId": {
+    "description": "Employee ID field"
+  },
+  "department": "Departamento",
+  "@department": {
+    "description": "Department field"
+  },
+  "hireDate": "Fecha de Contratación",
+  "@hireDate": {
+    "description": "Hire date field"
+  },
+  "status": "Estado",
+  "@status": {
+    "description": "Status field"
+  },
+  "quickStats": "Estadísticas Rápidas",
+  "@quickStats": {
+    "description": "Quick stats section"
+  },
+  "orders": "Pedidos",
+  "@orders": {
+    "description": "Orders section"
+  },
+  "thisMonth": "Este Mes",
+  "@thisMonth": {
+    "description": "This month section"
+  },
+  "tables": "Mesas",
+  "@tables": {
+    "description": "Tables section"
+  },
+  "thisWeek": "Esta Semana",
+  "@thisWeek": {
+    "description": "This week section"
+  },
+  "tips": "Propinas",
+  "@tips": {
+    "description": "Tips section"
+  },
+  "changePassword": "Cambiar Contraseña",
+  "@changePassword": {
+    "description": "Change password button"
+  },
+  "passwordChangeComingSoon": "¡Cambio de contraseña próximamente!",
+  "@passwordChangeComingSoon": {
+    "description": "Password change coming soon message"
+  },
+  "notificationSettings": "Configuración de Notificaciones",
+  "@notificationSettings": {
+    "description": "Notification settings section"
+  },
+  "notificationSettingsComingSoon": "¡Configuración de notificaciones próximamente!",
+  "@notificationSettingsComingSoon": {
+    "description": "Notification settings coming soon message"
+  },
+  "themeSettings": "Configuración de Tema",
+  "@themeSettings": {
+    "description": "Theme settings section"
+  },
+  "themeSettingsComingSoon": "¡Configuración de tema próximamente!",
+  "@themeSettingsComingSoon": {
+    "description": "Theme settings coming soon message"
+  },
+  "privacyAndSecurity": "Privacidad y Seguridad",
+  "@privacyAndSecurity": {
+    "description": "Privacy and security section"
+  },
+  "privacySettingsComingSoon": "¡Configuración de privacidad próximamente!",
+  "@privacySettingsComingSoon": {
+    "description": "Privacy settings coming soon message"
+  },
+  "helpCenter": "Centro de Ayuda",
+  "@helpCenter": {
+    "description": "Help center section"
+  },
+  "helpCenterComingSoon": "¡Centro de ayuda próximamente!",
+  "@helpCenterComingSoon": {
+    "description": "Help center coming soon message"
+  },
+  "contactSupport": "Contactar Soporte",
+  "@contactSupport": {
+    "description": "Contact support section"
+  },
+  "contactSupportComingSoon": "¡Contactar soporte próximamente!",
+  "@contactSupportComingSoon": {
+    "description": "Contact support coming soon message"
+  },
+  "trainingMaterials": "Materiales de Entrenamiento",
+  "@trainingMaterials": {
+    "description": "Training materials section"
+  },
+  "trainingMaterialsComingSoon": "¡Materiales de entrenamiento próximamente!",
+  "@trainingMaterialsComingSoon": {
+    "description": "Training materials coming soon message"
+  },
+  "clearAllData": "Borrar Todos los Datos",
+  "@clearAllData": {
+    "description": "Clear all data button"
+  },
+  "clearDataConfirmation": "Esto borrará todos los datos almacenados y te cerrará sesión. Esta acción no se puede deshacer.",
+  "@clearDataConfirmation": {
+    "description": "Clear data confirmation message"
+  },
+  "clearStoredDataDebug": "Borrar Datos Almacenados (Debug)",
+  "@clearStoredDataDebug": {
+    "description": "Clear stored data debug button"
+  },
+  "floorPlan": "Plano del Piso",
+  "@floorPlan": {
+    "description": "Floor plan screen title"
+  },
+  "messages": "Mensajes",
+  "@messages": {
+    "description": "Messages screen title"
+  },
+  "businessManagement": "Gestión de Negocios",
+  "@businessManagement": {
+    "description": "Business management screen title"
+  },
+  "addBusiness": "Agregar Negocio",
+  "@addBusiness": {
+    "description": "Add business button"
+  },
+  "errorLoadingBusinesses": "Error al cargar negocios",
+  "@errorLoadingBusinesses": {
+    "description": "Error message when loading businesses fails"
+  },
+  "noBusinessesFound": "No se encontraron negocios",
+  "@noBusinessesFound": {
+    "description": "Message when no businesses are found"
+  },
+  "addFirstBusinessToGetStarted": "Agrega tu primer negocio para comenzar",
+  "@addFirstBusinessToGetStarted": {
+    "description": "Message to add first business"
+  },
+  "active": "Activo",
+  "@active": {
+    "description": "Active status"
+  },
+  "inactive": "Inactivo",
+  "@inactive": {
+    "description": "Inactive status"
+  },
+  "edit": "Editar",
+  "@edit": {
+    "description": "Edit button text"
+  },
+  "deleteBusiness": "Eliminar Negocio",
+  "@deleteBusiness": {
+    "description": "Delete business button"
+  },
+  "deleteBusinessConfirmation": "¿Estás seguro de que quieres eliminar",
+  "@deleteBusinessConfirmation": {
+    "description": "Delete business confirmation message"
+  },
+  "thisActionCannotBeUndone": "Esta acción no se puede deshacer.",
+  "@thisActionCannotBeUndone": {
+    "description": "Warning that action cannot be undone"
+  },
+  "floorPlanManagement": "Gestión de Planos del Piso",
+  "@floorPlanManagement": {
+    "description": "Floor plan management screen title"
+  },
+  "refresh": "Actualizar",
+  "@refresh": {
+    "description": "Refresh button"
+  },
+  "overview": "Resumen",
+  "@overview": {
+    "description": "Overview section"
+  },
+  "floorPlans": "Planos del Piso",
+  "@floorPlans": {
+    "description": "Floor plans section"
+  },
+  "tableStatusOverview": "Resumen del Estado de Mesas",
+  "@tableStatusOverview": {
+    "description": "Table status overview section"
+  },
+  "realTimeRestaurantMetrics": "Métricas en tiempo real del plano del restaurante",
+  "@realTimeRestaurantMetrics": {
+    "description": "Real-time restaurant metrics description"
+  },
+  "totalTables": "Total de Mesas",
+  "@totalTables": {
+    "description": "Total tables count"
+  },
+  "available": "Disponible",
+  "@available": {
+    "description": "Available status"
+  },
+  "occupied": "Ocupada",
+  "@occupied": {
+    "description": "Occupied status"
+  },
+  "reserved": "Reservada",
+  "@reserved": {
+    "description": "Reserved status"
+  },
+  "cleaning": "Limpieza",
+  "@cleaning": {
+    "description": "Cleaning status"
+  },
+  "cart": "Carrito",
+  "@cart": {
+    "description": "Cart section"
+  },
+  "cartIsEmpty": "El carrito está vacío",
+  "@cartIsEmpty": {
+    "description": "Cart empty message"
+  },
+  "itemNotFoundForBarcode": "Artículo no encontrado para este código de barras",
+  "@itemNotFoundForBarcode": {
+    "description": "Item not found for barcode message"
+  },
+  "promotion": "Promoción",
+  "@promotion": {
+    "description": "Promotion section"
+  },
+  "cashier": "Cajero",
+  "@cashier": {
+    "description": "Cashier section"
+  },
+  "menu": "Menú",
+  "@menu": {
+    "description": "Menu section"
+  },
+  "inventory": "Inventario",
+  "@inventory": {
+    "description": "Inventory section"
+  },
+  "discounts": "Descuentos",
+  "@discounts": {
+    "description": "Discounts section"
+  },
+  "promotions": "Promociones",
+  "@promotions": {
+    "description": "Promotions section"
+  },
+  "scan": "Escanear",
+  "@scan": {
+    "description": "Scan button"
+  },
+  "errorLoadingCategories": "Error al cargar categorías",
+  "@errorLoadingCategories": {
+    "description": "Error message when loading categories fails"
+  },
+  "errorLoadingItems": "Error al cargar artículos",
+  "@errorLoadingItems": {
+    "description": "Error message when loading items fails"
+  },
+  "searchResult": "Resultado de Búsqueda",
+  "@searchResult": {
+    "description": "Search result section"
+  },
+  "noItemsFound": "No se encontraron artículos",
+  "@noItemsFound": {
+    "description": "No items found message"
+  },
+  "tryAdjustingSearchTerms": "Intenta ajustar tus términos de búsqueda",
+  "@tryAdjustingSearchTerms": {
+    "description": "Suggestion to adjust search terms"
+  },
+  "noItemsAvailableInCategory": "No hay artículos disponibles en esta categoría",
+  "@noItemsAvailableInCategory": {
+    "description": "No items available in category message"
+  },
+  "actions": "Acciones",
+  "@actions": {
+    "description": "Actions section"
+  },
+  "guest": "Invitado",
+  "@guest": {
+    "description": "Guest label"
+  },
+  "yourCartIsEmpty": "Tu carrito está vacío",
+  "@yourCartIsEmpty": {
+    "description": "Your cart is empty message"
+  },
+  "addItemsToGetStarted": "Agrega artículos para comenzar",
+  "@addItemsToGetStarted": {
+    "description": "Add items to get started message"
+  },
+  "chargeTableOrder": "Cobrar Pedido de Mesa",
+  "@chargeTableOrder": {
+    "description": "Charge table order button"
+  },
+  "holdOrder": "Mantener Pedido",
+  "@holdOrder": {
+    "description": "Hold order button"
+  },
+  "orderHeld": "Pedido mantenido",
+  "@orderHeld": {
+    "description": "Order held message"
+  },
+  "voidOrder": "Anular Pedido",
+  "@voidOrder": {
+    "description": "Void order button"
+  },
+  "orderVoided": "Pedido anulado",
+  "@orderVoided": {
+    "description": "Order voided message"
+  },
+  "printReceipt": "Imprimir Recibo",
+  "@printReceipt": {
+    "description": "Print receipt button"
+  },
+  "receiptPrinted": "Recibo impreso",
+  "@receiptPrinted": {
+    "description": "Receipt printed message"
+  },
+  "emailReceipt": "Enviar Recibo por Email",
+  "@emailReceipt": {
+    "description": "Email receipt button"
+  },
+  "receiptEmailed": "Recibo enviado por email",
+  "@receiptEmailed": {
+    "description": "Receipt emailed message"
+  },
+  "setGuestCount": "Establecer Número de Invitados",
+  "@setGuestCount": {
+    "description": "Set guest count button"
+  },
+  "customerInfo": "Información del Cliente",
+  "@customerInfo": {
+    "description": "Customer info section"
+  },
+  "customerInfoDialog": "Diálogo de información del cliente",
+  "@customerInfoDialog": {
+    "description": "Customer info dialog description"
+  },
+  "specialRequests": "Solicitudes Especiales",
+  "@specialRequests": {
+    "description": "Special requests section"
+  },
+  "specialRequestsDialog": "Diálogo de solicitudes especiales",
+  "@specialRequestsDialog": {
+    "description": "Special requests dialog description"
+  },
+  "total": "Total",
+  "@total": {
+    "description": "Total amount"
+  },
+  "more": "Más",
+  "@more": {
+    "description": "More button"
+  },
+  "posService": "Servicio POS",
+  "@posService": {
+    "description": "POS service section"
+  },
+  "noRecentSales": "No hay ventas recientes",
+  "@noRecentSales": {
+    "description": "No recent sales message"
+  },
+  "salesWillAppearHere": "Las ventas aparecerán aquí después de las transacciones",
+  "@salesWillAppearHere": {
+    "description": "Sales will appear here message"
+  },
+  "currentOrders": "Pedidos Actuales",
+  "@currentOrders": {
+    "description": "Current orders section"
+  },
+  "manageRestaurantOrders": "Gestionar pedidos del restaurante",
+  "@manageRestaurantOrders": {
+    "description": "Manage restaurant orders description"
+  },
+  "noActiveOrders": "No Hay Pedidos Activos",
+  "@noActiveOrders": {
+    "description": "No active orders message"
+  },
+  "newOrdersWillAppearHere": "Los nuevos pedidos aparecerán aquí",
+  "@newOrdersWillAppearHere": {
+    "description": "New orders will appear here message"
+  },
+  "failedToLoadOrders": "Error al cargar pedidos",
+  "@failedToLoadOrders": {
+    "description": "Failed to load orders message"
+  },
+  "dailyTransactions": "Transacciones Diarias",
+  "@dailyTransactions": {
+    "description": "Daily transactions section"
+  },
+  "viewCompletedSales": "Ver ventas completadas",
+  "@viewCompletedSales": {
+    "description": "View completed sales button"
+  },
+  "noTransactionsToday": "No Hay Transacciones Hoy",
+  "@noTransactionsToday": {
+    "description": "No transactions today message"
+  },
+  "completedSalesWillAppearHere": "Las ventas completadas aparecerán aquí",
+  "@completedSalesWillAppearHere": {
+    "description": "Completed sales will appear here message"
+  },
+  "failedToLoadTransactions": "Error al cargar transacciones",
+  "@failedToLoadTransactions": {
+    "description": "Failed to load transactions message"
+  },
+  "inventoryStatus": "Estado del Inventario",
+  "@inventoryStatus": {
+    "description": "Inventory status section"
+  },
+  "monitorStockLevels": "Monitorear niveles de stock",
+  "@monitorStockLevels": {
+    "description": "Monitor stock levels description"
+  },
+  "noInventoryData": "No Hay Datos de Inventario",
+  "@noInventoryData": {
+    "description": "No inventory data message"
+  },
+  "menuItemsWillAppearHere": "Los elementos del menú aparecerán aquí con información de stock",
+  "@menuItemsWillAppearHere": {
+    "description": "Menu items will appear here message"
+  },
+  "failedToLoadInventory": "Error al cargar inventario",
+  "@failedToLoadInventory": {
+    "description": "Failed to load inventory message"
+  },
+  "unknown": "Desconocido",
+  "@unknown": {
+    "description": "Unknown status"
+  },
+  "pending": "pendiente",
+  "@pending": {
+    "description": "Pending status"
+  },
+  "splitPayment": "Pago Dividido",
+  "@splitPayment": {
+    "description": "Split payment section"
+  },
+  "customerName": "Nombre del Cliente",
+  "@customerName": {
+    "description": "Customer name field"
+  },
+  "customerPhone": "Teléfono del Cliente",
+  "@customerPhone": {
+    "description": "Customer phone field"
+  },
+  "customerEmail": "Email del Cliente",
+  "@customerEmail": {
+    "description": "Customer email field"
+  },
+  "notes": "Notas",
+  "@notes": {
+    "description": "Notes field"
+  },
+  "paymentMethods": "Métodos de Pago",
+  "@paymentMethods": {
+    "description": "Payment methods section"
+  },
+  "addPayment": "Agregar Pago",
+  "@addPayment": {
+    "description": "Add payment button"
+  },
+  "amount": "Monto",
+  "@amount": {
+    "description": "Amount field"
+  },
+  "amountIsRequired": "El monto es requerido",
+  "@amountIsRequired": {
+    "description": "Amount required validation"
+  },
+  "paymentMethod": "Método de Pago",
+  "@paymentMethod": {
+    "description": "Payment method field"
+  },
+  "cash": "Efectivo",
+  "@cash": {
+    "description": "Cash payment method"
+  },
+  "creditCard": "Tarjeta de Crédito",
+  "@creditCard": {
+    "description": "Credit card payment method"
+  },
+  "debitCard": "Tarjeta de Débito",
+  "@debitCard": {
+    "description": "Debit card payment method"
+  },
+  "mobilePayment": "Pago Móvil",
+  "@mobilePayment": {
+    "description": "Mobile payment method"
+  },
+  "check": "Cheque",
+  "@check": {
+    "description": "Check payment method"
+  },
+  "paymentMethodIsRequired": "El método de pago es requerido",
+  "@paymentMethodIsRequired": {
+    "description": "Payment method required validation"
+  },
+  "completeSplitPayment": "Completar Pago Dividido",
+  "@completeSplitPayment": {
+    "description": "Complete split payment button"
+  },
+  "selectCustomer": "Seleccionar Cliente",
+  "@selectCustomer": {
+    "description": "Select customer button"
+  },
+  "newCustomer": "Nuevo Cliente",
+  "@newCustomer": {
+    "description": "New customer button"
+  },
+  "guestCheckout": "Pago de Invitado",
+  "@guestCheckout": {
+    "description": "Guest checkout button"
+  },
+  "searchResults": "Resultados de Búsqueda",
+  "@searchResults": {
+    "description": "Search results section"
+  },
+  "noEmail": "Sin email",
+  "@noEmail": {
+    "description": "No email status"
+  },
+  "noPhone": "Sin teléfono",
+  "@noPhone": {
+    "description": "No phone status"
+  },
+  "noCustomersFound": "No se encontraron clientes",
+  "@noCustomersFound": {
+    "description": "No customers found message"
+  },
+  "createCustomer": "Crear Cliente",
+  "@createCustomer": {
+    "description": "Create customer button"
+  },
+  "splitBilling": "Facturación Dividida",
+  "@splitBilling": {
+    "description": "Split billing section"
+  },
+  "addSplit": "Agregar División",
+  "@addSplit": {
+    "description": "Add split button"
+  },
+  "removeLastSplit": "Eliminar Última División",
+  "@removeLastSplit": {
+    "description": "Remove last split button"
+  },
+  "assignItemToSplit": "Asignar artículo a división",
+  "@assignItemToSplit": {
+    "description": "Assign item to split description"
+  },
+  "newStockQuantity": "Nueva Cantidad de Stock",
+  "@newStockQuantity": {
+    "description": "New stock quantity field"
+  },
+  "update": "Actualizar",
+  "@update": {
+    "description": "Update button"
+  },
+  "card": "Tarjeta",
+  "@card": {
+    "description": "Card payment method"
+  },
+  "mobile": "Móvil",
+  "@mobile": {
+    "description": "Mobile payment method"
+  },
+  "finalizeSplit": "Finalizar División",
+  "@finalizeSplit": {
+    "description": "Finalize split button"
+  },
+  "allItems": "Todos los Artículos",
+  "@allItems": {
+    "description": "All items section"
+  },
+  "lowStock": "Stock Bajo",
+  "@lowStock": {
+    "description": "Low stock section"
+  },
+  "categories": "Categorías",
+  "@categories": {
+    "description": "Categories section"
+  },
+  "errorLoadingInventory": "Error al cargar inventario",
+  "@errorLoadingInventory": {
+    "description": "Error loading inventory message"
+  },
+  "noInventoryItemsFound": "No se encontraron artículos de inventario",
+  "@noInventoryItemsFound": {
+    "description": "No inventory items found message"
+  },
+  "addYourFirstItemToGetStarted": "Agrega tu primer artículo para comenzar",
+  "@addYourFirstItemToGetStarted": {
+    "description": "Add your first item message"
+  },
+  "allItemsAreWellStocked": "Todos los artículos están bien abastecidos",
+  "@allItemsAreWellStocked": {
+    "description": "All items well stocked message"
+  },
+  "noLowStockItemsFound": "No se encontraron artículos con stock bajo",
+  "@noLowStockItemsFound": {
+    "description": "No low stock items found message"
+  },
+  "noCategoriesFound": "No se encontraron categorías",
+  "@noCategoriesFound": {
+    "description": "No categories found message"
+  },
+  "categoriesWillAppearHere": "Las categorías aparecerán aquí",
+  "@categoriesWillAppearHere": {
+    "description": "Categories will appear here message"
+  },
+  "outOfStock": "Sin Stock",
+  "@outOfStock": {
+    "description": "Out of stock status"
+  },
+  "searchInventory": "Buscar Inventario",
+  "@searchInventory": {
+    "description": "Search inventory button"
+  },
+  "clear": "Limpiar",
+  "@clear": {
+    "description": "Clear button"
+  },
+  "close": "Cerrar",
+  "@close": {
+    "description": "Close button"
+  },
+  "filterOptions": "Opciones de Filtro",
+  "@filterOptions": {
+    "description": "Filter options section"
+  },
+  "filterOptionsWillBeImplementedHere": "Las opciones de filtro se implementarán aquí",
+  "@filterOptionsWillBeImplementedHere": {
+    "description": "Filter options implementation message"
+  },
+  "addNewItem": "Agregar Nuevo Artículo",
+  "@addNewItem": {
+    "description": "Add new item button"
+  },
+  "addItemFormWillBeImplementedHere": "El formulario de agregar artículo se implementará aquí",
+  "@addItemFormWillBeImplementedHere": {
+    "description": "Add item form implementation message"
+  },
+  "add": "Agregar",
+  "@add": {
+    "description": "Add button"
+  },
+  "editItem": "Editar Artículo",
+  "@editItem": {
+    "description": "Edit item button"
+  },
+  "updateStock": "Actualizar Stock",
+  "@updateStock": {
+    "description": "Update stock button"
+  },
+  "deleteItem": "Eliminar Artículo",
+  "@deleteItem": {
+    "description": "Delete item button"
+  },
+  "reportsAndAnalytics": "Reportes y Análisis",
+  "@reportsAndAnalytics": {
+    "description": "Reports and analytics section"
+  },
+  "refreshData": "Actualizar Datos",
+  "@refreshData": {
+    "description": "Refresh data button"
+  },
+  "exportReport": "Exportar Reporte",
+  "@exportReport": {
+    "description": "Export report button"
+  },
+  "recipeAndPromotionFeatures": "Características de Recetas y Promociones",
+  "@recipeAndPromotionFeatures": {
+    "description": "Recipe and promotion features section"
+  },
+  "revenue": "Ingresos",
+  "@revenue": {
+    "description": "Revenue section"
+  },
+  "dateRange": "Rango de Fechas",
+  "@dateRange": {
+    "description": "Date range field"
+  },
+  "custom": "Personalizado",
+  "@custom": {
+    "description": "Custom option"
+  },
+  "allStatus": "Todos los Estados",
+  "@allStatus": {
+    "description": "All status option"
+  },
+  "completed": "Completado",
+  "@completed": {
+    "description": "Completed status"
+  },
+  "cancelled": "Cancelado",
+  "@cancelled": {
+    "description": "Cancelled status"
+  },
+  "refunded": "Reembolsado",
+  "@refunded": {
+    "description": "Refunded status"
+  },
+  "payment": "Pago",
+  "@payment": {
+    "description": "Payment section"
+  },
+  "allMethods": "Todos los Métodos",
+  "@allMethods": {
+    "description": "All methods option"
+  },
+  "pdfReport": "Reporte PDF",
+  "@pdfReport": {
+    "description": "PDF report option"
+  },
+  "csvData": "Datos CSV",
+  "@csvData": {
+    "description": "CSV data option"
+  },
+  "excelSpreadsheet": "Hoja de Cálculo Excel",
+  "@excelSpreadsheet": {
+    "description": "Excel spreadsheet option"
+  },
+  "exportingReportAs": "Exportando reporte como",
+  "@exportingReportAs": {
+    "description": "Exporting report message"
+  },
+  "loadingOverviewData": "Cargando datos del resumen...",
+  "@loadingOverviewData": {
+    "description": "Loading overview data message"
+  },
+  "failedToLoadOverviewData": "Error al cargar datos del resumen",
+  "@failedToLoadOverviewData": {
+    "description": "Failed to load overview data message"
+  },
+  "totalSales": "Ventas Totales",
+  "@totalSales": {
+    "description": "Total sales section"
+  },
+  "averageOrder": "Pedido Promedio",
+  "@averageOrder": {
+    "description": "Average order section"
+  },
+  "perTransaction": "por transacción",
+  "@perTransaction": {
+    "description": "Per transaction description"
+  },
+  "topProduct": "Producto Principal",
+  "@topProduct": {
+    "description": "Top product section"
+  },
+  "mostPopularItem": "Artículo más popular",
+  "@mostPopularItem": {
+    "description": "Most popular item description"
+  },
+  "conversionRate": "Tasa de Conversión",
+  "@conversionRate": {
+    "description": "Conversion rate section"
+  },
+  "ofVisitors": "de visitantes",
+  "@ofVisitors": {
+    "description": "Of visitors description"
+  },
+  "salesTrend": "Tendencia de Ventas",
+  "@salesTrend": {
+    "description": "Sales trend section"
+  },
+  "salesTrendChart": "Gráfico de tendencia de ventas",
+  "@salesTrendChart": {
+    "description": "Sales trend chart description"
+  },
+  "comingSoonWithRealData": "Próximamente con datos reales",
+  "@comingSoonWithRealData": {
+    "description": "Coming soon with real data message"
+  },
+  "topSellingItems": "Artículos Más Vendidos",
+  "@topSellingItems": {
+    "description": "Top selling items section"
+  },
+  "viewAll": "Ver Todo",
+  "@viewAll": {
+    "description": "View all button"
+  },
+  "popularItem": "Artículo popular",
+  "@popularItem": {
+    "description": "Popular item description"
+  },
+  "loadingTransactions": "Cargando transacciones...",
+  "@loadingTransactions": {
+    "description": "Loading transactions message"
+  },
+  "noTransactionsFound": "No se encontraron transacciones",
+  "@noTransactionsFound": {
+    "description": "No transactions found message"
+  },
+  "tryAdjustingFiltersOrDateRange": "Intenta ajustar tus filtros o rango de fechas",
+  "@tryAdjustingFiltersOrDateRange": {
+    "description": "Try adjusting filters message"
+  },
+  "sale": "Venta",
+  "@sale": {
+    "description": "Sale label"
+  },
+  "saleNumber": "Venta #",
+  "@saleNumber": {
+    "description": "Sale number prefix"
+  },
+  "loadingRevenueData": "Cargando datos de ingresos...",
+  "@loadingRevenueData": {
+    "description": "Loading revenue data message"
+  },
+  "failedToLoadRevenueData": "Error al cargar datos de ingresos",
+  "@failedToLoadRevenueData": {
+    "description": "Failed to load revenue data message"
+  },
+  "totalRevenue": "Ingresos Totales",
+  "@totalRevenue": {
+    "description": "Total revenue section"
+  },
+  "grossIncome": "Ingresos brutos",
+  "@grossIncome": {
+    "description": "Gross income description"
+  },
+  "grossProfit": "Beneficio Bruto",
+  "@grossProfit": {
+    "description": "Gross profit section"
+  },
+  "afterCosts": "Después de costos",
+  "@afterCosts": {
+    "description": "After costs description"
+  },
+  "profitMargin": "Margen de Beneficio",
+  "@profitMargin": {
+    "description": "Profit margin section"
+  },
+  "profitRatio": "Ratio de beneficio",
+  "@profitRatio": {
+    "description": "Profit ratio description"
+  },
+  "totalCost": "Costo Total",
+  "@totalCost": {
+    "description": "Total cost section"
+  },
+  "operatingCosts": "Costos operativos",
+  "@operatingCosts": {
+    "description": "Operating costs description"
+  },
+  "revenueByDay": "Ingresos por Día",
+  "@revenueByDay": {
+    "description": "Revenue by day section"
+  },
+  "revenueTrendChart": "Gráfico de tendencia de ingresos",
+  "@revenueTrendChart": {
+    "description": "Revenue trend chart description"
+  },
+  "transactionDetails": "Detalles de Transacción",
+  "@transactionDetails": {
+    "description": "Transaction details section"
+  },
+  "items": "Artículos",
+  "@items": {
+    "description": "Items section"
+  },
+  "noItemsFoundForThisSale": "No se encontraron artículos para esta venta",
+  "@noItemsFoundForThisSale": {
+    "description": "No items found for sale message"
+  },
+  "loadingItems": "Cargando artículos...",
+  "@loadingItems": {
+    "description": "Loading items message"
+  },
+  "businessAnalytics": "Análisis de Negocio",
+  "@businessAnalytics": {
+    "description": "Business analytics section"
+  },
+  "itemAnalytics": "Análisis de Artículos",
+  "@itemAnalytics": {
+    "description": "Item analytics section"
+  },
+  "staffAnalytics": "Análisis de Personal",
+  "@staffAnalytics": {
+    "description": "Staff analytics section"
+  },
+  "customerAnalytics": "Análisis de Clientes",
+  "@customerAnalytics": {
+    "description": "Customer analytics section"
+  },
+  "inventoryAnalytics": "Análisis de Inventario",
+  "@inventoryAnalytics": {
+    "description": "Inventory analytics section"
+  },
+  "revenueAnalytics": "Análisis de Ingresos",
+  "@revenueAnalytics": {
+    "description": "Revenue analytics section"
+  },
+  "performanceMetrics": "Métricas de Rendimiento",
+  "@performanceMetrics": {
+    "description": "Performance metrics section"
+  },
+  "salesMetrics": "Métricas de Ventas",
+  "@salesMetrics": {
+    "description": "Sales metrics section"
+  },
+  "customerMetrics": "Métricas de Clientes",
+  "@customerMetrics": {
+    "description": "Customer metrics section"
+  },
+  "inventoryMetrics": "Métricas de Inventario",
+  "@inventoryMetrics": {
+    "description": "Inventory metrics section"
+  },
+  "staffMetrics": "Métricas de Personal",
+  "@staffMetrics": {
+    "description": "Staff metrics section"
+  },
+  "revenueMetrics": "Métricas de Ingresos",
+  "@revenueMetrics": {
+    "description": "Revenue metrics section"
+  },
+  "dataExport": "Exportar Datos",
+  "@dataExport": {
+    "description": "Data export section"
+  },
+  "reportGeneration": "Generación de Reportes",
+  "@reportGeneration": {
+    "description": "Report generation section"
+  },
+  "chartVisualization": "Visualización de Gráficos",
+  "@chartVisualization": {
+    "description": "Chart visualization section"
+  },
+  "trendAnalysis": "Análisis de Tendencias",
+  "@trendAnalysis": {
+    "description": "Trend analysis section"
+  },
+  "comparativeAnalysis": "Análisis Comparativo",
+  "@comparativeAnalysis": {
+    "description": "Comparative analysis section"
+  },
+  "forecasting": "Pronósticos",
+  "@forecasting": {
+    "description": "Forecasting section"
+  },
+  "kpiDashboard": "Panel de KPI",
+  "@kpiDashboard": {
+    "description": "KPI dashboard section"
+  },
+  "realTimeAnalytics": "Análisis en Tiempo Real",
+  "@realTimeAnalytics": {
+    "description": "Real-time analytics section"
+  },
+  "historicalData": "Datos Históricos",
+  "@historicalData": {
+    "description": "Historical data section"
+  },
+  "dataInsights": "Insights de Datos",
+  "@dataInsights": {
+    "description": "Data insights section"
+  },
+  "businessIntelligence": "Inteligencia de Negocios",
+  "@businessIntelligence": {
+    "description": "Business intelligence section"
+  },
+  "currencyManagement": "Gestión de Monedas",
+  "@currencyManagement": {
+    "description": "Currency management section"
+  },
+  "addCurrency": "Agregar Moneda",
+  "@addCurrency": {
+    "description": "Add currency button"
+  },
+  "currencyCode": "Código de Moneda",
+  "@currencyCode": {
+    "description": "Currency code field"
+  },
+  "currencySymbol": "Símbolo de Moneda",
+  "@currencySymbol": {
+    "description": "Currency symbol field"
+  },
+  "currencyName": "Nombre de Moneda",
+  "@currencyName": {
+    "description": "Currency name field"
+  },
+  "exchangeRate": "Tasa de Cambio",
+  "@exchangeRate": {
+    "description": "Exchange rate field"
+  },
+  "isDefault": "Es Predeterminada",
+  "@isDefault": {
+    "description": "Is default field"
+  },
+  "defaultCurrency": "Predeterminada",
+  "@defaultCurrency": {
+    "description": "Default currency label"
+  },
+  "editCurrency": "Editar Moneda",
+  "@editCurrency": {
+    "description": "Edit currency button"
+  },
+  "deleteCurrency": "Eliminar Moneda",
+  "@deleteCurrency": {
+    "description": "Delete currency button"
+  },
+  "currencyPreferences": "Preferencias de Moneda",
+  "@currencyPreferences": {
+    "description": "Currency preferences section"
+  },
+  "orderTaking": "Toma de Pedidos",
+  "@orderTaking": {
+    "description": "Order taking section"
+  },
+  "tableSelection": "Selección de Mesa",
+  "@tableSelection": {
+    "description": "Table selection section"
+  },
+  "waiterDashboard": "Panel de Mesero",
+  "@waiterDashboard": {
+    "description": "Waiter dashboard section"
+  },
+  "waiterScreen": "Pantalla de Mesero",
+  "@waiterScreen": {
+    "description": "Waiter screen section"
+  },
+  "takeOrder": "Tomar Pedido",
+  "@takeOrder": {
+    "description": "Take order button"
+  },
+  "viewOrders": "Ver Pedidos",
+  "@viewOrders": {
+    "description": "View orders button"
+  },
+  "tableStatus": "Estado de Mesa",
+  "@tableStatus": {
+    "description": "Table status section"
+  },
+  "assignTable": "Asignar Mesa",
+  "@assignTable": {
+    "description": "Assign table button"
+  },
+  "unassignTable": "Desasignar Mesa",
+  "@unassignTable": {
+    "description": "Unassign table button"
+  },
+  "waiterOrders": "Pedidos de Mesero",
+  "@waiterOrders": {
+    "description": "Waiter orders section"
+  },
+  "adminDashboard": "Panel de Administrador",
+  "@adminDashboard": {
+    "description": "Admin dashboard section"
+  },
+  "menuManagement": "Gestión de Menú",
+  "@menuManagement": {
+    "description": "Menu management section"
+  },
+  "pdfMenuGeneration": "Generación de Menú PDF",
+  "@pdfMenuGeneration": {
+    "description": "PDF menu generation section"
+  },
+  "customTemplateManagement": "Gestión de Plantillas Personalizadas",
+  "@customTemplateManagement": {
+    "description": "Custom template management section"
+  },
+  "generateMenu": "Generar Menú",
+  "@generateMenu": {
+    "description": "Generate menu button"
+  },
+  "templateSettings": "Configuración de Plantilla",
+  "@templateSettings": {
+    "description": "Template settings section"
+  },
+  "reports": "Reportes",
+  "@reports": {
+    "description": "Reports section"
+  },
+  "salesReport": "Reporte de Ventas",
+  "@salesReport": {
+    "description": "Sales report section"
+  },
+  "inventoryReport": "Reporte de Inventario",
+  "@inventoryReport": {
+    "description": "Inventory report section"
+  },
+  "staffReport": "Reporte de Personal",
+  "@staffReport": {
+    "description": "Staff report section"
+  },
+  "recipes": "Recetas",
+  "@recipes": {
+    "description": "Recipes section"
+  },
+  "smartSuggestions": "Sugerencias Inteligentes",
+  "@smartSuggestions": {
+    "description": "Smart suggestions section"
+  },
+  "inventoryAlerts": "Alertas de Inventario",
+  "@inventoryAlerts": {
+    "description": "Inventory alerts section"
+  },
+  "promotionsManagement": "Gestión de Promociones",
+  "@promotionsManagement": {
+    "description": "Promotions management screen title"
+  },
+  "errorLoadingPromotions": "Error al cargar promociones",
+  "@errorLoadingPromotions": {
+    "description": "Error loading promotions message"
+  },
+  "noPromotionsYet": "Aún no hay promociones",
+  "@noPromotionsYet": {
+    "description": "No promotions yet message"
+  },
+  "createYourFirstPromotionToGetStarted": "Crea tu primera promoción para comenzar",
+  "@createYourFirstPromotionToGetStarted": {
+    "description": "Create first promotion message"
+  },
+  "scheduled": "Programado",
+  "@scheduled": {
+    "description": "Scheduled status"
+  },
+  "expired": "Expirado",
+  "@expired": {
+    "description": "Expired status"
+  },
+  "createPromotionFormWillBeImplemented": "El formulario de crear promoción se implementará aquí",
+  "@createPromotionFormWillBeImplemented": {
+    "description": "Create promotion form placeholder"
+  },
+  "editPromotion": "Editar Promoción",
+  "@editPromotion": {
+    "description": "Edit promotion title"
+  },
+  "editPromotionFormWillBeImplemented": "El formulario de editar promoción se implementará aquí",
+  "@editPromotionFormWillBeImplemented": {
+    "description": "Edit promotion form placeholder"
+  },
+  "deletePromotion": "Eliminar Promoción",
+  "@deletePromotion": {
+    "description": "Delete promotion title"
+  },
+  "areYouSureYouWantToDelete": "¿Estás seguro de que quieres eliminar",
+  "@areYouSureYouWantToDelete": {
+    "description": "Delete confirmation message"
+  },
+  "createChefSpecialPromotion": "Crear Promoción Especial del Chef",
+  "@createChefSpecialPromotion": {
+    "description": "Create chef special promotion title"
+  },
+  "availableRecipes": "Recetas Disponibles",
+  "@availableRecipes": {
+    "description": "Available recipes section title"
+  },
+  "errorLoadingRecipes": "Error al cargar recetas",
+  "@errorLoadingRecipes": {
+    "description": "Error loading recipes message"
+  },
+  "noRecipeSuggestionsAvailable": "No hay sugerencias de recetas disponibles",
+  "@noRecipeSuggestionsAvailable": {
+    "description": "No recipe suggestions available message"
+  },
+  "quantity": "Cantidad",
+  "@quantity": {
+    "description": "Quantity field label"
+  },
+  "wasteReduction": "Reducción de Desperdicios",
+  "@wasteReduction": {
+    "description": "Waste reduction section title"
+  },
+  "promotionCreated": "Promoción creada",
+  "@promotionCreated": {
+    "description": "Promotion created message"
+  },
+  "type": "Tipo",
+  "@type": {
+    "description": "Type field label"
+  },
+  "quantityTracking": "Seguimiento de Cantidad",
+  "@quantityTracking": {
+    "description": "Quantity tracking section title"
+  },
+  "totalQuantity": "Cantidad Total",
+  "@totalQuantity": {
+    "description": "Total quantity label"
+  },
+  "usedQuantity": "Cantidad Usada",
+  "@usedQuantity": {
+    "description": "Used quantity label"
+  },
+  "remaining": "Restante",
+  "@remaining": {
+    "description": "Remaining label"
+  },
+  "expires": "Expira",
+  "@expires": {
+    "description": "Expires label"
+  },
+  "specialOffer": "Oferta Especial",
+  "@specialOffer": {
+    "description": "Special offer label"
+  },
+  "selectedItems": "Artículos Seleccionados",
+  "@selectedItems": {
+    "description": "Selected items label"
+  },
+  "noDescription": "Sin descripción",
+  "@noDescription": {
+    "description": "No description placeholder"
+  },
+  "cook": "Cocinar",
+  "@cook": {
+    "description": "Cook button text"
+  },
+  "freshlyPrepared": "Recién preparado",
+  "@freshlyPrepared": {
+    "description": "Freshly prepared description"
+  },
+  "usingPremiumIngredients": "usando ingredientes premium",
+  "@usingPremiumIngredients": {
+    "description": "Using premium ingredients description"
+  },
+  "createPromotionWithQuantityTracking": "Crear promoción con seguimiento de cantidad",
+  "@createPromotionWithQuantityTracking": {
+    "description": "Create promotion with quantity tracking description"
+  },
+  "createAPromotionForExpiringOrUnderperformingItems": "Crear una promoción para artículos que expiran o de bajo rendimiento",
+  "@createAPromotionForExpiringOrUnderperformingItems": {
+    "description": "Create promotion for expiring items description"
+  },
+  "createTargetedPromotions": "Crear promociones dirigidas",
+  "@createTargetedPromotions": {
+    "description": "Create targeted promotions description"
+  },
+  "helpMoveInventory": "ayudar a mover inventario",
+  "@helpMoveInventory": {
+    "description": "Help move inventory description"
+  },
+  "increaseSalesAndReduceWaste": "aumentar ventas y reducir desperdicios",
+  "@increaseSalesAndReduceWaste": {
+    "description": "Increase sales and reduce waste description"
+  },
+  "cookingAnalytics": "Análisis de Cocina",
+  "@cookingAnalytics": {
+    "description": "Cooking analytics section title"
+  },
+  "errorLoadingAnalytics": "Error al cargar análisis",
+  "@errorLoadingAnalytics": {
+    "description": "Error loading analytics message"
+  },
+  "totalRecipesCooked": "Total de Recetas Cocinadas",
+  "@totalRecipesCooked": {
+    "description": "Total recipes cooked label"
+  },
+  "wasteReduced": "Desperdicios Reducidos",
+  "@wasteReduced": {
+    "description": "Waste reduced label"
+  },
+  "promotionsCreated": "Promociones Creadas",
+  "@promotionsCreated": {
+    "description": "Promotions created label"
+  },
+  "errorLoadingHistory": "Error al cargar historial",
+  "@errorLoadingHistory": {
+    "description": "Error loading history message"
+  },
+  "noCookingHistoryYet": "Aún no hay historial de cocina",
+  "@noCookingHistoryYet": {
+    "description": "No cooking history yet message"
+  },
+  "startCookingRecipesToSeeYourHistoryHere": "Comienza a cocinar recetas para ver tu historial aquí",
+  "@startCookingRecipesToSeeYourHistoryHere": {
+    "description": "Start cooking recipes message"
+  },
+  "unknownRecipe": "Receta desconocida",
+  "@unknownRecipe": {
+    "description": "Unknown recipe placeholder"
+  },
+  "date": "Fecha",
+  "@date": {
+    "description": "Date field label"
+  },
+  "unknownDate": "Fecha desconocida",
+  "@unknownDate": {
+    "description": "Unknown date placeholder"
+  },
+  "invalidDate": "Fecha inválida",
+  "@invalidDate": {
+    "description": "Invalid date message"
+  },
+  "urgency": "Urgencia",
+  "@urgency": {
+    "description": "Urgency field label"
+  },
+  "onboardingPage1Title": "Bienvenido a POS Móvil",
+  "@onboardingPage1Title": {
+    "description": "Primer título de página de onboarding"
+  },
+  "onboardingPage1Description": "Gestiona las operaciones de tu restaurante eficientemente con nuestro sistema POS integral",
+  "@onboardingPage1Description": {
+    "description": "Primera descripción de página de onboarding"
+  },
+  "onboardingPage2Title": "Gestión Fácil de Pedidos",
+  "@onboardingPage2Title": {
+    "description": "Segundo título de página de onboarding"
+  },
+  "onboardingPage2Description": "Toma pedidos rápidamente y gestiona mesas con nuestra interfaz intuitiva",
+  "@onboardingPage2Description": {
+    "description": "Segunda descripción de página de onboarding"
+  },
+  "onboardingPage3Title": "Pantalla de Cocina en Tiempo Real",
+  "@onboardingPage3Title": {
+    "description": "Tercer título de página de onboarding"
+  },
+  "onboardingPage3Description": "Mantén un seguimiento de los pedidos en tiempo real con nuestro sistema de pantalla de cocina",
+  "@onboardingPage3Description": {
+    "description": "Tercera descripción de página de onboarding"
+  },
+  "onboardingPage4Title": "Reportes Integrales",
+  "@onboardingPage4Title": {
+    "description": "Cuarto título de página de onboarding"
+  },
+  "onboardingPage4Description": "Genera reportes detallados y análisis para optimizar tu negocio",
+  "@onboardingPage4Description": {
+    "description": "Cuarta descripción de página de onboarding"
+  },
+  "goBack": "Volver",
+  "@goBack": {
+    "description": "Texto del botón volver"
+  },
+  "addMenuItem": "Agregar Artículo del Menú",
+  "@addMenuItem": {
+    "description": "Texto del botón agregar artículo del menú"
+  },
+  "selectBusiness": "Seleccionar Negocio",
+  "@selectBusiness": {
+    "description": "Etiqueta del campo seleccionar negocio"
+  },
+  "selectOneBusiness": "Selecciona un negocio",
+  "@selectOneBusiness": {
+    "description": "Mensaje de selecciona un negocio"
+  },
+  "searchMenuItems": "Buscar artículos del menú",
+  "@searchMenuItems": {
+    "description": "Etiqueta del campo buscar artículos del menú"
+  },
+  "category": "Categoría",
+  "@category": {
+    "description": "Etiqueta del campo categoría"
+  },
+  "allCategories": "Todas las Categorías",
+  "@allCategories": {
+    "description": "Opción todas las categorías"
+  },
+  "availableOnly": "Solo Disponibles",
+  "@availableOnly": {
+    "description": "Opción de filtro solo disponibles"
+  },
+  "clearFilters": "Limpiar Filtros",
+  "@clearFilters": {
+    "description": "Texto del botón limpiar filtros"
+  },
+  "selectABusiness": "Selecciona un negocio",
+  "@selectABusiness": {
+    "description": "Mensaje de selecciona un negocio"
+  },
+  "pleaseSelectABusinessFromDropdown": "Por favor selecciona un negocio del menú desplegable",
+  "@pleaseSelectABusinessFromDropdown": {
+    "description": "Mensaje de por favor selecciona un negocio del menú desplegable"
+  },
+  "errorLoadingMenuItems": "Error cargando artículos del menú",
+  "@errorLoadingMenuItems": {
+    "description": "Mensaje de error cargando artículos del menú"
+  },
+  "noMenuItemsFound": "No se encontraron artículos del menú",
+  "@noMenuItemsFound": {
+    "description": "Mensaje de no se encontraron artículos del menú"
+  },
+  "tryAdjustingFiltersOrAddNewMenuItem": "Intenta ajustar los filtros o agregar un nuevo artículo del menú",
+  "@tryAdjustingFiltersOrAddNewMenuItem": {
+    "description": "Mensaje de intenta ajustar filtros o agregar nuevo artículo del menú"
+  },
+  "categoryId": "ID de Categoría",
+  "@categoryId": {
+    "description": "Etiqueta del campo ID de categoría"
+  },
+  "makeUnavailable": "Hacer No Disponible",
+  "@makeUnavailable": {
+    "description": "Texto del botón hacer no disponible"
+  },
+  "deleteMenuItem": "Eliminar Artículo del Menú",
+  "@deleteMenuItem": {
+    "description": "Título del diálogo eliminar artículo del menú"
+  },
+  "menuItemDeletedSuccessfully": "Artículo del menú eliminado exitosamente",
+  "@menuItemDeletedSuccessfully": {
+    "description": "Mensaje de éxito de artículo del menú eliminado"
+  },
+  "errorDeletingMenuItem": "Error eliminando artículo del menú",
+  "@errorDeletingMenuItem": {
+    "description": "Mensaje de error eliminando artículo del menú"
+  },
+  "menuItemMadeUnavailable": "hecho no disponible",
+  "@menuItemMadeUnavailable": {
+    "description": "Mensaje de artículo del menú hecho no disponible"
+  },
+  "menuItemMadeAvailable": "hecho disponible",
+  "@menuItemMadeAvailable": {
+    "description": "Mensaje de artículo del menú hecho disponible"
+  },
+  "successfully": "exitosamente",
+  "@successfully": {
+    "description": "Mensaje de exitosamente"
+  },
+  "errorUpdatingMenuItemAvailability": "Error actualizando disponibilidad del artículo del menú",
+  "@errorUpdatingMenuItemAvailability": {
+    "description": "Mensaje de error actualizando disponibilidad del artículo del menú"
+  },
+  "createMenuItem": "Crear Artículo del Menú",
+  "@createMenuItem": {
+    "description": "Título del diálogo crear artículo del menú"
+  },
+  "business": "Negocio",
+  "@business": {
+    "description": "Etiqueta del campo negocio"
+  },
+  "pleaseSelectACategory": "Por favor selecciona una categoría",
+  "@pleaseSelectACategory": {
+    "description": "Mensaje de por favor selecciona una categoría"
+  },
+  "pleaseSelectABusinessFirst": "Por favor selecciona un negocio primero",
+  "@pleaseSelectABusinessFirst": {
+    "description": "Mensaje de por favor selecciona un negocio primero"
+  },
+  "menuItemCreatedSuccessfully": "Artículo del menú creado exitosamente",
+  "@menuItemCreatedSuccessfully": {
+    "description": "Mensaje de éxito de artículo del menú creado"
+  },
+  "errorCreatingMenuItem": "Error creando artículo del menú",
+  "@errorCreatingMenuItem": {
+    "description": "Mensaje de error creando artículo del menú"
+  },
+  "editMenuItem": "Editar Artículo del Menú",
+  "@editMenuItem": {
+    "description": "Título del diálogo editar artículo del menú"
+  },
+  "menuItemUpdatedSuccessfully": "Artículo del menú actualizado exitosamente",
+  "@menuItemUpdatedSuccessfully": {
+    "description": "Mensaje de éxito de artículo del menú actualizado"
+  },
+  "errorUpdatingMenuItem": "Error actualizando artículo del menú",
+  "@errorUpdatingMenuItem": {
+    "description": "Mensaje de error actualizando artículo del menú"
   }
 } 

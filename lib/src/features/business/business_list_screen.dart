@@ -4,6 +4,7 @@ import 'business_provider.dart';
 import 'models/business.dart';
 import '../../shared/widgets/theme_toggle_button.dart';
 import '../../shared/widgets/app_image.dart';
+import '../../core/localization/app_localizations.dart';
 
 class BusinessListScreen extends ConsumerWidget {
   const BusinessListScreen({super.key});
@@ -11,10 +12,11 @@ class BusinessListScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final businessesAsync = ref.watch(businessesProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Business Management'),
+        title: Text(l10n.businessManagement),
         centerTitle: true,
         actions: [
           const ThemeToggleButton(),
@@ -40,7 +42,7 @@ class BusinessListScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                'Error loading businesses',
+                l10n.errorLoadingBusinesses,
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 8),
@@ -57,6 +59,7 @@ class BusinessListScreen extends ConsumerWidget {
   }
 
   Widget _buildBusinessList(BuildContext context, List<Business> businesses) {
+    final l10n = AppLocalizations.of(context)!;
     if (businesses.isEmpty) {
       return Center(
         child: Column(
@@ -69,12 +72,12 @@ class BusinessListScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'No businesses found',
+              l10n.noBusinessesFound,
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 8),
             Text(
-              'Add your first business to get started',
+              l10n.addFirstBusinessToGetStarted,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).textTheme.bodySmall?.color,
               ),
@@ -134,7 +137,7 @@ class BusinessListScreen extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    isActive ? 'Active' : 'Inactive',
+                    isActive ? l10n.active : l10n.inactive,
                     style: TextStyle(
                       color: isActive ? Colors.green : Colors.red,
                       fontSize: 12,
@@ -155,23 +158,23 @@ class BusinessListScreen extends ConsumerWidget {
                     }
                   },
                   itemBuilder: (context) => [
-                    const PopupMenuItem(
+                    PopupMenuItem(
                       value: 'edit',
                       child: Row(
                         children: [
-                          Icon(Icons.edit),
-                          SizedBox(width: 8),
-                          Text('Edit'),
+                          const Icon(Icons.edit),
+                          const SizedBox(width: 8),
+                          Text(l10n.edit),
                         ],
                       ),
                     ),
-                    const PopupMenuItem(
+                    PopupMenuItem(
                       value: 'delete',
                       child: Row(
                         children: [
-                          Icon(Icons.delete, color: Colors.red),
-                          SizedBox(width: 8),
-                          Text('Delete', style: TextStyle(color: Colors.red)),
+                          const Icon(Icons.delete, color: Colors.red),
+                          const SizedBox(width: 8),
+                          Text(l10n.delete, style: const TextStyle(color: Colors.red)),
                         ],
                       ),
                     ),
@@ -189,17 +192,18 @@ class BusinessListScreen extends ConsumerWidget {
   }
 
   void _showDeleteConfirmation(BuildContext context, Business business) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Business'),
+        title: Text(l10n.deleteBusiness),
         content: Text(
-          'Are you sure you want to delete "${business.name}"? This action cannot be undone.',
+          '${l10n.deleteBusinessConfirmation} "${business.name}"? ${l10n.thisActionCannotBeUndone}',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () {
@@ -209,7 +213,7 @@ class BusinessListScreen extends ConsumerWidget {
             style: TextButton.styleFrom(
               foregroundColor: Colors.red,
             ),
-            child: const Text('Delete'),
+            child: Text(l10n.delete),
           ),
         ],
       ),

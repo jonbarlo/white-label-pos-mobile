@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'kitchen_order_provider.dart';
 import 'kitchen_order.dart';
 import '../../shared/widgets/theme_toggle_button.dart';
+import '../../core/localization/app_localizations.dart';
 
 class KitchenScreenManager extends ConsumerWidget {
   const KitchenScreenManager({super.key});
@@ -169,7 +170,7 @@ class KitchenScreenManager extends ConsumerWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                     textStyle: const TextStyle(fontSize: 18),
                   ),
-                  child: const Text('Retry'),
+                  child: Text(AppLocalizations.of(context)!.retry),
                 ),
               ],
             ),
@@ -396,7 +397,7 @@ class _KitchenOrderCardManagerState extends State<KitchenOrderCardManager> {
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
-                    child: const Text('PREPARING'),
+                    child: Text(AppLocalizations.of(context)!.preparing),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -409,7 +410,7 @@ class _KitchenOrderCardManagerState extends State<KitchenOrderCardManager> {
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
-                    child: const Text('READY'),
+                    child: Text(AppLocalizations.of(context)!.ready),
                   ),
                 ),
               ],

@@ -10,6 +10,7 @@ import '../../shared/models/result.dart';
 import '../../shared/widgets/loading_indicator.dart';
 import '../../shared/utils/currency_formatter.dart';
 import '../business/business_provider.dart';
+import '../../core/localization/app_localizations.dart';
 
 class FloorPlanManagementScreen extends ConsumerStatefulWidget {
   const FloorPlanManagementScreen({super.key});
@@ -43,6 +44,7 @@ class _FloorPlanManagementScreenState extends ConsumerState<FloorPlanManagementS
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final floorPlanState = ref.watch(progressiveFloorPlansProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
@@ -53,7 +55,7 @@ class _FloorPlanManagementScreenState extends ConsumerState<FloorPlanManagementS
         surfaceTintColor: Colors.transparent,
         centerTitle: true,
         title: Text(
-          'Floor Plan Management',
+          l10n.floorPlanManagement,
           style: theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.w600,
             color: theme.colorScheme.onSurface,
@@ -70,7 +72,7 @@ class _FloorPlanManagementScreenState extends ConsumerState<FloorPlanManagementS
           IconButton(
             icon: Icon(Icons.refresh, color: theme.colorScheme.onSurface),
             onPressed: () => ref.read(progressiveFloorPlansProvider.notifier).refresh(),
-            tooltip: 'Refresh',
+            tooltip: l10n.refresh,
           ),
         ],
         bottom: PreferredSize(
@@ -94,11 +96,11 @@ class _FloorPlanManagementScreenState extends ConsumerState<FloorPlanManagementS
               unselectedLabelColor: theme.colorScheme.onSurface,
               labelStyle: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w600),
               unselectedLabelStyle: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w500),
-              tabs: const [
-                Tab(text: 'Overview'),
-                Tab(text: 'Floor Plans'),
-                Tab(text: 'Tables'),
-                Tab(text: 'Settings'),
+              tabs: [
+                Tab(text: l10n.overview),
+                Tab(text: l10n.floorPlans),
+                Tab(text: l10n.tables),
+                Tab(text: l10n.settings),
               ],
             ),
           ),
@@ -144,6 +146,7 @@ class _FloorPlanManagementScreenState extends ConsumerState<FloorPlanManagementS
 
   Widget _buildRestaurantOverview(List<FloorPlan> floorPlans) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     // Calculate statistics
     int totalTables = 0;
@@ -182,8 +185,8 @@ class _FloorPlanManagementScreenState extends ConsumerState<FloorPlanManagementS
         children: [
           // Restaurant Metrics Section
           _buildSectionHeader(
-            title: 'Table Status Overview',
-            subtitle: 'Real-time restaurant floor plan metrics',
+            title: l10n.tableStatusOverview,
+            subtitle: l10n.realTimeRestaurantMetrics,
             icon: Icons.analytics,
             theme: theme,
           ),
@@ -192,16 +195,16 @@ class _FloorPlanManagementScreenState extends ConsumerState<FloorPlanManagementS
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
-              children: [
-                _buildCompactStatCard('Total Tables', totalTables.toString(), Icons.table_restaurant, theme.colorScheme.primary, theme),
+                          children: [
+              _buildCompactStatCard(l10n.totalTables, totalTables.toString(), Icons.table_restaurant, theme.colorScheme.primary, theme),
+              const SizedBox(width: 8),
+              _buildCompactStatCard(l10n.available, availableTables.toString(), Icons.check_circle, Colors.green, theme),
+              const SizedBox(width: 8),
+              _buildCompactStatCard(l10n.occupied, occupiedTables.toString(), Icons.people, Colors.red, theme),
                 const SizedBox(width: 8),
-                _buildCompactStatCard('Available', availableTables.toString(), Icons.check_circle, Colors.green, theme),
+                _buildCompactStatCard(l10n.reserved, reservedTables.toString(), Icons.schedule, Colors.orange, theme),
                 const SizedBox(width: 8),
-                _buildCompactStatCard('Occupied', occupiedTables.toString(), Icons.people, Colors.red, theme),
-                const SizedBox(width: 8),
-                _buildCompactStatCard('Reserved', reservedTables.toString(), Icons.schedule, Colors.orange, theme),
-                const SizedBox(width: 8),
-                _buildCompactStatCard('Cleaning', cleaningTables.toString(), Icons.cleaning_services, Colors.purple, theme),
+                _buildCompactStatCard(l10n.cleaning, cleaningTables.toString(), Icons.cleaning_services, Colors.purple, theme),
                 const SizedBox(width: 8),
                 _buildCompactStatCard('Revenue Today', CurrencyFormatter.formatCRC(totalRevenue), Icons.attach_money, theme.colorScheme.secondary, theme),
               ],

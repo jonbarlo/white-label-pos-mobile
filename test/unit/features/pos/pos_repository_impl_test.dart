@@ -46,7 +46,7 @@ void main() {
           slug: 'test-business',
           type: BusinessType.restaurant,
           taxRate: 8.5,
-          currency: 'USD',
+          currencyId: 2,
           timezone: 'America/New_York',
           isActive: true,
           createdAt: DateTime.now(),

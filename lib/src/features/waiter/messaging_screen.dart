@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'messaging_provider.dart';
+import '../../core/localization/app_localizations.dart';
 
 class MessagingScreen extends ConsumerStatefulWidget {
   const MessagingScreen({super.key});
@@ -147,7 +148,7 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen>
                   const SizedBox(height: 8),
                   ElevatedButton(
                     onPressed: () => ref.invalidate(messagesProvider),
-                    child: const Text('Retry'),
+                    child: Text(AppLocalizations.of(context)!.retry),
                   ),
                 ],
               ),
@@ -335,7 +336,7 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen>
                   const SizedBox(height: 8),
                   ElevatedButton(
                     onPressed: () => ref.invalidate(activePromotionsProvider),
-                    child: const Text('Retry'),
+                    child: Text(AppLocalizations.of(context)!.retry),
                   ),
                 ],
               ),
@@ -512,12 +513,12 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Emergency Call'),
-        content: const Text('Are you sure you want to make an emergency call?'),
+        title: Text(AppLocalizations.of(context)!.emergencyCall),
+        content: Text(AppLocalizations.of(context)!.emergencyCallConfirmation),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -532,7 +533,7 @@ class _MessagingScreenState extends ConsumerState<MessagingScreen>
               });
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Call'),
+            child: Text(AppLocalizations.of(context)!.call),
           ),
         ],
       ),

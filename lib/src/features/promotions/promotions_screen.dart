@@ -11,7 +11,7 @@ class PromotionsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final promotionsAsync = ref.watch(promotionsNotifierProvider);
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
@@ -72,7 +72,7 @@ class PromotionsScreen extends ConsumerWidget {
   }
 
   Widget _buildPromotionsList(BuildContext context, List<Promotion> promotions) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     if (promotions.isEmpty) {
       return Center(
@@ -114,7 +114,7 @@ class PromotionsScreen extends ConsumerWidget {
   }
 
   Widget _buildPromotionCard(BuildContext context, Promotion promotion) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -161,7 +161,7 @@ class PromotionsScreen extends ConsumerWidget {
   }
 
   Widget _buildStatusChip(BuildContext context, PromotionStatus status) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     String label;
     Color color;
@@ -204,7 +204,7 @@ class PromotionsScreen extends ConsumerWidget {
   }
 
   Widget _buildTypeChip(BuildContext context, PromotionType type) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     String label;
     Color color;
@@ -247,13 +247,13 @@ class PromotionsScreen extends ConsumerWidget {
   }
 
   void _showCreatePromotionDialog(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(l10n.createPromotion),
-        content: const Text('Create promotion form will be implemented here'),
+        content: Text(l10n.createPromotionFormWillBeImplemented),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -272,13 +272,13 @@ class PromotionsScreen extends ConsumerWidget {
   }
 
   void _showEditPromotionDialog(BuildContext context, Promotion promotion) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(l10n.editPromotion),
-        content: const Text('Edit promotion form will be implemented here'),
+        content: Text(l10n.editPromotionFormWillBeImplemented),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -297,7 +297,7 @@ class PromotionsScreen extends ConsumerWidget {
   }
 
   void _showDeletePromotionDialog(BuildContext context, Promotion promotion) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     showDialog(
       context: context,

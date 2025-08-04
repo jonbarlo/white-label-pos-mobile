@@ -1,839 +1,5072 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/intl.dart' as intl;
 
-class AppLocalizations {
-  const AppLocalizations(this._locale);
+import 'app_localizations_en.dart';
+import 'app_localizations_es.dart';
 
-  final Locale _locale;
+// ignore_for_file: type=lint
 
-  static const AppLocalizationDelegate delegate = AppLocalizationDelegate();
+/// Callers can lookup localized strings with an instance of AppLocalizations
+/// returned by `AppLocalizations.of(context)`.
+///
+/// Applications need to include `AppLocalizations.delegate()` in their app's
+/// `localizationDelegates` list, and the locales they support in the app's
+/// `supportedLocales` list. For example:
+///
+/// ```dart
+/// import 'localization/app_localizations.dart';
+///
+/// return MaterialApp(
+///   localizationsDelegates: AppLocalizations.localizationsDelegates,
+///   supportedLocales: AppLocalizations.supportedLocales,
+///   home: MyApplicationHome(),
+/// );
+/// ```
+///
+/// ## Update pubspec.yaml
+///
+/// Please make sure to update your pubspec.yaml to include the following
+/// packages:
+///
+/// ```yaml
+/// dependencies:
+///   # Internationalization support.
+///   flutter_localizations:
+///     sdk: flutter
+///   intl: any # Use the pinned version from flutter_localizations
+///
+///   # Rest of dependencies
+/// ```
+///
+/// ## iOS Applications
+///
+/// iOS applications define key application metadata, including supported
+/// locales, in an Info.plist file that is built into the application bundle.
+/// To configure the locales supported by your app, you’ll need to edit this
+/// file.
+///
+/// First, open your project’s ios/Runner.xcworkspace Xcode workspace file.
+/// Then, in the Project Navigator, open the Info.plist file under the Runner
+/// project’s Runner folder.
+///
+/// Next, select the Information Property List item, select Add Item from the
+/// Editor menu, then select Localizations from the pop-up menu.
+///
+/// Select and expand the newly-created Localizations item then, for each
+/// locale your application supports, add a new item and select the locale
+/// you wish to add from the pop-up menu in the Value field. This list should
+/// be consistent with the languages listed in the AppLocalizations.supportedLocales
+/// property.
+abstract class AppLocalizations {
+  AppLocalizations(String locale)
+      : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
-  // Static properties for MaterialApp configuration
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
+  final String localeName;
+
+  static AppLocalizations? of(BuildContext context) {
+    return Localizations.of<AppLocalizations>(context, AppLocalizations);
+  }
+
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
+
+  /// A list of this localizations delegate along with the default localizations
+  /// delegates.
+  ///
+  /// Returns a list of localizations delegates containing this delegate along with
+  /// GlobalMaterialLocalizations.delegate, GlobalCupertinoLocalizations.delegate,
+  /// and GlobalWidgetsLocalizations.delegate.
+  ///
+  /// Additional delegates can be added by appending to this list in
+  /// MaterialApp. This list does not have to be used at all if a custom list
+  /// of delegates is preferred or required.
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
+      <LocalizationsDelegate<dynamic>>[
     delegate,
     GlobalMaterialLocalizations.delegate,
-    GlobalWidgetsLocalizations.delegate,
     GlobalCupertinoLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
   ];
 
+  /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('es', 'CR'),
-    Locale('en', 'US'),
+    Locale('en'),
+    Locale('es')
   ];
 
-  static AppLocalizations of(BuildContext context) {
-    return Localizations.of<AppLocalizations>(context, AppLocalizations) ?? const AppLocalizations(Locale('es', 'CR'));
-  }
+  /// The title of the application
+  ///
+  /// In en, this message translates to:
+  /// **'Mobile POS'**
+  String get appTitle;
 
-  // Translation getters with locale support
-  String get appTitle => _locale.languageCode == 'en' ? 'Mobile POS' : 'POS Móvil';
-  String get login => _locale.languageCode == 'en' ? 'Login' : 'Iniciar Sesión';
-  String get loginFailed => _locale.languageCode == 'en' ? 'Login Failed' : 'Error al Iniciar Sesión';
-  String get loginError => _locale.languageCode == 'en' ? 'Login Error' : 'Error al Iniciar Sesión';
-  String get welcomeBack => _locale.languageCode == 'en' ? 'Welcome Back :)' : '¡Bienvenido de Vuelta :)';
-  String get loginSubtitle => _locale.languageCode == 'en' 
-    ? 'To keep connected with us please login with your personal information'
-    : 'Para mantenerte conectado con nosotros, por favor inicia sesión con tu información personal';
-  String get enterBusinessSlug => _locale.languageCode == 'en' ? 'Enter your business slug' : 'Ingresa el slug de tu negocio';
-  String get enterEmail => _locale.languageCode == 'en' ? 'Enter your email' : 'Ingresa tu correo';
-  String get enterPassword => _locale.languageCode == 'en' ? 'Enter your password' : 'Ingresa tu contraseña';
-  String get quickLogin => _locale.languageCode == 'en' ? 'Quick Login (Test User)' : 'Inicio Rápido (Usuario de Prueba)';
-  String get loginNow => _locale.languageCode == 'en' ? 'Login Now' : 'Iniciar Sesión Ahora';
-  String get email => _locale.languageCode == 'en' ? 'Email' : 'Correo Electrónico';
-  String get password => _locale.languageCode == 'en' ? 'Password' : 'Contraseña';
-  String get businessSlug => _locale.languageCode == 'en' ? 'Business Slug' : 'Slug del Negocio';
-  String get dashboard => _locale.languageCode == 'en' ? 'Dashboard' : 'Panel Principal';
-  String get settings => _locale.languageCode == 'en' ? 'Settings' : 'Configuración';
-  String get logout => _locale.languageCode == 'en' ? 'Logout' : 'Cerrar Sesión';
-  String get cancel => _locale.languageCode == 'en' ? 'Cancel' : 'Cancelar';
-  String get confirm => _locale.languageCode == 'en' ? 'Confirm' : 'Confirmar';
-  String get save => _locale.languageCode == 'en' ? 'Save' : 'Guardar';
-  String get delete => _locale.languageCode == 'en' ? 'Delete' : 'Eliminar';
-  String get back => _locale.languageCode == 'en' ? 'Back' : 'Atrás';
-  String get next => _locale.languageCode == 'en' ? 'Next' : 'Siguiente';
-  String get previous => _locale.languageCode == 'en' ? 'Previous' : 'Anterior';
-  String get search => _locale.languageCode == 'en' ? 'Search' : 'Buscar';
-  String get ok => 'OK';
-  String get loading => _locale.languageCode == 'en' ? 'Loading...' : 'Cargando...';
-  String get pointOfSaleSystem => _locale.languageCode == 'en' ? 'Point of Sale System' : 'Sistema de Punto de Venta';
-  String get analytics => _locale.languageCode == 'en' ? 'Analytics' : 'Análisis';
-  String get features => _locale.languageCode == 'en' ? 'Features' : 'Características';
-  String get salesOverview => _locale.languageCode == 'en' ? 'Sales Overview' : 'Resumen de Ventas';
-  String get todaysSales => _locale.languageCode == 'en' ? 'Today\'s Sales' : 'Ventas de Hoy';
-  String get transactions => _locale.languageCode == 'en' ? 'Transactions' : 'Transacciones';
-  String get avgOrder => _locale.languageCode == 'en' ? 'Avg Order' : 'Pedido Promedio';
-  String get newFeaturesAvailable => _locale.languageCode == 'en' ? 'New Features Available' : 'Nuevas Características Disponibles';
-  String get exploreFeaturesDescription => _locale.languageCode == 'en' ? 'Explore our new Recipe & Promotion System with mobile notifications.' : 'Explora nuestro nuevo Sistema de Recetas y Promociones con notificaciones móviles.';
-  String get exploreFeatures => _locale.languageCode == 'en' ? 'Explore Features' : 'Explorar Características';
-  String get viewAnalytics => _locale.languageCode == 'en' ? 'View Analytics' : 'Ver Análisis';
-  String get recentActivity => _locale.languageCode == 'en' ? 'Recent Activity' : 'Actividad Reciente';
-  String get languageSettings => _locale.languageCode == 'en' ? 'Language Settings' : 'Configuración de Idioma';
-  String get languageStatus => _locale.languageCode == 'en' ? 'Language Status' : 'Estado del Idioma';
-  String get currentLanguage => _locale.languageCode == 'en' ? 'Current Language' : 'Idioma Actual';
-  String get nativeName => _locale.languageCode == 'en' ? 'Native Name' : 'Nombre Nativo';
-  String get selectLanguage => _locale.languageCode == 'en' ? 'Select Language' : 'Seleccionar Idioma';
-  String get languageChangesSaved => _locale.languageCode == 'en' ? 'Language changes saved' : 'Cambios de idioma guardados';
-  String get information => _locale.languageCode == 'en' ? 'Information' : 'Información';
-  String get languageInfo => _locale.languageCode == 'en' ? 'Mobile POS supports Spanish and English. Default language is Spanish (Costa Rica).' : 'POS Móvil soporta Español e Inglés. El idioma predeterminado es Español (Costa Rica).';
-  String get languageChangesApplied => _locale.languageCode == 'en' ? 'Language changes will be saved and applied immediately.' : 'Los cambios de idioma se guardarán y aplicarán inmediatamente.';
-  String get profile => _locale.languageCode == 'en' ? 'Profile' : 'Perfil';
-  String get confirmLogout => _locale.languageCode == 'en' ? 'Confirm Logout' : 'Confirmar Cierre de Sesión';
-  String get logoutConfirmation => _locale.languageCode == 'en' ? 'Are you sure you want to logout?' : '¿Estás seguro de que quieres cerrar sesión?';
-  String get saving => _locale.languageCode == 'en' ? 'Saving...' : 'Guardando...';
-  String get loadingProfile => _locale.languageCode == 'en' ? 'Loading profile...' : 'Cargando perfil...';
-  String get profileUpdatedSuccessfully => _locale.languageCode == 'en' ? 'Profile updated successfully!' : '¡Perfil actualizado exitosamente!';
-  String get failedToLoadProfile => _locale.languageCode == 'en' ? 'Failed to load profile' : 'Error al cargar el perfil';
-  String get retry => _locale.languageCode == 'en' ? 'Retry' : 'Reintentar';
-  String get pleaseLoginToViewProfile => _locale.languageCode == 'en' ? 'Please log in to view your profile' : 'Por favor inicia sesión para ver tu perfil';
-  String get initializing => _locale.languageCode == 'en' ? 'Initializing...' : 'Inicializando...';
-  String get userDataNotAvailable => _locale.languageCode == 'en' ? 'User data not available' : 'Datos de usuario no disponibles';
-  String get personalInformation => _locale.languageCode == 'en' ? 'Personal Information' : 'Información Personal';
-  String get workInformation => _locale.languageCode == 'en' ? 'Work Information' : 'Información Laboral';
-  String get accountSettings => _locale.languageCode == 'en' ? 'Account Settings' : 'Configuración de Cuenta';
-  String get supportAndHelp => _locale.languageCode == 'en' ? 'Support & Help' : 'Soporte y Ayuda';
-  String get editProfile => _locale.languageCode == 'en' ? 'Edit Profile' : 'Editar Perfil';
-  String get changePhoto => _locale.languageCode == 'en' ? 'Change Photo' : 'Cambiar Foto';
-  String get photoUploadComingSoon => _locale.languageCode == 'en' ? 'Photo upload coming soon!' : '¡Subida de fotos próximamente!';
-  String get fullName => _locale.languageCode == 'en' ? 'Full Name' : 'Nombre Completo';
-  String get enterYourName => _locale.languageCode == 'en' ? 'Enter your name' : 'Ingresa tu nombre';
-  String get phoneNumber => _locale.languageCode == 'en' ? 'Phone Number' : 'Número de Teléfono';
-  String get saveChanges => _locale.languageCode == 'en' ? 'Save Changes' : 'Guardar Cambios';
-  String get name => _locale.languageCode == 'en' ? 'Name' : 'Nombre';
-  String get phone => _locale.languageCode == 'en' ? 'Phone' : 'Teléfono';
-  String get role => _locale.languageCode == 'en' ? 'Role' : 'Rol';
-  String get employeeId => _locale.languageCode == 'en' ? 'Employee ID' : 'ID de Empleado';
-  String get department => _locale.languageCode == 'en' ? 'Department' : 'Departamento';
-  String get hireDate => _locale.languageCode == 'en' ? 'Hire Date' : 'Fecha de Contratación';
-  String get status => _locale.languageCode == 'en' ? 'Status' : 'Estado';
-  String get quickStats => _locale.languageCode == 'en' ? 'Quick Stats' : 'Estadísticas Rápidas';
-  String get orders => _locale.languageCode == 'en' ? 'Orders' : 'Pedidos';
-  String get thisMonth => _locale.languageCode == 'en' ? 'This Month' : 'Este Mes';
-  String get tables => _locale.languageCode == 'en' ? 'Tables' : 'Mesas';
-  String get thisWeek => _locale.languageCode == 'en' ? 'This Week' : 'Esta Semana';
-  String get tips => _locale.languageCode == 'en' ? 'Tips' : 'Propinas';
-  String get changePassword => _locale.languageCode == 'en' ? 'Change Password' : 'Cambiar Contraseña';
-  String get passwordChangeComingSoon => _locale.languageCode == 'en' ? 'Password change coming soon!' : '¡Cambio de contraseña próximamente!';
-  String get notificationSettings => _locale.languageCode == 'en' ? 'Notification Settings' : 'Configuración de Notificaciones';
-  String get notificationSettingsComingSoon => _locale.languageCode == 'en' ? 'Notification settings coming soon!' : '¡Configuración de notificaciones próximamente!';
-  String get themeSettings => _locale.languageCode == 'en' ? 'Theme Settings' : 'Configuración de Tema';
-  String get themeSettingsComingSoon => _locale.languageCode == 'en' ? 'Theme settings coming soon!' : '¡Configuración de tema próximamente!';
-  String get privacyAndSecurity => _locale.languageCode == 'en' ? 'Privacy & Security' : 'Privacidad y Seguridad';
-  String get privacySettingsComingSoon => _locale.languageCode == 'en' ? 'Privacy settings coming soon!' : '¡Configuración de privacidad próximamente!';
-  String get helpCenter => _locale.languageCode == 'en' ? 'Help Center' : 'Centro de Ayuda';
-  String get helpCenterComingSoon => _locale.languageCode == 'en' ? 'Help center coming soon!' : '¡Centro de ayuda próximamente!';
-  String get contactSupport => _locale.languageCode == 'en' ? 'Contact Support' : 'Contactar Soporte';
-  String get contactSupportComingSoon => _locale.languageCode == 'en' ? 'Contact support coming soon!' : '¡Contactar soporte próximamente!';
-  String get trainingMaterials => _locale.languageCode == 'en' ? 'Training Materials' : 'Materiales de Entrenamiento';
-  String get trainingMaterialsComingSoon => _locale.languageCode == 'en' ? 'Training materials coming soon!' : '¡Materiales de entrenamiento próximamente!';
-  String get clearAllData => _locale.languageCode == 'en' ? 'Clear All Data' : 'Borrar Todos los Datos';
-  String get clearDataConfirmation => _locale.languageCode == 'en' ? 'This will clear all stored data and log you out. This action cannot be undone.' : 'Esto borrará todos los datos almacenados y te cerrará sesión. Esta acción no se puede deshacer.';
-  String get clearStoredDataDebug => _locale.languageCode == 'en' ? 'Clear Stored Data (Debug)' : 'Borrar Datos Almacenados (Debug)';
-  String get floorPlan => _locale.languageCode == 'en' ? 'Floor Plan' : 'Plano del Piso';
-  String get messages => _locale.languageCode == 'en' ? 'Messages' : 'Mensajes';
-  String get businessManagement => _locale.languageCode == 'en' ? 'Business Management' : 'Gestión de Negocios';
-  String get addBusiness => _locale.languageCode == 'en' ? 'Add Business' : 'Agregar Negocio';
-  String get errorLoadingBusinesses => _locale.languageCode == 'en' ? 'Error loading businesses' : 'Error al cargar negocios';
-  String get noBusinessesFound => _locale.languageCode == 'en' ? 'No businesses found' : 'No se encontraron negocios';
-  String get addFirstBusinessToGetStarted => _locale.languageCode == 'en' ? 'Add your first business to get started' : 'Agrega tu primer negocio para comenzar';
-  String get active => _locale.languageCode == 'en' ? 'Active' : 'Activo';
-  String get inactive => _locale.languageCode == 'en' ? 'Inactive' : 'Inactivo';
-  String get edit => _locale.languageCode == 'en' ? 'Edit' : 'Editar';
-  String get deleteBusiness => _locale.languageCode == 'en' ? 'Delete Business' : 'Eliminar Negocio';
-  String get deleteBusinessConfirmation => _locale.languageCode == 'en' ? 'Are you sure you want to delete' : '¿Estás seguro de que quieres eliminar';
-  String get thisActionCannotBeUndone => _locale.languageCode == 'en' ? 'This action cannot be undone.' : 'Esta acción no se puede deshacer.';
-  String get floorPlanManagement => _locale.languageCode == 'en' ? 'Floor Plan Management' : 'Gestión de Planos del Piso';
-  String get refresh => _locale.languageCode == 'en' ? 'Refresh' : 'Actualizar';
-  String get overview => _locale.languageCode == 'en' ? 'Overview' : 'Resumen';
-  String get floorPlans => _locale.languageCode == 'en' ? 'Floor Plans' : 'Planos del Piso';
-  String get tableStatusOverview => _locale.languageCode == 'en' ? 'Table Status Overview' : 'Resumen del Estado de Mesas';
-  String get realTimeRestaurantMetrics => _locale.languageCode == 'en' ? 'Real-time restaurant floor plan metrics' : 'Métricas en tiempo real del plano del restaurante';
-  String get totalTables => _locale.languageCode == 'en' ? 'Total Tables' : 'Total de Mesas';
-  String get available => _locale.languageCode == 'en' ? 'Available' : 'Disponible';
-  String get occupied => _locale.languageCode == 'en' ? 'Occupied' : 'Ocupada';
-  String get reserved => _locale.languageCode == 'en' ? 'Reserved' : 'Reservada';
-  String get cleaning => _locale.languageCode == 'en' ? 'Cleaning' : 'Limpieza';
-  
-  // POS Operations
-  String get cart => _locale.languageCode == 'en' ? 'Cart' : 'Carrito';
-  String get cartIsEmpty => _locale.languageCode == 'en' ? 'Cart is empty' : 'El carrito está vacío';
-  String get itemNotFoundForBarcode => _locale.languageCode == 'en' ? 'Item not found for this barcode' : 'Artículo no encontrado para este código de barras';
-  String get promotion => _locale.languageCode == 'en' ? 'Promotion' : 'Promoción';
-  String get cashier => _locale.languageCode == 'en' ? 'Cashier' : 'Cajero';
-  String get menu => _locale.languageCode == 'en' ? 'Menu' : 'Menú';
-  String get inventory => _locale.languageCode == 'en' ? 'Inventory' : 'Inventario';
-  String get discounts => _locale.languageCode == 'en' ? 'Discounts' : 'Descuentos';
-  String get promotions => _locale.languageCode == 'en' ? 'Promotions' : 'Promociones';
-  String get scan => _locale.languageCode == 'en' ? 'Scan' : 'Escanear';
-  String get errorLoadingCategories => _locale.languageCode == 'en' ? 'Error loading categories' : 'Error al cargar categorías';
-  String get errorLoadingItems => _locale.languageCode == 'en' ? 'Error loading items' : 'Error al cargar artículos';
-  String get searchResult => _locale.languageCode == 'en' ? 'Search Result' : 'Resultado de Búsqueda';
-  String get noItemsFound => _locale.languageCode == 'en' ? 'No items found' : 'No se encontraron artículos';
-  String get tryAdjustingSearchTerms => _locale.languageCode == 'en' ? 'Try adjusting your search terms' : 'Intenta ajustar tus términos de búsqueda';
-  String get noItemsAvailableInCategory => _locale.languageCode == 'en' ? 'No items available in this category' : 'No hay artículos disponibles en esta categoría';
-  String get actions => _locale.languageCode == 'en' ? 'Actions' : 'Acciones';
-  String get guest => _locale.languageCode == 'en' ? 'Guest' : 'Invitado';
-  String get yourCartIsEmpty => _locale.languageCode == 'en' ? 'Your cart is empty' : 'Tu carrito está vacío';
-  String get addItemsToGetStarted => _locale.languageCode == 'en' ? 'Add items to get started' : 'Agrega artículos para comenzar';
-  String get chargeTableOrder => _locale.languageCode == 'en' ? 'Charge Table Order' : 'Cobrar Pedido de Mesa';
-  String get holdOrder => _locale.languageCode == 'en' ? 'Hold Order' : 'Mantener Pedido';
-  String get orderHeld => _locale.languageCode == 'en' ? 'Order held' : 'Pedido mantenido';
-  String get voidOrder => _locale.languageCode == 'en' ? 'Void Order' : 'Anular Pedido';
-  String get orderVoided => _locale.languageCode == 'en' ? 'Order voided' : 'Pedido anulado';
-  String get printReceipt => _locale.languageCode == 'en' ? 'Print Receipt' : 'Imprimir Recibo';
-  String get receiptPrinted => _locale.languageCode == 'en' ? 'Receipt printed' : 'Recibo impreso';
-  String get emailReceipt => _locale.languageCode == 'en' ? 'Email Receipt' : 'Enviar Recibo por Email';
-  String get receiptEmailed => _locale.languageCode == 'en' ? 'Receipt emailed' : 'Recibo enviado por email';
-  String get setGuestCount => _locale.languageCode == 'en' ? 'Set Guest Count' : 'Establecer Número de Invitados';
-  String get customerInfo => _locale.languageCode == 'en' ? 'Customer Info' : 'Información del Cliente';
-  String get customerInfoDialog => _locale.languageCode == 'en' ? 'Customer info dialog' : 'Diálogo de información del cliente';
-  String get specialRequests => _locale.languageCode == 'en' ? 'Special Requests' : 'Solicitudes Especiales';
-  String get specialRequestsDialog => _locale.languageCode == 'en' ? 'Special requests dialog' : 'Diálogo de solicitudes especiales';
-  String get total => _locale.languageCode == 'en' ? 'Total' : 'Total';
-  String get more => _locale.languageCode == 'en' ? 'More' : 'Más';
-  String get posService => _locale.languageCode == 'en' ? 'POS Service' : 'Servicio POS';
-  String get noRecentSales => _locale.languageCode == 'en' ? 'No recent sales' : 'No hay ventas recientes';
-  String get salesWillAppearHere => _locale.languageCode == 'en' ? 'Sales will appear here after transactions' : 'Las ventas aparecerán aquí después de las transacciones';
-  String get currentOrders => _locale.languageCode == 'en' ? 'Current Orders' : 'Pedidos Actuales';
-  String get manageRestaurantOrders => _locale.languageCode == 'en' ? 'Manage restaurant orders' : 'Gestionar pedidos del restaurante';
-  String get noActiveOrders => _locale.languageCode == 'en' ? 'No Active Orders' : 'No Hay Pedidos Activos';
-  String get newOrdersWillAppearHere => _locale.languageCode == 'en' ? 'New orders will appear here' : 'Los nuevos pedidos aparecerán aquí';
-  String get failedToLoadOrders => _locale.languageCode == 'en' ? 'Failed to load orders' : 'Error al cargar pedidos';
-  String get dailyTransactions => _locale.languageCode == 'en' ? 'Daily Transactions' : 'Transacciones Diarias';
-  String get viewCompletedSales => _locale.languageCode == 'en' ? 'View completed sales' : 'Ver ventas completadas';
-  String get noTransactionsToday => _locale.languageCode == 'en' ? 'No Transactions Today' : 'No Hay Transacciones Hoy';
-  String get completedSalesWillAppearHere => _locale.languageCode == 'en' ? 'Completed sales will appear here' : 'Las ventas completadas aparecerán aquí';
-  String get failedToLoadTransactions => _locale.languageCode == 'en' ? 'Failed to load transactions' : 'Error al cargar transacciones';
-  String get inventoryStatus => _locale.languageCode == 'en' ? 'Inventory Status' : 'Estado del Inventario';
-  String get monitorStockLevels => _locale.languageCode == 'en' ? 'Monitor stock levels' : 'Monitorear niveles de stock';
-  String get noInventoryData => _locale.languageCode == 'en' ? 'No Inventory Data' : 'No Hay Datos de Inventario';
-  String get menuItemsWillAppearHere => _locale.languageCode == 'en' ? 'Menu items will appear here with stock info' : 'Los elementos del menú aparecerán aquí con información de stock';
-  String get failedToLoadInventory => _locale.languageCode == 'en' ? 'Failed to load inventory' : 'Error al cargar inventario';
-  String get unknown => _locale.languageCode == 'en' ? 'Unknown' : 'Desconocido';
-  String get pending => _locale.languageCode == 'en' ? 'pending' : 'pendiente';
-  
-  // Split Payment Dialog
-  String get splitPayment => _locale.languageCode == 'en' ? 'Split Payment' : 'Pago Dividido';
-  String get customerName => _locale.languageCode == 'en' ? 'Customer Name' : 'Nombre del Cliente';
-  String get customerPhone => _locale.languageCode == 'en' ? 'Customer Phone' : 'Teléfono del Cliente';
-  String get customerEmail => _locale.languageCode == 'en' ? 'Customer Email' : 'Email del Cliente';
-  String get notes => _locale.languageCode == 'en' ? 'Notes' : 'Notas';
-  String get paymentMethods => _locale.languageCode == 'en' ? 'Payment Methods' : 'Métodos de Pago';
-  String get addPayment => _locale.languageCode == 'en' ? 'Add Payment' : 'Agregar Pago';
-  String get amount => _locale.languageCode == 'en' ? 'Amount' : 'Monto';
-  String get amountIsRequired => _locale.languageCode == 'en' ? 'Amount is required' : 'El monto es requerido';
-  String get paymentMethod => _locale.languageCode == 'en' ? 'Payment Method' : 'Método de Pago';
-  String get cash => _locale.languageCode == 'en' ? 'Cash' : 'Efectivo';
-  String get creditCard => _locale.languageCode == 'en' ? 'Credit Card' : 'Tarjeta de Crédito';
-  String get debitCard => _locale.languageCode == 'en' ? 'Debit Card' : 'Tarjeta de Débito';
-  String get mobilePayment => _locale.languageCode == 'en' ? 'Mobile Payment' : 'Pago Móvil';
-  String get check => _locale.languageCode == 'en' ? 'Check' : 'Cheque';
-  String get paymentMethodIsRequired => _locale.languageCode == 'en' ? 'Payment method is required' : 'El método de pago es requerido';
-  String get completeSplitPayment => _locale.languageCode == 'en' ? 'Complete Split Payment' : 'Completar Pago Dividido';
-  
-  // Customer Selection Dialog
-  String get selectCustomer => _locale.languageCode == 'en' ? 'Select Customer' : 'Seleccionar Cliente';
-  String get newCustomer => _locale.languageCode == 'en' ? 'New Customer' : 'Nuevo Cliente';
-  String get guestCheckout => _locale.languageCode == 'en' ? 'Guest Checkout' : 'Pago de Invitado';
-  String get searchResults => _locale.languageCode == 'en' ? 'Search Results' : 'Resultados de Búsqueda';
-  String get noEmail => _locale.languageCode == 'en' ? 'No email' : 'Sin email';
-  String get noPhone => _locale.languageCode == 'en' ? 'No phone' : 'Sin teléfono';
-  String get noCustomersFound => _locale.languageCode == 'en' ? 'No customers found' : 'No se encontraron clientes';
-  String get createCustomer => _locale.languageCode == 'en' ? 'Create Customer' : 'Crear Cliente';
-  
-  // Split Billing Screen
-  String get splitBilling => _locale.languageCode == 'en' ? 'Split Billing' : 'Facturación Dividida';
-  String get addSplit => _locale.languageCode == 'en' ? 'Add Split' : 'Agregar División';
-  String get removeLastSplit => _locale.languageCode == 'en' ? 'Remove Last Split' : 'Eliminar Última División';
-  String get assignItemToSplit => _locale.languageCode == 'en' ? 'Assign item to split' : 'Asignar artículo a división';
-  String get newStockQuantity => _locale.languageCode == 'en' ? 'New Stock Quantity' : 'Nueva Cantidad de Stock';
-  String get update => _locale.languageCode == 'en' ? 'Update' : 'Actualizar';
-  String get card => _locale.languageCode == 'en' ? 'Card' : 'Tarjeta';
-  String get mobile => _locale.languageCode == 'en' ? 'Mobile' : 'Móvil';
-  String get finalizeSplit => _locale.languageCode == 'en' ? 'Finalize Split' : 'Finalizar División';
-  
-  // Inventory Screen
-  String get allItems => _locale.languageCode == 'en' ? 'All Items' : 'Todos los Artículos';
-  String get lowStock => _locale.languageCode == 'en' ? 'Low Stock' : 'Stock Bajo';
-  String get categories => _locale.languageCode == 'en' ? 'Categories' : 'Categorías';
-  String get errorLoadingInventory => _locale.languageCode == 'en' ? 'Error loading inventory' : 'Error al cargar inventario';
-  String get noInventoryItemsFound => _locale.languageCode == 'en' ? 'No inventory items found' : 'No se encontraron artículos de inventario';
-  String get addYourFirstItemToGetStarted => _locale.languageCode == 'en' ? 'Add your first item to get started' : 'Agrega tu primer artículo para comenzar';
-  String get allItemsAreWellStocked => _locale.languageCode == 'en' ? 'All items are well stocked' : 'Todos los artículos están bien abastecidos';
-  String get noLowStockItemsFound => _locale.languageCode == 'en' ? 'No low stock items found' : 'No se encontraron artículos con stock bajo';
-  String get noCategoriesFound => _locale.languageCode == 'en' ? 'No categories found' : 'No se encontraron categorías';
-  String get categoriesWillAppearHere => _locale.languageCode == 'en' ? 'Categories will appear here' : 'Las categorías aparecerán aquí';
-  String get outOfStock => _locale.languageCode == 'en' ? 'Out of Stock' : 'Sin Stock';
-  String get searchInventory => _locale.languageCode == 'en' ? 'Search Inventory' : 'Buscar Inventario';
-  String get clear => _locale.languageCode == 'en' ? 'Clear' : 'Limpiar';
-  String get close => _locale.languageCode == 'en' ? 'Close' : 'Cerrar';
-  String get filterOptions => _locale.languageCode == 'en' ? 'Filter Options' : 'Opciones de Filtro';
-  String get filterOptionsWillBeImplementedHere => _locale.languageCode == 'en' ? 'Filter options will be implemented here' : 'Las opciones de filtro se implementarán aquí';
-  String get addNewItem => _locale.languageCode == 'en' ? 'Add New Item' : 'Agregar Nuevo Artículo';
-  String get addItemFormWillBeImplementedHere => _locale.languageCode == 'en' ? 'Add item form will be implemented here' : 'El formulario de agregar artículo se implementará aquí';
-  String get add => _locale.languageCode == 'en' ? 'Add' : 'Agregar';
-  String get editItem => _locale.languageCode == 'en' ? 'Edit Item' : 'Editar Artículo';
-  String get updateStock => _locale.languageCode == 'en' ? 'Update Stock' : 'Actualizar Stock';
-  String get deleteItem => _locale.languageCode == 'en' ? 'Delete Item' : 'Eliminar Artículo';
-  
-  // Reports & Analytics
-  String get reportsAndAnalytics => _locale.languageCode == 'en' ? 'Reports & Analytics' : 'Reportes y Análisis';
-  String get refreshData => _locale.languageCode == 'en' ? 'Refresh Data' : 'Actualizar Datos';
-  String get exportReport => _locale.languageCode == 'en' ? 'Export Report' : 'Exportar Reporte';
-  String get recipeAndPromotionFeatures => _locale.languageCode == 'en' ? 'Recipe & Promotion Features' : 'Características de Recetas y Promociones';
-  String get revenue => _locale.languageCode == 'en' ? 'Revenue' : 'Ingresos';
-  String get dateRange => _locale.languageCode == 'en' ? 'Date Range' : 'Rango de Fechas';
-  String get custom => _locale.languageCode == 'en' ? 'Custom' : 'Personalizado';
-  String get allStatus => _locale.languageCode == 'en' ? 'All Status' : 'Todos los Estados';
-  String get completed => _locale.languageCode == 'en' ? 'Completed' : 'Completado';
-  String get cancelled => _locale.languageCode == 'en' ? 'Cancelled' : 'Cancelado';
-  String get refunded => _locale.languageCode == 'en' ? 'Refunded' : 'Reembolsado';
-  String get payment => _locale.languageCode == 'en' ? 'Payment' : 'Pago';
-  String get allMethods => _locale.languageCode == 'en' ? 'All Methods' : 'Todos los Métodos';
-  String get pdfReport => _locale.languageCode == 'en' ? 'PDF Report' : 'Reporte PDF';
-  String get csvData => _locale.languageCode == 'en' ? 'CSV Data' : 'Datos CSV';
-  String get excelSpreadsheet => _locale.languageCode == 'en' ? 'Excel Spreadsheet' : 'Hoja de Cálculo Excel';
-  String get exportingReportAs => _locale.languageCode == 'en' ? 'Exporting report as' : 'Exportando reporte como';
-  String get loadingOverviewData => _locale.languageCode == 'en' ? 'Loading overview data...' : 'Cargando datos del resumen...';
-  String get failedToLoadOverviewData => _locale.languageCode == 'en' ? 'Failed to load overview data' : 'Error al cargar datos del resumen';
-  String get totalSales => _locale.languageCode == 'en' ? 'Total Sales' : 'Ventas Totales';
-  String get averageOrder => _locale.languageCode == 'en' ? 'Average Order' : 'Pedido Promedio';
-  String get perTransaction => _locale.languageCode == 'en' ? 'per transaction' : 'por transacción';
-  String get topProduct => _locale.languageCode == 'en' ? 'Top Product' : 'Producto Principal';
-  String get mostPopularItem => _locale.languageCode == 'en' ? 'Most popular item' : 'Artículo más popular';
-  String get conversionRate => _locale.languageCode == 'en' ? 'Conversion Rate' : 'Tasa de Conversión';
-  String get ofVisitors => _locale.languageCode == 'en' ? 'of visitors' : 'de visitantes';
-  String get salesTrend => _locale.languageCode == 'en' ? 'Sales Trend' : 'Tendencia de Ventas';
-  String get salesTrendChart => _locale.languageCode == 'en' ? 'Sales trend chart' : 'Gráfico de tendencia de ventas';
-  String get comingSoonWithRealData => _locale.languageCode == 'en' ? 'Coming soon with real data' : 'Próximamente con datos reales';
-  String get topSellingItems => _locale.languageCode == 'en' ? 'Top Selling Items' : 'Artículos Más Vendidos';
-  String get viewAll => _locale.languageCode == 'en' ? 'View All' : 'Ver Todo';
-  String get popularItem => _locale.languageCode == 'en' ? 'Popular item' : 'Artículo popular';
-  String get loadingTransactions => _locale.languageCode == 'en' ? 'Loading transactions...' : 'Cargando transacciones...';
-  String get noTransactionsFound => _locale.languageCode == 'en' ? 'No transactions found' : 'No se encontraron transacciones';
-  String get tryAdjustingFiltersOrDateRange => _locale.languageCode == 'en' ? 'Try adjusting your filters or date range' : 'Intenta ajustar tus filtros o rango de fechas';
-  String get sale => _locale.languageCode == 'en' ? 'Sale' : 'Venta';
-  String get saleNumber => _locale.languageCode == 'en' ? 'Sale #' : 'Venta #';
-  String get loadingRevenueData => _locale.languageCode == 'en' ? 'Loading revenue data...' : 'Cargando datos de ingresos...';
-  String get failedToLoadRevenueData => _locale.languageCode == 'en' ? 'Failed to load revenue data' : 'Error al cargar datos de ingresos';
-  String get totalRevenue => _locale.languageCode == 'en' ? 'Total Revenue' : 'Ingresos Totales';
-  String get grossIncome => _locale.languageCode == 'en' ? 'Gross income' : 'Ingresos brutos';
-  String get grossProfit => _locale.languageCode == 'en' ? 'Gross Profit' : 'Beneficio Bruto';
-  String get afterCosts => _locale.languageCode == 'en' ? 'After costs' : 'Después de costos';
-  String get profitMargin => _locale.languageCode == 'en' ? 'Profit Margin' : 'Margen de Beneficio';
-  String get profitRatio => _locale.languageCode == 'en' ? 'Profit ratio' : 'Ratio de beneficio';
-  String get totalCost => _locale.languageCode == 'en' ? 'Total Cost' : 'Costo Total';
-  String get operatingCosts => _locale.languageCode == 'en' ? 'Operating costs' : 'Costos operativos';
-  String get revenueByDay => _locale.languageCode == 'en' ? 'Revenue by Day' : 'Ingresos por Día';
-  String get revenueTrendChart => _locale.languageCode == 'en' ? 'Revenue trend chart' : 'Gráfico de tendencia de ingresos';
-  String get transactionDetails => _locale.languageCode == 'en' ? 'Transaction Details' : 'Detalles de Transacción';
-  String get items => _locale.languageCode == 'en' ? 'Items' : 'Artículos';
-  String get noItemsFoundForThisSale => _locale.languageCode == 'en' ? 'No items found for this sale' : 'No se encontraron artículos para esta venta';
-  String get loadingItems => _locale.languageCode == 'en' ? 'Loading items...' : 'Cargando artículos...';
-  String get businessAnalytics => _locale.languageCode == 'en' ? 'Business Analytics' : 'Análisis de Negocio';
-  String get itemAnalytics => _locale.languageCode == 'en' ? 'Item Analytics' : 'Análisis de Artículos';
-  String get staffAnalytics => _locale.languageCode == 'en' ? 'Staff Analytics' : 'Análisis de Personal';
-  String get customerAnalytics => _locale.languageCode == 'en' ? 'Customer Analytics' : 'Análisis de Clientes';
-  String get inventoryAnalytics => _locale.languageCode == 'en' ? 'Inventory Analytics' : 'Análisis de Inventario';
-  String get revenueAnalytics => _locale.languageCode == 'en' ? 'Revenue Analytics' : 'Análisis de Ingresos';
-  String get performanceMetrics => _locale.languageCode == 'en' ? 'Performance Metrics' : 'Métricas de Rendimiento';
-  String get salesMetrics => _locale.languageCode == 'en' ? 'Sales Metrics' : 'Métricas de Ventas';
-  String get customerMetrics => _locale.languageCode == 'en' ? 'Customer Metrics' : 'Métricas de Clientes';
-  String get inventoryMetrics => _locale.languageCode == 'en' ? 'Inventory Metrics' : 'Métricas de Inventario';
-  String get staffMetrics => _locale.languageCode == 'en' ? 'Staff Metrics' : 'Métricas de Personal';
-  String get revenueMetrics => _locale.languageCode == 'en' ? 'Revenue Metrics' : 'Métricas de Ingresos';
-  String get dataExport => _locale.languageCode == 'en' ? 'Data Export' : 'Exportar Datos';
-  String get reportGeneration => _locale.languageCode == 'en' ? 'Report Generation' : 'Generación de Reportes';
-  String get chartVisualization => _locale.languageCode == 'en' ? 'Chart Visualization' : 'Visualización de Gráficos';
-  String get trendAnalysis => _locale.languageCode == 'en' ? 'Trend Analysis' : 'Análisis de Tendencias';
-  String get comparativeAnalysis => _locale.languageCode == 'en' ? 'Comparative Analysis' : 'Análisis Comparativo';
-  String get forecasting => _locale.languageCode == 'en' ? 'Forecasting' : 'Pronósticos';
-  String get kpiDashboard => _locale.languageCode == 'en' ? 'KPI Dashboard' : 'Panel de KPI';
-  String get realTimeAnalytics => _locale.languageCode == 'en' ? 'Real-time Analytics' : 'Análisis en Tiempo Real';
-  String get historicalData => _locale.languageCode == 'en' ? 'Historical Data' : 'Datos Históricos';
-  String get dataInsights => _locale.languageCode == 'en' ? 'Data Insights' : 'Insights de Datos';
-  String get businessIntelligence => _locale.languageCode == 'en' ? 'Business Intelligence' : 'Inteligencia de Negocios';
-  
+  /// Login button text
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get login;
 
-  
-  // Currency Management strings
-  String get currencyManagement => _locale.languageCode == 'en' ? 'Currency Management' : 'Gestión de Monedas';
-  String get addCurrency => _locale.languageCode == 'en' ? 'Add Currency' : 'Agregar Moneda';
-  String get currencyCode => _locale.languageCode == 'en' ? 'Currency Code' : 'Código de Moneda';
-  String get currencySymbol => _locale.languageCode == 'en' ? 'Currency Symbol' : 'Símbolo de Moneda';
-  String get currencyName => _locale.languageCode == 'en' ? 'Currency Name' : 'Nombre de Moneda';
-  String get exchangeRate => _locale.languageCode == 'en' ? 'Exchange Rate' : 'Tasa de Cambio';
-  String get isDefault => _locale.languageCode == 'en' ? 'Is Default' : 'Es Predeterminada';
-  String get defaultCurrency => _locale.languageCode == 'en' ? 'Default' : 'Predeterminada';
-  String get editCurrency => _locale.languageCode == 'en' ? 'Edit Currency' : 'Editar Moneda';
-  String get deleteCurrency => _locale.languageCode == 'en' ? 'Delete Currency' : 'Eliminar Moneda';
-  String get currencyPreferences => _locale.languageCode == 'en' ? 'Currency Preferences' : 'Preferencias de Moneda';
-  
-  // Waiter/Staff strings
-  String get orderTaking => _locale.languageCode == 'en' ? 'Order Taking' : 'Toma de Pedidos';
-  String get tableSelection => _locale.languageCode == 'en' ? 'Table Selection' : 'Selección de Mesa';
-  String get waiterDashboard => _locale.languageCode == 'en' ? 'Waiter Dashboard' : 'Panel de Mesero';
-  String get waiterScreen => _locale.languageCode == 'en' ? 'Waiter Screen' : 'Pantalla de Mesero';
-  String get takeOrder => _locale.languageCode == 'en' ? 'Take Order' : 'Tomar Pedido';
-  String get viewOrders => _locale.languageCode == 'en' ? 'View Orders' : 'Ver Pedidos';
-  String get tableStatus => _locale.languageCode == 'en' ? 'Table Status' : 'Estado de Mesa';
-  String get assignTable => _locale.languageCode == 'en' ? 'Assign Table' : 'Asignar Mesa';
-  String get unassignTable => _locale.languageCode == 'en' ? 'Unassign Table' : 'Desasignar Mesa';
-  String get waiterOrders => _locale.languageCode == 'en' ? 'Waiter Orders' : 'Pedidos de Mesero';
-  
-  // Admin strings
-  String get adminDashboard => _locale.languageCode == 'en' ? 'Admin Dashboard' : 'Panel de Administrador';
-  String get menuManagement => _locale.languageCode == 'en' ? 'Menu Management' : 'Gestión de Menú';
-  String get pdfMenuGeneration => _locale.languageCode == 'en' ? 'PDF Menu Generation' : 'Generación de Menú PDF';
-  String get customTemplateManagement => _locale.languageCode == 'en' ? 'Custom Template Management' : 'Gestión de Plantillas Personalizadas';
-  String get generateMenu => _locale.languageCode == 'en' ? 'Generate Menu' : 'Generar Menú';
-  String get templateSettings => _locale.languageCode == 'en' ? 'Template Settings' : 'Configuración de Plantilla';
-  
-  // Reports strings
-  String get reports => _locale.languageCode == 'en' ? 'Reports' : 'Reportes';
-  String get salesReport => _locale.languageCode == 'en' ? 'Sales Report' : 'Reporte de Ventas';
-  String get inventoryReport => _locale.languageCode == 'en' ? 'Inventory Report' : 'Reporte de Inventario';
-  String get staffReport => _locale.languageCode == 'en' ? 'Staff Report' : 'Reporte de Personal';
-  
-  // Recipe strings
-  String get recipes => _locale.languageCode == 'en' ? 'Recipes' : 'Recetas';
-  String get smartSuggestions => _locale.languageCode == 'en' ? 'Smart Suggestions' : 'Sugerencias Inteligentes';
-  String get inventoryAlerts => _locale.languageCode == 'en' ? 'Inventory Alerts' : 'Alertas de Inventario';
-  String get createRecipe => _locale.languageCode == 'en' ? 'Create Recipe' : 'Crear Receta';
-  String get editRecipe => _locale.languageCode == 'en' ? 'Edit Recipe' : 'Editar Receta';
-  String get recipeIngredients => _locale.languageCode == 'en' ? 'Recipe Ingredients' : 'Ingredientes de Receta';
-  String get recipeInstructions => _locale.languageCode == 'en' ? 'Recipe Instructions' : 'Instrucciones de Receta';
-  
-  // Promotion strings
-  String get createPromotion => _locale.languageCode == 'en' ? 'Create Promotion' : 'Crear Promoción';
-  String get editPromotion => _locale.languageCode == 'en' ? 'Edit Promotion' : 'Editar Promoción';
-  String get promotionType => _locale.languageCode == 'en' ? 'Promotion Type' : 'Tipo de Promoción';
-  String get discountPercentage => _locale.languageCode == 'en' ? 'Discount Percentage' : 'Porcentaje de Descuento';
-  
-  // Onboarding strings
-  String get onboarding => _locale.languageCode == 'en' ? 'Onboarding' : 'Integración';
-  String get welcomeToPos => _locale.languageCode == 'en' ? 'Welcome to POS' : 'Bienvenido al POS';
-  String get getStarted => _locale.languageCode == 'en' ? 'Get Started' : 'Comenzar';
-  String get skip => _locale.languageCode == 'en' ? 'Skip' : 'Omitir';
-  String get nextStep => _locale.languageCode == 'en' ? 'Next Step' : 'Siguiente Paso';
-  
-  // Debug strings
-  String get debug => _locale.languageCode == 'en' ? 'Debug' : 'Depuración';
-  String get environmentDebug => _locale.languageCode == 'en' ? 'Environment Debug' : 'Depuración de Entorno';
-  String get debugInfo => _locale.languageCode == 'en' ? 'Debug Info' : 'Información de Depuración';
-  
-  // Kitchen/Viewer strings
-  String get kitchenScreen => _locale.languageCode == 'en' ? 'Kitchen Screen' : 'Pantalla de Cocina';
-  String get barScreen => _locale.languageCode == 'en' ? 'Bar Screen' : 'Pantalla de Bar';
-  String get orderQueue => _locale.languageCode == 'en' ? 'Order Queue' : 'Cola de Pedidos';
-  String get prepareOrder => _locale.languageCode == 'en' ? 'Prepare Order' : 'Preparar Pedido';
-  String get orderReady => _locale.languageCode == 'en' ? 'Order Ready' : 'Pedido Listo';
-  String get orderCompleted => _locale.languageCode == 'en' ? 'Order Completed' : 'Pedido Completado';
-  String get pleaseFillAllRequiredFields => _locale.languageCode == 'en' ? 'Please fill in all required fields' : 'Por favor complete todos los campos requeridos';
-  String get currencyCreatedSuccessfully => _locale.languageCode == 'en' ? 'Currency created successfully' : 'Moneda creada exitosamente';
-  String get currencyUpdatedSuccessfully => _locale.languageCode == 'en' ? 'Currency updated successfully' : 'Moneda actualizada exitosamente';
-  String get currencyDeletedSuccessfully => _locale.languageCode == 'en' ? 'Currency deleted successfully' : 'Moneda eliminada exitosamente';
-  String get failedToCreateCurrency => _locale.languageCode == 'en' ? 'Failed to create currency' : 'Error al crear moneda';
-  String get failedToUpdateCurrency => _locale.languageCode == 'en' ? 'Failed to update currency' : 'Error al actualizar moneda';
-  String get failedToDeleteCurrency => _locale.languageCode == 'en' ? 'Failed to delete currency' : 'Error al eliminar moneda';
-  String get create => _locale.languageCode == 'en' ? 'Create' : 'Crear';
-  String get activate => _locale.languageCode == 'en' ? 'Activate' : 'Activar';
-  String get deactivate => _locale.languageCode == 'en' ? 'Deactivate' : 'Desactivar';
-  String get activated => _locale.languageCode == 'en' ? 'activated' : 'activada';
-  String get deactivated => _locale.languageCode == 'en' ? 'deactivated' : 'desactivada';
-  String get decimalPlaces => _locale.languageCode == 'en' ? 'Decimal Places' : 'Lugares Decimales';
-  String get defaultText => _locale.languageCode == 'en' ? 'Default' : 'Predeterminado';
-  String get errorLoadingExchangeRates => _locale.languageCode == 'en' ? 'Error loading exchange rates' : 'Error al cargar tasas de cambio';
-  String get failedToLoadExchangeRates => _locale.languageCode == 'en' ? 'Failed to load exchange rates' : 'Error al cargar tasas de cambio';
-  String get noExchangeRatesAvailable => _locale.languageCode == 'en' ? 'No exchange rates available' : 'No hay tasas de cambio disponibles';
-  String get updated => _locale.languageCode == 'en' ? 'Updated' : 'Actualizado';
-  String get failedToLoadCurrencies => _locale.languageCode == 'en' ? 'Failed to load currencies' : 'Error al cargar monedas';
-  String get selectYourPreferredCurrency => _locale.languageCode == 'en' ? 'Select Your Preferred Currency' : 'Selecciona Tu Moneda Preferida';
-  String get currencyPreferenceDescription => _locale.languageCode == 'en' ? 'This will be used for displaying prices and calculations throughout the app.' : 'Esto se usará para mostrar precios y cálculos en toda la aplicación.';
-  String get savePreference => _locale.languageCode == 'en' ? 'Save Preference' : 'Guardar Preferencia';
-  String get currencyPreferenceUpdatedTo => _locale.languageCode == 'en' ? 'Currency preference updated to' : 'Preferencia de moneda actualizada a';
-  String get failedToUpdateCurrencyPreference => _locale.languageCode == 'en' ? 'Failed to update currency preference' : 'Error al actualizar preferencia de moneda';
-  String get readyToServeCustomers => _locale.languageCode == 'en' ? 'Ready to serve your customers?' : '¿Listo para servir a tus clientes?';
-  String get todaysOrders => _locale.languageCode == 'en' ? 'Today\'s Orders' : 'Pedidos de Hoy';
-  String get activeTables => _locale.languageCode == 'en' ? 'Active Tables' : 'Mesas Activas';
-  String get tipsEarned => _locale.languageCode == 'en' ? 'Tips Earned' : 'Propinas Ganadas';
-  String get quickActions => _locale.languageCode == 'en' ? 'Quick Actions' : 'Acciones Rápidas';
-  String get viewTables => _locale.languageCode == 'en' ? 'View Tables' : 'Ver Mesas';
-  String get kitchenView => _locale.languageCode == 'en' ? 'Kitchen View' : 'Vista de Cocina';
-  String get messagesAndPromotions => _locale.languageCode == 'en' ? 'Messages & Promotions' : 'Mensajes y Promociones';
-  String get error => _locale.languageCode == 'en' ? 'Error' : 'Error';
-  String get urgent => _locale.languageCode == 'en' ? 'URGENT' : 'URGENTE';
-  String get created => _locale.languageCode == 'en' ? 'Created' : 'Creado';
-  String get markAsRead => _locale.languageCode == 'en' ? 'Mark as Read' : 'Marcar como Leído';
-  String get noMessagesOrPromotions => _locale.languageCode == 'en' ? 'No messages or promotions' : 'No hay mensajes o promociones';
-  String get checkBackLaterForUpdates => _locale.languageCode == 'en' ? 'Check back later for updates' : 'Revisa más tarde para actualizaciones';
-  String get errorLoadingMessages => _locale.languageCode == 'en' ? 'Error loading messages' : 'Error al cargar mensajes';
-  String get todaysPerformance => _locale.languageCode == 'en' ? 'Today\'s Performance' : 'Rendimiento de Hoy';
-  String get recentOrders => _locale.languageCode == 'en' ? 'Recent Orders' : 'Pedidos Recientes';
-  String get order => _locale.languageCode == 'en' ? 'Order' : 'Pedido';
-  String get table => _locale.languageCode == 'en' ? 'Table' : 'Mesa';
-  String get refreshTables => _locale.languageCode == 'en' ? 'Refresh Tables' : 'Actualizar Mesas';
-  String get floorPlanView => _locale.languageCode == 'en' ? 'Floor Plan View' : 'Vista del Plano';
-  String get noFloorPlansAvailable => _locale.languageCode == 'en' ? 'No floor plans available. Please create a floor plan first.' : 'No hay planos disponibles. Por favor crea un plano primero.';
-  String get searchTables => _locale.languageCode == 'en' ? 'Search tables...' : 'Buscar mesas...';
-  String get all => _locale.languageCode == 'en' ? 'All' : 'Todos';
-  String get loadingTables => _locale.languageCode == 'en' ? 'Loading tables...' : 'Cargando mesas...';
-  String get errorLoadingTables => _locale.languageCode == 'en' ? 'Error loading tables' : 'Error al cargar mesas';
-  String get noTablesFoundMatching => _locale.languageCode == 'en' ? 'No tables found matching' : 'No se encontraron mesas que coincidan con';
-  String get noAvailableTables => _locale.languageCode == 'en' ? 'No available tables' : 'No hay mesas disponibles';
-  String get noOccupiedTables => _locale.languageCode == 'en' ? 'No occupied tables' : 'No hay mesas ocupadas';
-  String get noReservedTables => _locale.languageCode == 'en' ? 'No reserved tables' : 'No hay mesas reservadas';
-  String get noTablesBeingCleaned => _locale.languageCode == 'en' ? 'No tables being cleaned' : 'No hay mesas siendo limpiadas';
-  String get noTablesFound => _locale.languageCode == 'en' ? 'No tables found' : 'No se encontraron mesas';
-  String get checkBackLaterOrTryDifferentFilter => _locale.languageCode == 'en' ? 'Check back later or try a different filter' : 'Revisa más tarde o intenta un filtro diferente';
-  String get seats => _locale.languageCode == 'en' ? 'seats' : 'asientos';
-  String get selectOpenOrder => _locale.languageCode == 'en' ? 'Select Open Order' : 'Seleccionar Pedido Abierto';
-  String get details => _locale.languageCode == 'en' ? 'Details' : 'Detalles';
-  String get capacity => _locale.languageCode == 'en' ? 'Capacity' : 'Capacidad';
-  String get customer => _locale.languageCode == 'en' ? 'Customer' : 'Cliente';
-  String get assignedTo => _locale.languageCode == 'en' ? 'Assigned to' : 'Asignado a';
-  String get lastActivity => _locale.languageCode == 'en' ? 'Last Activity' : 'Última Actividad';
-  String get reservation => _locale.languageCode == 'en' ? 'Reservation' : 'Reserva';
-  String get orderItems => _locale.languageCode == 'en' ? 'Order Items' : 'Artículos del Pedido';
-  String get noItems => _locale.languageCode == 'en' ? 'No items' : 'Sin artículos';
-  String get reserveTable => _locale.languageCode == 'en' ? 'Reserve Table' : 'Reservar Mesa';
-  String get time => _locale.languageCode == 'en' ? 'Time' : 'Hora';
-  String get selectTime => _locale.languageCode == 'en' ? 'Select Time' : 'Seleccionar Hora';
-  String get reserve => _locale.languageCode == 'en' ? 'Reserve' : 'Reservar';
-  String get placeholder => _locale.languageCode == 'en' ? 'placeholder' : 'marcador de posición';
-  String get seatCustomerAtTable => _locale.languageCode == 'en' ? 'Seat Customer at Table' : 'Sentar Cliente en Mesa';
-  String get partySize => _locale.languageCode == 'en' ? 'Party Size' : 'Tamaño del Grupo';
-  String get pleaseEnterValidNameAndPartySize => _locale.languageCode == 'en' ? 'Please enter a valid name and party size.' : 'Por favor ingresa un nombre válido y tamaño del grupo.';
-  String get customerSeatedAtTable => _locale.languageCode == 'en' ? 'Customer seated at table' : 'Cliente sentado en mesa';
-  String get failedToSeatCustomer => _locale.languageCode == 'en' ? 'Failed to seat customer' : 'Error al sentar cliente';
-  String get seat => _locale.languageCode == 'en' ? 'Seat' : 'Sentar';
-  String get clearingTable => _locale.languageCode == 'en' ? 'Clearing table' : 'Limpiando mesa';
-  String get clearedSuccessfully => _locale.languageCode == 'en' ? 'cleared successfully' : 'limpiada exitosamente';
-  String get failedToClearTable => _locale.languageCode == 'en' ? 'Failed to clear table' : 'Error al limpiar mesa';
-  String get checkInReservationForTable => _locale.languageCode == 'en' ? 'Check-in Reservation for Table' : 'Check-in de Reserva para Mesa';
-  String get reservationCheckedInForTable => _locale.languageCode == 'en' ? 'Reservation checked in for table' : 'Reserva registrada para mesa';
-  String get failedToCheckIn => _locale.languageCode == 'en' ? 'Failed to check-in' : 'Error al registrar';
-  String get checkIn => _locale.languageCode == 'en' ? 'Check-in' : 'Registrar';
-  String get view => _locale.languageCode == 'en' ? 'View' : 'Ver';
-  String get ready => _locale.languageCode == 'en' ? 'Ready' : 'Listo';
-  String get addItems => _locale.languageCode == 'en' ? 'Add Items' : 'Agregar Artículos';
-  String get start => _locale.languageCode == 'en' ? 'Start' : 'Iniciar';
-  
-  // Order taking screen strings
-  String get orderForTable => _locale.languageCode == 'en' ? 'Order - Table' : 'Pedido - Mesa';
-  String get refreshOrders => _locale.languageCode == 'en' ? 'Refresh Orders' : 'Actualizar Pedidos';
-  String get loadingTableOrders => _locale.languageCode == 'en' ? 'Loading table orders...' : 'Cargando pedidos de mesa...';
-  String get errorLoadingOrders => _locale.languageCode == 'en' ? 'Error loading orders' : 'Error al cargar pedidos';
-  String get customerDetails => _locale.languageCode == 'en' ? 'Customer Details' : 'Detalles del Cliente';
-  String get customerNameLabel => _locale.languageCode == 'en' ? 'Customer Name' : 'Nombre del Cliente';
-  String get enterCustomerName => _locale.languageCode == 'en' ? 'Enter customer name' : 'Ingresa el nombre del cliente';
-  String get specialInstructions => _locale.languageCode == 'en' ? 'Special Instructions' : 'Instrucciones Especiales';
-  String get specialInstructionsHint => _locale.languageCode == 'en' ? 'Allergies, preferences, etc.' : 'Alergias, preferencias, etc.';
-  String get menuItems => _locale.languageCode == 'en' ? 'Menu Items' : 'Artículos del Menú';
-  String get noMenuItemsAvailable => _locale.languageCode == 'en' ? 'No menu items available' : 'No hay artículos de menú disponibles';
-  String get menuItemsTemporarilyUnavailable => _locale.languageCode == 'en' ? 'Menu items temporarily unavailable' : 'Artículos del menú temporalmente no disponibles';
-  String get existingOrderItemsWillStillBeShown => _locale.languageCode == 'en' ? 'Existing order items will still be shown' : 'Los artículos del pedido existente seguirán mostrándose';
-  String get unavailable => _locale.languageCode == 'en' ? 'Unavailable' : 'No Disponible';
-  String get orderItemsCount => _locale.languageCode == 'en' ? 'Order Items' : 'Artículos del Pedido';
-  String get noItemsInCart => _locale.languageCode == 'en' ? 'No items in cart' : 'No hay artículos en el carrito';
-  String get subtotal => _locale.languageCode == 'en' ? 'Subtotal:' : 'Subtotal:';
-  String get tax => _locale.languageCode == 'en' ? 'Tax (8.5%):' : 'Impuesto (8.5%):';
-  String get totalWithColon => _locale.languageCode == 'en' ? 'Total:' : 'Total:';
-  String get submitOrder => _locale.languageCode == 'en' ? 'Submit Order' : 'Enviar Pedido';
-  String get submitting => _locale.languageCode == 'en' ? 'Submitting...' : 'Enviando...';
-  String get splitBill => _locale.languageCode == 'en' ? 'Split Bill' : 'Dividir Cuenta';
-  String get pleaseAddItemsToOrder => _locale.languageCode == 'en' ? 'Please add items to the order' : 'Por favor agrega artículos al pedido';
-  String get orderSubmittedSuccessfully => _locale.languageCode == 'en' ? 'Order submitted successfully!' : '¡Pedido enviado exitosamente!';
-  String get failedToSubmitOrder => _locale.languageCode == 'en' ? 'Failed to submit order:' : 'Error al enviar pedido:';
-  
-  // Waiter dashboard screen strings
-  String get pendingOrders => _locale.languageCode == 'en' ? 'Pending Orders' : 'Pedidos Pendientes';
-  String get todaysTips => _locale.languageCode == 'en' ? 'Today\'s Tips' : 'Propinas de Hoy';
-  String get orderHistory => _locale.languageCode == 'en' ? 'Order History' : 'Historial de Pedidos';
-  String get viewPastOrders => _locale.languageCode == 'en' ? 'View past orders' : 'Ver pedidos anteriores';
-  String get manageCustomerDetails => _locale.languageCode == 'en' ? 'Manage customer details' : 'Gestionar detalles del cliente';
-  String get customerInformation => _locale.languageCode == 'en' ? 'Customer Information' : 'Información del Cliente';
-  String get inventoryCheck => _locale.languageCode == 'en' ? 'Inventory Check' : 'Verificación de Inventario';
-  String get checkItemAvailability => _locale.languageCode == 'en' ? 'Check item availability' : 'Verificar disponibilidad de artículos';
-  String get dailyReport => _locale.languageCode == 'en' ? 'Daily Report' : 'Reporte Diario';
-  String get viewDailySummary => _locale.languageCode == 'en' ? 'View daily summary' : 'Ver resumen diario';
-  String get tableOrderCompleted => _locale.languageCode == 'en' ? 'Table' : 'Mesa';
-  String get orderCompletedLowercase => _locale.languageCode == 'en' ? 'order completed' : 'pedido completado';
-  String get newCustomerAtTable => _locale.languageCode == 'en' ? 'New customer at Table' : 'Nuevo cliente en Mesa';
-  String get kitchenNotificationTableReady => _locale.languageCode == 'en' ? 'Kitchen notification: Table' : 'Notificación de cocina: Mesa';
-  String get readyLowercase => _locale.languageCode == 'en' ? 'ready' : 'lista';
-  String get promotionUpdated => _locale.languageCode == 'en' ? 'Promotion updated:' : 'Promoción actualizada:';
-  String get happyHourSpecial => _locale.languageCode == 'en' ? 'Happy Hour Special' : 'Especial de Happy Hour';
-  String get comingSoon => _locale.languageCode == 'en' ? 'Coming Soon' : 'Próximamente';
-  String get waiter => _locale.languageCode == 'en' ? 'Waiter' : 'Mesero';
-  
-  // Admin dashboard screen strings
-  String get accessDenied => _locale.languageCode == 'en' ? 'Access Denied' : 'Acceso Denegado';
-  String get accessDeniedDescription => _locale.languageCode == 'en' ? 'This feature is only available to system administrators.' : 'Esta función solo está disponible para administradores del sistema.';
-  String get systemAdministration => _locale.languageCode == 'en' ? 'System Administration' : 'Administración del Sistema';
-  String get multiTenantPosManagement => _locale.languageCode == 'en' ? 'Multi-tenant POS Management' : 'Gestión Multi-tenant de POS';
-  String get multiTenantPosDescription => _locale.languageCode == 'en' ? 'Manage all businesses, menus, inventory, and system settings from one centralized dashboard.' : 'Gestiona todos los negocios, menús, inventario y configuraciones del sistema desde un panel centralizado.';
-  String get systemOverview => _locale.languageCode == 'en' ? 'System Overview' : 'Resumen del Sistema';
-  String get totalBusinesses => _locale.languageCode == 'en' ? 'Total Businesses' : 'Negocios Totales';
-  String get activeUsers => _locale.languageCode == 'en' ? 'Active Users' : 'Usuarios Activos';
-  String get manageBusinesses => _locale.languageCode == 'en' ? 'Manage Businesses' : 'Gestionar Negocios';
-  String get createEditManageAllBusinesses => _locale.languageCode == 'en' ? 'Create, edit, and manage all businesses' : 'Crear, editar y gestionar todos los negocios';
-  String get viewPerformanceMetricsAndReports => _locale.languageCode == 'en' ? 'View performance metrics and reports' : 'Ver métricas de rendimiento y reportes';
-  String get businessSettings => _locale.languageCode == 'en' ? 'Business Settings' : 'Configuración de Negocios';
-  String get configureBusinessSpecificSettings => _locale.languageCode == 'en' ? 'Configure business-specific settings' : 'Configurar ajustes específicos del negocio';
-  String get businessUsers => _locale.languageCode == 'en' ? 'Business Users' : 'Usuarios del Negocio';
-  String get manageUsersAcrossAllBusinesses => _locale.languageCode == 'en' ? 'Manage users across all businesses' : 'Gestionar usuarios en todos los negocios';
-  String get crudOperationsForAllMenuItems => _locale.languageCode == 'en' ? 'CRUD operations for all menu items' : 'Operaciones CRUD para todos los artículos del menú';
-  String get manageMenuCategories => _locale.languageCode == 'en' ? 'Manage menu categories' : 'Gestionar categorías del menú';
-  String get generateProfessionalPdfMenus => _locale.languageCode == 'en' ? 'Generate professional PDF menus' : 'Generar menús PDF profesionales';
-  String get customTemplates => _locale.languageCode == 'en' ? 'Custom Templates' : 'Plantillas Personalizadas';
-  String get manageCustomMenuTemplates => _locale.languageCode == 'en' ? 'Manage custom menu templates' : 'Gestionar plantillas de menú personalizadas';
-  String get menuTemplates => _locale.languageCode == 'en' ? 'Menu Templates' : 'Plantillas de Menú';
-  String get createAndManageMenuTemplates => _locale.languageCode == 'en' ? 'Create and manage menu templates' : 'Crear y gestionar plantillas de menú';
-  String get menuAnalytics => _locale.languageCode == 'en' ? 'Menu Analytics' : 'Análisis de Menús';
-  String get menuPerformanceAndInsights => _locale.languageCode == 'en' ? 'Menu performance and insights' : 'Rendimiento e insights del menú';
-  String get inventoryManagement => _locale.languageCode == 'en' ? 'Inventory Management' : 'Gestión de Inventario';
-  String get inventoryItems => _locale.languageCode == 'en' ? 'Inventory Items' : 'Artículos de Inventario';
-  String get manageAllInventoryItems => _locale.languageCode == 'en' ? 'Manage all inventory items' : 'Gestionar todos los artículos del inventario';
-  String get stockManagement => _locale.languageCode == 'en' ? 'Stock Management' : 'Gestión de Stock';
-  String get trackAndManageStockLevels => _locale.languageCode == 'en' ? 'Track and manage stock levels' : 'Rastrear y gestionar niveles de stock';
-  String get suppliers => _locale.languageCode == 'en' ? 'Suppliers' : 'Proveedores';
-  String get manageSuppliersAndVendors => _locale.languageCode == 'en' ? 'Manage suppliers and vendors' : 'Gestionar proveedores y vendedores';
-  String get inventoryReports => _locale.languageCode == 'en' ? 'Inventory Reports' : 'Reportes de Inventario';
-  String get generateInventoryReports => _locale.languageCode == 'en' ? 'Generate inventory reports' : 'Generar reportes de inventario';
-  String get userManagement => _locale.languageCode == 'en' ? 'User Management' : 'Gestión de Usuarios';
-  String get systemUsers => _locale.languageCode == 'en' ? 'System Users' : 'Usuarios del Sistema';
-  String get manageAllSystemUsers => _locale.languageCode == 'en' ? 'Manage all system users' : 'Gestionar todos los usuarios del sistema';
-  String get rolesAndPermissions => _locale.languageCode == 'en' ? 'Roles & Permissions' : 'Roles y Permisos';
-  String get configureUserRolesAndPermissions => _locale.languageCode == 'en' ? 'Configure user roles and permissions' : 'Configurar roles y permisos de usuario';
-  String get userActivity => _locale.languageCode == 'en' ? 'User Activity' : 'Actividad de Usuario';
-  String get monitorUserActivityAndLogs => _locale.languageCode == 'en' ? 'Monitor user activity and logs' : 'Monitorear actividad de usuario y logs';
-  String get accessControl => _locale.languageCode == 'en' ? 'Access Control' : 'Control de Acceso';
-  String get manageAccessAndSecurity => _locale.languageCode == 'en' ? 'Manage access and security' : 'Gestionar acceso y seguridad';
-  String get systemSettings => _locale.languageCode == 'en' ? 'System Settings' : 'Configuración del Sistema';
-  String get systemConfiguration => _locale.languageCode == 'en' ? 'System Configuration' : 'Configuración del Sistema';
-  String get configureSystemWideSettings => _locale.languageCode == 'en' ? 'Configure system-wide settings' : 'Configurar ajustes del sistema';
-  String get backupAndRestore => _locale.languageCode == 'en' ? 'Backup & Restore' : 'Respaldo y Restauración';
-  String get manageSystemBackups => _locale.languageCode == 'en' ? 'Manage system backups' : 'Gestionar respaldos del sistema';
-  String get systemLogs => _locale.languageCode == 'en' ? 'System Logs' : 'Logs del Sistema';
-  String get viewSystemLogsAndErrors => _locale.languageCode == 'en' ? 'View system logs and errors' : 'Ver logs y errores del sistema';
-  String get apiManagement => _locale.languageCode == 'en' ? 'API Management' : 'Gestión de API';
-  String get manageApiKeysAndEndpoints => _locale.languageCode == 'en' ? 'Manage API keys and endpoints' : 'Gestionar claves API y endpoints';
-  
-  // Admin menu management screen strings
-  String get goBack => _locale.languageCode == 'en' ? 'Go Back' : 'Volver';
-  String get addMenuItem => _locale.languageCode == 'en' ? 'Add Menu Item' : 'Agregar Artículo del Menú';
-  String get selectBusiness => _locale.languageCode == 'en' ? 'Select Business' : 'Seleccionar Negocio';
-  String get selectOneBusiness => _locale.languageCode == 'en' ? 'Select One Business' : 'Seleccionar Un Negocio';
-  String get searchMenuItems => _locale.languageCode == 'en' ? 'Search menu items...' : 'Buscar artículos del menú...';
-  String get allCategories => _locale.languageCode == 'en' ? 'All Categories' : 'Todas las Categorías';
-  String get availableOnly => _locale.languageCode == 'en' ? 'Available Only' : 'Solo Disponibles';
-  String get clearFilters => _locale.languageCode == 'en' ? 'Clear Filters' : 'Limpiar Filtros';
-  String get selectABusiness => _locale.languageCode == 'en' ? 'Select a Business' : 'Seleccionar un Negocio';
-  String get pleaseSelectABusinessFromDropdown => _locale.languageCode == 'en' ? 'Please select a business from the dropdown above to view and manage menu items.' : 'Por favor selecciona un negocio del menú desplegable arriba para ver y gestionar artículos del menú.';
-  String get errorLoadingMenuItems => _locale.languageCode == 'en' ? 'Error Loading Menu Items' : 'Error al Cargar Artículos del Menú';
-  String get noMenuItemsFound => _locale.languageCode == 'en' ? 'No menu items found' : 'No se encontraron artículos del menú';
-  String get tryAdjustingFiltersOrAddNewMenuItem => _locale.languageCode == 'en' ? 'Try adjusting your filters or add a new menu item.' : 'Intenta ajustar tus filtros o agregar un nuevo artículo del menú.';
-  String get categoryId => _locale.languageCode == 'en' ? 'Category ID:' : 'ID de Categoría:';
-  String get makeUnavailable => _locale.languageCode == 'en' ? 'Make Unavailable' : 'Hacer No Disponible';
-  String get deleteMenuItem => _locale.languageCode == 'en' ? 'Delete Menu Item' : 'Eliminar Artículo del Menú';
-  String get areYouSureYouWantToDelete => _locale.languageCode == 'en' ? 'Are you sure you want to delete' : '¿Estás seguro de que quieres eliminar';
-  String get menuItemDeletedSuccessfully => _locale.languageCode == 'en' ? 'Menu item deleted successfully' : 'Artículo del menú eliminado exitosamente';
-  String get errorDeletingMenuItem => _locale.languageCode == 'en' ? 'Error deleting menu item:' : 'Error al eliminar artículo del menú:';
-  String get menuItemMadeUnavailable => _locale.languageCode == 'en' ? 'made unavailable' : 'hecho no disponible';
-  String get menuItemMadeAvailable => _locale.languageCode == 'en' ? 'made available' : 'hecho disponible';
-  String get successfully => _locale.languageCode == 'en' ? 'successfully' : 'exitosamente';
-  String get errorUpdatingMenuItemAvailability => _locale.languageCode == 'en' ? 'Error updating menu item availability:' : 'Error al actualizar disponibilidad del artículo del menú:';
-  String get createMenuItem => _locale.languageCode == 'en' ? 'Create Menu Item' : 'Crear Artículo del Menú';
-  String get itemName => _locale.languageCode == 'en' ? 'Item Name' : 'Nombre del Artículo';
-  String get pleaseEnterAnItemName => _locale.languageCode == 'en' ? 'Please enter an item name' : 'Por favor ingresa un nombre de artículo';
-  String get imageUrlOptional => _locale.languageCode == 'en' ? 'Image URL (Optional)' : 'URL de Imagen (Opcional)';
-  String get imageUrlHint => _locale.languageCode == 'en' ? 'https://example.com/image.jpg' : 'https://ejemplo.com/imagen.jpg';
-  String get pleaseSelectABusinessFirst => _locale.languageCode == 'en' ? 'Please select a business first' : 'Por favor selecciona un negocio primero';
-  String get menuItemCreatedSuccessfully => _locale.languageCode == 'en' ? 'Menu item created successfully' : 'Artículo del menú creado exitosamente';
-  String get errorCreatingMenuItem => _locale.languageCode == 'en' ? 'Error creating menu item:' : 'Error al crear artículo del menú:';
-  String get editMenuItem => _locale.languageCode == 'en' ? 'Edit Menu Item' : 'Editar Artículo del Menú';
-  String get pleaseSelectACategory => _locale.languageCode == 'en' ? 'Please select a category' : 'Por favor selecciona una categoría';
-  String get menuItemUpdatedSuccessfully => _locale.languageCode == 'en' ? 'Menu item updated successfully' : 'Artículo del menú actualizado exitosamente';
-  String get errorUpdatingMenuItem => _locale.languageCode == 'en' ? 'Error updating menu item:' : 'Error al actualizar artículo del menú:';
-  String get category => _locale.languageCode == 'en' ? 'Category' : 'Categoría';
-  String get description => _locale.languageCode == 'en' ? 'Description' : 'Descripción';
-  String get price => _locale.languageCode == 'en' ? 'Price' : 'Precio';
-  String get pleaseEnterAPrice => _locale.languageCode == 'en' ? 'Please enter a price' : 'Por favor ingresa un precio';
-  String get pleaseEnterAValidPrice => _locale.languageCode == 'en' ? 'Please enter a valid price' : 'Por favor ingresa un precio válido';
-  String get business => _locale.languageCode == 'en' ? 'Business' : 'Negocio';
-  String get na => _locale.languageCode == 'en' ? 'N/A' : 'N/A';
-  
-  // Recipe-related strings
-  String get newText => _locale.languageCode == 'en' ? 'New' : 'Nuevo';
-  String get refreshRecipes => _locale.languageCode == 'en' ? 'Refresh Recipes' : 'Actualizar Recetas';
-  String get easy => _locale.languageCode == 'en' ? 'Easy' : 'Fácil';
-  String get medium => _locale.languageCode == 'en' ? 'Medium' : 'Medio';
-  String get hard => _locale.languageCode == 'en' ? 'Hard' : 'Difícil';
-  String get searchRecipes => _locale.languageCode == 'en' ? 'Search recipes...' : 'Buscar recetas...';
-  String get activeOnly => _locale.languageCode == 'en' ? 'Active Only' : 'Solo Activos';
-  String get searchingRecipes => _locale.languageCode == 'en' ? 'Searching recipes...' : 'Buscando recetas...';
-  String get loadingRecipes => _locale.languageCode == 'en' ? 'Loading recipes...' : 'Cargando recetas...';
-  String get unableToLoadRecipes => _locale.languageCode == 'en' ? 'Unable to Load Recipes' : 'No se Pudieron Cargar las Recetas';
-  String get checkConnectionAndTryAgain => _locale.languageCode == 'en' ? 'Please check your connection and try again' : 'Por favor verifica tu conexión e intenta de nuevo';
-  String get tryAgain => _locale.languageCode == 'en' ? 'Try Again' : 'Intentar de Nuevo';
-  String get noRecipesFound => _locale.languageCode == 'en' ? 'No Recipes Found' : 'No se Encontraron Recetas';
-  String get noRecipesFoundForQuery => _locale.languageCode == 'en' ? 'No recipes found for' : 'No se encontraron recetas para';
-  String get clearSearch => _locale.languageCode == 'en' ? 'Clear Search' : 'Limpiar Búsqueda';
-  String get noDifficultyRecipes => _locale.languageCode == 'en' ? 'No' : 'No hay';
-  String get tryDifferentDifficultyOrCreateNew => _locale.languageCode == 'en' ? 'Try a different difficulty level or create a new recipe' : 'Intenta un nivel de dificultad diferente o crea una nueva receta';
-  String get difficulty => _locale.languageCode == 'en' ? 'Difficulty' : 'Dificultad';
-  String get prepTime => _locale.languageCode == 'en' ? 'Prep Time' : 'Tiempo de Preparación';
-  String get cookTime => _locale.languageCode == 'en' ? 'Cook Time' : 'Tiempo de Cocción';
-  String get minutes => _locale.languageCode == 'en' ? 'minutes' : 'minutos';
-  String get servings => _locale.languageCode == 'en' ? 'Servings' : 'Porciones';
-  String get ingredients => _locale.languageCode == 'en' ? 'Ingredients:' : 'Ingredientes:';
-  String get instructions => _locale.languageCode == 'en' ? 'Instructions:' : 'Instrucciones:';
-  String get deleteRecipe => _locale.languageCode == 'en' ? 'Delete Recipe' : 'Eliminar Receta';
-  String get deleteRecipeConfirmation => _locale.languageCode == 'en' ? 'Are you sure you want to delete' : '¿Estás seguro de que quieres eliminar';
-  String get recipeDeletedSuccessfully => _locale.languageCode == 'en' ? 'Recipe deleted successfully' : 'Receta eliminada exitosamente';
-  String get failedToDeleteRecipe => _locale.languageCode == 'en' ? 'Failed to delete recipe:' : 'Error al eliminar receta:';
-  
-  // Smart suggestions screen strings
-  String get smartRecipeSuggestions => _locale.languageCode == 'en' ? 'Smart Recipe Suggestions' : 'Sugerencias Inteligentes de Recetas';
-  String get cooked => _locale.languageCode == 'en' ? 'Cooked' : 'Cocinado';
-  String get wastePrevention => _locale.languageCode == 'en' ? 'Waste Prevention' : 'Prevención de Desperdicio';
-  String get noPendingSuggestionsAvailable => _locale.languageCode == 'en' ? 'No pending suggestions available' : 'No hay sugerencias pendientes disponibles';
-  String get highUrgency => _locale.languageCode == 'en' ? 'High Urgency' : 'Alta Urgencia';
-  String get mediumUrgency => _locale.languageCode == 'en' ? 'Medium Urgency' : 'Urgencia Media';
-  String get lowUrgency => _locale.languageCode == 'en' ? 'Low Urgency' : 'Baja Urgencia';
-  String get noCookedSuggestionsAvailable => _locale.languageCode == 'en' ? 'No cooked suggestions available' : 'No hay sugerencias cocinadas disponibles';
-  String get noSuggestionsAvailable => _locale.languageCode == 'en' ? 'No suggestions available' : 'No hay sugerencias disponibles';
-  String get errorLoadingWastePreventionData => _locale.languageCode == 'en' ? 'Error loading waste prevention data' : 'Error al cargar datos de prevención de desperdicio';
-  String get noSmartRecipeSuggestionsAvailable => _locale.languageCode == 'en' ? 'No smart recipe suggestions available' : 'No hay sugerencias inteligentes de recetas disponibles';
-  
-  // Additional smart suggestions strings
-  String get confidence => _locale.languageCode == 'en' ? 'Confidence' : 'Confianza';
-  String get potentialSavings => _locale.languageCode == 'en' ? 'Potential Savings' : 'Ahorro Potencial';
-  String get cookRecipe => _locale.languageCode == 'en' ? 'Cook Recipe' : 'Cocinar Receta';
-  String get alreadyCooked => _locale.languageCode == 'en' ? 'Already Cooked' : 'Ya Cocinado';
-  String get cookedOn => _locale.languageCode == 'en' ? 'Cooked On' : 'Cocinado El';
-  String get recipeCookedSuccessfully => _locale.languageCode == 'en' ? 'Recipe Cooked Successfully' : 'Receta Cocinada Exitosamente';
-  String get cookRecipeTitle => _locale.languageCode == 'en' ? 'Cook' : 'Cocinar';
-  String get cookRecipeUsing => _locale.languageCode == 'en' ? 'Cook recipe using:' : 'Cocinar receta usando:';
-  String get thisWill => _locale.languageCode == 'en' ? 'This will:' : 'Esto hará:';
-  String get consumeInventoryItems => _locale.languageCode == 'en' ? '• Consume inventory items' : '• Consumir artículos del inventario';
-  String get reduceWaste => _locale.languageCode == 'en' ? '• Reduce waste' : '• Reducir desperdicio';
-  String get createPromotionWithQuantityTracking => _locale.languageCode == 'en' ? '• Create a promotion with quantity tracking' : '• Crear una promoción con seguimiento de cantidad';
-  String get recipeConfiguration => _locale.languageCode == 'en' ? 'Recipe Configuration:' : 'Configuración de Receta:';
-  String get quantityToCook => _locale.languageCode == 'en' ? 'Quantity to Cook' : 'Cantidad a Cocinar';
-  String get thisWillCreatePromotionWithSameQuantity => _locale.languageCode == 'en' ? 'This will create a promotion with the same quantity' : 'Esto creará una promoción con la misma cantidad';
-  String get promotionConfiguration => _locale.languageCode == 'en' ? 'Promotion Configuration:' : 'Configuración de Promoción:';
-  String get promotionName => _locale.languageCode == 'en' ? 'Promotion Name' : 'Nombre de Promoción';
-  String get promotionDescription => _locale.languageCode == 'en' ? 'Promotion Description' : 'Descripción de Promoción';
-  String get descriptionOfPromotion => _locale.languageCode == 'en' ? 'Description of the promotion' : 'Descripción de la promoción';
-  String get chefsSpecial => _locale.languageCode == 'en' ? 'Chef\'s Special' : 'Especial del Chef';
-  String get buyOneGetOne => _locale.languageCode == 'en' ? 'Buy One Get One' : 'Compra Uno Obtén Uno';
-  String get flashSale => _locale.languageCode == 'en' ? 'Flash Sale' : 'Venta Flash';
-  String get discountType => _locale.languageCode == 'en' ? 'Discount Type' : 'Tipo de Descuento';
-  String get percentageDiscount => _locale.languageCode == 'en' ? 'Percentage Discount' : 'Descuento Porcentual';
-  String get fixedAmountOff => _locale.languageCode == 'en' ? 'Fixed Amount Off' : 'Cantidad Fija de Descuento';
-  String get freeItem => _locale.languageCode == 'en' ? 'Free Item' : 'Artículo Gratis';
-  String get discountAmount => _locale.languageCode == 'en' ? 'Discount Amount (\$)' : 'Cantidad de Descuento (\$)';
-  String get matchingIngredients => _locale.languageCode == 'en' ? 'Matching Ingredients:' : 'Ingredientes Coincidentes:';
-  String get ingredientsUsed => _locale.languageCode == 'en' ? 'Ingredients Used:' : 'Ingredientes Usados:';
-  
-  // Inventory alerts screen strings
-  String get allAlerts => _locale.languageCode == 'en' ? 'All Alerts' : 'Todas las Alertas';
-  String get expiringItems => _locale.languageCode == 'en' ? 'Expiring Items' : 'Artículos por Vencer';
-  String get underperforming => _locale.languageCode == 'en' ? 'Underperforming' : 'Bajo Rendimiento';
-  String get noInventoryAlertsAvailable => _locale.languageCode == 'en' ? 'No inventory alerts available' : 'No hay alertas de inventario disponibles';
-  String get noExpiringItemsAlerts => _locale.languageCode == 'en' ? 'No expiring items alerts' : 'No hay alertas de artículos por vencer';
-  String get noUnderperformingItemsAlerts => _locale.languageCode == 'en' ? 'No underperforming items alerts' : 'No hay alertas de artículos de bajo rendimiento';
-  String get item => _locale.languageCode == 'en' ? 'Item' : 'Artículo';
-  String get viewDetails => _locale.languageCode == 'en' ? 'View Details' : 'Ver Detalles';
-  String get createChefSpecialPromotion => _locale.languageCode == 'en' ? 'Create a Chef\'s Special promotion' : 'Crear una promoción Especial del Chef';
-  String get availableRecipes => _locale.languageCode == 'en' ? 'Available Recipes:' : 'Recetas Disponibles:';
-  String get errorLoadingRecipes => _locale.languageCode == 'en' ? 'Error loading recipes' : 'Error al cargar recetas';
-  String get noRecipeSuggestionsAvailable => _locale.languageCode == 'en' ? 'No recipe suggestions available' : 'No hay sugerencias de recetas disponibles';
-  String get quantity => _locale.languageCode == 'en' ? 'Quantity' : 'Cantidad';
-  String get cookingRecipe => _locale.languageCode == 'en' ? 'Cooking recipe' : 'Cocinando receta';
-  String get recipe => _locale.languageCode == 'en' ? 'Recipe' : 'Receta';
-  String get quantityCooked => _locale.languageCode == 'en' ? 'Quantity Cooked' : 'Cantidad Cocinada';
-  String get costSavings => _locale.languageCode == 'en' ? 'Cost Savings' : 'Ahorro de Costos';
-  String get wasteReduction => _locale.languageCode == 'en' ? 'Waste Reduction' : 'Reducción de Desperdicio';
-  String get promotionCreated => _locale.languageCode == 'en' ? 'Promotion Created' : 'Promoción Creada';
-  String get type => _locale.languageCode == 'en' ? 'Type' : 'Tipo';
-  String get quantityTracking => _locale.languageCode == 'en' ? 'Quantity Tracking' : 'Seguimiento de Cantidad';
-  String get totalQuantity => _locale.languageCode == 'en' ? 'Total Quantity' : 'Cantidad Total';
-  String get usedQuantity => _locale.languageCode == 'en' ? 'Used Quantity' : 'Cantidad Usada';
-  String get remaining => _locale.languageCode == 'en' ? 'Remaining' : 'Restante';
-  String get expires => _locale.languageCode == 'en' ? 'Expires' : 'Expira';
-  String get failedToCookRecipe => _locale.languageCode == 'en' ? 'Failed to cook recipe' : 'Error al cocinar receta';
-  String get specialOffer => _locale.languageCode == 'en' ? 'Special Offer' : 'Oferta Especial';
-  String get selectedItems => _locale.languageCode == 'en' ? 'Selected Items' : 'Artículos Seleccionados';
-  String get promotionCreatedFromInventoryAlert => _locale.languageCode == 'en' ? 'Promotion created from inventory alert' : 'Promoción creada desde alerta de inventario';
-  String get successfullyCreatedPromotion => _locale.languageCode == 'en' ? 'Successfully created promotion' : 'Promoción creada exitosamente';
-  String get errorCreatingPromotion => _locale.languageCode == 'en' ? 'Error creating promotion' : 'Error al crear promoción';
-  String get useExpiringItemsToCreateDishes => _locale.languageCode == 'en' ? 'Use expiring items to create dishes' : 'Usar artículos por vencer para crear platos';
-  String get createSpecialOffersForItems => _locale.languageCode == 'en' ? 'Create special offers for items' : 'Crear ofertas especiales para artículos';
-  String get checkCookingHistoryAndMetrics => _locale.languageCode == 'en' ? 'Check cooking history and metrics' : 'Revisar historial de cocina y métricas';
-  String get cookingHistory => _locale.languageCode == 'en' ? 'Cooking History' : 'Historial de Cocina';
-  String get viewRecentCookingActivities => _locale.languageCode == 'en' ? 'View recent cooking activities' : 'Ver actividades recientes de cocina';
-  String get selectARecipeToCookUsingExpiringItems => _locale.languageCode == 'en' ? 'Select a recipe to cook using expiring items:' : 'Selecciona una receta para cocinar usando artículos por vencer:';
-  String get thisFeatureWill => _locale.languageCode == 'en' ? 'This feature will:' : 'Esta función hará:';
-  String get automaticallySelectRecipesUsingExpiringItems => _locale.languageCode == 'en' ? 'Automatically select recipes using expiring items' : 'Seleccionar automáticamente recetas usando artículos por vencer';
-  String get consumeInventoryAndReduceWaste => _locale.languageCode == 'en' ? 'Consume inventory and reduce waste' : 'Consumir inventario y reducir desperdicio';
-  String get createCustomizablePromotions => _locale.languageCode == 'en' ? 'Create customizable promotions' : 'Crear promociones personalizables';
-  String get noDescription => _locale.languageCode == 'en' ? 'No description' : 'Sin descripción';
-  String get cook => _locale.languageCode == 'en' ? 'Cook' : 'Cocinar';
-  String get chefSpecial => _locale.languageCode == 'en' ? 'Chef\'s Special' : 'Especial del Chef';
-  String get freshlyPrepared => _locale.languageCode == 'en' ? 'Freshly prepared' : 'Recién preparado';
-  String get usingPremiumIngredients => _locale.languageCode == 'en' ? 'using premium ingredients' : 'usando ingredientes premium';
-  String get thisWillCreateAPromotionWithTheSameQuantity => _locale.languageCode == 'en' ? 'This will create a promotion with the same quantity' : 'Esto creará una promoción con la misma cantidad';
-  String get eG => _locale.languageCode == 'en' ? 'e.g.' : 'ej.';
-  String get trufflePizza => _locale.languageCode == 'en' ? 'Truffle Pizza' : 'Pizza de Trufa';
-  String get descriptionOfThePromotion => _locale.languageCode == 'en' ? 'Description of the promotion' : 'Descripción de la promoción';
-  String get promotionExpiresInHours => _locale.languageCode == 'en' ? 'Promotion Expires In (Hours)' : 'Promoción Expira En (Horas)';
-  String get pleaseEnterAPromotionName => _locale.languageCode == 'en' ? 'Please enter a promotion name' : 'Por favor ingresa un nombre de promoción';
-  String get quantityMustBeGreaterThan0 => _locale.languageCode == 'en' ? 'Quantity must be greater than 0' : 'La cantidad debe ser mayor que 0';
-  String get createAPromotionForExpiringOrUnderperformingItems => _locale.languageCode == 'en' ? 'Create a promotion for expiring or underperforming items:' : 'Crear una promoción para artículos por vencer o de bajo rendimiento:';
-  String get createTargetedPromotions => _locale.languageCode == 'en' ? 'Create targeted promotions' : 'Crear promociones dirigidas';
-  String get helpMoveInventory => _locale.languageCode == 'en' ? 'Help move inventory' : 'Ayudar a mover inventario';
-  String get increaseSalesAndReduceWaste => _locale.languageCode == 'en' ? 'Increase sales and reduce waste' : 'Aumentar ventas y reducir desperdicio';
-  String get percentage => _locale.languageCode == 'en' ? 'Percentage (%)' : 'Porcentaje (%)';
-  String get pleaseEnterAValidDiscountValue => _locale.languageCode == 'en' ? 'Please enter a valid discount value' : 'Por favor ingresa un valor de descuento válido';
-  String get cookingAnalytics => _locale.languageCode == 'en' ? 'Cooking Analytics' : 'Análisis de Cocina';
-  String get errorLoadingAnalytics => _locale.languageCode == 'en' ? 'Error loading analytics' : 'Error al cargar análisis';
-  String get totalRecipesCooked => _locale.languageCode == 'en' ? 'Total Recipes Cooked' : 'Total de Recetas Cocinadas';
-  String get wasteReduced => _locale.languageCode == 'en' ? 'Waste Reduced' : 'Desperdicio Reducido';
-  String get promotionsCreated => _locale.languageCode == 'en' ? 'Promotions Created' : 'Promociones Creadas';
-  String get errorLoadingHistory => _locale.languageCode == 'en' ? 'Error loading history' : 'Error al cargar historial';
-  String get noCookingHistoryYet => _locale.languageCode == 'en' ? 'No cooking history yet' : 'Aún no hay historial de cocina';
-  String get startCookingRecipesToSeeYourHistoryHere => _locale.languageCode == 'en' ? 'Start cooking recipes to see your history here' : 'Comienza a cocinar recetas para ver tu historial aquí';
-  String get date => _locale.languageCode == 'en' ? 'Date' : 'Fecha';
-  String get unknownDate => _locale.languageCode == 'en' ? 'Unknown date' : 'Fecha desconocida';
-  String get invalidDate => _locale.languageCode == 'en' ? 'Invalid date' : 'Fecha inválida';
-  String get urgency => _locale.languageCode == 'en' ? 'Urgency' : 'Urgencia';
-  
-  // Promotions screen strings
-  String get promotionsManagement => _locale.languageCode == 'en' ? 'Promotions Management' : 'Gestión de Promociones';
-  String get errorLoadingPromotions => _locale.languageCode == 'en' ? 'Error loading promotions' : 'Error al cargar promociones';
-  String get noPromotionsYet => _locale.languageCode == 'en' ? 'No promotions yet' : 'Aún no hay promociones';
-  String get createYourFirstPromotionToGetStarted => _locale.languageCode == 'en' ? 'Create your first promotion to get started' : 'Crea tu primera promoción para comenzar';
-  String get scheduled => _locale.languageCode == 'en' ? 'Scheduled' : 'Programado';
-  String get expired => _locale.languageCode == 'en' ? 'Expired' : 'Expirado';
-  String get deletePromotion => _locale.languageCode == 'en' ? 'Delete Promotion' : 'Eliminar Promoción';
-  String get discount => _locale.languageCode == 'en' ? 'Discount' : 'Descuento';
+  /// Login failed error message
+  ///
+  /// In en, this message translates to:
+  /// **'Login Failed'**
+  String get loginFailed;
+
+  /// Login error message
+  ///
+  /// In en, this message translates to:
+  /// **'Login Error'**
+  String get loginError;
+
+  /// Welcome back message
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome Back'**
+  String get welcomeBack;
+
+  /// Login subtitle message
+  ///
+  /// In en, this message translates to:
+  /// **'To keep connected with us please login with your personal information'**
+  String get loginSubtitle;
+
+  /// Business slug hint text
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your business slug'**
+  String get enterBusinessSlug;
+
+  /// Email hint text
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your email'**
+  String get enterEmail;
+
+  /// Password hint text
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your password'**
+  String get enterPassword;
+
+  /// Quick login dropdown label
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Login (Test User)'**
+  String get quickLogin;
+
+  /// Login button text
+  ///
+  /// In en, this message translates to:
+  /// **'Login Now'**
+  String get loginNow;
+
+  /// Email field label
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get email;
+
+  /// Password field label
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get password;
+
+  /// Business slug field label
+  ///
+  /// In en, this message translates to:
+  /// **'Business Slug'**
+  String get businessSlug;
+
+  /// Dashboard screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Dashboard'**
+  String get dashboard;
+
+  /// Settings screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settings;
+
+  /// Logout button text
+  ///
+  /// In en, this message translates to:
+  /// **'Logout'**
+  String get logout;
+
+  /// Cancel button text
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// Confirm button text
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirm;
+
+  /// Save button text
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// Delete button text
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// Back button text
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get back;
+
+  /// Next button
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get next;
+
+  /// Previous button
+  ///
+  /// In en, this message translates to:
+  /// **'Previous'**
+  String get previous;
+
+  /// Search field hint
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get search;
+
+  /// Filter button
+  ///
+  /// In en, this message translates to:
+  /// **'Filter'**
+  String get filter;
+
+  /// Sort button
+  ///
+  /// In en, this message translates to:
+  /// **'Sort'**
+  String get sort;
+
+  /// Refresh button text
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get refresh;
+
+  /// Loading message
+  ///
+  /// In en, this message translates to:
+  /// **'Loading...'**
+  String get loading;
+
+  /// Error dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get error;
+
+  /// Success message
+  ///
+  /// In en, this message translates to:
+  /// **'Success'**
+  String get success;
+
+  /// Warning message
+  ///
+  /// In en, this message translates to:
+  /// **'Warning'**
+  String get warning;
+
+  /// Info message
+  ///
+  /// In en, this message translates to:
+  /// **'Information'**
+  String get info;
+
+  /// Yes button
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get yes;
+
+  /// No button
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get no;
+
+  /// OK button text
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get ok;
+
+  /// Close button text
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// Open button
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get open;
+
+  /// Edit button text
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get edit;
+
+  /// Add button text
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get add;
+
+  /// Remove button
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get remove;
+
+  /// Select button
+  ///
+  /// In en, this message translates to:
+  /// **'Select'**
+  String get select;
+
+  /// Deselect button
+  ///
+  /// In en, this message translates to:
+  /// **'Deselect'**
+  String get deselect;
+
+  /// Clear button
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get clear;
+
+  /// Reset button
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get reset;
+
+  /// Apply button
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get apply;
+
+  /// Submit button
+  ///
+  /// In en, this message translates to:
+  /// **'Submit'**
+  String get submit;
+
+  /// Continue button text
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueAction;
+
+  /// Finish button
+  ///
+  /// In en, this message translates to:
+  /// **'Finish'**
+  String get finish;
+
+  /// Start button
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get start;
+
+  /// Stop button
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get stop;
+
+  /// Pause button
+  ///
+  /// In en, this message translates to:
+  /// **'Pause'**
+  String get pause;
+
+  /// Resume button
+  ///
+  /// In en, this message translates to:
+  /// **'Resume'**
+  String get resume;
+
+  /// Retry button text
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
+
+  /// Point of sale system subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Point of Sale System'**
+  String get pointOfSaleSystem;
+
+  /// Inventory alerts section
+  ///
+  /// In en, this message translates to:
+  /// **'Inventory Alerts'**
+  String get inventoryAlerts;
+
+  /// All alerts tab
+  ///
+  /// In en, this message translates to:
+  /// **'All Alerts'**
+  String get allAlerts;
+
+  /// Expiring items tab
+  ///
+  /// In en, this message translates to:
+  /// **'Expiring Items'**
+  String get expiringItems;
+
+  /// Underperforming items tab
+  ///
+  /// In en, this message translates to:
+  /// **'Underperforming'**
+  String get underperforming;
+
+  /// Error message when creating promotion fails
+  ///
+  /// In en, this message translates to:
+  /// **'Error creating promotion'**
+  String get errorCreatingPromotion;
+
+  /// Promotion configuration section title
+  ///
+  /// In en, this message translates to:
+  /// **'Promotion Configuration'**
+  String get promotionConfiguration;
+
+  /// Percentage discount option
+  ///
+  /// In en, this message translates to:
+  /// **'Percentage Discount'**
+  String get percentageDiscount;
+
+  /// Fixed amount discount option
+  ///
+  /// In en, this message translates to:
+  /// **'Fixed Amount Off'**
+  String get fixedAmountOff;
+
+  /// Buy one get one promotion option
+  ///
+  /// In en, this message translates to:
+  /// **'Buy One Get One'**
+  String get buyOneGetOne;
+
+  /// Quick actions label
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Actions'**
+  String get quickActions;
+
+  /// Cook recipe button text
+  ///
+  /// In en, this message translates to:
+  /// **'Cook Recipe'**
+  String get cookRecipe;
+
+  /// Description for cook recipe action
+  ///
+  /// In en, this message translates to:
+  /// **'Use expiring items to create dishes'**
+  String get useExpiringItemsToCreateDishes;
+
+  /// Create promotion button text
+  ///
+  /// In en, this message translates to:
+  /// **'Create Promotion'**
+  String get createPromotion;
+
+  /// Description for create promotion action
+  ///
+  /// In en, this message translates to:
+  /// **'Create special offers for items'**
+  String get createSpecialOffersForItems;
+
+  /// View analytics action
+  ///
+  /// In en, this message translates to:
+  /// **'View Analytics'**
+  String get viewAnalytics;
+
+  /// Description for view analytics action
+  ///
+  /// In en, this message translates to:
+  /// **'Check cooking history and metrics'**
+  String get checkCookingHistoryAndMetrics;
+
+  /// Cooking history action
+  ///
+  /// In en, this message translates to:
+  /// **'Cooking History'**
+  String get cookingHistory;
+
+  /// Description for cooking history action
+  ///
+  /// In en, this message translates to:
+  /// **'View recent cooking activities'**
+  String get viewRecentCookingActivities;
+
+  /// Dialog text for recipe selection
+  ///
+  /// In en, this message translates to:
+  /// **'Select a recipe to cook using expiring items'**
+  String get selectARecipeToCookUsingExpiringItems;
+
+  /// Feature description prefix
+  ///
+  /// In en, this message translates to:
+  /// **'This feature will:'**
+  String get thisFeatureWill;
+
+  /// Feature benefit description
+  ///
+  /// In en, this message translates to:
+  /// **'Automatically select recipes using expiring items'**
+  String get automaticallySelectRecipesUsingExpiringItems;
+
+  /// Feature benefit description
+  ///
+  /// In en, this message translates to:
+  /// **'Consume inventory and reduce waste'**
+  String get consumeInventoryAndReduceWaste;
+
+  /// Feature benefit description
+  ///
+  /// In en, this message translates to:
+  /// **'Create customizable promotions'**
+  String get createCustomizablePromotions;
+
+  /// Quantity field label
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity to Cook'**
+  String get quantityToCook;
+
+  /// Helper text for quantity field
+  ///
+  /// In en, this message translates to:
+  /// **'This will create a promotion with the same quantity'**
+  String get thisWillCreateAPromotionWithTheSameQuantity;
+
+  /// Promotion name field label
+  ///
+  /// In en, this message translates to:
+  /// **'Promotion Name'**
+  String get promotionName;
+
+  /// Example abbreviation
+  ///
+  /// In en, this message translates to:
+  /// **'e.g.'**
+  String get eG;
+
+  /// Chef special promotion type
+  ///
+  /// In en, this message translates to:
+  /// **'Chef Special'**
+  String get chefSpecial;
+
+  /// Example dish name
+  ///
+  /// In en, this message translates to:
+  /// **'Truffle Pizza'**
+  String get trufflePizza;
+
+  /// Promotion description field label
+  ///
+  /// In en, this message translates to:
+  /// **'Promotion Description'**
+  String get promotionDescription;
+
+  /// Promotion description hint
+  ///
+  /// In en, this message translates to:
+  /// **'Description of the promotion'**
+  String get descriptionOfThePromotion;
+
+  /// Promotion type field label
+  ///
+  /// In en, this message translates to:
+  /// **'Promotion Type'**
+  String get promotionType;
+
+  /// Discount promotion type
+  ///
+  /// In en, this message translates to:
+  /// **'Discount'**
+  String get discount;
+
+  /// Flash sale promotion type
+  ///
+  /// In en, this message translates to:
+  /// **'Flash Sale'**
+  String get flashSale;
+
+  /// Discount type field label
+  ///
+  /// In en, this message translates to:
+  /// **'Discount Type'**
+  String get discountType;
+
+  /// Free item discount type
+  ///
+  /// In en, this message translates to:
+  /// **'Free Item'**
+  String get freeItem;
+
+  /// Discount percentage field label
+  ///
+  /// In en, this message translates to:
+  /// **'Discount Percentage'**
+  String get discountPercentage;
+
+  /// Discount amount field label
+  ///
+  /// In en, this message translates to:
+  /// **'Discount Amount'**
+  String get discountAmount;
+
+  /// Promotion expiration field label
+  ///
+  /// In en, this message translates to:
+  /// **'Promotion Expires In (Hours)'**
+  String get promotionExpiresInHours;
+
+  /// Validation error for promotion name
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a promotion name'**
+  String get pleaseEnterAPromotionName;
+
+  /// Validation error for discount value
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid discount value'**
+  String get pleaseEnterAValidDiscountValue;
+
+  /// Success message for promotion creation
+  ///
+  /// In en, this message translates to:
+  /// **'Successfully created promotion'**
+  String get successfullyCreatedPromotion;
+
+  /// Percentage field label
+  ///
+  /// In en, this message translates to:
+  /// **'Percentage'**
+  String get percentage;
+
+  /// Amount label
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get amount;
+
+  /// Description for promotion created from inventory alert
+  ///
+  /// In en, this message translates to:
+  /// **'Promotion created from inventory alert'**
+  String get promotionCreatedFromInventoryAlert;
+
+  /// Analytics screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Analytics'**
+  String get analytics;
+
+  /// Features screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Features'**
+  String get features;
+
+  /// Sales overview label
+  ///
+  /// In en, this message translates to:
+  /// **'Sales Overview'**
+  String get salesOverview;
+
+  /// Today's sales label
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Sales'**
+  String get todaysSales;
+
+  /// Transactions section
+  ///
+  /// In en, this message translates to:
+  /// **'Transactions'**
+  String get transactions;
+
+  /// Average order label
+  ///
+  /// In en, this message translates to:
+  /// **'Avg Order'**
+  String get avgOrder;
+
+  /// New features available section
+  ///
+  /// In en, this message translates to:
+  /// **'New Features Available'**
+  String get newFeaturesAvailable;
+
+  /// Description for exploring features
+  ///
+  /// In en, this message translates to:
+  /// **'Explore our new Recipe & Promotion System with mobile notifications.'**
+  String get exploreFeaturesDescription;
+
+  /// Explore features button
+  ///
+  /// In en, this message translates to:
+  /// **'Explore Features'**
+  String get exploreFeatures;
+
+  /// Recent activity label
+  ///
+  /// In en, this message translates to:
+  /// **'Recent Activity'**
+  String get recentActivity;
+
+  /// Language settings label
+  ///
+  /// In en, this message translates to:
+  /// **'Language Settings'**
+  String get languageSettings;
+
+  /// Language status label
+  ///
+  /// In en, this message translates to:
+  /// **'Language Status'**
+  String get languageStatus;
+
+  /// Current language label
+  ///
+  /// In en, this message translates to:
+  /// **'Current Language'**
+  String get currentLanguage;
+
+  /// Native name field
+  ///
+  /// In en, this message translates to:
+  /// **'Native Name'**
+  String get nativeName;
+
+  /// Select language label
+  ///
+  /// In en, this message translates to:
+  /// **'Select Language'**
+  String get selectLanguage;
+
+  /// Language changes saved message
+  ///
+  /// In en, this message translates to:
+  /// **'Language changes saved'**
+  String get languageChangesSaved;
+
+  /// Language information text
+  ///
+  /// In en, this message translates to:
+  /// **'Mobile POS supports Spanish and English. Default language is Spanish (Costa Rica).'**
+  String get languageInfo;
+
+  /// Language changes applied message
+  ///
+  /// In en, this message translates to:
+  /// **'Language changes will be saved and applied immediately.'**
+  String get languageChangesApplied;
+
+  /// Profile label
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get profile;
+
+  /// Confirm logout dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Logout'**
+  String get confirmLogout;
+
+  /// Logout confirmation message
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to logout?'**
+  String get logoutConfirmation;
+
+  /// Saving message
+  ///
+  /// In en, this message translates to:
+  /// **'Saving...'**
+  String get saving;
+
+  /// Loading profile message
+  ///
+  /// In en, this message translates to:
+  /// **'Loading profile...'**
+  String get loadingProfile;
+
+  /// Profile updated success message
+  ///
+  /// In en, this message translates to:
+  /// **'Profile updated successfully!'**
+  String get profileUpdatedSuccessfully;
+
+  /// Failed to load profile message
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load profile'**
+  String get failedToLoadProfile;
+
+  /// Please login to view profile message
+  ///
+  /// In en, this message translates to:
+  /// **'Please log in to view your profile'**
+  String get pleaseLoginToViewProfile;
+
+  /// Initializing message
+  ///
+  /// In en, this message translates to:
+  /// **'Initializing...'**
+  String get initializing;
+
+  /// User data not available message
+  ///
+  /// In en, this message translates to:
+  /// **'User data not available'**
+  String get userDataNotAvailable;
+
+  /// Personal information label
+  ///
+  /// In en, this message translates to:
+  /// **'Personal Information'**
+  String get personalInformation;
+
+  /// Work information label
+  ///
+  /// In en, this message translates to:
+  /// **'Work Information'**
+  String get workInformation;
+
+  /// Account settings label
+  ///
+  /// In en, this message translates to:
+  /// **'Account Settings'**
+  String get accountSettings;
+
+  /// Support and help label
+  ///
+  /// In en, this message translates to:
+  /// **'Support & Help'**
+  String get supportAndHelp;
+
+  /// Edit profile button
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Profile'**
+  String get editProfile;
+
+  /// Change photo button
+  ///
+  /// In en, this message translates to:
+  /// **'Change Photo'**
+  String get changePhoto;
+
+  /// Photo upload coming soon message
+  ///
+  /// In en, this message translates to:
+  /// **'Photo upload coming soon!'**
+  String get photoUploadComingSoon;
+
+  /// Full name field
+  ///
+  /// In en, this message translates to:
+  /// **'Full Name'**
+  String get fullName;
+
+  /// Enter your name hint
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your name'**
+  String get enterYourName;
+
+  /// Phone number field
+  ///
+  /// In en, this message translates to:
+  /// **'Phone Number'**
+  String get phoneNumber;
+
+  /// Save changes button
+  ///
+  /// In en, this message translates to:
+  /// **'Save Changes'**
+  String get saveChanges;
+
+  /// Name field
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get name;
+
+  /// Phone label
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get phone;
+
+  /// Role field
+  ///
+  /// In en, this message translates to:
+  /// **'Role'**
+  String get role;
+
+  /// Employee ID field
+  ///
+  /// In en, this message translates to:
+  /// **'Employee ID'**
+  String get employeeId;
+
+  /// Department field
+  ///
+  /// In en, this message translates to:
+  /// **'Department'**
+  String get department;
+
+  /// Hire date field
+  ///
+  /// In en, this message translates to:
+  /// **'Hire Date'**
+  String get hireDate;
+
+  /// Status label
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get status;
+
+  /// Quick stats section
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Stats'**
+  String get quickStats;
+
+  /// Orders label
+  ///
+  /// In en, this message translates to:
+  /// **'Orders'**
+  String get orders;
+
+  /// This month section
+  ///
+  /// In en, this message translates to:
+  /// **'This Month'**
+  String get thisMonth;
+
+  /// Tables label
+  ///
+  /// In en, this message translates to:
+  /// **'Tables'**
+  String get tables;
+
+  /// This week section
+  ///
+  /// In en, this message translates to:
+  /// **'This Week'**
+  String get thisWeek;
+
+  /// Tips section
+  ///
+  /// In en, this message translates to:
+  /// **'Tips'**
+  String get tips;
+
+  /// Change password button
+  ///
+  /// In en, this message translates to:
+  /// **'Change Password'**
+  String get changePassword;
+
+  /// Password change coming soon message
+  ///
+  /// In en, this message translates to:
+  /// **'Password change coming soon!'**
+  String get passwordChangeComingSoon;
+
+  /// Notification settings section
+  ///
+  /// In en, this message translates to:
+  /// **'Notification Settings'**
+  String get notificationSettings;
+
+  /// Notification settings coming soon message
+  ///
+  /// In en, this message translates to:
+  /// **'Notification settings coming soon!'**
+  String get notificationSettingsComingSoon;
+
+  /// Theme settings section
+  ///
+  /// In en, this message translates to:
+  /// **'Theme Settings'**
+  String get themeSettings;
+
+  /// Theme settings coming soon message
+  ///
+  /// In en, this message translates to:
+  /// **'Theme settings coming soon!'**
+  String get themeSettingsComingSoon;
+
+  /// Privacy and security section
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy & Security'**
+  String get privacyAndSecurity;
+
+  /// Privacy settings coming soon message
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy settings coming soon!'**
+  String get privacySettingsComingSoon;
+
+  /// Help center section
+  ///
+  /// In en, this message translates to:
+  /// **'Help Center'**
+  String get helpCenter;
+
+  /// Help center coming soon message
+  ///
+  /// In en, this message translates to:
+  /// **'Help center coming soon!'**
+  String get helpCenterComingSoon;
+
+  /// Contact support section
+  ///
+  /// In en, this message translates to:
+  /// **'Contact Support'**
+  String get contactSupport;
+
+  /// Contact support coming soon message
+  ///
+  /// In en, this message translates to:
+  /// **'Contact support coming soon!'**
+  String get contactSupportComingSoon;
+
+  /// Training materials section
+  ///
+  /// In en, this message translates to:
+  /// **'Training Materials'**
+  String get trainingMaterials;
+
+  /// Training materials coming soon message
+  ///
+  /// In en, this message translates to:
+  /// **'Training materials coming soon!'**
+  String get trainingMaterialsComingSoon;
+
+  /// Clear all data button
+  ///
+  /// In en, this message translates to:
+  /// **'Clear All Data'**
+  String get clearAllData;
+
+  /// Clear data confirmation message
+  ///
+  /// In en, this message translates to:
+  /// **'This will clear all stored data and log you out. This action cannot be undone.'**
+  String get clearDataConfirmation;
+
+  /// Clear stored data debug button
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Stored Data (Debug)'**
+  String get clearStoredDataDebug;
+
+  /// Floor plan screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Floor Plan'**
+  String get floorPlan;
+
+  /// Messages screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Messages'**
+  String get messages;
+
+  /// Business management label
+  ///
+  /// In en, this message translates to:
+  /// **'Business Management'**
+  String get businessManagement;
+
+  /// Add business button
+  ///
+  /// In en, this message translates to:
+  /// **'Add Business'**
+  String get addBusiness;
+
+  /// Error message when loading businesses fails
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading businesses'**
+  String get errorLoadingBusinesses;
+
+  /// No businesses found message
+  ///
+  /// In en, this message translates to:
+  /// **'No businesses found'**
+  String get noBusinessesFound;
+
+  /// Add first business message
+  ///
+  /// In en, this message translates to:
+  /// **'Add your first business to get started'**
+  String get addFirstBusinessToGetStarted;
+
+  /// Active status
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get active;
+
+  /// Inactive status
+  ///
+  /// In en, this message translates to:
+  /// **'Inactive'**
+  String get inactive;
+
+  /// Delete business button
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Business'**
+  String get deleteBusiness;
+
+  /// Delete business confirmation message
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete'**
+  String get deleteBusinessConfirmation;
+
+  /// Warning that action cannot be undone
+  ///
+  /// In en, this message translates to:
+  /// **'This action cannot be undone.'**
+  String get thisActionCannotBeUndone;
+
+  /// Floor plan management label
+  ///
+  /// In en, this message translates to:
+  /// **'Floor Plan Management'**
+  String get floorPlanManagement;
+
+  /// Overview section
+  ///
+  /// In en, this message translates to:
+  /// **'Overview'**
+  String get overview;
+
+  /// Floor plans label
+  ///
+  /// In en, this message translates to:
+  /// **'Floor Plans'**
+  String get floorPlans;
+
+  /// Table status overview label
+  ///
+  /// In en, this message translates to:
+  /// **'Table Status Overview'**
+  String get tableStatusOverview;
+
+  /// Real-time restaurant metrics description
+  ///
+  /// In en, this message translates to:
+  /// **'Real-time restaurant floor plan metrics'**
+  String get realTimeRestaurantMetrics;
+
+  /// Total tables label
+  ///
+  /// In en, this message translates to:
+  /// **'Total Tables'**
+  String get totalTables;
+
+  /// Available label
+  ///
+  /// In en, this message translates to:
+  /// **'Available'**
+  String get available;
+
+  /// Occupied label
+  ///
+  /// In en, this message translates to:
+  /// **'Occupied'**
+  String get occupied;
+
+  /// Reserved status
+  ///
+  /// In en, this message translates to:
+  /// **'reserved'**
+  String get reserved;
+
+  /// Cleaning label
+  ///
+  /// In en, this message translates to:
+  /// **'Cleaning'**
+  String get cleaning;
+
+  /// Cart label
+  ///
+  /// In en, this message translates to:
+  /// **'Cart'**
+  String get cart;
+
+  /// Cart empty message
+  ///
+  /// In en, this message translates to:
+  /// **'Cart is empty'**
+  String get cartIsEmpty;
+
+  /// Item not found for barcode message
+  ///
+  /// In en, this message translates to:
+  /// **'Item not found for this barcode'**
+  String get itemNotFoundForBarcode;
+
+  /// Promotion section
+  ///
+  /// In en, this message translates to:
+  /// **'Promotion'**
+  String get promotion;
+
+  /// Cashier label
+  ///
+  /// In en, this message translates to:
+  /// **'Cashier'**
+  String get cashier;
+
+  /// Menu label
+  ///
+  /// In en, this message translates to:
+  /// **'Menu'**
+  String get menu;
+
+  /// Inventory label
+  ///
+  /// In en, this message translates to:
+  /// **'Inventory'**
+  String get inventory;
+
+  /// Discounts section
+  ///
+  /// In en, this message translates to:
+  /// **'Discounts'**
+  String get discounts;
+
+  /// Promotions section
+  ///
+  /// In en, this message translates to:
+  /// **'Promotions'**
+  String get promotions;
+
+  /// Scan button text
+  ///
+  /// In en, this message translates to:
+  /// **'Scan'**
+  String get scan;
+
+  /// Error message when loading categories fails
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading categories'**
+  String get errorLoadingCategories;
+
+  /// Error message when loading items fails
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading items'**
+  String get errorLoadingItems;
+
+  /// Search result section
+  ///
+  /// In en, this message translates to:
+  /// **'Search Result'**
+  String get searchResult;
+
+  /// No items found message
+  ///
+  /// In en, this message translates to:
+  /// **'No items found'**
+  String get noItemsFound;
+
+  /// Suggestion to adjust search terms
+  ///
+  /// In en, this message translates to:
+  /// **'Try adjusting your search terms'**
+  String get tryAdjustingSearchTerms;
+
+  /// No items available in category message
+  ///
+  /// In en, this message translates to:
+  /// **'No items available in this category'**
+  String get noItemsAvailableInCategory;
+
+  /// Actions label
+  ///
+  /// In en, this message translates to:
+  /// **'Actions'**
+  String get actions;
+
+  /// Guest label
+  ///
+  /// In en, this message translates to:
+  /// **'Guest'**
+  String get guest;
+
+  /// Your cart is empty message
+  ///
+  /// In en, this message translates to:
+  /// **'Your cart is empty'**
+  String get yourCartIsEmpty;
+
+  /// Add items to get started message
+  ///
+  /// In en, this message translates to:
+  /// **'Add items to get started'**
+  String get addItemsToGetStarted;
+
+  /// Charge table order button
+  ///
+  /// In en, this message translates to:
+  /// **'Charge Table Order'**
+  String get chargeTableOrder;
+
+  /// Hold order button
+  ///
+  /// In en, this message translates to:
+  /// **'Hold Order'**
+  String get holdOrder;
+
+  /// Order held message
+  ///
+  /// In en, this message translates to:
+  /// **'Order held'**
+  String get orderHeld;
+
+  /// Void order button
+  ///
+  /// In en, this message translates to:
+  /// **'Void Order'**
+  String get voidOrder;
+
+  /// Order voided message
+  ///
+  /// In en, this message translates to:
+  /// **'Order voided'**
+  String get orderVoided;
+
+  /// Print receipt button
+  ///
+  /// In en, this message translates to:
+  /// **'Print Receipt'**
+  String get printReceipt;
+
+  /// Receipt printed message
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt printed'**
+  String get receiptPrinted;
+
+  /// Email receipt button
+  ///
+  /// In en, this message translates to:
+  /// **'Email Receipt'**
+  String get emailReceipt;
+
+  /// Receipt emailed message
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt emailed'**
+  String get receiptEmailed;
+
+  /// Set guest count dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Set Guest Count'**
+  String get setGuestCount;
+
+  /// Customer info label
+  ///
+  /// In en, this message translates to:
+  /// **'Customer Info'**
+  String get customerInfo;
+
+  /// Customer info dialog description
+  ///
+  /// In en, this message translates to:
+  /// **'Customer info dialog'**
+  String get customerInfoDialog;
+
+  /// Special requests section
+  ///
+  /// In en, this message translates to:
+  /// **'Special Requests'**
+  String get specialRequests;
+
+  /// Special requests dialog description
+  ///
+  /// In en, this message translates to:
+  /// **'Special requests dialog'**
+  String get specialRequestsDialog;
+
+  /// Total label
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get total;
+
+  /// More label
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get more;
+
+  /// POS service label
+  ///
+  /// In en, this message translates to:
+  /// **'POS Service'**
+  String get posService;
+
+  /// No recent sales message
+  ///
+  /// In en, this message translates to:
+  /// **'No recent sales'**
+  String get noRecentSales;
+
+  /// Sales will appear here message
+  ///
+  /// In en, this message translates to:
+  /// **'Sales will appear here after transactions'**
+  String get salesWillAppearHere;
+
+  /// Current orders section
+  ///
+  /// In en, this message translates to:
+  /// **'Current Orders'**
+  String get currentOrders;
+
+  /// Manage restaurant orders description
+  ///
+  /// In en, this message translates to:
+  /// **'Manage restaurant orders'**
+  String get manageRestaurantOrders;
+
+  /// No active orders message
+  ///
+  /// In en, this message translates to:
+  /// **'No Active Orders'**
+  String get noActiveOrders;
+
+  /// New orders will appear here message
+  ///
+  /// In en, this message translates to:
+  /// **'New orders will appear here'**
+  String get newOrdersWillAppearHere;
+
+  /// Failed to load orders message
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load orders'**
+  String get failedToLoadOrders;
+
+  /// Daily transactions section
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Transactions'**
+  String get dailyTransactions;
+
+  /// View completed sales button
+  ///
+  /// In en, this message translates to:
+  /// **'View completed sales'**
+  String get viewCompletedSales;
+
+  /// No transactions today message
+  ///
+  /// In en, this message translates to:
+  /// **'No Transactions Today'**
+  String get noTransactionsToday;
+
+  /// Completed sales will appear here message
+  ///
+  /// In en, this message translates to:
+  /// **'Completed sales will appear here'**
+  String get completedSalesWillAppearHere;
+
+  /// Failed to load transactions message
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load transactions'**
+  String get failedToLoadTransactions;
+
+  /// Inventory status section
+  ///
+  /// In en, this message translates to:
+  /// **'Inventory Status'**
+  String get inventoryStatus;
+
+  /// Monitor stock levels description
+  ///
+  /// In en, this message translates to:
+  /// **'Monitor stock levels'**
+  String get monitorStockLevels;
+
+  /// No inventory data message
+  ///
+  /// In en, this message translates to:
+  /// **'No Inventory Data'**
+  String get noInventoryData;
+
+  /// Menu items will appear here message
+  ///
+  /// In en, this message translates to:
+  /// **'Menu items will appear here with stock info'**
+  String get menuItemsWillAppearHere;
+
+  /// Failed to load inventory message
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load inventory'**
+  String get failedToLoadInventory;
+
+  /// Unknown status
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get unknown;
+
+  /// Pending status
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get pending;
+
+  /// Split payment button text
+  ///
+  /// In en, this message translates to:
+  /// **'Split Payment'**
+  String get splitPayment;
+
+  /// Customer name label
+  ///
+  /// In en, this message translates to:
+  /// **'Customer Name'**
+  String get customerName;
+
+  /// Customer phone label
+  ///
+  /// In en, this message translates to:
+  /// **'Customer Phone'**
+  String get customerPhone;
+
+  /// Customer email label
+  ///
+  /// In en, this message translates to:
+  /// **'Customer Email'**
+  String get customerEmail;
+
+  /// Notes label
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get notes;
+
+  /// Payment methods label
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Methods'**
+  String get paymentMethods;
+
+  /// Add payment label
+  ///
+  /// In en, this message translates to:
+  /// **'Add Payment'**
+  String get addPayment;
+
+  /// Amount validation message
+  ///
+  /// In en, this message translates to:
+  /// **'Amount is required'**
+  String get amountIsRequired;
+
+  /// Payment method label
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Method'**
+  String get paymentMethod;
+
+  /// Cash payment method
+  ///
+  /// In en, this message translates to:
+  /// **'Cash'**
+  String get cash;
+
+  /// Credit card payment method
+  ///
+  /// In en, this message translates to:
+  /// **'Credit Card'**
+  String get creditCard;
+
+  /// Debit card payment method
+  ///
+  /// In en, this message translates to:
+  /// **'Debit Card'**
+  String get debitCard;
+
+  /// Mobile payment method
+  ///
+  /// In en, this message translates to:
+  /// **'Mobile Payment'**
+  String get mobilePayment;
+
+  /// Check payment method
+  ///
+  /// In en, this message translates to:
+  /// **'Check'**
+  String get check;
+
+  /// Payment method validation message
+  ///
+  /// In en, this message translates to:
+  /// **'Payment method is required'**
+  String get paymentMethodIsRequired;
+
+  /// Complete split payment label
+  ///
+  /// In en, this message translates to:
+  /// **'Complete Split Payment'**
+  String get completeSplitPayment;
+
+  /// Select customer label
+  ///
+  /// In en, this message translates to:
+  /// **'Select Customer'**
+  String get selectCustomer;
+
+  /// New customer label
+  ///
+  /// In en, this message translates to:
+  /// **'New Customer'**
+  String get newCustomer;
+
+  /// Guest checkout label
+  ///
+  /// In en, this message translates to:
+  /// **'Guest Checkout'**
+  String get guestCheckout;
+
+  /// Search results label
+  ///
+  /// In en, this message translates to:
+  /// **'Search Results'**
+  String get searchResults;
+
+  /// No email label
+  ///
+  /// In en, this message translates to:
+  /// **'No Email'**
+  String get noEmail;
+
+  /// No phone label
+  ///
+  /// In en, this message translates to:
+  /// **'No Phone'**
+  String get noPhone;
+
+  /// No customers found message
+  ///
+  /// In en, this message translates to:
+  /// **'No customers found'**
+  String get noCustomersFound;
+
+  /// Create customer label
+  ///
+  /// In en, this message translates to:
+  /// **'Create Customer'**
+  String get createCustomer;
+
+  /// Split billing screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Split Billing'**
+  String get splitBilling;
+
+  /// Add split button text
+  ///
+  /// In en, this message translates to:
+  /// **'Add Split'**
+  String get addSplit;
+
+  /// Remove last split button text
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Last Split'**
+  String get removeLastSplit;
+
+  /// Assign item to split hint text
+  ///
+  /// In en, this message translates to:
+  /// **'Assign item to split'**
+  String get assignItemToSplit;
+
+  /// New stock quantity field
+  ///
+  /// In en, this message translates to:
+  /// **'New Stock Quantity'**
+  String get newStockQuantity;
+
+  /// Update button text
+  ///
+  /// In en, this message translates to:
+  /// **'Update'**
+  String get update;
+
+  /// Card payment method
+  ///
+  /// In en, this message translates to:
+  /// **'Card'**
+  String get card;
+
+  /// Mobile payment method
+  ///
+  /// In en, this message translates to:
+  /// **'Mobile'**
+  String get mobile;
+
+  /// Finalize split button text
+  ///
+  /// In en, this message translates to:
+  /// **'Finalize Split'**
+  String get finalizeSplit;
+
+  /// All items label
+  ///
+  /// In en, this message translates to:
+  /// **'All Items'**
+  String get allItems;
+
+  /// Low stock label
+  ///
+  /// In en, this message translates to:
+  /// **'Low Stock'**
+  String get lowStock;
+
+  /// Categories label
+  ///
+  /// In en, this message translates to:
+  /// **'Categories'**
+  String get categories;
+
+  /// Error loading inventory message
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading inventory'**
+  String get errorLoadingInventory;
+
+  /// No inventory items found message
+  ///
+  /// In en, this message translates to:
+  /// **'No inventory items found'**
+  String get noInventoryItemsFound;
+
+  /// Add your first item message
+  ///
+  /// In en, this message translates to:
+  /// **'Add your first item to get started'**
+  String get addYourFirstItemToGetStarted;
+
+  /// All items well stocked message
+  ///
+  /// In en, this message translates to:
+  /// **'All items are well stocked'**
+  String get allItemsAreWellStocked;
+
+  /// No low stock items found message
+  ///
+  /// In en, this message translates to:
+  /// **'No low stock items found'**
+  String get noLowStockItemsFound;
+
+  /// No categories found message
+  ///
+  /// In en, this message translates to:
+  /// **'No categories found'**
+  String get noCategoriesFound;
+
+  /// Categories will appear here message
+  ///
+  /// In en, this message translates to:
+  /// **'Categories will appear here'**
+  String get categoriesWillAppearHere;
+
+  /// Out of stock status
+  ///
+  /// In en, this message translates to:
+  /// **'Out of Stock'**
+  String get outOfStock;
+
+  /// Search inventory label
+  ///
+  /// In en, this message translates to:
+  /// **'Search Inventory'**
+  String get searchInventory;
+
+  /// Filter options label
+  ///
+  /// In en, this message translates to:
+  /// **'Filter Options'**
+  String get filterOptions;
+
+  /// Filter options implementation message
+  ///
+  /// In en, this message translates to:
+  /// **'Filter options will be implemented here'**
+  String get filterOptionsWillBeImplementedHere;
+
+  /// Add new item label
+  ///
+  /// In en, this message translates to:
+  /// **'Add New Item'**
+  String get addNewItem;
+
+  /// Add item form implementation message
+  ///
+  /// In en, this message translates to:
+  /// **'Add item form will be implemented here'**
+  String get addItemFormWillBeImplementedHere;
+
+  /// Edit item label
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Item'**
+  String get editItem;
+
+  /// Update stock label
+  ///
+  /// In en, this message translates to:
+  /// **'Update Stock'**
+  String get updateStock;
+
+  /// Delete item label
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Item'**
+  String get deleteItem;
+
+  /// Reports and analytics screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Reports & Analytics'**
+  String get reportsAndAnalytics;
+
+  /// Refresh data action
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh Data'**
+  String get refreshData;
+
+  /// Export report action
+  ///
+  /// In en, this message translates to:
+  /// **'Export Report'**
+  String get exportReport;
+
+  /// Recipe and promotion features label
+  ///
+  /// In en, this message translates to:
+  /// **'Recipe & Promotion Features'**
+  String get recipeAndPromotionFeatures;
+
+  /// Revenue section
+  ///
+  /// In en, this message translates to:
+  /// **'Revenue'**
+  String get revenue;
+
+  /// Date range label
+  ///
+  /// In en, this message translates to:
+  /// **'Date Range'**
+  String get dateRange;
+
+  /// Custom option
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get custom;
+
+  /// All status filter
+  ///
+  /// In en, this message translates to:
+  /// **'All Status'**
+  String get allStatus;
+
+  /// Completed status
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get completed;
+
+  /// Cancelled status
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get cancelled;
+
+  /// Refunded status
+  ///
+  /// In en, this message translates to:
+  /// **'Refunded'**
+  String get refunded;
+
+  /// Payment label
+  ///
+  /// In en, this message translates to:
+  /// **'Payment'**
+  String get payment;
+
+  /// All payment methods filter
+  ///
+  /// In en, this message translates to:
+  /// **'All Methods'**
+  String get allMethods;
+
+  /// PDF report option
+  ///
+  /// In en, this message translates to:
+  /// **'PDF Report'**
+  String get pdfReport;
+
+  /// CSV data option
+  ///
+  /// In en, this message translates to:
+  /// **'CSV Data'**
+  String get csvData;
+
+  /// Excel spreadsheet option
+  ///
+  /// In en, this message translates to:
+  /// **'Excel Spreadsheet'**
+  String get excelSpreadsheet;
+
+  /// Exporting report message
+  ///
+  /// In en, this message translates to:
+  /// **'Exporting report as'**
+  String get exportingReportAs;
+
+  /// Loading overview data message
+  ///
+  /// In en, this message translates to:
+  /// **'Loading overview data...'**
+  String get loadingOverviewData;
+
+  /// Failed to load overview data message
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load overview data'**
+  String get failedToLoadOverviewData;
+
+  /// Total sales section
+  ///
+  /// In en, this message translates to:
+  /// **'Total Sales'**
+  String get totalSales;
+
+  /// Average order section
+  ///
+  /// In en, this message translates to:
+  /// **'Average Order'**
+  String get averageOrder;
+
+  /// Per transaction description
+  ///
+  /// In en, this message translates to:
+  /// **'per transaction'**
+  String get perTransaction;
+
+  /// Top product section
+  ///
+  /// In en, this message translates to:
+  /// **'Top Product'**
+  String get topProduct;
+
+  /// Most popular item description
+  ///
+  /// In en, this message translates to:
+  /// **'Most popular item'**
+  String get mostPopularItem;
+
+  /// Conversion rate section
+  ///
+  /// In en, this message translates to:
+  /// **'Conversion Rate'**
+  String get conversionRate;
+
+  /// Of visitors description
+  ///
+  /// In en, this message translates to:
+  /// **'of visitors'**
+  String get ofVisitors;
+
+  /// Sales trend section
+  ///
+  /// In en, this message translates to:
+  /// **'Sales Trend'**
+  String get salesTrend;
+
+  /// Sales trend chart description
+  ///
+  /// In en, this message translates to:
+  /// **'Sales trend chart'**
+  String get salesTrendChart;
+
+  /// Coming soon with real data message
+  ///
+  /// In en, this message translates to:
+  /// **'Coming soon with real data'**
+  String get comingSoonWithRealData;
+
+  /// Top selling items section
+  ///
+  /// In en, this message translates to:
+  /// **'Top Selling Items'**
+  String get topSellingItems;
+
+  /// View all button
+  ///
+  /// In en, this message translates to:
+  /// **'View All'**
+  String get viewAll;
+
+  /// Popular item description
+  ///
+  /// In en, this message translates to:
+  /// **'Popular item'**
+  String get popularItem;
+
+  /// Loading transactions message
+  ///
+  /// In en, this message translates to:
+  /// **'Loading transactions...'**
+  String get loadingTransactions;
+
+  /// No transactions found message
+  ///
+  /// In en, this message translates to:
+  /// **'No transactions found'**
+  String get noTransactionsFound;
+
+  /// Try adjusting filters message
+  ///
+  /// In en, this message translates to:
+  /// **'Try adjusting your filters or date range'**
+  String get tryAdjustingFiltersOrDateRange;
+
+  /// Sale label
+  ///
+  /// In en, this message translates to:
+  /// **'Sale'**
+  String get sale;
+
+  /// Sale number prefix
+  ///
+  /// In en, this message translates to:
+  /// **'Sale #'**
+  String get saleNumber;
+
+  /// Loading revenue data message
+  ///
+  /// In en, this message translates to:
+  /// **'Loading revenue data...'**
+  String get loadingRevenueData;
+
+  /// Failed to load revenue data message
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load revenue data'**
+  String get failedToLoadRevenueData;
+
+  /// Total revenue section
+  ///
+  /// In en, this message translates to:
+  /// **'Total Revenue'**
+  String get totalRevenue;
+
+  /// Gross income description
+  ///
+  /// In en, this message translates to:
+  /// **'Gross income'**
+  String get grossIncome;
+
+  /// Gross profit section
+  ///
+  /// In en, this message translates to:
+  /// **'Gross Profit'**
+  String get grossProfit;
+
+  /// After costs description
+  ///
+  /// In en, this message translates to:
+  /// **'After costs'**
+  String get afterCosts;
+
+  /// Profit margin section
+  ///
+  /// In en, this message translates to:
+  /// **'Profit Margin'**
+  String get profitMargin;
+
+  /// Profit ratio description
+  ///
+  /// In en, this message translates to:
+  /// **'Profit ratio'**
+  String get profitRatio;
+
+  /// Total cost section
+  ///
+  /// In en, this message translates to:
+  /// **'Total Cost'**
+  String get totalCost;
+
+  /// Operating costs description
+  ///
+  /// In en, this message translates to:
+  /// **'Operating costs'**
+  String get operatingCosts;
+
+  /// Revenue by day section
+  ///
+  /// In en, this message translates to:
+  /// **'Revenue by Day'**
+  String get revenueByDay;
+
+  /// Revenue trend chart description
+  ///
+  /// In en, this message translates to:
+  /// **'Revenue trend chart'**
+  String get revenueTrendChart;
+
+  /// Transaction details section
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction Details'**
+  String get transactionDetails;
+
+  /// Items section
+  ///
+  /// In en, this message translates to:
+  /// **'Items'**
+  String get items;
+
+  /// No items found for sale message
+  ///
+  /// In en, this message translates to:
+  /// **'No items found for this sale'**
+  String get noItemsFoundForThisSale;
+
+  /// Loading items message
+  ///
+  /// In en, this message translates to:
+  /// **'Loading items...'**
+  String get loadingItems;
+
+  /// Business analytics section
+  ///
+  /// In en, this message translates to:
+  /// **'Business Analytics'**
+  String get businessAnalytics;
+
+  /// Item analytics section
+  ///
+  /// In en, this message translates to:
+  /// **'Item Analytics'**
+  String get itemAnalytics;
+
+  /// Staff analytics section
+  ///
+  /// In en, this message translates to:
+  /// **'Staff Analytics'**
+  String get staffAnalytics;
+
+  /// Customer analytics section
+  ///
+  /// In en, this message translates to:
+  /// **'Customer Analytics'**
+  String get customerAnalytics;
+
+  /// Inventory analytics section
+  ///
+  /// In en, this message translates to:
+  /// **'Inventory Analytics'**
+  String get inventoryAnalytics;
+
+  /// Revenue analytics section
+  ///
+  /// In en, this message translates to:
+  /// **'Revenue Analytics'**
+  String get revenueAnalytics;
+
+  /// Performance metrics section
+  ///
+  /// In en, this message translates to:
+  /// **'Performance Metrics'**
+  String get performanceMetrics;
+
+  /// Sales metrics section
+  ///
+  /// In en, this message translates to:
+  /// **'Sales Metrics'**
+  String get salesMetrics;
+
+  /// Customer metrics section
+  ///
+  /// In en, this message translates to:
+  /// **'Customer Metrics'**
+  String get customerMetrics;
+
+  /// Inventory metrics section
+  ///
+  /// In en, this message translates to:
+  /// **'Inventory Metrics'**
+  String get inventoryMetrics;
+
+  /// Staff metrics section
+  ///
+  /// In en, this message translates to:
+  /// **'Staff Metrics'**
+  String get staffMetrics;
+
+  /// Revenue metrics section
+  ///
+  /// In en, this message translates to:
+  /// **'Revenue Metrics'**
+  String get revenueMetrics;
+
+  /// Data export section
+  ///
+  /// In en, this message translates to:
+  /// **'Data Export'**
+  String get dataExport;
+
+  /// Report generation section
+  ///
+  /// In en, this message translates to:
+  /// **'Report Generation'**
+  String get reportGeneration;
+
+  /// Chart visualization section
+  ///
+  /// In en, this message translates to:
+  /// **'Chart Visualization'**
+  String get chartVisualization;
+
+  /// Trend analysis section
+  ///
+  /// In en, this message translates to:
+  /// **'Trend Analysis'**
+  String get trendAnalysis;
+
+  /// Comparative analysis section
+  ///
+  /// In en, this message translates to:
+  /// **'Comparative Analysis'**
+  String get comparativeAnalysis;
+
+  /// Forecasting section
+  ///
+  /// In en, this message translates to:
+  /// **'Forecasting'**
+  String get forecasting;
+
+  /// KPI dashboard section
+  ///
+  /// In en, this message translates to:
+  /// **'KPI Dashboard'**
+  String get kpiDashboard;
+
+  /// Real-time analytics section
+  ///
+  /// In en, this message translates to:
+  /// **'Real-time Analytics'**
+  String get realTimeAnalytics;
+
+  /// Historical data section
+  ///
+  /// In en, this message translates to:
+  /// **'Historical Data'**
+  String get historicalData;
+
+  /// Data insights section
+  ///
+  /// In en, this message translates to:
+  /// **'Data Insights'**
+  String get dataInsights;
+
+  /// Business intelligence section
+  ///
+  /// In en, this message translates to:
+  /// **'Business Intelligence'**
+  String get businessIntelligence;
+
+  /// Currency management section
+  ///
+  /// In en, this message translates to:
+  /// **'Currency Management'**
+  String get currencyManagement;
+
+  /// Add currency button
+  ///
+  /// In en, this message translates to:
+  /// **'Add Currency'**
+  String get addCurrency;
+
+  /// Currency code field
+  ///
+  /// In en, this message translates to:
+  /// **'Currency Code'**
+  String get currencyCode;
+
+  /// Currency symbol field
+  ///
+  /// In en, this message translates to:
+  /// **'Currency Symbol'**
+  String get currencySymbol;
+
+  /// Currency name field
+  ///
+  /// In en, this message translates to:
+  /// **'Currency Name'**
+  String get currencyName;
+
+  /// Exchange rate field
+  ///
+  /// In en, this message translates to:
+  /// **'Exchange Rate'**
+  String get exchangeRate;
+
+  /// Is default field
+  ///
+  /// In en, this message translates to:
+  /// **'Is Default'**
+  String get isDefault;
+
+  /// Default currency label
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get defaultCurrency;
+
+  /// Edit currency button
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Currency'**
+  String get editCurrency;
+
+  /// Delete currency button
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Currency'**
+  String get deleteCurrency;
+
+  /// Currency preferences section
+  ///
+  /// In en, this message translates to:
+  /// **'Currency Preferences'**
+  String get currencyPreferences;
+
+  /// Order taking section
+  ///
+  /// In en, this message translates to:
+  /// **'Order Taking'**
+  String get orderTaking;
+
+  /// Table selection section
+  ///
+  /// In en, this message translates to:
+  /// **'Table Selection'**
+  String get tableSelection;
+
+  /// Waiter dashboard title
+  ///
+  /// In en, this message translates to:
+  /// **'Waiter Dashboard'**
+  String get waiterDashboard;
+
+  /// Waiter screen section
+  ///
+  /// In en, this message translates to:
+  /// **'Waiter Screen'**
+  String get waiterScreen;
+
+  /// Take order button
+  ///
+  /// In en, this message translates to:
+  /// **'Take Order'**
+  String get takeOrder;
+
+  /// View orders button
+  ///
+  /// In en, this message translates to:
+  /// **'View Orders'**
+  String get viewOrders;
+
+  /// Table status section
+  ///
+  /// In en, this message translates to:
+  /// **'Table Status'**
+  String get tableStatus;
+
+  /// Assign table button
+  ///
+  /// In en, this message translates to:
+  /// **'Assign Table'**
+  String get assignTable;
+
+  /// Unassign table button
+  ///
+  /// In en, this message translates to:
+  /// **'Unassign Table'**
+  String get unassignTable;
+
+  /// Waiter orders section
+  ///
+  /// In en, this message translates to:
+  /// **'Waiter Orders'**
+  String get waiterOrders;
+
+  /// Admin dashboard section
+  ///
+  /// In en, this message translates to:
+  /// **'Admin Dashboard'**
+  String get adminDashboard;
+
+  /// Menu management section
+  ///
+  /// In en, this message translates to:
+  /// **'Menu Management'**
+  String get menuManagement;
+
+  /// PDF menu generation section
+  ///
+  /// In en, this message translates to:
+  /// **'PDF Menu Generation'**
+  String get pdfMenuGeneration;
+
+  /// Custom template management section
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Template Management'**
+  String get customTemplateManagement;
+
+  /// Generate menu button
+  ///
+  /// In en, this message translates to:
+  /// **'Generate Menu'**
+  String get generateMenu;
+
+  /// Template settings section
+  ///
+  /// In en, this message translates to:
+  /// **'Template Settings'**
+  String get templateSettings;
+
+  /// Reports section
+  ///
+  /// In en, this message translates to:
+  /// **'Reports'**
+  String get reports;
+
+  /// Sales report section
+  ///
+  /// In en, this message translates to:
+  /// **'Sales Report'**
+  String get salesReport;
+
+  /// Inventory report section
+  ///
+  /// In en, this message translates to:
+  /// **'Inventory Report'**
+  String get inventoryReport;
+
+  /// Staff report section
+  ///
+  /// In en, this message translates to:
+  /// **'Staff Report'**
+  String get staffReport;
+
+  /// Recipes section
+  ///
+  /// In en, this message translates to:
+  /// **'Recipes'**
+  String get recipes;
+
+  /// Smart suggestions section
+  ///
+  /// In en, this message translates to:
+  /// **'Smart Suggestions'**
+  String get smartSuggestions;
+
+  /// First onboarding page title
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Mobile POS'**
+  String get onboardingPage1Title;
+
+  /// First onboarding page description
+  ///
+  /// In en, this message translates to:
+  /// **'Manage your restaurant operations efficiently with our comprehensive POS system'**
+  String get onboardingPage1Description;
+
+  /// Second onboarding page title
+  ///
+  /// In en, this message translates to:
+  /// **'Easy Order Management'**
+  String get onboardingPage2Title;
+
+  /// Second onboarding page description
+  ///
+  /// In en, this message translates to:
+  /// **'Take orders quickly and manage tables with our intuitive interface'**
+  String get onboardingPage2Description;
+
+  /// Third onboarding page title
+  ///
+  /// In en, this message translates to:
+  /// **'Real-time Kitchen Display'**
+  String get onboardingPage3Title;
+
+  /// Third onboarding page description
+  ///
+  /// In en, this message translates to:
+  /// **'Keep track of orders in real-time with our kitchen display system'**
+  String get onboardingPage3Description;
+
+  /// Fourth onboarding page title
+  ///
+  /// In en, this message translates to:
+  /// **'Comprehensive Reports'**
+  String get onboardingPage4Title;
+
+  /// Fourth onboarding page description
+  ///
+  /// In en, this message translates to:
+  /// **'Generate detailed reports and analytics to optimize your business'**
+  String get onboardingPage4Description;
+
+  /// Onboarding screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Onboarding Screen'**
+  String get onboardingScreen;
+
+  /// Page label
+  ///
+  /// In en, this message translates to:
+  /// **'Page'**
+  String get page;
+
+  /// Of text for pagination
+  ///
+  /// In en, this message translates to:
+  /// **'of'**
+  String get ofText;
+
+  /// Skip onboarding accessibility label
+  ///
+  /// In en, this message translates to:
+  /// **'Skip onboarding and go to login'**
+  String get skipOnboardingAndGoToLogin;
+
+  /// Skip button text
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get skip;
+
+  /// Onboarding content accessibility label
+  ///
+  /// In en, this message translates to:
+  /// **'Onboarding content area'**
+  String get onboardingContentArea;
+
+  /// Previous page button accessibility label
+  ///
+  /// In en, this message translates to:
+  /// **'Go to previous page'**
+  String get goToPreviousPage;
+
+  /// Complete onboarding button accessibility label
+  ///
+  /// In en, this message translates to:
+  /// **'Complete onboarding and get started'**
+  String get completeOnboardingAndGetStarted;
+
+  /// Next page button accessibility label
+  ///
+  /// In en, this message translates to:
+  /// **'Go to next page'**
+  String get goToNextPage;
+
+  /// Get started button text
+  ///
+  /// In en, this message translates to:
+  /// **'Get Started'**
+  String get getStarted;
+
+  /// Bytes unit
+  ///
+  /// In en, this message translates to:
+  /// **'bytes'**
+  String get bytes;
+
+  /// Error message for PDF generation
+  ///
+  /// In en, this message translates to:
+  /// **'Error generating PDF'**
+  String get errorGeneratingPdf;
+
+  /// Permission denied error message
+  ///
+  /// In en, this message translates to:
+  /// **'Permission denied to open file'**
+  String get permissionDeniedToOpenFile;
+
+  /// Error message for PDF download
+  ///
+  /// In en, this message translates to:
+  /// **'Error downloading PDF'**
+  String get errorDownloadingPdf;
+
+  /// Color picker dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Pick Category Background Color'**
+  String get pickCategoryBackgroundColor;
+
+  /// Access denied message
+  ///
+  /// In en, this message translates to:
+  /// **'Access Denied'**
+  String get accessDenied;
+
+  /// Administrator access required message
+  ///
+  /// In en, this message translates to:
+  /// **'This feature is only available to system administrators'**
+  String get thisFeatureIsOnlyAvailableToSystemAdministrators;
+
+  /// Error message for template loading
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading templates'**
+  String get errorLoadingTemplates;
+
+  /// No templates available message
+  ///
+  /// In en, this message translates to:
+  /// **'No custom templates'**
+  String get noCustomTemplates;
+
+  /// Create first template message
+  ///
+  /// In en, this message translates to:
+  /// **'Create your first custom template to get started'**
+  String get createYourFirstCustomTemplateToGetStarted;
+
+  /// Default text
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get defaultText;
+
+  /// Preview button text
+  ///
+  /// In en, this message translates to:
+  /// **'Preview'**
+  String get preview;
+
+  /// Set as default button text
+  ///
+  /// In en, this message translates to:
+  /// **'Set as Default'**
+  String get setAsDefault;
+
+  /// Template set as default message
+  ///
+  /// In en, this message translates to:
+  /// **'template set as default'**
+  String get templateSetAsDefault;
+
+  /// Error message for setting default template
+  ///
+  /// In en, this message translates to:
+  /// **'Error setting default template'**
+  String get errorSettingDefaultTemplate;
+
+  /// Delete template dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Template'**
+  String get deleteTemplate;
+
+  /// Delete template confirmation message
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete the template'**
+  String get areYouSureYouWantToDeleteTemplate;
+
+  /// Template deleted success message
+  ///
+  /// In en, this message translates to:
+  /// **'template deleted successfully'**
+  String get templateDeletedSuccessfully;
+
+  /// Error message for deleting template
+  ///
+  /// In en, this message translates to:
+  /// **'Error deleting template'**
+  String get errorDeletingTemplate;
+
+  /// Create template dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Create Custom Template'**
+  String get createCustomTemplate;
+
+  /// Template name field label
+  ///
+  /// In en, this message translates to:
+  /// **'Template Name'**
+  String get templateName;
+
+  /// Template name validation message
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a template name'**
+  String get pleaseEnterATemplateName;
+
+  /// Description field label
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get description;
+
+  /// HTML content field label
+  ///
+  /// In en, this message translates to:
+  /// **'HTML Content'**
+  String get htmlContent;
+
+  /// HTML content field hint
+  ///
+  /// In en, this message translates to:
+  /// **'Enter HTML template content'**
+  String get enterHtmlTemplateContent;
+
+  /// HTML content validation message
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter HTML content'**
+  String get pleaseEnterHtmlContent;
+
+  /// CSS content field label
+  ///
+  /// In en, this message translates to:
+  /// **'CSS Content'**
+  String get cssContent;
+
+  /// CSS content field hint
+  ///
+  /// In en, this message translates to:
+  /// **'Enter CSS styles'**
+  String get enterCssStyles;
+
+  /// Set as default template checkbox label
+  ///
+  /// In en, this message translates to:
+  /// **'Set as Default Template'**
+  String get setAsDefaultTemplate;
+
+  /// Create button text
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get create;
+
+  /// Template created success message
+  ///
+  /// In en, this message translates to:
+  /// **'Template created successfully'**
+  String get templateCreatedSuccessfully;
+
+  /// Error message for creating template
+  ///
+  /// In en, this message translates to:
+  /// **'Error creating template'**
+  String get errorCreatingTemplate;
+
+  /// Edit template dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Custom Template'**
+  String get editCustomTemplate;
+
+  /// Template updated success message
+  ///
+  /// In en, this message translates to:
+  /// **'Template updated successfully'**
+  String get templateUpdatedSuccessfully;
+
+  /// Error message for updating template
+  ///
+  /// In en, this message translates to:
+  /// **'Error updating template'**
+  String get errorUpdatingTemplate;
+
+  /// Preview template dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Preview Template'**
+  String get previewTemplate;
+
+  /// Information section title
+  ///
+  /// In en, this message translates to:
+  /// **'Information'**
+  String get information;
+
+  /// New button text
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get newText;
+
+  /// Refresh recipes button tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh recipes'**
+  String get refreshRecipes;
+
+  /// All label
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get all;
+
+  /// Easy difficulty level
+  ///
+  /// In en, this message translates to:
+  /// **'Easy'**
+  String get easy;
+
+  /// Medium difficulty level
+  ///
+  /// In en, this message translates to:
+  /// **'Medium'**
+  String get medium;
+
+  /// Hard difficulty level
+  ///
+  /// In en, this message translates to:
+  /// **'Hard'**
+  String get hard;
+
+  /// Search recipes field hint
+  ///
+  /// In en, this message translates to:
+  /// **'Search recipes...'**
+  String get searchRecipes;
+
+  /// Active only filter option
+  ///
+  /// In en, this message translates to:
+  /// **'Active Only'**
+  String get activeOnly;
+
+  /// Searching recipes loading message
+  ///
+  /// In en, this message translates to:
+  /// **'Searching recipes...'**
+  String get searchingRecipes;
+
+  /// Loading recipes message
+  ///
+  /// In en, this message translates to:
+  /// **'Loading recipes...'**
+  String get loadingRecipes;
+
+  /// Unable to load recipes error message
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load recipes'**
+  String get unableToLoadRecipes;
+
+  /// Connection error message
+  ///
+  /// In en, this message translates to:
+  /// **'Check your connection and try again'**
+  String get checkConnectionAndTryAgain;
+
+  /// Try again button text
+  ///
+  /// In en, this message translates to:
+  /// **'Try Again'**
+  String get tryAgain;
+
+  /// No recipes found message
+  ///
+  /// In en, this message translates to:
+  /// **'No recipes found'**
+  String get noRecipesFound;
+
+  /// No recipes found for search query
+  ///
+  /// In en, this message translates to:
+  /// **'No recipes found for query'**
+  String get noRecipesFoundForQuery;
+
+  /// Clear search button text
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Search'**
+  String get clearSearch;
+
+  /// No difficulty recipes message prefix
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get noDifficultyRecipes;
+
+  /// Try different difficulty message
+  ///
+  /// In en, this message translates to:
+  /// **'Try a different difficulty or create a new recipe'**
+  String get tryDifferentDifficultyOrCreateNew;
+
+  /// Difficulty label
+  ///
+  /// In en, this message translates to:
+  /// **'Difficulty'**
+  String get difficulty;
+
+  /// Prep time label
+  ///
+  /// In en, this message translates to:
+  /// **'Prep Time'**
+  String get prepTime;
+
+  /// Minutes unit
+  ///
+  /// In en, this message translates to:
+  /// **'minutes'**
+  String get minutes;
+
+  /// Cook time label
+  ///
+  /// In en, this message translates to:
+  /// **'Cook Time'**
+  String get cookTime;
+
+  /// Servings label
+  ///
+  /// In en, this message translates to:
+  /// **'Servings'**
+  String get servings;
+
+  /// Ingredients label
+  ///
+  /// In en, this message translates to:
+  /// **'Ingredients'**
+  String get ingredients;
+
+  /// Instructions label
+  ///
+  /// In en, this message translates to:
+  /// **'Instructions'**
+  String get instructions;
+
+  /// Delete recipe dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Recipe'**
+  String get deleteRecipe;
+
+  /// Delete recipe confirmation message
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete the recipe'**
+  String get deleteRecipeConfirmation;
+
+  /// Recipe deleted success message
+  ///
+  /// In en, this message translates to:
+  /// **'Recipe deleted successfully'**
+  String get recipeDeletedSuccessfully;
+
+  /// Failed to delete recipe error message
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete recipe'**
+  String get failedToDeleteRecipe;
+
+  /// Template selection section title
+  ///
+  /// In en, this message translates to:
+  /// **'Template Selection'**
+  String get templateSelection;
+
+  /// No templates available message
+  ///
+  /// In en, this message translates to:
+  /// **'No templates available'**
+  String get noTemplatesAvailable;
+
+  /// Failed to load templates error message
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load templates'**
+  String get failedToLoadTemplates;
+
+  /// No inventory alerts available message
+  ///
+  /// In en, this message translates to:
+  /// **'No inventory alerts available'**
+  String get noInventoryAlertsAvailable;
+
+  /// No expiring items alerts message
+  ///
+  /// In en, this message translates to:
+  /// **'No expiring items alerts'**
+  String get noExpiringItemsAlerts;
+
+  /// No underperforming items alerts message
+  ///
+  /// In en, this message translates to:
+  /// **'No underperforming items alerts'**
+  String get noUnderperformingItemsAlerts;
+
+  /// Item label
+  ///
+  /// In en, this message translates to:
+  /// **'Item'**
+  String get item;
+
+  /// View details button text
+  ///
+  /// In en, this message translates to:
+  /// **'View Details'**
+  String get viewDetails;
+
+  /// Cook recipe using message
+  ///
+  /// In en, this message translates to:
+  /// **'Cook recipe using'**
+  String get cookRecipeUsing;
+
+  /// Unknown item label
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown Item'**
+  String get unknownItem;
+
+  /// This will message
+  ///
+  /// In en, this message translates to:
+  /// **'This will'**
+  String get thisWill;
+
+  /// Consume inventory items bullet point
+  ///
+  /// In en, this message translates to:
+  /// **'• Consume inventory items'**
+  String get consumeInventoryItems;
+
+  /// Reduce waste bullet point
+  ///
+  /// In en, this message translates to:
+  /// **'• Reduce waste'**
+  String get reduceWaste;
+
+  /// Bar screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Bar Screen'**
+  String get barScreen;
+
+  /// Kitchen orders title
+  ///
+  /// In en, this message translates to:
+  /// **'Kitchen Orders'**
+  String get kitchenOrders;
+
+  /// Refresh orders button
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh Orders'**
+  String get refreshOrders;
+
+  /// All caught up message
+  ///
+  /// In en, this message translates to:
+  /// **'All caught up!'**
+  String get allCaughtUp;
+
+  /// Loading kitchen orders message
+  ///
+  /// In en, this message translates to:
+  /// **'Loading kitchen orders...'**
+  String get loadingKitchenOrders;
+
+  /// Error loading orders message
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading orders'**
+  String get errorLoadingOrders;
+
+  /// Check connection message
+  ///
+  /// In en, this message translates to:
+  /// **'Please check your connection and try again'**
+  String get pleaseCheckConnectionAndTryAgain;
+
+  /// Order label
+  ///
+  /// In en, this message translates to:
+  /// **'Order'**
+  String get order;
+
+  /// Urgent label
+  ///
+  /// In en, this message translates to:
+  /// **'Urgent'**
+  String get urgent;
+
+  /// Table label
+  ///
+  /// In en, this message translates to:
+  /// **'Table'**
+  String get table;
+
+  /// Prepare button text
+  ///
+  /// In en, this message translates to:
+  /// **'Prepare'**
+  String get prepare;
+
+  /// Ready status
+  ///
+  /// In en, this message translates to:
+  /// **'READY'**
+  String get ready;
+
+  /// Complete status
+  ///
+  /// In en, this message translates to:
+  /// **'Complete'**
+  String get complete;
+
+  /// Read only mode label
+  ///
+  /// In en, this message translates to:
+  /// **'Read Only Mode'**
+  String get readOnlyMode;
+
+  /// Order for table label
+  ///
+  /// In en, this message translates to:
+  /// **'Order for Table'**
+  String get orderForTable;
+
+  /// Loading table orders message
+  ///
+  /// In en, this message translates to:
+  /// **'Loading table orders...'**
+  String get loadingTableOrders;
+
+  /// Customer details label
+  ///
+  /// In en, this message translates to:
+  /// **'Customer Details'**
+  String get customerDetails;
+
+  /// Customer name label
+  ///
+  /// In en, this message translates to:
+  /// **'Customer Name'**
+  String get customerNameLabel;
+
+  /// Enter customer name hint
+  ///
+  /// In en, this message translates to:
+  /// **'Enter customer name'**
+  String get enterCustomerName;
+
+  /// Special instructions label
+  ///
+  /// In en, this message translates to:
+  /// **'Special Instructions'**
+  String get specialInstructions;
+
+  /// Special instructions hint
+  ///
+  /// In en, this message translates to:
+  /// **'Any special instructions for the order'**
+  String get specialInstructionsHint;
+
+  /// Menu items label
+  ///
+  /// In en, this message translates to:
+  /// **'Menu Items'**
+  String get menuItems;
+
+  /// No menu items available message
+  ///
+  /// In en, this message translates to:
+  /// **'No menu items available'**
+  String get noMenuItemsAvailable;
+
+  /// Menu items temporarily unavailable message
+  ///
+  /// In en, this message translates to:
+  /// **'Menu items temporarily unavailable'**
+  String get menuItemsTemporarilyUnavailable;
+
+  /// Existing order items message
+  ///
+  /// In en, this message translates to:
+  /// **'Existing order items will still be shown'**
+  String get existingOrderItemsWillStillBeShown;
+
+  /// Unavailable status
+  ///
+  /// In en, this message translates to:
+  /// **'Unavailable'**
+  String get unavailable;
+
+  /// Order items count label
+  ///
+  /// In en, this message translates to:
+  /// **'Order Items Count'**
+  String get orderItemsCount;
+
+  /// No items in cart message
+  ///
+  /// In en, this message translates to:
+  /// **'No items in cart'**
+  String get noItemsInCart;
+
+  /// Subtotal label
+  ///
+  /// In en, this message translates to:
+  /// **'Subtotal'**
+  String get subtotal;
+
+  /// Tax label
+  ///
+  /// In en, this message translates to:
+  /// **'Tax'**
+  String get tax;
+
+  /// Total with colon
+  ///
+  /// In en, this message translates to:
+  /// **'Total:'**
+  String get totalWithColon;
+
+  /// Submitting message
+  ///
+  /// In en, this message translates to:
+  /// **'Submitting...'**
+  String get submitting;
+
+  /// Submit order button text
+  ///
+  /// In en, this message translates to:
+  /// **'Submit Order'**
+  String get submitOrder;
+
+  /// Please add items to order message
+  ///
+  /// In en, this message translates to:
+  /// **'Please add items to your order'**
+  String get pleaseAddItemsToOrder;
+
+  /// Order submitted successfully message
+  ///
+  /// In en, this message translates to:
+  /// **'Order submitted successfully'**
+  String get orderSubmittedSuccessfully;
+
+  /// Failed to submit order message
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to submit order'**
+  String get failedToSubmitOrder;
+
+  /// Refresh tables button
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh Tables'**
+  String get refreshTables;
+
+  /// No floor plans available message
+  ///
+  /// In en, this message translates to:
+  /// **'No floor plans available'**
+  String get noFloorPlansAvailable;
+
+  /// Floor plan view label
+  ///
+  /// In en, this message translates to:
+  /// **'Floor Plan View'**
+  String get floorPlanView;
+
+  /// Search tables label
+  ///
+  /// In en, this message translates to:
+  /// **'Search Tables'**
+  String get searchTables;
+
+  /// Loading tables message
+  ///
+  /// In en, this message translates to:
+  /// **'Loading tables...'**
+  String get loadingTables;
+
+  /// Error loading tables message
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading tables'**
+  String get errorLoadingTables;
+
+  /// No tables found matching search
+  ///
+  /// In en, this message translates to:
+  /// **'No tables found matching your search'**
+  String get noTablesFoundMatching;
+
+  /// No available tables message
+  ///
+  /// In en, this message translates to:
+  /// **'No available tables'**
+  String get noAvailableTables;
+
+  /// No occupied tables message
+  ///
+  /// In en, this message translates to:
+  /// **'No occupied tables'**
+  String get noOccupiedTables;
+
+  /// No reserved tables message
+  ///
+  /// In en, this message translates to:
+  /// **'No reserved tables'**
+  String get noReservedTables;
+
+  /// No tables being cleaned message
+  ///
+  /// In en, this message translates to:
+  /// **'No tables being cleaned'**
+  String get noTablesBeingCleaned;
+
+  /// No tables found message
+  ///
+  /// In en, this message translates to:
+  /// **'No tables found'**
+  String get noTablesFound;
+
+  /// Check back later message
+  ///
+  /// In en, this message translates to:
+  /// **'Check back later or try a different filter'**
+  String get checkBackLaterOrTryDifferentFilter;
+
+  /// Seats label
+  ///
+  /// In en, this message translates to:
+  /// **'seats'**
+  String get seats;
+
+  /// Select open order title
+  ///
+  /// In en, this message translates to:
+  /// **'Select Open Order'**
+  String get selectOpenOrder;
+
+  /// Details label
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get details;
+
+  /// Capacity label
+  ///
+  /// In en, this message translates to:
+  /// **'Capacity'**
+  String get capacity;
+
+  /// Customer label
+  ///
+  /// In en, this message translates to:
+  /// **'Customer'**
+  String get customer;
+
+  /// Assigned to label
+  ///
+  /// In en, this message translates to:
+  /// **'Assigned to'**
+  String get assignedTo;
+
+  /// Last activity label
+  ///
+  /// In en, this message translates to:
+  /// **'Last Activity'**
+  String get lastActivity;
+
+  /// Reservation label
+  ///
+  /// In en, this message translates to:
+  /// **'Reservation'**
+  String get reservation;
+
+  /// Order items label
+  ///
+  /// In en, this message translates to:
+  /// **'Order Items'**
+  String get orderItems;
+
+  /// No items label
+  ///
+  /// In en, this message translates to:
+  /// **'No Items'**
+  String get noItems;
+
+  /// Reserve table action
+  ///
+  /// In en, this message translates to:
+  /// **'Reserve Table'**
+  String get reserveTable;
+
+  /// Time label
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get time;
+
+  /// Select time label
+  ///
+  /// In en, this message translates to:
+  /// **'Select Time'**
+  String get selectTime;
+
+  /// Placeholder text
+  ///
+  /// In en, this message translates to:
+  /// **'placeholder'**
+  String get placeholder;
+
+  /// Reserve button
+  ///
+  /// In en, this message translates to:
+  /// **'Reserve'**
+  String get reserve;
+
+  /// Seat customer at table action
+  ///
+  /// In en, this message translates to:
+  /// **'Seat Customer at Table'**
+  String get seatCustomerAtTable;
+
+  /// Party size label
+  ///
+  /// In en, this message translates to:
+  /// **'Party Size'**
+  String get partySize;
+
+  /// Please enter valid name and party size message
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid name and party size'**
+  String get pleaseEnterValidNameAndPartySize;
+
+  /// Customer seated at table message
+  ///
+  /// In en, this message translates to:
+  /// **'Customer seated at table'**
+  String get customerSeatedAtTable;
+
+  /// Failed to seat customer error
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to seat customer'**
+  String get failedToSeatCustomer;
+
+  /// Seat button
+  ///
+  /// In en, this message translates to:
+  /// **'Seat'**
+  String get seat;
+
+  /// Clearing table action
+  ///
+  /// In en, this message translates to:
+  /// **'Clearing table'**
+  String get clearingTable;
+
+  /// Table cleared successfully message
+  ///
+  /// In en, this message translates to:
+  /// **'cleared successfully'**
+  String get clearedSuccessfully;
+
+  /// Failed to clear table error
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to clear table'**
+  String get failedToClearTable;
+
+  /// Check in reservation for table action
+  ///
+  /// In en, this message translates to:
+  /// **'Check in Reservation for Table'**
+  String get checkInReservationForTable;
+
+  /// Reservation checked in for table message
+  ///
+  /// In en, this message translates to:
+  /// **'Reservation checked in for table'**
+  String get reservationCheckedInForTable;
+
+  /// Failed to check in error
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to check in'**
+  String get failedToCheckIn;
+
+  /// Check in button
+  ///
+  /// In en, this message translates to:
+  /// **'Check In'**
+  String get checkIn;
+
+  /// View button
+  ///
+  /// In en, this message translates to:
+  /// **'View'**
+  String get view;
+
+  /// Add items button
+  ///
+  /// In en, this message translates to:
+  /// **'Add Items'**
+  String get addItems;
+
+  /// Waiter label
+  ///
+  /// In en, this message translates to:
+  /// **'Waiter'**
+  String get waiter;
+
+  /// Ready to serve customers message
+  ///
+  /// In en, this message translates to:
+  /// **'Ready to serve customers'**
+  String get readyToServeCustomers;
+
+  /// Active tables label
+  ///
+  /// In en, this message translates to:
+  /// **'Active Tables'**
+  String get activeTables;
+
+  /// Pending orders label
+  ///
+  /// In en, this message translates to:
+  /// **'Pending Orders'**
+  String get pendingOrders;
+
+  /// Today's tips label
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Tips'**
+  String get todaysTips;
+
+  /// Order history label
+  ///
+  /// In en, this message translates to:
+  /// **'Order History'**
+  String get orderHistory;
+
+  /// View past orders button
+  ///
+  /// In en, this message translates to:
+  /// **'View Past Orders'**
+  String get viewPastOrders;
+
+  /// Manage customer details button
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Customer Details'**
+  String get manageCustomerDetails;
+
+  /// Customer information label
+  ///
+  /// In en, this message translates to:
+  /// **'Customer Information'**
+  String get customerInformation;
+
+  /// Inventory check label
+  ///
+  /// In en, this message translates to:
+  /// **'Inventory Check'**
+  String get inventoryCheck;
+
+  /// Check item availability button
+  ///
+  /// In en, this message translates to:
+  /// **'Check Item Availability'**
+  String get checkItemAvailability;
+
+  /// Daily report label
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Report'**
+  String get dailyReport;
+
+  /// View daily summary button
+  ///
+  /// In en, this message translates to:
+  /// **'View Daily Summary'**
+  String get viewDailySummary;
+
+  /// Table order completed message
+  ///
+  /// In en, this message translates to:
+  /// **'Table order completed'**
+  String get tableOrderCompleted;
+
+  /// Order completed lowercase
+  ///
+  /// In en, this message translates to:
+  /// **'completed'**
+  String get orderCompletedLowercase;
+
+  /// New customer at table message
+  ///
+  /// In en, this message translates to:
+  /// **'New customer at table'**
+  String get newCustomerAtTable;
+
+  /// Kitchen notification table ready message
+  ///
+  /// In en, this message translates to:
+  /// **'Kitchen notification: table ready'**
+  String get kitchenNotificationTableReady;
+
+  /// Ready lowercase
+  ///
+  /// In en, this message translates to:
+  /// **'ready'**
+  String get readyLowercase;
+
+  /// Promotion updated message
+  ///
+  /// In en, this message translates to:
+  /// **'Promotion updated'**
+  String get promotionUpdated;
+
+  /// Happy hour special label
+  ///
+  /// In en, this message translates to:
+  /// **'Happy Hour Special'**
+  String get happyHourSpecial;
+
+  /// Coming soon label
+  ///
+  /// In en, this message translates to:
+  /// **'Coming Soon'**
+  String get comingSoon;
+
+  /// Today's orders label
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Orders'**
+  String get todaysOrders;
+
+  /// Tips earned label
+  ///
+  /// In en, this message translates to:
+  /// **'Tips Earned'**
+  String get tipsEarned;
+
+  /// View tables button text
+  ///
+  /// In en, this message translates to:
+  /// **'View Tables'**
+  String get viewTables;
+
+  /// Kitchen view button text
+  ///
+  /// In en, this message translates to:
+  /// **'Kitchen View'**
+  String get kitchenView;
+
+  /// Messages and promotions label
+  ///
+  /// In en, this message translates to:
+  /// **'Messages & Promotions'**
+  String get messagesAndPromotions;
+
+  /// Created label
+  ///
+  /// In en, this message translates to:
+  /// **'Created'**
+  String get created;
+
+  /// Mark as read button
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as Read'**
+  String get markAsRead;
+
+  /// No messages or promotions message
+  ///
+  /// In en, this message translates to:
+  /// **'No messages or promotions'**
+  String get noMessagesOrPromotions;
+
+  /// Check back later for updates message
+  ///
+  /// In en, this message translates to:
+  /// **'Check back later for updates'**
+  String get checkBackLaterForUpdates;
+
+  /// Error loading messages message
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading messages'**
+  String get errorLoadingMessages;
+
+  /// Today's performance label
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Performance'**
+  String get todaysPerformance;
+
+  /// Recent orders label
+  ///
+  /// In en, this message translates to:
+  /// **'Recent Orders'**
+  String get recentOrders;
+
+  /// Split bill button text
+  ///
+  /// In en, this message translates to:
+  /// **'Split Bill'**
+  String get splitBill;
+
+  /// Content options section title
+  ///
+  /// In en, this message translates to:
+  /// **'Content Options'**
+  String get contentOptions;
+
+  /// Include prices option
+  ///
+  /// In en, this message translates to:
+  /// **'Include Prices'**
+  String get includePrices;
+
+  /// Show item prices in menu description
+  ///
+  /// In en, this message translates to:
+  /// **'Show item prices in menu'**
+  String get showItemPricesInMenu;
+
+  /// Include descriptions option
+  ///
+  /// In en, this message translates to:
+  /// **'Include Descriptions'**
+  String get includeDescriptions;
+
+  /// Show item descriptions in menu description
+  ///
+  /// In en, this message translates to:
+  /// **'Show item descriptions in menu'**
+  String get showItemDescriptions;
+
+  /// Include allergens option
+  ///
+  /// In en, this message translates to:
+  /// **'Include Allergens'**
+  String get includeAllergens;
+
+  /// Show allergen information description
+  ///
+  /// In en, this message translates to:
+  /// **'Show allergen information'**
+  String get showAllergenInformation;
+
+  /// Include calories option
+  ///
+  /// In en, this message translates to:
+  /// **'Include Calories'**
+  String get includeCalories;
+
+  /// Show calorie information description
+  ///
+  /// In en, this message translates to:
+  /// **'Show calorie information'**
+  String get showCalorieInformation;
+
+  /// Include item images option
+  ///
+  /// In en, this message translates to:
+  /// **'Include Item Images'**
+  String get includeItemImages;
+
+  /// Show menu item images in PDF description
+  ///
+  /// In en, this message translates to:
+  /// **'Show menu item images in PDF'**
+  String get showMenuItemImagesInPdf;
+
+  /// Include business logo option
+  ///
+  /// In en, this message translates to:
+  /// **'Include Business Logo'**
+  String get includeBusinessLogo;
+
+  /// Show business logo in PDF header description
+  ///
+  /// In en, this message translates to:
+  /// **'Show business logo in PDF header'**
+  String get showBusinessLogoInPdfHeader;
+
+  /// Layout options section title
+  ///
+  /// In en, this message translates to:
+  /// **'Layout Options'**
+  String get layoutOptions;
+
+  /// Orientation field label
+  ///
+  /// In en, this message translates to:
+  /// **'Orientation'**
+  String get orientation;
+
+  /// Portrait orientation
+  ///
+  /// In en, this message translates to:
+  /// **'Portrait'**
+  String get portrait;
+
+  /// Landscape orientation
+  ///
+  /// In en, this message translates to:
+  /// **'Landscape'**
+  String get landscape;
+
+  /// Font size field label
+  ///
+  /// In en, this message translates to:
+  /// **'Font Size'**
+  String get fontSize;
+
+  /// Small font size
+  ///
+  /// In en, this message translates to:
+  /// **'Small'**
+  String get small;
+
+  /// Large font size
+  ///
+  /// In en, this message translates to:
+  /// **'Large'**
+  String get large;
+
+  /// Color scheme field label
+  ///
+  /// In en, this message translates to:
+  /// **'Color Scheme'**
+  String get colorScheme;
+
+  /// Light color scheme
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get light;
+
+  /// Dark color scheme
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get dark;
+
+  /// Auto color scheme
+  ///
+  /// In en, this message translates to:
+  /// **'Auto'**
+  String get auto;
+
+  /// Category layout options section title
+  ///
+  /// In en, this message translates to:
+  /// **'Category Layout Options'**
+  String get categoryLayoutOptions;
+
+  /// Category layout field label
+  ///
+  /// In en, this message translates to:
+  /// **'Category Layout'**
+  String get categoryLayout;
+
+  /// Category layout helper text
+  ///
+  /// In en, this message translates to:
+  /// **'How categories are organized in the PDF'**
+  String get howCategoriesAreOrganizedInPdf;
+
+  /// Same page category layout option
+  ///
+  /// In en, this message translates to:
+  /// **'Same page - category items together'**
+  String get samePageCategoryItemsTogether;
+
+  /// Separate page category layout option
+  ///
+  /// In en, this message translates to:
+  /// **'Separate page - category title page, items on pages'**
+  String get separatePageCategoryTitlePageItemsPages;
+
+  /// Category background color field label
+  ///
+  /// In en, this message translates to:
+  /// **'Category Background Color'**
+  String get categoryBackgroundColor;
+
+  /// Hex color code example
+  ///
+  /// In en, this message translates to:
+  /// **'Hex color code (e.g., #0066CC)'**
+  String get hexColorCodeExample;
+
+  /// Max items per page field label
+  ///
+  /// In en, this message translates to:
+  /// **'Max Items Per Page'**
+  String get maxItemsPerPage;
+
+  /// Default colon text
+  ///
+  /// In en, this message translates to:
+  /// **'Default:'**
+  String get defaultColon;
+
+  /// Generating PDF loading message
+  ///
+  /// In en, this message translates to:
+  /// **'Generating PDF...'**
+  String get generatingPdf;
+
+  /// Generate PDF menu button text
+  ///
+  /// In en, this message translates to:
+  /// **'Generate PDF Menu'**
+  String get generatePdfMenu;
+
+  /// Please select template message
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a template'**
+  String get pleaseSelectTemplate;
+
+  /// PDF generated successfully message
+  ///
+  /// In en, this message translates to:
+  /// **'PDF generated successfully'**
+  String get pdfGeneratedSuccessfully;
+
+  /// Access denied description
+  ///
+  /// In en, this message translates to:
+  /// **'This feature is only available to system administrators'**
+  String get accessDeniedDescription;
+
+  /// Go back button text
+  ///
+  /// In en, this message translates to:
+  /// **'Go Back'**
+  String get goBack;
+
+  /// Add menu item button text
+  ///
+  /// In en, this message translates to:
+  /// **'Add Menu Item'**
+  String get addMenuItem;
+
+  /// Select business field label
+  ///
+  /// In en, this message translates to:
+  /// **'Select Business'**
+  String get selectBusiness;
+
+  /// Select one business message
+  ///
+  /// In en, this message translates to:
+  /// **'Select one business'**
+  String get selectOneBusiness;
+
+  /// Search menu items field label
+  ///
+  /// In en, this message translates to:
+  /// **'Search menu items'**
+  String get searchMenuItems;
+
+  /// Category field label
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get category;
+
+  /// All categories option
+  ///
+  /// In en, this message translates to:
+  /// **'All Categories'**
+  String get allCategories;
+
+  /// Available only filter option
+  ///
+  /// In en, this message translates to:
+  /// **'Available Only'**
+  String get availableOnly;
+
+  /// Clear filters button text
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Filters'**
+  String get clearFilters;
+
+  /// Select a business message
+  ///
+  /// In en, this message translates to:
+  /// **'Select a business'**
+  String get selectABusiness;
+
+  /// Please select a business from dropdown message
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a business from the dropdown'**
+  String get pleaseSelectABusinessFromDropdown;
+
+  /// Error loading menu items message
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading menu items'**
+  String get errorLoadingMenuItems;
+
+  /// No menu items found message
+  ///
+  /// In en, this message translates to:
+  /// **'No menu items found'**
+  String get noMenuItemsFound;
+
+  /// Try adjusting filters or add new menu item message
+  ///
+  /// In en, this message translates to:
+  /// **'Try adjusting filters or add a new menu item'**
+  String get tryAdjustingFiltersOrAddNewMenuItem;
+
+  /// Category ID field label
+  ///
+  /// In en, this message translates to:
+  /// **'Category ID'**
+  String get categoryId;
+
+  /// Make unavailable button text
+  ///
+  /// In en, this message translates to:
+  /// **'Make Unavailable'**
+  String get makeUnavailable;
+
+  /// Delete menu item dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Menu Item'**
+  String get deleteMenuItem;
+
+  /// Menu item deleted success message
+  ///
+  /// In en, this message translates to:
+  /// **'Menu item deleted successfully'**
+  String get menuItemDeletedSuccessfully;
+
+  /// Error deleting menu item message
+  ///
+  /// In en, this message translates to:
+  /// **'Error deleting menu item'**
+  String get errorDeletingMenuItem;
+
+  /// Menu item made unavailable message
+  ///
+  /// In en, this message translates to:
+  /// **'made unavailable'**
+  String get menuItemMadeUnavailable;
+
+  /// Menu item made available message
+  ///
+  /// In en, this message translates to:
+  /// **'made available'**
+  String get menuItemMadeAvailable;
+
+  /// Successfully message
+  ///
+  /// In en, this message translates to:
+  /// **'successfully'**
+  String get successfully;
+
+  /// Error updating menu item availability message
+  ///
+  /// In en, this message translates to:
+  /// **'Error updating menu item availability'**
+  String get errorUpdatingMenuItemAvailability;
+
+  /// Create menu item dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Create Menu Item'**
+  String get createMenuItem;
+
+  /// Business field label
+  ///
+  /// In en, this message translates to:
+  /// **'Business'**
+  String get business;
+
+  /// Please select a category message
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a category'**
+  String get pleaseSelectACategory;
+
+  /// Please select a business first message
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a business first'**
+  String get pleaseSelectABusinessFirst;
+
+  /// Menu item created success message
+  ///
+  /// In en, this message translates to:
+  /// **'Menu item created successfully'**
+  String get menuItemCreatedSuccessfully;
+
+  /// Error creating menu item message
+  ///
+  /// In en, this message translates to:
+  /// **'Error creating menu item'**
+  String get errorCreatingMenuItem;
+
+  /// Edit menu item dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Menu Item'**
+  String get editMenuItem;
+
+  /// Menu item updated success message
+  ///
+  /// In en, this message translates to:
+  /// **'Menu item updated successfully'**
+  String get menuItemUpdatedSuccessfully;
+
+  /// Error updating menu item message
+  ///
+  /// In en, this message translates to:
+  /// **'Error updating menu item'**
+  String get errorUpdatingMenuItem;
+
+  /// System administration title
+  ///
+  /// In en, this message translates to:
+  /// **'System Administration'**
+  String get systemAdministration;
+
+  /// Multi-tenant POS management title
+  ///
+  /// In en, this message translates to:
+  /// **'Multi-Tenant POS Management'**
+  String get multiTenantPosManagement;
+
+  /// Multi-tenant POS description
+  ///
+  /// In en, this message translates to:
+  /// **'Manage multiple businesses and their POS systems'**
+  String get multiTenantPosDescription;
+
+  /// System overview title
+  ///
+  /// In en, this message translates to:
+  /// **'System Overview'**
+  String get systemOverview;
+
+  /// Total businesses label
+  ///
+  /// In en, this message translates to:
+  /// **'Total Businesses'**
+  String get totalBusinesses;
+
+  /// Active users label
+  ///
+  /// In en, this message translates to:
+  /// **'Active Users'**
+  String get activeUsers;
+
+  /// Smart recipe suggestions label
+  ///
+  /// In en, this message translates to:
+  /// **'Smart Recipe Suggestions'**
+  String get smartRecipeSuggestions;
+
+  /// Cooked label
+  ///
+  /// In en, this message translates to:
+  /// **'Cooked'**
+  String get cooked;
+
+  /// Waste prevention label
+  ///
+  /// In en, this message translates to:
+  /// **'Waste Prevention'**
+  String get wastePrevention;
+
+  /// No pending suggestions available message
+  ///
+  /// In en, this message translates to:
+  /// **'No pending suggestions available'**
+  String get noPendingSuggestionsAvailable;
+
+  /// High urgency label
+  ///
+  /// In en, this message translates to:
+  /// **'High Urgency'**
+  String get highUrgency;
+
+  /// Medium urgency label
+  ///
+  /// In en, this message translates to:
+  /// **'Medium Urgency'**
+  String get mediumUrgency;
+
+  /// Low urgency label
+  ///
+  /// In en, this message translates to:
+  /// **'Low Urgency'**
+  String get lowUrgency;
+
+  /// No cooked suggestions available message
+  ///
+  /// In en, this message translates to:
+  /// **'No cooked suggestions available'**
+  String get noCookedSuggestionsAvailable;
+
+  /// No suggestions available message
+  ///
+  /// In en, this message translates to:
+  /// **'No suggestions available'**
+  String get noSuggestionsAvailable;
+
+  /// Error loading waste prevention data message
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading waste prevention data'**
+  String get errorLoadingWastePreventionData;
+
+  /// No smart recipe suggestions available message
+  ///
+  /// In en, this message translates to:
+  /// **'No smart recipe suggestions available'**
+  String get noSmartRecipeSuggestionsAvailable;
+
+  /// Confidence label
+  ///
+  /// In en, this message translates to:
+  /// **'Confidence'**
+  String get confidence;
+
+  /// Potential savings label
+  ///
+  /// In en, this message translates to:
+  /// **'Potential Savings'**
+  String get potentialSavings;
+
+  /// Matching ingredients label
+  ///
+  /// In en, this message translates to:
+  /// **'Matching Ingredients'**
+  String get matchingIngredients;
+
+  /// Already cooked label
+  ///
+  /// In en, this message translates to:
+  /// **'Already Cooked'**
+  String get alreadyCooked;
+
+  /// Cooked on label
+  ///
+  /// In en, this message translates to:
+  /// **'Cooked On'**
+  String get cookedOn;
+
+  /// Ingredients used label
+  ///
+  /// In en, this message translates to:
+  /// **'Ingredients Used'**
+  String get ingredientsUsed;
+
+  /// Recipe cooked successfully message
+  ///
+  /// In en, this message translates to:
+  /// **'Recipe cooked successfully'**
+  String get recipeCookedSuccessfully;
+
+  /// Cook recipe title
+  ///
+  /// In en, this message translates to:
+  /// **'Cook Recipe'**
+  String get cookRecipeTitle;
+
+  /// Recipe configuration label
+  ///
+  /// In en, this message translates to:
+  /// **'Recipe Configuration'**
+  String get recipeConfiguration;
+
+  /// This will create promotion message
+  ///
+  /// In en, this message translates to:
+  /// **'This will create a promotion with the same quantity'**
+  String get thisWillCreatePromotionWithSameQuantity;
+
+  /// Chef special example label
+  ///
+  /// In en, this message translates to:
+  /// **'Chef\'s Special Example'**
+  String get chefSpecialExample;
+
+  /// Quantity must be greater than 0 message
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity must be greater than 0'**
+  String get quantityMustBeGreaterThan0;
+
+  /// Create promotion for label
+  ///
+  /// In en, this message translates to:
+  /// **'Create Promotion for'**
+  String get createPromotionFor;
+
+  /// Create promotion to help move inventory message
+  ///
+  /// In en, this message translates to:
+  /// **'Create a promotion to help move inventory'**
+  String get createAPromotionToHelpMoveInventory;
+
+  /// Chef special discount example label
+  ///
+  /// In en, this message translates to:
+  /// **'Chef\'s Special Discount Example'**
+  String get chefSpecialDiscountExample;
+
+  /// Cooking recipe message
+  ///
+  /// In en, this message translates to:
+  /// **'Cooking recipe...'**
+  String get cookingRecipe;
+
+  /// Recipe label
+  ///
+  /// In en, this message translates to:
+  /// **'Recipe'**
+  String get recipe;
+
+  /// Quantity cooked label
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity Cooked'**
+  String get quantityCooked;
+
+  /// Cost savings label
+  ///
+  /// In en, this message translates to:
+  /// **'Cost Savings'**
+  String get costSavings;
+
+  /// Failed to cook recipe message
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to cook recipe'**
+  String get failedToCookRecipe;
+
+  /// Not available label
+  ///
+  /// In en, this message translates to:
+  /// **'N/A'**
+  String get na;
+
+  /// Promotions management screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Promotions Management'**
+  String get promotionsManagement;
+
+  /// Error loading promotions message
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading promotions'**
+  String get errorLoadingPromotions;
+
+  /// No promotions yet message
+  ///
+  /// In en, this message translates to:
+  /// **'No promotions yet'**
+  String get noPromotionsYet;
+
+  /// Create first promotion message
+  ///
+  /// In en, this message translates to:
+  /// **'Create your first promotion to get started'**
+  String get createYourFirstPromotionToGetStarted;
+
+  /// Scheduled status
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled'**
+  String get scheduled;
+
+  /// Expired status
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get expired;
+
+  /// Create promotion form placeholder
+  ///
+  /// In en, this message translates to:
+  /// **'Create promotion form will be implemented here'**
+  String get createPromotionFormWillBeImplemented;
+
+  /// Edit promotion title
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Promotion'**
+  String get editPromotion;
+
+  /// Edit promotion form placeholder
+  ///
+  /// In en, this message translates to:
+  /// **'Edit promotion form will be implemented here'**
+  String get editPromotionFormWillBeImplemented;
+
+  /// Delete promotion title
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Promotion'**
+  String get deletePromotion;
+
+  /// Delete confirmation message
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete'**
+  String get areYouSureYouWantToDelete;
+
+  /// Create chef special promotion title
+  ///
+  /// In en, this message translates to:
+  /// **'Create Chef Special Promotion'**
+  String get createChefSpecialPromotion;
+
+  /// Available recipes section title
+  ///
+  /// In en, this message translates to:
+  /// **'Available Recipes'**
+  String get availableRecipes;
+
+  /// Error loading recipes message
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading recipes'**
+  String get errorLoadingRecipes;
+
+  /// No recipe suggestions available message
+  ///
+  /// In en, this message translates to:
+  /// **'No recipe suggestions available'**
+  String get noRecipeSuggestionsAvailable;
+
+  /// Quantity field label
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity'**
+  String get quantity;
+
+  /// Waste reduction section title
+  ///
+  /// In en, this message translates to:
+  /// **'Waste Reduction'**
+  String get wasteReduction;
+
+  /// Promotion created label
+  ///
+  /// In en, this message translates to:
+  /// **'Promotion Created:'**
+  String get promotionCreated;
+
+  /// Type field label
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get type;
+
+  /// Quantity tracking label
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity Tracking:'**
+  String get quantityTracking;
+
+  /// Total quantity label
+  ///
+  /// In en, this message translates to:
+  /// **'Total Quantity'**
+  String get totalQuantity;
+
+  /// Used quantity label
+  ///
+  /// In en, this message translates to:
+  /// **'Used Quantity'**
+  String get usedQuantity;
+
+  /// Remaining label
+  ///
+  /// In en, this message translates to:
+  /// **'Remaining'**
+  String get remaining;
+
+  /// Expires label
+  ///
+  /// In en, this message translates to:
+  /// **'Expires'**
+  String get expires;
+
+  /// Special offer label
+  ///
+  /// In en, this message translates to:
+  /// **'Special Offer'**
+  String get specialOffer;
+
+  /// Selected items label
+  ///
+  /// In en, this message translates to:
+  /// **'Selected Items'**
+  String get selectedItems;
+
+  /// No description placeholder
+  ///
+  /// In en, this message translates to:
+  /// **'No description'**
+  String get noDescription;
+
+  /// Cook button text
+  ///
+  /// In en, this message translates to:
+  /// **'Cook'**
+  String get cook;
+
+  /// Freshly prepared description
+  ///
+  /// In en, this message translates to:
+  /// **'Freshly prepared'**
+  String get freshlyPrepared;
+
+  /// Using premium ingredients description
+  ///
+  /// In en, this message translates to:
+  /// **'using premium ingredients'**
+  String get usingPremiumIngredients;
+
+  /// Create promotion with quantity tracking bullet point
+  ///
+  /// In en, this message translates to:
+  /// **'• Create a promotion with quantity tracking'**
+  String get createPromotionWithQuantityTracking;
+
+  /// Create promotion for expiring items description
+  ///
+  /// In en, this message translates to:
+  /// **'Create a promotion for expiring or underperforming items'**
+  String get createAPromotionForExpiringOrUnderperformingItems;
+
+  /// Create targeted promotions description
+  ///
+  /// In en, this message translates to:
+  /// **'Create targeted promotions'**
+  String get createTargetedPromotions;
+
+  /// Help move inventory description
+  ///
+  /// In en, this message translates to:
+  /// **'help move inventory'**
+  String get helpMoveInventory;
+
+  /// Increase sales and reduce waste description
+  ///
+  /// In en, this message translates to:
+  /// **'increase sales and reduce waste'**
+  String get increaseSalesAndReduceWaste;
+
+  /// Cooking analytics section title
+  ///
+  /// In en, this message translates to:
+  /// **'Cooking Analytics'**
+  String get cookingAnalytics;
+
+  /// Error loading analytics message
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading analytics'**
+  String get errorLoadingAnalytics;
+
+  /// Total recipes cooked label
+  ///
+  /// In en, this message translates to:
+  /// **'Total Recipes Cooked'**
+  String get totalRecipesCooked;
+
+  /// Waste reduced label
+  ///
+  /// In en, this message translates to:
+  /// **'Waste Reduced'**
+  String get wasteReduced;
+
+  /// Promotions created label
+  ///
+  /// In en, this message translates to:
+  /// **'Promotions Created'**
+  String get promotionsCreated;
+
+  /// Error loading history message
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading history'**
+  String get errorLoadingHistory;
+
+  /// No cooking history yet message
+  ///
+  /// In en, this message translates to:
+  /// **'No cooking history yet'**
+  String get noCookingHistoryYet;
+
+  /// Start cooking recipes message
+  ///
+  /// In en, this message translates to:
+  /// **'Start cooking recipes to see your history here'**
+  String get startCookingRecipesToSeeYourHistoryHere;
+
+  /// Unknown recipe placeholder
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown recipe'**
+  String get unknownRecipe;
+
+  /// Date field label
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get date;
+
+  /// Unknown date placeholder
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown date'**
+  String get unknownDate;
+
+  /// Invalid date message
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid date'**
+  String get invalidDate;
+
+  /// Urgency field label
+  ///
+  /// In en, this message translates to:
+  /// **'Urgency'**
+  String get urgency;
+
+  /// Floor plan editor screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Floor Plan Editor'**
+  String get floorPlanEditor;
+
+  /// Send button text
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get send;
+
+  /// Reply button text
+  ///
+  /// In en, this message translates to:
+  /// **'Reply'**
+  String get reply;
+
+  /// Call button text
+  ///
+  /// In en, this message translates to:
+  /// **'Call'**
+  String get call;
+
+  /// Restart app button text
+  ///
+  /// In en, this message translates to:
+  /// **'Restart App'**
+  String get restartApp;
+
+  /// Clear data button text
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Data'**
+  String get clearData;
+
+  /// Clear table button text
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Table'**
+  String get clearTable;
+
+  /// Seat customer button text
+  ///
+  /// In en, this message translates to:
+  /// **'Seat Customer'**
+  String get seatCustomer;
+
+  /// Make reservation button text
+  ///
+  /// In en, this message translates to:
+  /// **'Make Reservation'**
+  String get makeReservation;
+
+  /// Tables management screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Tables Management'**
+  String get tablesManagement;
+
+  /// New message dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'New Message'**
+  String get newMessage;
+
+  /// Emergency call dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Emergency Call'**
+  String get emergencyCall;
+
+  /// Emergency call confirmation message
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to make an emergency call?'**
+  String get emergencyCallConfirmation;
+
+  /// Preparing status
+  ///
+  /// In en, this message translates to:
+  /// **'PREPARING'**
+  String get preparing;
+
+  /// Language settings screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get language;
+
+  /// Language updated message
+  ///
+  /// In en, this message translates to:
+  /// **'Language Updated'**
+  String get languageUpdated;
+
+  /// Floor plan viewer screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Floor Plan Viewer'**
+  String get floorPlanViewer;
+
+  /// Clear table confirmation message
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to clear this table? This will mark it as available.'**
+  String get clearTableConfirmation;
+
+  /// Unassigned items label
+  ///
+  /// In en, this message translates to:
+  /// **'Unassigned Items:'**
+  String get unassignedItems;
+
+  /// No items assigned message
+  ///
+  /// In en, this message translates to:
+  /// **'No items assigned.'**
+  String get noItemsAssigned;
+
+  /// Checkout button text
+  ///
+  /// In en, this message translates to:
+  /// **'Checkout'**
+  String get checkout;
+
+  /// Complete sale button text
+  ///
+  /// In en, this message translates to:
+  /// **'Complete Sale'**
+  String get completeSale;
+
+  /// Scan barcode dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Scan Barcode'**
+  String get scanBarcode;
+
+  /// Enter barcode manually instruction
+  ///
+  /// In en, this message translates to:
+  /// **'Enter barcode manually or use camera scanner:'**
+  String get enterBarcodeManually;
+
+  /// Available discounts dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Available Discounts'**
+  String get availableDiscounts;
+
+  /// How many guests question
+  ///
+  /// In en, this message translates to:
+  /// **'How many guests will be dining?'**
+  String get howManyGuests;
+
+  /// Set button text
+  ///
+  /// In en, this message translates to:
+  /// **'Set'**
+  String get set;
+
+  /// Select promotion dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Select Promotion'**
+  String get selectPromotion;
+
+  /// Network error dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Network Error'**
+  String get networkError;
+
+  /// Add step button text
+  ///
+  /// In en, this message translates to:
+  /// **'Add Step'**
+  String get addStep;
+
+  /// Position in pixels label
+  ///
+  /// In en, this message translates to:
+  /// **'Position (pixels)'**
+  String get positionPixels;
+
+  /// Size in pixels label
+  ///
+  /// In en, this message translates to:
+  /// **'Size (pixels)'**
+  String get sizePixels;
+
+  /// Add table button text
+  ///
+  /// In en, this message translates to:
+  /// **'Add Table'**
+  String get addTable;
+
+  /// i18n test screen title
+  ///
+  /// In en, this message translates to:
+  /// **'i18n Test Screen'**
+  String get i18nTestScreen;
+
+  /// Spanish Costa Rica language option
+  ///
+  /// In en, this message translates to:
+  /// **'Spanish (es-CR)'**
+  String get spanishCostaRica;
+
+  /// English US language option
+  ///
+  /// In en, this message translates to:
+  /// **'English (en-US)'**
+  String get englishUS;
+
+  /// Language switching bullet point
+  ///
+  /// In en, this message translates to:
+  /// **'• Language switching'**
+  String get languageSwitching;
+
+  /// Language persistence bullet point
+  ///
+  /// In en, this message translates to:
+  /// **'• Language persistence'**
+  String get languagePersistence;
+
+  /// Locale management bullet point
+  ///
+  /// In en, this message translates to:
+  /// **'• Locale management'**
+  String get localeManagement;
+
+  /// Translation display bullet point
+  ///
+  /// In en, this message translates to:
+  /// **'• Translation display'**
+  String get translationDisplay;
+
+  /// Language testing screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Language Testing'**
+  String get languageTesting;
+
+  /// Switch to Spanish button text
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to Spanish'**
+  String get switchToSpanish;
+
+  /// Switch to English button text
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to English'**
+  String get switchToEnglish;
+
+  /// Test language switching button text
+  ///
+  /// In en, this message translates to:
+  /// **'Test Language Switching'**
+  String get testLanguageSwitching;
+
+  /// Test default language button text
+  ///
+  /// In en, this message translates to:
+  /// **'Test Default Language (Spanish)'**
+  String get testDefaultLanguage;
+
+  /// Test error messages button text
+  ///
+  /// In en, this message translates to:
+  /// **'Test Error Messages (Spanish)'**
+  String get testErrorMessages;
+
+  /// Test success messages button text
+  ///
+  /// In en, this message translates to:
+  /// **'Test Success Messages (Spanish)'**
+  String get testSuccessMessages;
 }
 
-class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {
-  const AppLocalizationDelegate();
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
+  const _AppLocalizationsDelegate();
 
   @override
-  bool isSupported(Locale locale) {
-    return ['es', 'en'].contains(locale.languageCode);
+  Future<AppLocalizations> load(Locale locale) {
+    return SynchronousFuture<AppLocalizations>(lookupAppLocalizations(locale));
   }
 
   @override
-  Future<AppLocalizations> load(Locale locale) async {
-    return AppLocalizations(locale);
-  }
+  bool isSupported(Locale locale) =>
+      <String>['en', 'es'].contains(locale.languageCode);
 
   @override
-  bool shouldReload(AppLocalizationDelegate old) => false;
-} 
+  bool shouldReload(_AppLocalizationsDelegate old) => false;
+}
+
+AppLocalizations lookupAppLocalizations(Locale locale) {
+  // Lookup logic when language+country codes are specified.
+  switch (locale.languageCode) {
+    case 'es':
+      {
+        switch (locale.countryCode) {
+          case 'CR':
+            return AppLocalizationsEsCr();
+        }
+        break;
+      }
+  }
+
+  // Lookup logic when only language code is specified.
+  switch (locale.languageCode) {
+    case 'en':
+      return AppLocalizationsEn();
+    case 'es':
+      return AppLocalizationsEs();
+  }
+
+  throw FlutterError(
+      'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
+      'an issue with the localizations generation tool. Please file an issue '
+      'on GitHub with a reproducible sample app and the gen-l10n configuration '
+      'that was used.');
+}

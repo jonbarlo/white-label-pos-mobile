@@ -11,6 +11,7 @@ import '../../shared/widgets/theme_toggle_button.dart';
 import '../../shared/widgets/app_image.dart';
 import '../../shared/utils/currency_formatter.dart';
 import '../business/business_provider.dart';
+import '../../core/localization/app_localizations.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -56,8 +57,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       setState(() { _loading = false; });
       if (result.isSuccess) {
         setState(() { _editing = false; });
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile updated successfully!'), backgroundColor: Colors.green),
+          SnackBar(content: Text(l10n.profileUpdatedSuccessfully), backgroundColor: Colors.green),
         );
       } else {
         setState(() { _error = result.errorMessage; });
@@ -71,15 +73,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Future<void> _logout() async {
+    final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Confirm Logout'),
-        content: const Text('Are you sure you want to logout?'),
+        title: Text(l10n.confirmLogout),
+        content: Text(l10n.logoutConfirmation),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(context).pop(true),
@@ -87,7 +90,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               backgroundColor: Theme.of(context).colorScheme.error,
               foregroundColor: Theme.of(context).colorScheme.onError,
             ),
-            child: const Text('Logout'),
+            child: Text(l10n.logout),
           ),
         ],
       ),
@@ -106,20 +109,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final authState = ref.watch(authNotifierProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     // Handle different auth states
-    if (_loading) return const LoadingWidget(message: 'Saving...');
+    if (_loading) return LoadingWidget(message: l10n.saving);
     
     switch (authState.status) {
       case AuthStatus.loading:
-        return const LoadingWidget(message: 'Loading profile...');
+        return LoadingWidget(message: l10n.loadingProfile);
       case AuthStatus.error:
         return Scaffold(
-          appBar: AppBar(title: const Text('Profile')),
+          appBar: AppBar(title: Text(l10n.profile)),
           body: Center(
             child: AppErrorWidget(
-              message: authState.errorMessage ?? 'Failed to load profile',
-              actionText: 'Retry',
+              message: authState.errorMessage ?? l10n.failedToLoadProfile,
+              actionText: l10n.retry,
               onActionPressed: () {
                 ref.read(authNotifierProvider.notifier).checkAuthStatus();
               },
@@ -127,29 +131,29 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
         );
       case AuthStatus.unauthenticated:
-        return const Scaffold(
+        return Scaffold(
           body: Center(
-            child: AppErrorWidget(message: 'Please log in to view your profile'),
+            child: AppErrorWidget(message: l10n.pleaseLoginToViewProfile),
           ),
         );
       case AuthStatus.initial:
-        return const LoadingWidget(message: 'Initializing...');
+        return LoadingWidget(message: l10n.initializing);
       case AuthStatus.authenticated:
         break; // Continue to show the profile
     }
 
     final user = authState.user;
     if (user == null) {
-      return const Scaffold(
+      return Scaffold(
         body: Center(
-          child: AppErrorWidget(message: 'User data not available'),
+          child: AppErrorWidget(message: l10n.userDataNotAvailable),
         ),
       );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: Text(l10n.profile),
         centerTitle: true,
         elevation: 0,
         actions: [
@@ -204,6 +208,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Widget _buildProfileHeaderCard(BuildContext context, ThemeData theme, User user) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -265,16 +270,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 children: [
                   ElevatedButton.icon(
                     icon: const Icon(Icons.edit, size: 18),
-                    label: const Text('Edit Profile'),
+                    label: Text(l10n.editProfile),
                     onPressed: () => _startEdit(user.name, user.email),
                   ),
                   const SizedBox(width: 12),
                   OutlinedButton.icon(
                     icon: const Icon(Icons.camera_alt, size: 18),
-                    label: const Text('Change Photo'),
+                    label: Text(l10n.changePhoto),
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Photo upload coming soon!')),
+                        SnackBar(content: Text(l10n.photoUploadComingSoon)),
                       );
                     },
                   ),
@@ -287,28 +292,28 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   children: [
                     TextFormField(
                       initialValue: _name,
-                      decoration: const InputDecoration(
-                        labelText: 'Full Name',
-                        prefixIcon: Icon(Icons.person),
+                      decoration: InputDecoration(
+                        labelText: l10n.fullName,
+                        prefixIcon: const Icon(Icons.person),
                       ),
-                      validator: (v) => v == null || v.isEmpty ? 'Enter your name' : null,
+                      validator: (v) => v == null || v.isEmpty ? l10n.enterYourName : null,
                       onSaved: (v) => _name = v,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
                       initialValue: _email,
-                      decoration: const InputDecoration(
-                        labelText: 'Email',
-                        prefixIcon: Icon(Icons.email),
+                      decoration: InputDecoration(
+                        labelText: l10n.email,
+                        prefixIcon: const Icon(Icons.email),
                       ),
                       enabled: false,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
                       initialValue: _phone,
-                      decoration: const InputDecoration(
-                        labelText: 'Phone Number',
-                        prefixIcon: Icon(Icons.phone),
+                      decoration: InputDecoration(
+                        labelText: l10n.phoneNumber,
+                        prefixIcon: const Icon(Icons.phone),
                       ),
                       onSaved: (v) => _phone = v,
                     ),
@@ -318,14 +323,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         Expanded(
                           child: ElevatedButton(
                             onPressed: _saveProfile,
-                            child: const Text('Save Changes'),
+                            child: Text(l10n.saveChanges),
                           ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: OutlinedButton(
                             onPressed: () => setState(() => _editing = false),
-                            child: const Text('Cancel'),
+                            child: Text(l10n.cancel),
                           ),
                         ),
                       ],
@@ -364,6 +369,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Widget _buildPersonalInfoCard(BuildContext context, ThemeData theme, User user) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -375,7 +381,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 Icon(Icons.person, color: theme.colorScheme.primary),
                 const SizedBox(width: 8),
                 Text(
-                  'Personal Information',
+                  l10n.personalInformation,
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -383,9 +389,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ],
             ),
             const SizedBox(height: 16),
-            _buildInfoRow('Name', user.name, Icons.person_outline),
-            _buildInfoRow('Email', user.email, Icons.email_outlined),
-            _buildInfoRow('Phone', '+1 (555) 123-4567', Icons.phone_outlined),
+            _buildInfoRow(l10n.name, user.name, Icons.person_outline),
+            _buildInfoRow(l10n.email, user.email, Icons.email_outlined),
+            _buildInfoRow(l10n.phone, '+1 (555) 123-4567', Icons.phone_outlined),
           ],
         ),
       ),
@@ -393,6 +399,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Widget _buildWorkInfoCard(BuildContext context, ThemeData theme, User user) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -404,7 +411,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 Icon(Icons.work, color: theme.colorScheme.secondary),
                 const SizedBox(width: 8),
                 Text(
-                  'Work Information',
+                  l10n.workInformation,
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -412,11 +419,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ],
             ),
             const SizedBox(height: 16),
-            _buildInfoRow('Role', user.role.displayName, Icons.badge_outlined),
-            _buildInfoRow('Employee ID', 'WST-001', Icons.credit_card_outlined),
-            _buildInfoRow('Department', 'Front of House', Icons.business_outlined),
-            _buildInfoRow('Hire Date', 'March 15, 2024', Icons.calendar_today_outlined),
-            _buildInfoRow('Status', 'Active', Icons.check_circle_outline, 
+            _buildInfoRow(l10n.role, user.role.displayName, Icons.badge_outlined),
+            _buildInfoRow(l10n.employeeId, 'WST-001', Icons.credit_card_outlined),
+            _buildInfoRow(l10n.department, 'Front of House', Icons.business_outlined),
+            _buildInfoRow(l10n.hireDate, 'March 15, 2024', Icons.calendar_today_outlined),
+            _buildInfoRow(l10n.status, l10n.active, Icons.check_circle_outline, 
               valueColor: theme.colorScheme.secondary),
           ],
         ),
@@ -425,6 +432,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Widget _buildQuickStatsCard(BuildContext context, ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -436,7 +444,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 Icon(Icons.analytics, color: theme.colorScheme.tertiary),
                 const SizedBox(width: 8),
                 Text(
-                  'Quick Stats',
+                  l10n.quickStats,
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -446,11 +454,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             const SizedBox(height: 16),
             Row(
               children: [
-                Expanded(child: _buildStatItem('Orders', '1,247', 'This Month', Icons.receipt_long)),
+                Expanded(child: _buildStatItem(l10n.orders, '1,247', l10n.thisMonth, Icons.receipt_long)),
                 const SizedBox(width: 16),
-                Expanded(child: _buildStatItem('Tables', '89', 'This Week', Icons.table_restaurant)),
+                Expanded(child: _buildStatItem(l10n.tables, '89', l10n.thisWeek, Icons.table_restaurant)),
                 const SizedBox(width: 16),
-                Expanded(child: _buildStatItem('Tips', CurrencyFormatter.formatCRC(2340.0), 'This Month', Icons.attach_money)),
+                Expanded(child: _buildStatItem(l10n.tips, CurrencyFormatter.formatCRC(2340.0), l10n.thisMonth, Icons.attach_money)),
               ],
             ),
           ],
@@ -460,6 +468,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Widget _buildAccountSettingsCard(BuildContext context, ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -471,7 +480,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 Icon(Icons.settings, color: theme.colorScheme.primary),
                 const SizedBox(width: 8),
                 Text(
-                  'Account Settings',
+                  l10n.accountSettings,
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -479,27 +488,27 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ],
             ),
             const SizedBox(height: 16),
-            _buildSettingsItem('Change Password', Icons.lock_outline, () {
+            _buildSettingsItem(l10n.changePassword, Icons.lock_outline, () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Password change coming soon!')),
+                SnackBar(content: Text(l10n.passwordChangeComingSoon)),
               );
             }),
-            _buildSettingsItem('Notification Settings', Icons.notifications_outlined, () {
+            _buildSettingsItem(l10n.notificationSettings, Icons.notifications_outlined, () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Notification settings coming soon!')),
+                SnackBar(content: Text(l10n.notificationSettingsComingSoon)),
               );
             }),
-            _buildSettingsItem('Theme Settings', Icons.palette_outlined, () {
+            _buildSettingsItem(l10n.themeSettings, Icons.palette_outlined, () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Theme settings coming soon!')),
+                SnackBar(content: Text(l10n.themeSettingsComingSoon)),
               );
             }),
-            _buildSettingsItem('Language Settings', Icons.language_outlined, () {
+            _buildSettingsItem(l10n.languageSettings, Icons.language_outlined, () {
               context.go('/language-settings');
             }),
-            _buildSettingsItem('Privacy & Security', Icons.security_outlined, () {
+            _buildSettingsItem(l10n.privacyAndSecurity, Icons.security_outlined, () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Privacy settings coming soon!')),
+                SnackBar(content: Text(l10n.privacySettingsComingSoon)),
               );
             }),
           ],
@@ -509,6 +518,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Widget _buildSupportCard(BuildContext context, ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -520,7 +530,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 Icon(Icons.help, color: theme.colorScheme.secondary),
                 const SizedBox(width: 8),
                 Text(
-                  'Support & Help',
+                  l10n.supportAndHelp,
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -528,19 +538,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ],
             ),
             const SizedBox(height: 16),
-            _buildSettingsItem('Help Center', Icons.help_outline, () {
+            _buildSettingsItem(l10n.helpCenter, Icons.help_outline, () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Help center coming soon!')),
+                SnackBar(content: Text(l10n.helpCenterComingSoon)),
               );
             }),
-            _buildSettingsItem('Contact Support', Icons.phone_outlined, () {
+            _buildSettingsItem(l10n.contactSupport, Icons.phone_outlined, () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Contact support coming soon!')),
+                SnackBar(content: Text(l10n.contactSupportComingSoon)),
               );
             }),
-            _buildSettingsItem('Training Materials', Icons.school_outlined, () {
+            _buildSettingsItem(l10n.trainingMaterials, Icons.school_outlined, () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Training materials coming soon!')),
+                SnackBar(content: Text(l10n.trainingMaterialsComingSoon)),
               );
             }),
           ],
@@ -550,11 +560,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Widget _buildLogoutButton(BuildContext context, ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton.icon(
         icon: const Icon(Icons.logout),
-        label: const Text('Logout'),
+        label: Text(l10n.logout),
         style: ElevatedButton.styleFrom(
           backgroundColor: theme.colorScheme.error,
           foregroundColor: theme.colorScheme.onError,
@@ -567,11 +578,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Widget _buildDebugButton(BuildContext context, ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton.icon(
         icon: const Icon(Icons.clear_all),
-        label: const Text('Clear Stored Data (Debug)'),
+        label: Text(l10n.clearStoredDataDebug),
         style: OutlinedButton.styleFrom(
           foregroundColor: theme.colorScheme.error,
           side: BorderSide(color: theme.colorScheme.error),
@@ -581,12 +593,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           final confirmed = await showDialog<bool>(
             context: context,
             builder: (context) => AlertDialog(
-              title: const Text('Clear All Data'),
-              content: const Text('This will clear all stored data and log you out. This action cannot be undone.'),
+              title: Text(l10n.clearAllData),
+              content: Text(l10n.clearDataConfirmation),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(false),
-                  child: const Text('Cancel'),
+                  child: Text(l10n.cancel),
                 ),
                 ElevatedButton(
                   onPressed: () => Navigator.of(context).pop(true),

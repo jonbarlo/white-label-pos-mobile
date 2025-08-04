@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'kitchen_order_provider.dart';
 import 'kitchen_order.dart';
 import '../../core/theme/theme_provider.dart';
+import '../../core/localization/app_localizations.dart';
 
 class KitchenScreen extends ConsumerWidget {
   const KitchenScreen({super.key});
@@ -11,12 +12,13 @@ class KitchenScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ordersAsync = ref.watch(kitchenOrdersProvider);
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         title: Text(
-          'Kitchen Orders',
+          l10n.kitchenOrders,
           style: theme.textTheme.headlineMedium?.copyWith(
             fontWeight: FontWeight.w600,
           ),
@@ -31,7 +33,7 @@ class KitchenScreen extends ConsumerWidget {
             onPressed: () {
               ref.invalidate(kitchenOrdersProvider);
             },
-            tooltip: 'Refresh Orders',
+            tooltip: l10n.refreshOrders,
           ),
           Consumer(
             builder: (context, ref, child) {
@@ -68,7 +70,7 @@ class KitchenScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 32),
                     Text(
-                      'No Active Orders',
+                      l10n.noActiveOrders,
                       style: theme.textTheme.headlineLarge?.copyWith(
                         fontSize: 36, // Much larger text
                         fontWeight: FontWeight.bold,
@@ -77,7 +79,7 @@ class KitchenScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'All caught up! 🎉',
+                      l10n.allCaughtUp,
                       style: theme.textTheme.headlineSmall?.copyWith(
                         fontSize: 24, // Larger text
                         color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
@@ -135,7 +137,7 @@ class KitchenScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 32),
                 Text(
-                  'Loading kitchen orders...',
+                  l10n.loadingKitchenOrders,
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontSize: 24, // Larger loading text
                     fontWeight: FontWeight.w600,
@@ -157,7 +159,7 @@ class KitchenScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 32),
                   Text(
-                    'Error Loading Orders',
+                    l10n.errorLoadingOrders,
                     style: theme.textTheme.headlineLarge?.copyWith(
                       fontSize: 32, // Larger error text
                       fontWeight: FontWeight.bold,
@@ -166,7 +168,7 @@ class KitchenScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Please check your connection and try again',
+                    l10n.pleaseCheckConnectionAndTryAgain,
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontSize: 20, // Larger subtitle
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
@@ -180,7 +182,7 @@ class KitchenScreen extends ConsumerWidget {
                     },
                     icon: const Icon(Icons.refresh, size: 24),
                     label: Text(
-                      'Retry',
+                      l10n.retry,
                       style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                     ),
                     style: ElevatedButton.styleFrom(
@@ -215,6 +217,7 @@ class KitchenOrderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final statusColor = _getStatusColor(order.status ?? 'pending');
     final urgencyLevel = _getUrgencyLevel(order.createdAt);
     
@@ -255,7 +258,7 @@ class KitchenOrderCard extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      'ORDER #${order.orderNumber}',
+                      '${l10n.order} #${order.orderNumber}',
                       style: TextStyle(
                         fontSize: 26, // Increased from 14-16px
                         fontWeight: FontWeight.bold,
@@ -272,7 +275,7 @@ class KitchenOrderCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        'URGENT',
+                        l10n.urgent,
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
@@ -295,7 +298,7 @@ class KitchenOrderCard extends StatelessWidget {
                 border: Border.all(color: statusColor.withValues(alpha: 0.3)),
               ),
               child: Text(
-                (order.status ?? 'pending').toUpperCase(),
+                (order.status ?? l10n.pending).toUpperCase(),
                 style: TextStyle(
                   color: statusColor,
                   fontWeight: FontWeight.bold,
@@ -313,7 +316,7 @@ class KitchenOrderCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'ITEMS',
+                    l10n.items,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -402,7 +405,7 @@ class KitchenOrderCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      'Table ${order.tableNumber}',
+                      '${l10n.table} ${order.tableNumber}',
                       style: TextStyle(
                         fontSize: 18, // Increased from 10px
                         fontWeight: FontWeight.w600,
@@ -438,7 +441,7 @@ class KitchenOrderCard extends StatelessWidget {
                 children: [
                   _buildStatusButton(
                     context,
-                    'Prepare',
+                    l10n.prepare,
                     'preparing',
                     Colors.blue.shade600,
                     Icons.play_arrow,
@@ -446,7 +449,7 @@ class KitchenOrderCard extends StatelessWidget {
                   const SizedBox(width: 12),
                   _buildStatusButton(
                     context,
-                    'Ready',
+                    l10n.ready,
                     'ready',
                     Colors.green.shade600,
                     Icons.check_circle,
@@ -454,7 +457,7 @@ class KitchenOrderCard extends StatelessWidget {
                   const SizedBox(width: 12),
                   _buildStatusButton(
                     context,
-                    'Complete',
+                    l10n.complete,
                     'completed',
                     Colors.grey.shade600,
                     Icons.done_all,

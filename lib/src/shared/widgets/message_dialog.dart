@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/localization/app_localizations.dart';
 
 /// A reusable message dialog component following Flutter Material Design conventions.
 /// 
@@ -76,7 +77,7 @@ class MessageDialog extends StatelessWidget {
       actions: actions ?? [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('OK'),
+          child: Text(AppLocalizations.of(context)!.ok),
         ),
       ],
     );

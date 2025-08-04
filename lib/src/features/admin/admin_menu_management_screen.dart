@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/services/navigation_service.dart';
 import '../../core/theme/theme_provider.dart';
@@ -35,7 +35,7 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final authState = ref.watch(authNotifierProvider);
     
@@ -179,7 +179,7 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
   }
 
   Widget _buildBusinessSelector(ThemeData theme) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final businessesAsync = ref.watch(adminBusinessesProvider);
     
     return businessesAsync.when(
@@ -231,7 +231,7 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
   }
 
   Widget _buildSearchField(ThemeData theme) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return TextField(
       decoration: InputDecoration(
         labelText: l10n.searchMenuItems,
@@ -277,7 +277,7 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
   }
 
   Widget _buildCategoryFilter(ThemeData theme) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final categoriesAsync = ref.watch(adminCategoriesProvider);
     
     return categoriesAsync.when(
@@ -330,7 +330,7 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
   }
 
   Widget _buildAvailabilityFilter(ThemeData theme) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
         Checkbox(
@@ -359,7 +359,7 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
   }
 
   Widget _buildClearFiltersButton(ThemeData theme) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return TextButton.icon(
       onPressed: () {
         setState(() {
@@ -380,7 +380,7 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
   Widget _buildContent(ThemeData theme) {
     // Show message when no business is selected
     if (_selectedBusinessId == null) {
-      final l10n = AppLocalizations.of(context);
+      final l10n = AppLocalizations.of(context)!;
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -433,7 +433,7 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, stack) {
-        final l10n = AppLocalizations.of(context);
+        final l10n = AppLocalizations.of(context)!;
         return Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -473,7 +473,7 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
   }
 
   Widget _buildEmptyState(ThemeData theme) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -504,7 +504,7 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
   }
 
   Widget _buildMenuItemCard(ThemeData theme, AdminMenuItem item) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: ListTile(
@@ -545,7 +545,7 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
-                    item.isAvailable ? '✓' : '✗',
+                    item.isAvailable ? '?' : '?',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: item.isAvailable 
                           ? theme.colorScheme.onPrimaryContainer
@@ -625,7 +625,7 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
   }
 
   void _showDeleteMenuItemDialog(BuildContext context, AdminMenuItem item) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -667,7 +667,7 @@ class _AdminMenuManagementScreenState extends ConsumerState<AdminMenuManagementS
   }
 
   void _toggleMenuItemAvailability(AdminMenuItem item) async {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     try {
       await ref.read(adminMenuProvider.notifier).toggleMenuItemAvailability(
         item.id,
@@ -731,7 +731,7 @@ class _CreateMenuItemDialogState extends ConsumerState<_CreateMenuItemDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final businessesAsync = ref.watch(adminBusinessesProvider);
     
     // Get the currently selected business ID
@@ -880,7 +880,7 @@ class _CreateMenuItemDialogState extends ConsumerState<_CreateMenuItemDialog> {
   }
 
   void _createMenuItem() {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     if (_formKey.currentState!.validate()) {
       final name = _nameController.text;
       final description = _descriptionController.text;
@@ -969,7 +969,7 @@ class _EditMenuItemDialogState extends ConsumerState<_EditMenuItemDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final businessesAsync = ref.watch(adminBusinessesProvider);
 
     return AlertDialog(
@@ -1115,7 +1115,7 @@ class _EditMenuItemDialogState extends ConsumerState<_EditMenuItemDialog> {
   }
 
   void _updateMenuItem() async {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     if (_formKey.currentState!.validate()) {
       final name = _nameController.text;
       final description = _descriptionController.text;

@@ -43,7 +43,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
     final authState = ref.watch(authNotifierProvider);
     final canManageRecipes = authState.canAccessKitchen || authState.isManager || authState.isAdmin;
     final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
@@ -261,7 +261,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
 
   Widget _buildSearchResults(String query) {
     final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return FutureBuilder<List<Recipe>?>(
       future: ref.read(recipeSearchProvider(query).future),
@@ -290,7 +290,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
 
   Widget _buildDifficultyFilteredList(RecipeDifficulty difficulty) {
     final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return FutureBuilder<List<Recipe>?>(
       future: ref.read(recipesByDifficultyProvider(difficulty).future),
@@ -319,7 +319,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
 
   Widget _buildAllRecipesList() {
     final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return FutureBuilder<List<Recipe>?>(
       future: ref.read(recipesProvider.future),
@@ -348,7 +348,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
   }
 
   Widget _buildErrorState(String error, ThemeData theme) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return Container(
       padding: const EdgeInsets.all(32),
@@ -395,7 +395,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
   }
 
   Widget _buildEmptySearchState(String query, ThemeData theme) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return Container(
       padding: const EdgeInsets.all(32),
@@ -424,7 +424,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
           ),
           const SizedBox(height: 8),
           Text(
-            l10n.noRecipesFoundForQuery(query),
+            '${l10n.noRecipesFoundForQuery} "$query"',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -445,7 +445,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
   }
 
   Widget _buildEmptyDifficultyState(RecipeDifficulty difficulty, ThemeData theme) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return Container(
       padding: const EdgeInsets.all(32),
@@ -466,7 +466,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
           ),
           const SizedBox(height: 24),
           Text(
-            l10n.noDifficultyRecipes(difficulty.name.toUpperCase()),
+            '${l10n.noDifficultyRecipes} ${difficulty.name.toUpperCase()} recipes',
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.w600,
               color: theme.colorScheme.onSurface,
@@ -613,7 +613,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
 
   void _showRecipeDetails(Recipe recipe) {
     final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     showDialog(
       context: context,
@@ -732,7 +732,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
 
   void _showDeleteRecipeDialog(Recipe recipe) {
     final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     showDialog(
       context: context,
@@ -746,7 +746,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
           ),
         ),
         content: Text(
-          l10n.deleteRecipeConfirmation(recipe.name),
+          '${l10n.deleteRecipeConfirmation} "${recipe.name}"?',
           style: theme.textTheme.bodyMedium,
         ),
         actions: [
@@ -770,7 +770,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen>
               } catch (e) {
                 if (mounted) {
                   Flushbar(
-                    message: l10n.failedToDeleteRecipe(e.toString()),
+                    message: '${l10n.failedToDeleteRecipe} ${e.toString()}',
                     backgroundColor: theme.colorScheme.error,
                     icon: Icon(Icons.error, color: theme.colorScheme.onError),
                     duration: const Duration(seconds: 4),

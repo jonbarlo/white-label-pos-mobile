@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/theme_provider.dart';
+import '../../core/localization/app_localizations.dart';
 import '../auth/models/user.dart';
 import '../auth/auth_provider.dart';
 import 'pdf_menu_provider.dart';
@@ -51,12 +52,13 @@ class _CustomTemplateManagementScreenState extends ConsumerState<CustomTemplateM
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final authState = ref.watch(authNotifierProvider);
+    final l10n = AppLocalizations.of(context)!;
     
     // Check if user is admin
     if (authState.user?.role != UserRole.admin) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Access Denied'),
+          title: Text(l10n.accessDenied),
           backgroundColor: theme.colorScheme.surface,
           elevation: 0,
         ),
@@ -71,14 +73,14 @@ class _CustomTemplateManagementScreenState extends ConsumerState<CustomTemplateM
               ),
               const SizedBox(height: 16),
               Text(
-                'Access Denied',
+                l10n.accessDenied,
                 style: theme.textTheme.headlineMedium?.copyWith(
                   color: theme.colorScheme.error,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                'This feature is only available to system administrators.',
+                'This feature is only available to system administrators',
                 style: theme.textTheme.bodyLarge?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -93,7 +95,7 @@ class _CustomTemplateManagementScreenState extends ConsumerState<CustomTemplateM
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Custom Template Management',
+          l10n.customTemplateManagement,
           style: theme.textTheme.headlineMedium?.copyWith(
             fontWeight: FontWeight.w600,
           ),
@@ -106,7 +108,7 @@ class _CustomTemplateManagementScreenState extends ConsumerState<CustomTemplateM
           IconButton(
             onPressed: _loadCustomTemplates,
             icon: const Icon(Icons.refresh),
-            tooltip: 'Refresh',
+            tooltip: l10n.refresh,
           ),
         ],
       ),
@@ -119,6 +121,8 @@ class _CustomTemplateManagementScreenState extends ConsumerState<CustomTemplateM
   }
 
   Widget _buildBody(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
+    
     if (_isLoading) {
       return const Center(
         child: CircularProgressIndicator(),
@@ -137,7 +141,7 @@ class _CustomTemplateManagementScreenState extends ConsumerState<CustomTemplateM
             ),
             const SizedBox(height: 16),
             Text(
-              'Error loading templates',
+              l10n.errorLoadingTemplates,
               style: theme.textTheme.headlineMedium?.copyWith(
                 color: theme.colorScheme.error,
               ),
@@ -153,7 +157,7 @@ class _CustomTemplateManagementScreenState extends ConsumerState<CustomTemplateM
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _loadCustomTemplates,
-              child: const Text('Retry'),
+              child: Text(l10n.retry),
             ),
           ],
         ),
@@ -172,14 +176,14 @@ class _CustomTemplateManagementScreenState extends ConsumerState<CustomTemplateM
             ),
             const SizedBox(height: 16),
             Text(
-              'No Custom Templates',
+              l10n.noCustomTemplates,
               style: theme.textTheme.headlineMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Create your first custom template to get started.',
+              l10n.createYourFirstCustomTemplateToGetStarted,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -201,6 +205,8 @@ class _CustomTemplateManagementScreenState extends ConsumerState<CustomTemplateM
   }
 
   Widget _buildTemplateCard(ThemeData theme, CustomMenuTemplate template) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       child: ListTile(
@@ -228,13 +234,13 @@ class _CustomTemplateManagementScreenState extends ConsumerState<CustomTemplateM
               children: [
                 if (template.isActive)
                   Chip(
-                    label: const Text('Active'),
+                    label: Text(l10n.active),
                     backgroundColor: theme.colorScheme.primaryContainer,
                     labelStyle: TextStyle(color: theme.colorScheme.onPrimaryContainer),
                   ),
                 if (template.isDefault)
                   Chip(
-                    label: const Text('Default'),
+                    label: Text(l10n.defaultText),
                     backgroundColor: theme.colorScheme.secondaryContainer,
                     labelStyle: TextStyle(color: theme.colorScheme.onSecondaryContainer),
                   ),
@@ -245,44 +251,44 @@ class _CustomTemplateManagementScreenState extends ConsumerState<CustomTemplateM
         trailing: PopupMenuButton<String>(
           onSelected: (value) => _handleTemplateAction(value, template),
           itemBuilder: (context) => [
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'edit',
               child: Row(
                 children: [
-                  Icon(Icons.edit),
-                  SizedBox(width: 8),
-                  Text('Edit'),
+                  const Icon(Icons.edit),
+                  const SizedBox(width: 8),
+                  Text(l10n.edit),
                 ],
               ),
             ),
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'preview',
               child: Row(
                 children: [
-                  Icon(Icons.preview),
-                  SizedBox(width: 8),
-                  Text('Preview'),
+                  const Icon(Icons.preview),
+                  const SizedBox(width: 8),
+                  Text(l10n.preview),
                 ],
               ),
             ),
             if (!template.isDefault)
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'set_default',
                 child: Row(
                   children: [
-                    Icon(Icons.star),
-                    SizedBox(width: 8),
-                    Text('Set as Default'),
+                    const Icon(Icons.star),
+                    const SizedBox(width: 8),
+                    Text(l10n.setAsDefault),
                   ],
                 ),
               ),
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'delete',
               child: Row(
                 children: [
-                  Icon(Icons.delete, color: Colors.red),
-                  SizedBox(width: 8),
-                  Text('Delete', style: TextStyle(color: Colors.red)),
+                  const Icon(Icons.delete, color: Colors.red),
+                  const SizedBox(width: 8),
+                  Text(l10n.delete, style: const TextStyle(color: Colors.red)),
                 ],
               ),
             ),
@@ -342,9 +348,10 @@ class _CustomTemplateManagementScreenState extends ConsumerState<CustomTemplateM
       );
       
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${template.name} set as default template'),
+            content: Text('${template.name} ${l10n.templateSetAsDefault}'),
             backgroundColor: Colors.green,
           ),
         );
@@ -352,9 +359,10 @@ class _CustomTemplateManagementScreenState extends ConsumerState<CustomTemplateM
       }
     } catch (error) {
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error setting default template: $error'),
+            content: Text('${l10n.errorSettingDefaultTemplate} $error'),
             backgroundColor: Colors.red,
           ),
         );
@@ -363,15 +371,16 @@ class _CustomTemplateManagementScreenState extends ConsumerState<CustomTemplateM
   }
 
   void _showDeleteConfirmation(BuildContext context, CustomMenuTemplate template) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Template'),
-        content: Text('Are you sure you want to delete "${template.name}"? This action cannot be undone.'),
+        title: Text(l10n.deleteTemplate),
+        content: Text('${l10n.areYouSureYouWantToDeleteTemplate} "${template.name}"? ${l10n.thisActionCannotBeUndone}'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () {
@@ -379,7 +388,7 @@ class _CustomTemplateManagementScreenState extends ConsumerState<CustomTemplateM
               _deleteTemplate(template);
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Delete'),
+            child: Text(l10n.delete),
           ),
         ],
       ),
@@ -397,9 +406,10 @@ class _CustomTemplateManagementScreenState extends ConsumerState<CustomTemplateM
       );
       
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${template.name} deleted successfully'),
+            content: Text('${template.name} ${l10n.templateDeletedSuccessfully}'),
             backgroundColor: Colors.green,
           ),
         );
@@ -407,9 +417,10 @@ class _CustomTemplateManagementScreenState extends ConsumerState<CustomTemplateM
       }
     } catch (error) {
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error deleting template: $error'),
+            content: Text('${l10n.errorDeletingTemplate} $error'),
             backgroundColor: Colors.red,
           ),
         );
@@ -447,8 +458,9 @@ class _CreateTemplateDialogState extends ConsumerState<_CreateTemplateDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return AlertDialog(
-      title: const Text('Create Custom Template'),
+      title: Text(l10n.createCustomTemplate),
       content: SizedBox(
         width: 600,
         height: 500,
@@ -459,13 +471,13 @@ class _CreateTemplateDialogState extends ConsumerState<_CreateTemplateDialog> {
               children: [
                 TextFormField(
                   controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Template Name',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: l10n.templateName,
+                    border: const OutlineInputBorder(),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter a template name';
+                      return l10n.pleaseEnterATemplateName;
                     }
                     return null;
                   },
@@ -473,24 +485,24 @@ class _CreateTemplateDialogState extends ConsumerState<_CreateTemplateDialog> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _descriptionController,
-                  decoration: const InputDecoration(
-                    labelText: 'Description',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: l10n.description,
+                    border: const OutlineInputBorder(),
                   ),
                   maxLines: 2,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _htmlController,
-                  decoration: const InputDecoration(
-                    labelText: 'HTML Content',
-                    border: OutlineInputBorder(),
-                    hintText: 'Enter HTML template content...',
+                  decoration: InputDecoration(
+                    labelText: l10n.htmlContent,
+                    border: const OutlineInputBorder(),
+                    hintText: l10n.enterHtmlTemplateContent,
                   ),
                   maxLines: 8,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter HTML content';
+                      return l10n.pleaseEnterHtmlContent;
                     }
                     return null;
                   },
@@ -498,10 +510,10 @@ class _CreateTemplateDialogState extends ConsumerState<_CreateTemplateDialog> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _cssController,
-                  decoration: const InputDecoration(
-                    labelText: 'CSS Content',
-                    border: OutlineInputBorder(),
-                    hintText: 'Enter CSS styles...',
+                  decoration: InputDecoration(
+                    labelText: l10n.cssContent,
+                    border: const OutlineInputBorder(),
+                    hintText: l10n.enterCssStyles,
                   ),
                   maxLines: 6,
                 ),
@@ -516,7 +528,7 @@ class _CreateTemplateDialogState extends ConsumerState<_CreateTemplateDialog> {
                         });
                       },
                     ),
-                    const Text('Active'),
+                    Text(l10n.active),
                     const SizedBox(width: 16),
                     Checkbox(
                       value: _isDefault,
@@ -526,7 +538,7 @@ class _CreateTemplateDialogState extends ConsumerState<_CreateTemplateDialog> {
                         });
                       },
                     ),
-                    const Text('Set as Default'),
+                    Text(l10n.setAsDefaultTemplate),
                   ],
                 ),
               ],
@@ -537,7 +549,7 @@ class _CreateTemplateDialogState extends ConsumerState<_CreateTemplateDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(l10n.cancel),
         ),
         ElevatedButton(
           onPressed: _isLoading ? null : _createTemplate,
@@ -547,7 +559,7 @@ class _CreateTemplateDialogState extends ConsumerState<_CreateTemplateDialog> {
                   height: 20,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : const Text('Create'),
+              : Text(l10n.create),
         ),
       ],
     );
@@ -575,19 +587,21 @@ class _CreateTemplateDialogState extends ConsumerState<_CreateTemplateDialog> {
       );
       
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Template created successfully'),
+          SnackBar(
+            content: Text(l10n.templateCreatedSuccessfully),
             backgroundColor: Colors.green,
           ),
         );
       }
     } catch (error) {
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error creating template: $error'),
+            content: Text('${l10n.errorCreatingTemplate} $error'),
             backgroundColor: Colors.red,
           ),
         );
@@ -644,8 +658,9 @@ class _EditTemplateDialogState extends ConsumerState<_EditTemplateDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return AlertDialog(
-      title: const Text('Edit Custom Template'),
+      title: Text(l10n.editCustomTemplate),
       content: SizedBox(
         width: 600,
         height: 500,
@@ -656,13 +671,13 @@ class _EditTemplateDialogState extends ConsumerState<_EditTemplateDialog> {
               children: [
                 TextFormField(
                   controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Template Name',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: l10n.templateName,
+                    border: const OutlineInputBorder(),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter a template name';
+                      return l10n.pleaseEnterATemplateName;
                     }
                     return null;
                   },
@@ -670,23 +685,23 @@ class _EditTemplateDialogState extends ConsumerState<_EditTemplateDialog> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _descriptionController,
-                  decoration: const InputDecoration(
-                    labelText: 'Description',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: l10n.description,
+                    border: const OutlineInputBorder(),
                   ),
                   maxLines: 2,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _htmlController,
-                  decoration: const InputDecoration(
-                    labelText: 'HTML Content',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: l10n.htmlContent,
+                    border: const OutlineInputBorder(),
                   ),
                   maxLines: 8,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter HTML content';
+                      return l10n.pleaseEnterHtmlContent;
                     }
                     return null;
                   },
@@ -694,9 +709,9 @@ class _EditTemplateDialogState extends ConsumerState<_EditTemplateDialog> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _cssController,
-                  decoration: const InputDecoration(
-                    labelText: 'CSS Content',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: l10n.cssContent,
+                    border: const OutlineInputBorder(),
                   ),
                   maxLines: 6,
                 ),
@@ -711,7 +726,7 @@ class _EditTemplateDialogState extends ConsumerState<_EditTemplateDialog> {
                         });
                       },
                     ),
-                    const Text('Active'),
+                    Text(l10n.active),
                     const SizedBox(width: 16),
                     Checkbox(
                       value: _isDefault,
@@ -721,7 +736,7 @@ class _EditTemplateDialogState extends ConsumerState<_EditTemplateDialog> {
                         });
                       },
                     ),
-                    const Text('Set as Default'),
+                    Text(l10n.setAsDefaultTemplate),
                   ],
                 ),
               ],
@@ -732,7 +747,7 @@ class _EditTemplateDialogState extends ConsumerState<_EditTemplateDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(l10n.cancel),
         ),
         ElevatedButton(
           onPressed: _isLoading ? null : _updateTemplate,
@@ -742,7 +757,7 @@ class _EditTemplateDialogState extends ConsumerState<_EditTemplateDialog> {
                   height: 20,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : const Text('Update'),
+              : Text(l10n.update),
         ),
       ],
     );
@@ -771,19 +786,21 @@ class _EditTemplateDialogState extends ConsumerState<_EditTemplateDialog> {
       );
       
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Template updated successfully'),
+          SnackBar(
+            content: Text(l10n.templateUpdatedSuccessfully),
             backgroundColor: Colors.green,
           ),
         );
       }
     } catch (error) {
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error updating template: $error'),
+            content: Text('${l10n.errorUpdatingTemplate} $error'),
             backgroundColor: Colors.red,
           ),
         );
@@ -807,9 +824,10 @@ class _PreviewTemplateDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return AlertDialog(
-      title: Text('Preview: ${template.name}'),
+      title: Text('${l10n.previewTemplate} ${template.name}'),
       content: SizedBox(
         width: 800,
         height: 600,
@@ -828,10 +846,10 @@ class _PreviewTemplateDialog extends StatelessWidget {
                 length: 2,
                 child: Column(
                   children: [
-                    const TabBar(
+                    TabBar(
                       tabs: [
-                        Tab(text: 'HTML'),
-                        Tab(text: 'CSS'),
+                        Tab(text: l10n.htmlContent),
+                        Tab(text: l10n.cssContent),
                       ],
                     ),
                     Expanded(
@@ -880,7 +898,7 @@ class _PreviewTemplateDialog extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Close'),
+          child: Text(l10n.close),
         ),
       ],
     );

@@ -14,6 +14,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:open_file/open_file.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:universal_html/html.dart' as html;
+import '../../core/localization/app_localizations.dart';
 
 class PdfMenuGenerationScreen extends ConsumerStatefulWidget {
   const PdfMenuGenerationScreen({super.key});
@@ -88,6 +89,7 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final authState = ref.watch(authNotifierProvider);
     final templatesAsync = ref.watch(pdfMenuProvider);
@@ -96,7 +98,7 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
     if (authState.user?.role != UserRole.admin) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Access Denied'),
+          title: Text(l10n.accessDenied),
           backgroundColor: theme.colorScheme.surface,
           elevation: 0,
         ),
@@ -111,14 +113,14 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
               ),
               const SizedBox(height: 16),
               Text(
-                'Access Denied',
+                l10n.accessDenied,
                 style: theme.textTheme.headlineMedium?.copyWith(
                   color: theme.colorScheme.error,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                'This feature is only available to system administrators.',
+                l10n.accessDeniedDescription,
                 style: theme.textTheme.bodyLarge?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -133,7 +135,7 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'PDF Menu Generation',
+          l10n.pdfMenuGeneration,
           style: theme.textTheme.headlineMedium?.copyWith(
             fontWeight: FontWeight.w600,
           ),
@@ -164,6 +166,7 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
   }
 
   Widget _buildTemplateSelection(ThemeData theme, AsyncValue<List<Map<String, String>>> templatesAsync) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -171,7 +174,7 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Template Selection',
+              l10n.templateSelection,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -180,10 +183,10 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
             templatesAsync.when(
               data: (templates) {
                 if (templates.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Text('No templates available'),
+                      padding: const EdgeInsets.all(16),
+                      child: Text(l10n.noTemplatesAvailable),
                     ),
                   );
                 }
@@ -261,7 +264,7 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Failed to load templates',
+                        l10n.failedToLoadTemplates,
                         style: theme.textTheme.titleMedium?.copyWith(
                           color: theme.colorScheme.error,
                         ),
@@ -279,7 +282,7 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
                         onPressed: () {
                           ref.read(pdfMenuProvider.notifier).loadTemplates();
                         },
-                        child: const Text('Retry'),
+                        child: Text(l10n.retry),
                       ),
                     ],
                   ),
@@ -293,6 +296,7 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
   }
 
   Widget _buildContentOptions(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -300,15 +304,15 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Content Options',
+              l10n.contentOptions,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
             ),
             const SizedBox(height: 16),
             CheckboxListTile(
-              title: const Text('Include Prices'),
-              subtitle: const Text('Show item prices in the menu'),
+                          title: Text(l10n.includePrices),
+            subtitle: Text(l10n.showItemPricesInMenu),
               value: _includePrices,
               onChanged: (value) {
                 setState(() {
@@ -317,8 +321,8 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
               },
             ),
             CheckboxListTile(
-              title: const Text('Include Descriptions'),
-              subtitle: const Text('Show item descriptions'),
+              title: Text(l10n.includeDescriptions),
+              subtitle: Text(l10n.showItemDescriptions),
               value: _includeDescriptions,
               onChanged: (value) {
                 setState(() {
@@ -327,8 +331,8 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
               },
             ),
             CheckboxListTile(
-              title: const Text('Include Allergens'),
-              subtitle: const Text('Show allergen information'),
+              title: Text(l10n.includeAllergens),
+              subtitle: Text(l10n.showAllergenInformation),
               value: _includeAllergens,
               onChanged: (value) {
                 setState(() {
@@ -337,8 +341,8 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
               },
             ),
             CheckboxListTile(
-              title: const Text('Include Calories'),
-              subtitle: const Text('Show calorie information'),
+              title: Text(l10n.includeCalories),
+              subtitle: Text(l10n.showCalorieInformation),
               value: _includeCalories,
               onChanged: (value) {
                 setState(() {
@@ -347,8 +351,8 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
               },
             ),
             CheckboxListTile(
-              title: const Text('Include Item Images'),
-              subtitle: const Text('Show menu item images in the PDF'),
+              title: Text(l10n.includeItemImages),
+              subtitle: Text(l10n.showMenuItemImagesInPdf),
               value: _includeItemImages,
               onChanged: (value) {
                 setState(() {
@@ -357,8 +361,8 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
               },
             ),
             CheckboxListTile(
-              title: const Text('Include Business Logo'),
-              subtitle: const Text('Show business logo in the PDF header'),
+              title: Text(l10n.includeBusinessLogo),
+              subtitle: Text(l10n.showBusinessLogoInPdfHeader),
               value: _includeBusinessLogo,
               onChanged: (value) {
                 setState(() {
@@ -373,6 +377,7 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
   }
 
   Widget _buildLayoutOptions(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -380,7 +385,7 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Layout Options',
+              l10n.layoutOptions,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -388,13 +393,13 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
               value: _orientation,
-              decoration: const InputDecoration(
-                labelText: 'Orientation',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.orientation,
+                border: const OutlineInputBorder(),
               ),
-              items: const [
-                DropdownMenuItem(value: 'portrait', child: Text('Portrait')),
-                DropdownMenuItem(value: 'landscape', child: Text('Landscape')),
+              items: [
+                DropdownMenuItem(value: 'portrait', child: Text(l10n.portrait)),
+                DropdownMenuItem(value: 'landscape', child: Text(l10n.landscape)),
               ],
               onChanged: (value) {
                 setState(() {
@@ -405,14 +410,14 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
               value: _fontSize,
-              decoration: const InputDecoration(
-                labelText: 'Font Size',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.fontSize,
+                border: const OutlineInputBorder(),
               ),
-              items: const [
-                DropdownMenuItem(value: 'small', child: Text('Small')),
-                DropdownMenuItem(value: 'medium', child: Text('Medium')),
-                DropdownMenuItem(value: 'large', child: Text('Large')),
+              items: [
+                DropdownMenuItem(value: 'small', child: Text(l10n.small)),
+                DropdownMenuItem(value: 'medium', child: Text(l10n.medium)),
+                DropdownMenuItem(value: 'large', child: Text(l10n.large)),
               ],
               onChanged: (value) {
                 setState(() {
@@ -423,14 +428,14 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
               value: _colorScheme,
-              decoration: const InputDecoration(
-                labelText: 'Color Scheme',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.colorScheme,
+                border: const OutlineInputBorder(),
               ),
-              items: const [
-                DropdownMenuItem(value: 'light', child: Text('Light')),
-                DropdownMenuItem(value: 'dark', child: Text('Dark')),
-                DropdownMenuItem(value: 'auto', child: Text('Auto')),
+              items: [
+                DropdownMenuItem(value: 'light', child: Text(l10n.light)),
+                DropdownMenuItem(value: 'dark', child: Text(l10n.dark)),
+                DropdownMenuItem(value: 'auto', child: Text(l10n.auto)),
               ],
               onChanged: (value) {
                 setState(() {
@@ -445,6 +450,7 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
   }
 
   Widget _buildCategoryLayoutOptions(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -452,7 +458,7 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Category Layout Options',
+              l10n.categoryLayoutOptions,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -460,19 +466,19 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
               value: _categoryLayout,
-              decoration: const InputDecoration(
-                labelText: 'Category Layout',
-                border: OutlineInputBorder(),
-                helperText: 'How categories are organized in the PDF',
+              decoration: InputDecoration(
+                labelText: l10n.categoryLayout,
+                border: const OutlineInputBorder(),
+                helperText: l10n.howCategoriesAreOrganizedInPdf,
               ),
-              items: const [
+              items: [
                 DropdownMenuItem(
                   value: 'same-page',
-                  child: Text('Same Page (Category + Items together)'),
+                  child: Text(l10n.samePageCategoryItemsTogether),
                 ),
                 DropdownMenuItem(
                   value: 'separate-page',
-                  child: Text('Separate Page (Category title page + items pages)'),
+                  child: Text(l10n.separatePageCategoryTitlePageItemsPages),
                 ),
               ],
               onChanged: (value) {
@@ -487,11 +493,11 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
                 Expanded(
                   child: TextFormField(
                     controller: _colorController,
-                    decoration: const InputDecoration(
-                      labelText: 'Category Background Color',
-                      border: OutlineInputBorder(),
-                      helperText: 'Hex color code (e.g., #f8f9fa)',
-                      prefixIcon: Icon(Icons.palette),
+                    decoration: InputDecoration(
+                      labelText: l10n.categoryBackgroundColor,
+                      border: const OutlineInputBorder(),
+                      helperText: l10n.hexColorCodeExample,
+                      prefixIcon: const Icon(Icons.palette),
                     ),
                     onChanged: (value) {
                       setState(() {
@@ -532,10 +538,10 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
                 Expanded(
                   child: TextFormField(
                     initialValue: _maxItemsPerPage.toString(),
-                    decoration: const InputDecoration(
-                      labelText: 'Max Items Per Page',
-                      border: OutlineInputBorder(),
-                      helperText: 'Default: 8',
+                    decoration: InputDecoration(
+                      labelText: l10n.maxItemsPerPage,
+                      border: const OutlineInputBorder(),
+                      helperText: l10n.defaultColon + ' 8',
                     ),
                     keyboardType: TextInputType.number,
                     onChanged: (value) {
@@ -554,6 +560,7 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
   }
 
   Widget _buildGenerateButton(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
@@ -564,24 +571,24 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
           foregroundColor: theme.colorScheme.onPrimary,
         ),
         child: _isGenerating
-            ? const Row(
+            ? Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   ),
-                  SizedBox(width: 12),
-                  Text('Generating PDF...'),
+                  const SizedBox(width: 12),
+                  Text(l10n.generatingPdf),
                 ],
               )
-            : const Row(
+            : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.picture_as_pdf),
-                  SizedBox(width: 8),
-                  Text('Generate PDF Menu'),
+                  const Icon(Icons.picture_as_pdf),
+                  const SizedBox(width: 8),
+                  Text(l10n.generatePdfMenu),
                 ],
               ),
       ),
@@ -589,10 +596,11 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
   }
 
   void _generatePdf() async {
+    final l10n = AppLocalizations.of(context)!;
     if (_selectedTemplate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select a template'),
+        SnackBar(
+          content: Text(l10n.pleaseSelectTemplate),
           backgroundColor: Colors.orange,
         ),
       );
@@ -630,7 +638,7 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
         
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('PDF generated successfully! Size: ${pdfBytes.length} bytes'),
+            content: Text('${l10n.pdfGeneratedSuccessfully} ${pdfBytes.length} ${l10n.bytes}'),
             backgroundColor: Colors.green,
           ),
         );
@@ -639,7 +647,7 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error generating PDF: $error'),
+            content: Text('${l10n.errorGeneratingPdf} $error'),
             backgroundColor: Colors.red,
           ),
         );
@@ -654,6 +662,7 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
   }
 
   void _downloadPdf(Uint8List pdfBytes, int businessId) async {
+    final l10n = AppLocalizations.of(context)!;
     final timestamp = DateTime.now().millisecondsSinceEpoch;
     final filename = 'menu-$businessId-$timestamp.pdf';
     
@@ -679,6 +688,7 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
   }
 
   Future<void> _downloadPdfMobile(Uint8List pdfBytes, String filename) async {
+    final l10n = AppLocalizations.of(context)!;
     try {
       final directory = await getApplicationDocumentsDirectory();
       final file = File('${directory.path}/$filename');
@@ -693,8 +703,8 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
         await OpenFile.open(file.path);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Permission denied to open file. Please grant storage permission in settings.'),
+          SnackBar(
+            content: Text(l10n.permissionDeniedToOpenFile),
             backgroundColor: Colors.red,
           ),
         );
@@ -702,8 +712,8 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
     } catch (e) {
       print('Error downloading PDF on mobile: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Error downloading PDF. Please try again.'),
+        SnackBar(
+          content: Text(l10n.errorDownloadingPdf),
           backgroundColor: Colors.red,
         ),
       );
@@ -711,6 +721,7 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
   }
 
   void _showColorPicker(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     Color currentColor = _parseHexColor(_categoryBackgroundColor);
     Color selectedColor = currentColor; // Local state for the picker
     
@@ -720,7 +731,7 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
-              title: const Text('Pick Category Background Color'),
+              title: Text(l10n.pickCategoryBackgroundColor),
               content: SingleChildScrollView(
                 child: ColorPicker(
                   pickerColor: selectedColor,
@@ -739,13 +750,13 @@ class _PdfMenuGenerationScreenState extends ConsumerState<PdfMenuGenerationScree
               ),
               actions: <Widget>[
                 TextButton(
-                  child: const Text('Cancel'),
+                  child: Text(l10n.cancel),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
                 ),
                 TextButton(
-                  child: const Text('OK'),
+                  child: Text(l10n.ok),
                   onPressed: () {
                     setState(() {
                       // Extract only RGB values (without alpha) and convert to hex

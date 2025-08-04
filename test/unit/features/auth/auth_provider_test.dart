@@ -122,7 +122,7 @@ void main() {
         slug: 'test-business',
         type: BusinessType.restaurant,
         taxRate: 8.5,
-        currency: 'USD',
+        currencyId: 2, // CRC (Costa Rican Colón)
         timezone: 'America/New_York',
         isActive: true,
         createdAt: DateTime.now(),

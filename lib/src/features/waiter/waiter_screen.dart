@@ -15,7 +15,7 @@ class WaiterScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final activeMessagesAsync = ref.watch(activeMessagesProvider);
 
 
@@ -74,7 +74,7 @@ class WaiterScreen extends ConsumerWidget {
   }
 
   Widget _buildWelcomeSection(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return Card(
       elevation: 4,
@@ -194,7 +194,7 @@ class WaiterScreen extends ConsumerWidget {
   }
 
   Widget _buildQuickActions(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -317,7 +317,7 @@ class WaiterScreen extends ConsumerWidget {
     WidgetRef ref,
     AsyncValue<List<StaffMessage>> activeMessagesAsync,
   ) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -387,7 +387,7 @@ class WaiterScreen extends ConsumerWidget {
   }
 
   Widget _buildMessageCard(BuildContext context, WidgetRef ref, StaffMessage message) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     Color cardColor;
     IconData icon;
@@ -522,7 +522,7 @@ class WaiterScreen extends ConsumerWidget {
   }
 
   Widget _buildEmptyMessagesCard(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return Card(
       elevation: 2,
@@ -562,7 +562,7 @@ class WaiterScreen extends ConsumerWidget {
   }
 
   Widget _buildErrorCard(BuildContext context, String error) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return Card(
       elevation: 2,
@@ -601,7 +601,7 @@ class WaiterScreen extends ConsumerWidget {
   }
 
   Widget _buildTodayStats(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -718,7 +718,7 @@ class WaiterScreen extends ConsumerWidget {
   }
 
   Widget _buildRecentOrders(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
