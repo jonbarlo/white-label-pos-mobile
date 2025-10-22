@@ -9,6 +9,7 @@ enum PaymentMethod { cash, card, mobile, check }
 class Sale {
   final String id;
   final List<CartItem>? items;
+  @JsonKey(name: 'totalAmount')
   final double total;
   final PaymentMethod paymentMethod;
   final DateTime createdAt;
@@ -63,40 +64,7 @@ class Sale {
     );
   }
 
-  factory Sale.fromJson(Map<String, dynamic> json) => Sale(
-        id: json['id'].toString(),
-        items: json['items'] != null 
-            ? (json['items'] as List<dynamic>)
-                .map((e) => CartItem.fromJson(e as Map<String, dynamic>))
-                .toList()
-            : null,
-        total: (json['finalAmount'] ?? json['total'] as num).toDouble(),
-        paymentMethod: _parsePaymentMethod(json['paymentMethod']),
-        createdAt: DateTime.parse(json['createdAt'] as String),
-        customerName: json['customerName'] as String?,
-        customerEmail: json['customerEmail'] as String?,
-        receiptNumber: json['receiptNumber'] as String?,
-        status: json['status'] as String?,
-        taxAmount: json['taxAmount'] != null ? (json['taxAmount'] as num).toDouble() : null,
-        discountAmount: json['discountAmount'] != null ? (json['discountAmount'] as num).toDouble() : null,
-      );
-
-  static PaymentMethod _parsePaymentMethod(dynamic value) {
-    if (value == null) return PaymentMethod.cash;
-    final method = value.toString().toLowerCase();
-    switch (method) {
-      case 'cash':
-        return PaymentMethod.cash;
-      case 'card':
-        return PaymentMethod.card;
-      case 'mobile':
-        return PaymentMethod.mobile;
-      case 'check':
-        return PaymentMethod.check;
-      default:
-        return PaymentMethod.cash;
-    }
-  }
+  factory Sale.fromJson(Map<String, dynamic> json) => _$SaleFromJson(json);
 
   Map<String, dynamic> toJson() => _$SaleToJson(this);
 
